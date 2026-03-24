@@ -398,6 +398,123 @@
     padding: 20px;
   }
 
+  .kpi-grid-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .kpi-grid-header h3 {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+
+  .btn-configure {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-configure:hover {
+    color: white;
+    background: rgba(255,255,255,0.08);
+    border-color: var(--text-muted);
+  }
+
+  /* Tile Picker Modal */
+  .tile-picker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 4px;
+  }
+
+  .tile-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .tile-option:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--text-muted);
+  }
+
+  .tile-option.selected {
+    background: rgba(227,24,55,0.1);
+    border-color: var(--primary);
+  }
+
+  .tile-option .tile-check {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: transparent;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .tile-option.selected .tile-check {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+
+  .tile-option .tile-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tile-option .tile-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .tile-option .tile-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .tile-category {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    padding: 12px 4px 6px;
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+
+  .tile-category:first-child {
+    padding-top: 0;
+  }
+
   .kpi-label {
     font-size: 12px;
     text-transform: uppercase;
@@ -801,6 +918,19 @@
   </div>
 </div>
 
+<!-- Tile Picker Modal -->
+<div class="modal-overlay" id="tilePickerModal">
+  <div class="modal" style="width:580px;">
+    <h3>Configure Dashboard Tiles</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Select the metrics you want to display. Changes save automatically.</p>
+    <div class="tile-picker-grid" id="tilePickerGrid"></div>
+    <div class="modal-buttons" style="margin-top:16px;">
+      <button class="btn-cancel" onclick="resetTileDefaults()">Reset Defaults</button>
+      <button class="btn-save" onclick="closeTilePicker()">Done</button>
+    </div>
+  </div>
+</div>
+
 <!-- Upload Zone (shown when no data) -->
 <div id="uploadZone" class="drop-zone">
   <h2>Load Your Data</h2>
@@ -843,6 +973,10 @@
 
   <!-- OVERVIEW TAB -->
   <div class="tab-content active" id="tab-overview">
+    <div class="kpi-grid-header">
+      <h3>Key Metrics</h3>
+      <button class="btn-configure" onclick="openTilePicker()">Configure Tiles</button>
+    </div>
     <div class="kpi-grid" id="overviewKPIs"></div>
     <div class="charts-row">
       <div class="chart-card">
@@ -1579,28 +1713,129 @@ function makeChart(canvasId, config) {
 }
 
 // ============================================================
+// CUSTOMIZABLE TILE ENGINE
+// ============================================================
+const TILE_CATALOG = [
+  // Revenue
+  { id: 'total_revenue',    cat: 'Revenue',      label: 'Total Revenue',        desc: 'Sum of net sales',                 calc: () => { const v = FILTERED.customers.reduce((s,r) => s+(+r.Net_Sales||0),0); return { value: money(v), sub: num(FILTERED.customers.length)+' invoices' }; }},
+  { id: 'avg_ticket',       cat: 'Revenue',      label: 'Avg Ticket',           desc: 'Revenue per invoice',              calc: () => { const c=FILTERED.customers; const v=c.length?c.reduce((s,r)=>s+(+r.Net_Sales||0),0)/c.length:0; return { value: money(v), sub: 'per invoice' }; }},
+  { id: 'service_revenue',  cat: 'Revenue',      label: 'Service Revenue',      desc: 'Revenue from services only',       calc: () => { const v=FILTERED.details.filter(r=>r.Invoice_Detail_Type==='SERVICE').reduce((s,r)=>s+(+r.Extended_Price||0),0); return { value: money(v) }; }},
+  { id: 'product_revenue',  cat: 'Revenue',      label: 'Product Revenue',      desc: 'Revenue from products only',       calc: () => { const v=FILTERED.details.filter(r=>r.Invoice_Detail_Type==='ITEM').reduce((s,r)=>s+(+r.Extended_Price||0),0); return { value: money(v) }; }},
+  { id: 'total_line_rev',   cat: 'Revenue',      label: 'Total Line Revenue',   desc: 'All line item revenue',            calc: () => { const v=FILTERED.details.reduce((s,r)=>s+(+r.Extended_Price||0),0); return { value: money(v) }; }},
+  { id: 'max_ticket',       cat: 'Revenue',      label: 'Highest Ticket',       desc: 'Largest single invoice',           calc: () => { const v=FILTERED.customers.reduce((m,r)=>Math.max(m,+r.Net_Sales||0),0); return { value: money(v) }; }},
+
+  // Volume
+  { id: 'total_invoices',   cat: 'Volume',       label: 'Total Invoices',       desc: 'Number of invoices',               calc: () => ({ value: num(FILTERED.customers.length) })},
+  { id: 'active_stores',    cat: 'Volume',       label: 'Active Stores',        desc: 'Stores with activity',             calc: () => ({ value: String(new Set(FILTERED.customers.map(r=>r.Store_Number)).size), sub: 'in period' })},
+  { id: 'total_qty_sold',   cat: 'Volume',       label: 'Total Qty Sold',       desc: 'Total items sold',                 calc: () => { const v=FILTERED.details.reduce((s,r)=>s+(+r.Quantity_Sold||0),0); return { value: num(Math.round(v)) }; }},
+  { id: 'unique_services',  cat: 'Volume',       label: 'Unique Services',      desc: 'Distinct services sold',           calc: () => ({ value: String(new Set(FILTERED.details.filter(r=>r.Invoice_Detail_Type==='SERVICE').map(r=>r.Invoice_Detail_Description)).size) })},
+
+  // Promotions
+  { id: 'promo_discounts',  cat: 'Promotions',   label: 'Promo Discounts',      desc: 'Total discount amount',            calc: () => { const p=FILTERED.promos; const v=p.reduce((s,r)=>s+(+r.Promo_Amount||0),0); return { value: money(v), sub: num(p.length)+' uses' }; }},
+  { id: 'promo_uses',       cat: 'Promotions',   label: 'Promo Uses',           desc: 'Total promo redemptions',          calc: () => ({ value: num(FILTERED.promos.length) })},
+  { id: 'avg_discount',     cat: 'Promotions',   label: 'Avg Discount',         desc: 'Average promo discount',           calc: () => { const p=FILTERED.promos; const v=p.length?p.reduce((s,r)=>s+(+r.Promo_Amount||0),0)/p.length:0; return { value: money(v), sub: 'per use' }; }},
+  { id: 'unique_promos',    cat: 'Promotions',   label: 'Unique Promos',        desc: 'Distinct promo codes used',        calc: () => ({ value: String(new Set(FILTERED.promos.map(r=>r.Promo_Code)).size) })},
+
+  // Inspections
+  { id: 'insp_total',       cat: 'Inspections',  label: 'Inspection Items',     desc: 'Total items inspected',            calc: () => ({ value: num(FILTERED.inspections.length), sub: 'checked' })},
+  { id: 'insp_green_pct',   cat: 'Inspections',  label: 'Green Rate',           desc: '% of inspections passing',         calc: () => { const i=FILTERED.inspections; const g=i.filter(r=>r.Inspection_Status==='Green').length; return { value: pct(i.length?g/i.length*100:0), sub: num(g)+' green' }; }},
+  { id: 'insp_needs_attn',  cat: 'Inspections',  label: 'Needs Attention',      desc: 'Yellow + Orange + Red items',      calc: () => { const i=FILTERED.inspections; const v=i.filter(r=>r.Inspection_Status==='Yellow'||r.Inspection_Status==='Orange'||r.Inspection_Status==='Red').length; return { value: num(v) }; }},
+  { id: 'insp_conversion',  cat: 'Inspections',  label: 'Upsell Conversion',    desc: 'Purchased / needs attention',      calc: () => { const i=FILTERED.inspections; const bad=i.filter(r=>r.Inspection_Status==='Yellow'||r.Inspection_Status==='Orange'||r.Inspection_Status==='Red'); const bought=bad.filter(r=>r.Purchased_This_Visit==='True').length; return { value: pct(bad.length?bought/bad.length*100:0), sub: num(bought)+' sold' }; }},
+  { id: 'insp_purchased',   cat: 'Inspections',  label: 'Items Purchased',      desc: 'Inspection items bought this visit', calc: () => ({ value: num(FILTERED.inspections.filter(r=>r.Purchased_This_Visit==='True').length) })},
+
+  // Operations
+  { id: 'avg_bay_time',     cat: 'Operations',   label: 'Avg Bay Time',         desc: 'Average minutes in bay',           calc: () => { const t=[]; FILTERED.customers.forEach(r=>{ const m=diffMinutes(r.Bay_Start_Time,r.Bay_End_Time); if(m!==null&&m>0&&m<180) t.push(m); }); return { value: t.length?(t.reduce((a,b)=>a+b,0)/t.length).toFixed(1)+' min':'--' }; }},
+  { id: 'avg_wait_time',    cat: 'Operations',   label: 'Avg Wait Time',        desc: 'Greet to bay start',               calc: () => { const t=[]; FILTERED.customers.forEach(r=>{ const m=diffMinutes(r.Greet_Time,r.Bay_Start_Time); if(m!==null&&m>=0&&m<120) t.push(m); }); return { value: t.length?(t.reduce((a,b)=>a+b,0)/t.length).toFixed(1)+' min':'--' }; }},
+  { id: 'vehicles_serviced',cat: 'Operations',   label: 'Vehicles Serviced',    desc: 'Total vehicles in period',         calc: () => ({ value: num(FILTERED.customers.length) })},
+  { id: 'unique_makes',     cat: 'Operations',   label: 'Unique Makes',         desc: 'Distinct vehicle makes',           calc: () => ({ value: String(new Set(FILTERED.customers.filter(r=>r.ChekChart_Make).map(r=>r.ChekChart_Make)).size) })},
+
+  // Customers
+  { id: 'email_capture',    cat: 'Customers',    label: 'Email Capture',        desc: '% with email on file',             calc: () => { const c=FILTERED.customers; const e=c.filter(r=>r.Customer_Email_Address&&r.Customer_Email_Address.trim()).length; return { value: pct(c.length?e/c.length*100:0), sub: num(e)+' emails' }; }},
+  { id: 'phone_capture',    cat: 'Customers',    label: 'Phone Capture',        desc: '% with phone on file',             calc: () => { const c=FILTERED.customers; const p=c.filter(r=>r.Customer_Phone_Number&&r.Customer_Phone_Number.trim()).length; return { value: pct(c.length?p/c.length*100:0), sub: num(p)+' phones' }; }},
+  { id: 'biz_accounts',     cat: 'Customers',    label: 'Business Accounts',    desc: 'Distinct fleet/corporate accts',   calc: () => ({ value: String(new Set(FILTERED.customers.filter(r=>r.Business_Account_ID&&r.Business_Account_ID.trim()).map(r=>r.Business_Account_ID)).size), sub: 'fleet / corporate' })},
+  { id: 'states_served',    cat: 'Customers',    label: 'States Served',        desc: 'Distinct customer states',         calc: () => ({ value: String(new Set(FILTERED.customers.filter(r=>r.Customer_State).map(r=>r.Customer_State)).size) })},
+  { id: 'cities_served',    cat: 'Customers',    label: 'Cities Served',        desc: 'Distinct customer cities',         calc: () => ({ value: String(new Set(FILTERED.customers.filter(r=>r.City&&r.City.trim()&&r.City!=='NA').map(r=>r.City)).size) })},
+];
+
+const DEFAULT_TILES = ['total_revenue','avg_ticket','active_stores','promo_discounts','insp_total'];
+
+function getSelectedTiles() {
+  const stored = localStorage.getItem('bp_tiles');
+  if (stored) {
+    try { return JSON.parse(stored); } catch(e) {}
+  }
+  return [...DEFAULT_TILES];
+}
+
+function saveSelectedTiles(ids) {
+  localStorage.setItem('bp_tiles', JSON.stringify(ids));
+}
+
+function renderCustomTiles() {
+  const selected = getSelectedTiles();
+  const html = selected.map(id => {
+    const tile = TILE_CATALOG.find(t => t.id === id);
+    if (!tile) return '';
+    const result = tile.calc();
+    return `<div class="kpi-card"><div class="kpi-label">${tile.label}</div><div class="kpi-value">${result.value}</div>${result.sub ? '<div class="kpi-sub">'+result.sub+'</div>' : ''}</div>`;
+  }).join('');
+  document.getElementById('overviewKPIs').innerHTML = html;
+}
+
+function openTilePicker() {
+  const selected = getSelectedTiles();
+  const cats = [...new Set(TILE_CATALOG.map(t => t.cat))];
+  let html = '';
+  cats.forEach(cat => {
+    html += `<div class="tile-category">${cat}</div>`;
+    TILE_CATALOG.filter(t => t.cat === cat).forEach(t => {
+      const sel = selected.includes(t.id) ? ' selected' : '';
+      html += `<div class="tile-option${sel}" data-tile-id="${t.id}" onclick="toggleTile(this)">
+        <div class="tile-check">&#10003;</div>
+        <div class="tile-info">
+          <div class="tile-name">${t.label}</div>
+          <div class="tile-desc">${t.desc}</div>
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('tilePickerGrid').innerHTML = html;
+  document.getElementById('tilePickerModal').classList.add('active');
+}
+
+function toggleTile(el) {
+  el.classList.toggle('selected');
+  saveTileSelection();
+}
+
+function saveTileSelection() {
+  const selected = [];
+  document.querySelectorAll('#tilePickerGrid .tile-option.selected').forEach(el => {
+    selected.push(el.dataset.tileId);
+  });
+  saveSelectedTiles(selected);
+  renderCustomTiles();
+}
+
+function closeTilePicker() {
+  document.getElementById('tilePickerModal').classList.remove('active');
+}
+
+function resetTileDefaults() {
+  saveSelectedTiles([...DEFAULT_TILES]);
+  renderCustomTiles();
+  openTilePicker(); // refresh the picker UI
+}
+
+document.getElementById('tilePickerModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('tilePickerModal')) closeTilePicker();
+});
+
+// ============================================================
 // OVERVIEW TAB
 // ============================================================
 function renderOverview() {
-  const cust = FILTERED.customers;
-  const det = FILTERED.details;
-  const promo = FILTERED.promos;
-  const insp = FILTERED.inspections;
-
-  const totalRev = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
-  const totalInv = cust.length;
-  const avgTicket = totalInv ? totalRev / totalInv : 0;
-  const uniqueStores = new Set(cust.map(r => r.Store_Number)).size;
-  const totalPromoDisc = promo.reduce((s, r) => s + (+r.Promo_Amount || 0), 0);
-  const inspCount = insp.length;
-
-  document.getElementById('overviewKPIs').innerHTML = `
-    <div class="kpi-card"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${money(totalRev)}</div><div class="kpi-sub">${num(totalInv)} invoices</div></div>
-    <div class="kpi-card"><div class="kpi-label">Avg Ticket</div><div class="kpi-value">${money(avgTicket)}</div><div class="kpi-sub">per invoice</div></div>
-    <div class="kpi-card"><div class="kpi-label">Active Stores</div><div class="kpi-value">${uniqueStores}</div><div class="kpi-sub">in period</div></div>
-    <div class="kpi-card"><div class="kpi-label">Promo Discounts</div><div class="kpi-value">${money(totalPromoDisc)}</div><div class="kpi-sub">${num(promo.length)} uses</div></div>
-    <div class="kpi-card"><div class="kpi-label">Inspection Items</div><div class="kpi-value">${num(inspCount)}</div><div class="kpi-sub">checked</div></div>
-  `;
+  renderCustomTiles();
 
   // Revenue by date
   const revByDate = {};
