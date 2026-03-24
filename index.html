@@ -77,31 +77,19 @@
   .client-badge {
     background: rgba(227,24,55,0.15);
     border: 1px solid rgba(227,24,55,0.3);
-    padding: 6px 16px;
-    border-radius: 20px;
+    padding: 10px 20px;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
     color: var(--primary);
     cursor: pointer;
     transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
 
   .client-badge:hover {
-    background: rgba(227,24,55,0.25);
+    background: rgba(227,24,55,0.3);
     border-color: var(--primary);
-  }
-
-  .client-badge .edit-icon {
-    font-size: 11px;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .client-badge:hover .edit-icon {
-    opacity: 1;
+    transform: scale(1.02);
   }
 
   /* Settings Modal */
@@ -370,19 +358,27 @@
   }
 
   .tab {
-    padding: 10px 20px;
+    padding: 12px 24px;
     background: transparent;
     border: none;
     color: var(--text-muted);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    transition: all 0.15s;
   }
 
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: rgba(227,24,55,0.05);
+  }
 
   .tab-content { display: none; }
   .tab-content.active { display: block; }
@@ -400,13 +396,6 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
-    transition: all 0.2s;
-  }
-
-  .kpi-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   }
 
   .kpi-label {
@@ -503,15 +492,23 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
 
-  thead th.sortable { cursor: pointer; }
-  thead th.sortable:hover { color: var(--primary); }
+  thead th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  thead th.sortable:hover {
+    color: white;
+    background: rgba(255,255,255,0.06);
+  }
 
   tbody td {
     padding: 8px 14px;
     border-bottom: 1px solid rgba(255,255,255,0.03);
   }
 
-  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody tr:hover { background: rgba(255,255,255,0.04); }
 
   .status-dot {
     display: inline-block;
@@ -538,19 +535,21 @@
     background: var(--card);
     color: var(--text);
     border: 1px solid var(--border);
-    padding: 8px 16px;
-    border-radius: 6px;
+    padding: 10px 20px;
+    border-radius: 8px;
     font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: all 0.2s;
+    transition: all 0.15s;
   }
 
   .btn-export:hover {
     border-color: var(--primary);
-    color: var(--primary);
+    color: white;
+    background: rgba(227,24,55,0.15);
   }
 
   /* Customer Detail Modal */
@@ -597,19 +596,24 @@
   }
 
   .cust-modal-close {
-    background: none;
-    border: none;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
     color: var(--text-muted);
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: all 0.2s;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.15s;
   }
 
   .cust-modal-close:hover {
-    color: var(--primary);
-    background: rgba(255,255,255,0.05);
+    color: white;
+    background: var(--primary);
+    border-color: var(--primary);
   }
 
   .cust-modal-body {
@@ -707,11 +711,21 @@
 
   tbody tr.clickable-row {
     cursor: pointer;
-    transition: background 0.15s;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
   }
 
   tbody tr.clickable-row:hover {
-    background: rgba(227,24,55,0.08);
+    background: rgba(227,24,55,0.12);
+    border-left-color: var(--primary);
+  }
+
+  tbody tr.clickable-row td:first-child {
+    padding-left: 11px;
+  }
+
+  tbody tr.clickable-row:active {
+    background: rgba(227,24,55,0.2);
   }
 
   /* Responsive */
@@ -748,9 +762,8 @@
     </div>
   </div>
   <div class="header-right">
-    <div class="client-badge" id="clientBadge" onclick="openSettings()" title="Click to edit">
+    <div class="client-badge" id="clientBadge" onclick="openSettings()">
       <span id="clientBadgeText">Click to set client</span>
-      <span class="edit-icon">&#9998;</span>
     </div>
     <div id="dateRange" style="font-size:12px;color:var(--text-muted);"></div>
   </div>
