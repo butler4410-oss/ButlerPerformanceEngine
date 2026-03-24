@@ -1110,7 +1110,7 @@
     </div>
     <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Gmail Integration (EmailJS)</div>
-    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Sends emails directly from your Gmail. Free at <a href="https://www.emailjs.com" target="_blank" style="color:var(--primary);">emailjs.com</a> — sign up, connect Gmail, create a template with variables: <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{to_email}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{subject}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{message}}</code></p>
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect chase@butleranalytics.io via <a href="https://www.emailjs.com" target="_blank" style="color:var(--primary);">emailjs.com</a> (free 200/mo). Create a template with: <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{to_email}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{from_name}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{subject}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{message}}</code></p>
     <div class="form-group">
       <label>EmailJS Public Key</label>
       <input type="text" id="settingEjsKey" placeholder="e.g. abc123XYZ">
@@ -3770,7 +3770,7 @@ function emailHandoff() {
   }
   body += 'Checklist Status: ' + checkedItems + '/' + totalItems + ' complete\n\n';
   body += 'Please confirm:\n- Production timeline\n- Any questions\n- Proof delivery date\n\n';
-  body += 'Best,\n';
+  body += 'Best,\nChase Butler\nDirector of Business Development\nchase@butleranalytics.io\n(706) 676-5110\n';
 
   const to = 'tim@triadex.com, ryan@triadex.com, riley@triadex.com';
 
@@ -3781,7 +3781,7 @@ function emailHandoff() {
       alert('Failed: ' + (err?.text || err?.message || 'Check Settings.'));
     });
   } else {
-    window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + '&cc=' + encodeURIComponent('cbutler@matriximaging.com'), '_self');
+    window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + '&cc=' + encodeURIComponent('chase@butleranalytics.io'), '_self');
   }
 }
 
@@ -4676,6 +4676,9 @@ function sendViaEmailJS(to, subject, message) {
   const templateId = localStorage.getItem('bp_ejs_template');
   return emailjs.send(serviceId, templateId, {
     to_email: to,
+    from_email: 'chase@butleranalytics.io',
+    from_name: 'Chase Butler — Butler Performance',
+    reply_to: 'chase@butleranalytics.io',
     subject: subject,
     message: message
   });
@@ -4738,9 +4741,12 @@ function testEmailSetup() {
   if (typeof emailjs !== 'undefined') {
     emailjs.init(key);
     emailjs.send(service, template, {
-      to_email: 'test@test.com',
+      to_email: 'chase@butleranalytics.io',
+      from_email: 'chase@butleranalytics.io',
+      from_name: 'Chase Butler — Butler Performance',
+      reply_to: 'chase@butleranalytics.io',
       subject: 'Butler Performance - Test Connection',
-      message: 'This is a test email from Butler Performance Analytics Engine. If you received this, your Gmail integration is working.'
+      message: 'This is a test email from Butler Performance Analytics Engine. If you received this, your Gmail integration is working correctly.\n\n— Chase Butler\nchase@butleranalytics.io'
     }).then(() => {
       resultEl.innerHTML = '<span style="color:var(--green);">Connection successful! Gmail is ready to send.</span>';
     }).catch(err => {
