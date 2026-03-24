@@ -396,6 +396,22 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
+    cursor: grab;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+
+  .kpi-card:active { cursor: grabbing; }
+
+  .kpi-card.dragging {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+
+  .kpi-card.drag-over {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(227,24,55,0.3);
+    transform: scale(1.02);
   }
 
   .kpi-grid-header {
@@ -1853,13 +1869,57 @@ function saveSelectedTiles(ids) {
 
 function renderCustomTiles() {
   const selected = getSelectedTiles();
-  const html = selected.map(id => {
+  const html = selected.map((id, idx) => {
     const tile = TILE_CATALOG.find(t => t.id === id);
     if (!tile) return '';
     const result = tile.calc();
-    return `<div class="kpi-card"><div class="kpi-label">${tile.label}</div><div class="kpi-value">${result.value}</div>${result.sub ? '<div class="kpi-sub">'+result.sub+'</div>' : ''}</div>`;
+    return `<div class="kpi-card" draggable="true" data-tile-idx="${idx}" data-tile-id="${id}"><div class="kpi-label">${tile.label}</div><div class="kpi-value">${result.value}</div>${result.sub ? '<div class="kpi-sub">'+result.sub+'</div>' : ''}</div>`;
   }).join('');
   document.getElementById('overviewKPIs').innerHTML = html;
+  initTileDrag();
+}
+
+let dragTileIdx = null;
+
+function initTileDrag() {
+  const grid = document.getElementById('overviewKPIs');
+  const cards = grid.querySelectorAll('.kpi-card');
+
+  cards.forEach(card => {
+    card.addEventListener('dragstart', (e) => {
+      dragTileIdx = +card.dataset.tileIdx;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      grid.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('drag-over'));
+      dragTileIdx = null;
+    });
+
+    card.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      card.classList.add('drag-over');
+    });
+
+    card.addEventListener('dragleave', () => {
+      card.classList.remove('drag-over');
+    });
+
+    card.addEventListener('drop', (e) => {
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      const dropIdx = +card.dataset.tileIdx;
+      if (dragTileIdx === null || dragTileIdx === dropIdx) return;
+      const tiles = getSelectedTiles();
+      const moved = tiles.splice(dragTileIdx, 1)[0];
+      tiles.splice(dropIdx, 0, moved);
+      saveSelectedTiles(tiles);
+      renderCustomTiles();
+    });
+  });
 }
 
 function openTilePicker() {
