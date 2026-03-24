@@ -1737,6 +1737,59 @@
       </div>
     </div>
 
+    <!-- Offer Configurator -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;background:rgba(68,138,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);font-weight:800;">&#9998;</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:white;">Offer Configurator</div>
+            <div style="font-size:11px;color:var(--text-muted);">Select postcard format and define offers for each card slot</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:24px;">
+        <!-- Step 1: Postcard Size + Layout -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+          <div class="form-group">
+            <label>Postcard Size</label>
+            <select id="offerSize" onchange="updateLayoutOptions()">
+              <option value="standard">Standard (6" x 4.25")</option>
+              <option value="medium">Medium (8.5" x 5.5")</option>
+              <option value="jumbo">Jumbo (11" x 6")</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Card Layout</label>
+            <select id="offerLayout" onchange="renderOfferSlots()">
+            </select>
+          </div>
+        </div>
+
+        <!-- Visual Preview + Offer Inputs -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <!-- Left: Visual Preview -->
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;">Front Preview</div>
+            <div id="postcardPreview" style="background:#f5f5f0;border-radius:12px;border:2px solid var(--border);position:relative;overflow:hidden;aspect-ratio:6/4.25;">
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:8px;text-align:center;">Dashed = card die-cut area &middot; Cards are plastic pop-out</div>
+          </div>
+          <!-- Right: Offer Slot Forms -->
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;">Offer Details</div>
+            <div id="offerSlotsForm"></div>
+          </div>
+        </div>
+
+        <!-- Save -->
+        <div style="margin-top:20px;display:flex;gap:10px;align-items:center;">
+          <button class="btn-save" onclick="saveOfferConfig()" style="padding:12px 28px;border-radius:10px;">Save Offer Configuration</button>
+          <span id="offerSaveStatus" style="font-size:12px;color:var(--text-muted);"></span>
+        </div>
+      </div>
+    </div>
+
     <!-- Active Campaigns -->
     <div class="table-wrap">
       <h3 style="display:flex;align-items:center;justify-content:space-between;">
@@ -3717,6 +3770,7 @@ function renderMarketing() {
   updateChecklistSidebar();
 
   renderCampaignTable();
+  initOfferConfigurator();
   renderHandoffChecklist();
 }
 
@@ -3850,6 +3904,170 @@ function generateSuppression() {
   URL.revokeObjectURL(a.href);
 
   alert('Suppression file generated: ' + num(rows.length - 1) + ' unique addresses' + (selectedStores.length ? ' for store(s) #' + selectedStores.join(', #') : '') + '.');
+}
+
+// ============================================================
+// OFFER CONFIGURATOR
+// ============================================================
+const POSTCARD_LAYOUTS = {
+  standard: [
+    { id: 'std-none', name: 'No Card', cards: 0 },
+    { id: 'std-1h', name: '1 Horizontal Card', cards: 1, slots: [{ x:52, y:2, w:46, h:48, label:'H' }] },
+    { id: 'std-1v', name: '1 Vertical Card', cards: 1, slots: [{ x:2, y:2, w:38, h:96, label:'V' }] },
+    { id: 'std-2hs', name: '2 Horizontal Small Cards', cards: 2, slots: [{ x:2, y:2, w:46, h:46, label:'1' },{ x:52, y:2, w:46, h:46, label:'2' }] },
+    { id: 'std-2vs', name: '2 Vertical Small Cards', cards: 2, slots: [{ x:2, y:2, w:30, h:96, label:'1' },{ x:34, y:2, w:30, h:96, label:'2' }] },
+    { id: 'std-3hs', name: '3 Horizontal Small Cards', cards: 3, slots: [{ x:2, y:2, w:30, h:46, label:'1' },{ x:34, y:2, w:30, h:46, label:'2' },{ x:66, y:2, w:30, h:46, label:'3' }] },
+    { id: 'std-4s', name: '4 Small Cards', cards: 4, slots: [{ x:2, y:2, w:46, h:46, label:'1' },{ x:52, y:2, w:46, h:46, label:'2' },{ x:2, y:52, w:46, h:46, label:'3' },{ x:52, y:52, w:46, h:46, label:'4' }] },
+    { id: 'std-2kt', name: '2 Horizontal Keytags', cards: 2, slots: [{ x:52, y:4, w:44, h:22, label:'1' },{ x:52, y:30, w:44, h:22, label:'2' }] },
+  ],
+  medium: [
+    { id: 'med-none', name: 'No Card', cards: 0 },
+    { id: 'med-1h', name: '1 Horizontal Card', cards: 1, slots: [{ x:52, y:2, w:46, h:48, label:'H' }] },
+    { id: 'med-1v', name: '1 Vertical Card', cards: 1, slots: [{ x:2, y:2, w:35, h:96, label:'V' }] },
+    { id: 'med-2v', name: '2 Vertical Cards', cards: 2, slots: [{ x:2, y:2, w:30, h:96, label:'1' },{ x:34, y:2, w:30, h:96, label:'2' }] },
+    { id: 'med-3h', name: '3 Horizontal Cards', cards: 3, slots: [{ x:2, y:2, w:30, h:46, label:'1' },{ x:34, y:2, w:30, h:46, label:'2' },{ x:66, y:2, w:30, h:46, label:'3' }] },
+    { id: 'med-4h', name: '4 Horizontal Cards', cards: 4, slots: [{ x:2, y:2, w:46, h:46, label:'1' },{ x:52, y:2, w:46, h:46, label:'2' },{ x:2, y:52, w:46, h:46, label:'3' },{ x:52, y:52, w:46, h:46, label:'4' }] },
+    { id: 'med-4s', name: '4 Small Cards', cards: 4, slots: [{ x:2, y:2, w:46, h:46, label:'1' },{ x:52, y:2, w:46, h:46, label:'2' },{ x:2, y:52, w:46, h:46, label:'3' },{ x:52, y:52, w:46, h:46, label:'4' }] },
+  ],
+  jumbo: [
+    { id: 'jmb-none', name: 'No Card', cards: 0 },
+    { id: 'jmb-1h', name: '1 Horizontal Card', cards: 1, slots: [{ x:52, y:4, w:44, h:46, label:'H' }] },
+    { id: 'jmb-2h', name: '2 Horizontal Cards', cards: 2, slots: [{ x:52, y:2, w:46, h:46, label:'1' },{ x:2, y:54, w:46, h:44, label:'2' }] },
+    { id: 'jmb-2hs', name: '2 Horizontal Stacked Cards', cards: 2, slots: [{ x:52, y:4, w:44, h:44, label:'1' },{ x:52, y:52, w:44, h:44, label:'2' }] },
+  ]
+};
+
+const ASPECT_RATIOS = { standard: '6/4.25', medium: '8.5/5.5', jumbo: '11/6' };
+
+function getOfferConfig() {
+  try { return JSON.parse(localStorage.getItem('bp_offers') || '{}'); } catch(e) { return {}; }
+}
+function saveOfferConfigData(data) { localStorage.setItem('bp_offers', JSON.stringify(data)); }
+
+function updateLayoutOptions() {
+  const size = document.getElementById('offerSize').value;
+  const sel = document.getElementById('offerLayout');
+  const layouts = POSTCARD_LAYOUTS[size] || [];
+  sel.innerHTML = layouts.map(l => `<option value="${l.id}">${l.name} ${l.cards ? '(' + l.cards + ' card' + (l.cards > 1 ? 's' : '') + ')' : ''}</option>`).join('');
+  renderOfferSlots();
+}
+
+function getCurrentLayout() {
+  const size = document.getElementById('offerSize').value;
+  const layoutId = document.getElementById('offerLayout').value;
+  const layouts = POSTCARD_LAYOUTS[size] || [];
+  return layouts.find(l => l.id === layoutId) || layouts[0];
+}
+
+function renderOfferSlots() {
+  const layout = getCurrentLayout();
+  const size = document.getElementById('offerSize').value;
+  const saved = getOfferConfig();
+
+  // Update preview aspect ratio
+  const preview = document.getElementById('postcardPreview');
+  preview.style.aspectRatio = ASPECT_RATIOS[size] || '6/4.25';
+
+  if (!layout || layout.cards === 0) {
+    preview.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#888;font-size:14px;font-style:italic;">No card slots — full design area</div>';
+    document.getElementById('offerSlotsForm').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;">This layout has no pop-out cards. The full postcard is a design area.</div>';
+    return;
+  }
+
+  // Render preview
+  let previewHTML = '<div style="position:absolute;inset:8%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#bbb;z-index:0;">POSTCARD DESIGN AREA</div>';
+  (layout.slots || []).forEach((slot, i) => {
+    const offer = saved[layout.id + '-' + i] || {};
+    const hasOffer = offer.title || offer.discount;
+    previewHTML += `<div style="position:absolute;left:${slot.x}%;top:${slot.y}%;width:${slot.w}%;height:${slot.h}%;border:2px dashed ${hasOffer ? '#e31837' : '#999'};border-radius:8px;background:${hasOffer ? 'rgba(227,24,55,0.08)' : 'rgba(0,0,0,0.03)'};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;z-index:1;overflow:hidden;">
+      ${hasOffer ?
+        '<div style="font-size:clamp(8px,1.5vw,13px);font-weight:800;color:#e31837;text-align:center;line-height:1.2;">' + (offer.discount || '') + '</div>' +
+        '<div style="font-size:clamp(6px,1vw,9px);color:#333;text-align:center;margin-top:2px;line-height:1.2;">' + (offer.title || '') + '</div>'
+        :
+        '<div style="font-size:clamp(8px,1.2vw,12px);color:#aaa;font-weight:600;">CARD ' + slot.label + '</div>'
+      }
+    </div>`;
+  });
+  preview.innerHTML = previewHTML;
+
+  // Render form slots
+  let formHTML = '';
+  (layout.slots || []).forEach((slot, i) => {
+    const offer = saved[layout.id + '-' + i] || {};
+    formHTML += `<div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="width:28px;height:28px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;">${slot.label}</div>
+        <div style="font-size:13px;font-weight:600;color:white;">Card ${slot.label} Offer</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="form-group" style="margin-bottom:8px;"><label>Offer Title</label><input type="text" class="offer-input" data-slot="${layout.id}-${i}" data-field="title" value="${(offer.title||'').replace(/"/g,'&quot;')}" placeholder="e.g. Signature Service" oninput="onOfferInput()"></div>
+        <div class="form-group" style="margin-bottom:8px;"><label>Discount / Deal</label><input type="text" class="offer-input" data-slot="${layout.id}-${i}" data-field="discount" value="${(offer.discount||'').replace(/"/g,'&quot;')}" placeholder="e.g. $15 OFF" oninput="onOfferInput()"></div>
+        <div class="form-group" style="margin-bottom:0;"><label>Fine Print / Terms</label><input type="text" class="offer-input" data-slot="${layout.id}-${i}" data-field="terms" value="${(offer.terms||'').replace(/"/g,'&quot;')}" placeholder="e.g. New customers only"></div>
+        <div class="form-group" style="margin-bottom:0;"><label>Coupon Code</label><input type="text" class="offer-input" data-slot="${layout.id}-${i}" data-field="code" value="${(offer.code||'').replace(/"/g,'&quot;')}" placeholder="e.g. SPRING15"></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('offerSlotsForm').innerHTML = formHTML;
+}
+
+function onOfferInput() {
+  // Auto-save as they type + update preview
+  const saved = getOfferConfig();
+  document.querySelectorAll('.offer-input').forEach(inp => {
+    const slot = inp.dataset.slot;
+    const field = inp.dataset.field;
+    if (!saved[slot]) saved[slot] = {};
+    saved[slot][field] = inp.value;
+  });
+  saveOfferConfigData(saved);
+  // Update preview only
+  const layout = getCurrentLayout();
+  if (!layout || !layout.slots) return;
+  const preview = document.getElementById('postcardPreview');
+  const size = document.getElementById('offerSize').value;
+  let previewHTML = '<div style="position:absolute;inset:8%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#bbb;z-index:0;">POSTCARD DESIGN AREA</div>';
+  (layout.slots || []).forEach((slot, i) => {
+    const offer = saved[layout.id + '-' + i] || {};
+    const hasOffer = offer.title || offer.discount;
+    previewHTML += `<div style="position:absolute;left:${slot.x}%;top:${slot.y}%;width:${slot.w}%;height:${slot.h}%;border:2px dashed ${hasOffer ? '#e31837' : '#999'};border-radius:8px;background:${hasOffer ? 'rgba(227,24,55,0.08)' : 'rgba(0,0,0,0.03)'};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;z-index:1;overflow:hidden;">
+      ${hasOffer ?
+        '<div style="font-size:clamp(8px,1.5vw,13px);font-weight:800;color:#e31837;text-align:center;line-height:1.2;">' + (offer.discount || '') + '</div>' +
+        '<div style="font-size:clamp(6px,1vw,9px);color:#333;text-align:center;margin-top:2px;line-height:1.2;">' + (offer.title || '') + '</div>' +
+        (offer.code ? '<div style="font-size:clamp(5px,0.8vw,7px);color:#666;margin-top:2px;font-family:monospace;">' + offer.code + '</div>' : '')
+        :
+        '<div style="font-size:clamp(8px,1.2vw,12px);color:#aaa;font-weight:600;">CARD ' + slot.label + '</div>'
+      }
+    </div>`;
+  });
+  preview.innerHTML = previewHTML;
+}
+
+function saveOfferConfig() {
+  const saved = getOfferConfig();
+  document.querySelectorAll('.offer-input').forEach(inp => {
+    const slot = inp.dataset.slot;
+    const field = inp.dataset.field;
+    if (!saved[slot]) saved[slot] = {};
+    saved[slot][field] = inp.value;
+  });
+  saved._size = document.getElementById('offerSize').value;
+  saved._layout = document.getElementById('offerLayout').value;
+  saveOfferConfigData(saved);
+  const el = document.getElementById('offerSaveStatus');
+  el.textContent = 'Saved!';
+  el.style.color = 'var(--green)';
+  setTimeout(() => { el.textContent = ''; }, 2000);
+}
+
+// Initialize layout on first render
+function initOfferConfigurator() {
+  const saved = getOfferConfig();
+  if (saved._size) document.getElementById('offerSize').value = saved._size;
+  updateLayoutOptions();
+  if (saved._layout) {
+    document.getElementById('offerLayout').value = saved._layout;
+    renderOfferSlots();
+  }
 }
 
 function renderHandoffChecklist() {
