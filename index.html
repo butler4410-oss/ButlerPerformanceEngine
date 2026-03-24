@@ -861,6 +861,106 @@
     background: rgba(227,24,55,0.2);
   }
 
+  /* Alert Banner */
+  .alert-banner {
+    display: none;
+    background: rgba(255,145,0,0.1);
+    border: 1px solid rgba(255,145,0,0.3);
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .alert-banner:hover {
+    background: rgba(255,145,0,0.15);
+    border-color: var(--orange);
+  }
+
+  .alert-banner.has-alerts { display: flex; align-items: center; gap: 14px; }
+
+  .alert-banner .alert-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,145,0,0.2);
+    border-radius: 8px;
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  .alert-banner .alert-text {
+    flex: 1;
+  }
+
+  .alert-banner .alert-count {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--orange);
+  }
+
+  .alert-banner .alert-summary {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .alert-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  .alert-item.severity-critical {
+    border-color: var(--red);
+    background: rgba(255,23,68,0.06);
+  }
+
+  .alert-item.severity-warning {
+    border-color: var(--orange);
+    background: rgba(255,145,0,0.06);
+  }
+
+  .alert-item.severity-info {
+    border-color: var(--blue);
+    background: rgba(68,138,255,0.06);
+  }
+
+  .alert-severity {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .alert-severity.critical { background: var(--red); }
+  .alert-severity.warning { background: var(--orange); }
+  .alert-severity.info { background: var(--blue); }
+
+  .alert-rule-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .alert-rule-row .rule-text { flex: 1; }
+
   /* Responsive */
   @media (max-width: 900px) {
     .charts-row { grid-template-columns: 1fr; }
@@ -897,6 +997,7 @@
     </div>
   </div>
   <div class="header-right">
+    <button class="btn-configure" id="alertsBtn" onclick="openAlerts()" style="border-color:var(--orange);color:var(--orange);">Alerts</button>
     <button class="btn-configure" onclick="openScheduler()" style="border-color:var(--primary);color:var(--primary);">Scheduled Reports</button>
     <div class="client-badge" id="clientBadge" onclick="openSettings()">
       <span id="clientBadgeText">Click to set client</span>
@@ -1021,6 +1122,62 @@
   </div>
 </div>
 
+<!-- Alerts Modal -->
+<div class="modal-overlay" id="alertsModal">
+  <div class="modal" style="width:700px;">
+    <h3>Performance Alerts</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Configure store-level thresholds. When data is loaded, stores that breach these thresholds trigger alerts.</p>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Alert Recipients</div>
+      <div id="alertRecipientsList"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <input type="text" id="alertRecipName" placeholder="Name (e.g. Andrew)" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;">
+        <input type="email" id="alertRecipEmail" placeholder="Email" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;">
+        <button class="btn-save" onclick="addAlertRecipient()" style="padding:8px 14px;font-size:12px;">Add</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Alert Rules</div>
+      <div id="alertRulesList"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <select id="alertMetric" style="flex:2;min-width:160px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <option value="avg_ticket">Avg Ticket</option>
+          <option value="revenue">Revenue</option>
+          <option value="invoice_count">Invoice Count</option>
+          <option value="avg_bay_time">Avg Bay Time (min)</option>
+          <option value="promo_discount_pct">Promo Discount % of Rev</option>
+          <option value="insp_conversion">Inspection Conversion %</option>
+          <option value="email_capture">Email Capture %</option>
+          <option value="yellow_red_pct">Yellow/Red Inspection %</option>
+        </select>
+        <select id="alertOperator" style="width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <option value="lt">Below</option>
+          <option value="gt">Above</option>
+        </select>
+        <input type="number" id="alertThreshold" placeholder="Value" style="width:100px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;">
+        <select id="alertSeverity" style="width:110px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <option value="critical">Critical</option>
+          <option value="warning" selected>Warning</option>
+          <option value="info">Info</option>
+        </select>
+        <button class="btn-save" onclick="addAlertRule()" style="padding:8px 14px;font-size:12px;">Add Rule</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Triggered Alerts</div>
+      <div id="triggeredAlertsList"></div>
+    </div>
+
+    <div class="modal-buttons">
+      <button class="btn-cancel" onclick="closeAlerts()">Close</button>
+      <button class="btn-save" onclick="sendAllAlerts()">Send All Alerts</button>
+    </div>
+  </div>
+</div>
+
 <!-- Upload Zone (shown when no data) -->
 <div id="uploadZone" class="drop-zone">
   <h2>Load Your Data</h2>
@@ -1048,6 +1205,15 @@
     </div>
     <button class="btn-apply" onclick="applyFilters()">Apply Filters</button>
     <button class="btn-reset" onclick="resetFilters()">Reset</button>
+  </div>
+
+  <!-- Alert Banner -->
+  <div class="alert-banner" id="alertBanner" onclick="openAlerts()">
+    <div class="alert-icon">!</div>
+    <div class="alert-text">
+      <div class="alert-count" id="alertBannerCount"></div>
+      <div class="alert-summary" id="alertBannerSummary"></div>
+    </div>
   </div>
 
   <!-- Tabs -->
@@ -1667,6 +1833,7 @@ function renderDashboard() {
   renderOperations();
   renderCustomers();
   renderStores();
+  runAlertCheck();
 }
 
 // ============================================================
@@ -3694,6 +3861,273 @@ function checkDueReports() {
 
 document.getElementById('schedulerModal').addEventListener('click', (e) => {
   if (e.target === document.getElementById('schedulerModal')) closeScheduler();
+});
+
+// ============================================================
+// PERFORMANCE ALERTS ENGINE
+// ============================================================
+const ALERT_METRICS = {
+  avg_ticket:       { label: 'Avg Ticket',              unit: '$',  fmt: v => money(v) },
+  revenue:          { label: 'Revenue',                  unit: '$',  fmt: v => money(v) },
+  invoice_count:    { label: 'Invoice Count',            unit: '',   fmt: v => num(v) },
+  avg_bay_time:     { label: 'Avg Bay Time',             unit: 'min',fmt: v => v.toFixed(1)+' min' },
+  promo_discount_pct:{ label: 'Promo Discount % of Rev', unit: '%',  fmt: v => pct(v) },
+  insp_conversion:  { label: 'Inspection Conversion',    unit: '%',  fmt: v => pct(v) },
+  email_capture:    { label: 'Email Capture',            unit: '%',  fmt: v => pct(v) },
+  yellow_red_pct:   { label: 'Yellow/Red Inspection',    unit: '%',  fmt: v => pct(v) }
+};
+
+function getAlertRecipients() {
+  try { return JSON.parse(localStorage.getItem('bp_alert_recipients') || '[]'); } catch(e) { return []; }
+}
+function saveAlertRecipients(list) { localStorage.setItem('bp_alert_recipients', JSON.stringify(list)); }
+
+function getAlertRules() {
+  try { return JSON.parse(localStorage.getItem('bp_alert_rules') || '[]'); } catch(e) { return []; }
+}
+function saveAlertRules(list) { localStorage.setItem('bp_alert_rules', JSON.stringify(list)); }
+
+function addAlertRecipient() {
+  const name = document.getElementById('alertRecipName').value.trim();
+  const email = document.getElementById('alertRecipEmail').value.trim();
+  if (!email) { alert('Please enter an email.'); return; }
+  const list = getAlertRecipients();
+  list.push({ name, email });
+  saveAlertRecipients(list);
+  document.getElementById('alertRecipName').value = '';
+  document.getElementById('alertRecipEmail').value = '';
+  renderAlertRecipients();
+}
+
+function removeAlertRecipient(idx) {
+  const list = getAlertRecipients();
+  list.splice(idx, 1);
+  saveAlertRecipients(list);
+  renderAlertRecipients();
+}
+
+function renderAlertRecipients() {
+  const list = getAlertRecipients();
+  document.getElementById('alertRecipientsList').innerHTML = list.length ? list.map((r, i) =>
+    `<div class="alert-rule-row"><div class="rule-text"><strong>${r.name || 'Manager'}</strong> — ${r.email}</div><button onclick="removeAlertRecipient(${i})" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button></div>`
+  ).join('') : '<div style="color:var(--text-muted);font-size:12px;padding:8px;">No recipients yet.</div>';
+}
+
+function addAlertRule() {
+  const metric = document.getElementById('alertMetric').value;
+  const operator = document.getElementById('alertOperator').value;
+  const threshold = +document.getElementById('alertThreshold').value;
+  const severity = document.getElementById('alertSeverity').value;
+  if (isNaN(threshold)) { alert('Please enter a threshold value.'); return; }
+  const list = getAlertRules();
+  list.push({ metric, operator, threshold, severity });
+  saveAlertRules(list);
+  document.getElementById('alertThreshold').value = '';
+  renderAlertRules();
+  runAlertCheck();
+}
+
+function removeAlertRule(idx) {
+  const list = getAlertRules();
+  list.splice(idx, 1);
+  saveAlertRules(list);
+  renderAlertRules();
+  runAlertCheck();
+}
+
+function renderAlertRules() {
+  const list = getAlertRules();
+  document.getElementById('alertRulesList').innerHTML = list.length ? list.map((r, i) => {
+    const m = ALERT_METRICS[r.metric] || { label: r.metric, fmt: v => v };
+    const opLabel = r.operator === 'lt' ? 'below' : 'above';
+    return `<div class="alert-rule-row"><div class="alert-severity ${r.severity}"></div><div class="rule-text">${m.label} <strong>${opLabel}</strong> ${m.fmt(r.threshold)}</div><span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">${r.severity}</span><button onclick="removeAlertRule(${i})" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button></div>`;
+  }).join('') : '<div style="color:var(--text-muted);font-size:12px;padding:8px;">No rules configured. Add a rule below.</div>';
+}
+
+function computeStoreMetrics(storeNum) {
+  const cust = FILTERED.customers.filter(r => r.Store_Number === storeNum);
+  const promo = FILTERED.promos.filter(r => r.Store_Number === storeNum);
+  const insp = FILTERED.inspections.filter(r => r.Store_Number === storeNum);
+
+  const rev = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+  const invCount = cust.length;
+  const avgTicket = invCount ? rev / invCount : 0;
+
+  const bayTimes = [];
+  cust.forEach(r => { const m = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time); if (m !== null && m > 0 && m < 180) bayTimes.push(m); });
+  const avgBay = bayTimes.length ? bayTimes.reduce((a,b) => a+b, 0) / bayTimes.length : 0;
+
+  const promoTotal = promo.reduce((s, r) => s + (+r.Promo_Amount || 0), 0);
+  const promoDiscPct = rev > 0 ? (promoTotal / rev * 100) : 0;
+
+  const inspValid = insp.filter(r => r.Inspection_Status && r.Inspection_Status !== 'NotCheck' && r.Inspection_Status !== 'NotEquip');
+  const inspBad = inspValid.filter(r => r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red');
+  const inspPurchased = inspBad.filter(r => r.Purchased_This_Visit === 'True').length;
+  const inspConv = inspBad.length ? (inspPurchased / inspBad.length * 100) : 0;
+  const yrPct = inspValid.length ? (inspBad.length / inspValid.length * 100) : 0;
+
+  const withEmail = cust.filter(r => r.Customer_Email_Address && r.Customer_Email_Address.trim()).length;
+  const emailCapture = invCount ? (withEmail / invCount * 100) : 0;
+
+  return {
+    avg_ticket: avgTicket,
+    revenue: rev,
+    invoice_count: invCount,
+    avg_bay_time: avgBay,
+    promo_discount_pct: promoDiscPct,
+    insp_conversion: inspConv,
+    email_capture: emailCapture,
+    yellow_red_pct: yrPct
+  };
+}
+
+let currentAlerts = [];
+
+function runAlertCheck() {
+  const rules = getAlertRules();
+  currentAlerts = [];
+
+  if (!rules.length || !FILTERED.customers.length) {
+    updateAlertBanner();
+    renderTriggeredAlerts();
+    return;
+  }
+
+  const stores = [...new Set(FILTERED.customers.map(r => r.Store_Number))];
+  stores.forEach(store => {
+    const metrics = computeStoreMetrics(store);
+    rules.forEach(rule => {
+      const val = metrics[rule.metric];
+      if (val === undefined) return;
+      const breached = rule.operator === 'lt' ? val < rule.threshold : val > rule.threshold;
+      if (breached) {
+        const m = ALERT_METRICS[rule.metric];
+        currentAlerts.push({
+          store,
+          metric: rule.metric,
+          metricLabel: m.label,
+          value: val,
+          valueFmt: m.fmt(val),
+          threshold: rule.threshold,
+          thresholdFmt: m.fmt(rule.threshold),
+          operator: rule.operator,
+          severity: rule.severity
+        });
+      }
+    });
+  });
+
+  // Sort: critical first, then warning, then info
+  const sevOrder = { critical: 0, warning: 1, info: 2 };
+  currentAlerts.sort((a, b) => (sevOrder[a.severity] || 9) - (sevOrder[b.severity] || 9));
+
+  updateAlertBanner();
+  renderTriggeredAlerts();
+}
+
+function updateAlertBanner() {
+  const banner = document.getElementById('alertBanner');
+  const btn = document.getElementById('alertsBtn');
+
+  if (currentAlerts.length > 0) {
+    banner.classList.add('has-alerts');
+    const critical = currentAlerts.filter(a => a.severity === 'critical').length;
+    const warning = currentAlerts.filter(a => a.severity === 'warning').length;
+    document.getElementById('alertBannerCount').textContent = currentAlerts.length + ' Performance Alert' + (currentAlerts.length > 1 ? 's' : '') + ' Triggered';
+    const parts = [];
+    if (critical) parts.push(critical + ' critical');
+    if (warning) parts.push(warning + ' warning');
+    const storeCount = new Set(currentAlerts.map(a => a.store)).size;
+    parts.push(storeCount + ' store' + (storeCount > 1 ? 's' : '') + ' affected');
+    document.getElementById('alertBannerSummary').textContent = parts.join(' · ') + ' — Click to review';
+
+    // Update header button
+    if (btn) {
+      btn.style.background = critical > 0 ? 'var(--red)' : 'var(--orange)';
+      btn.style.color = 'white';
+      btn.style.borderColor = critical > 0 ? 'var(--red)' : 'var(--orange)';
+      btn.textContent = currentAlerts.length + ' Alert' + (currentAlerts.length > 1 ? 's' : '');
+    }
+
+    // Change banner color for critical
+    if (critical > 0) {
+      banner.style.background = 'rgba(255,23,68,0.1)';
+      banner.style.borderColor = 'rgba(255,23,68,0.3)';
+    } else {
+      banner.style.background = '';
+      banner.style.borderColor = '';
+    }
+  } else {
+    banner.classList.remove('has-alerts');
+    if (btn) {
+      btn.style.background = '';
+      btn.style.color = 'var(--orange)';
+      btn.style.borderColor = 'var(--orange)';
+      btn.textContent = 'Alerts';
+    }
+  }
+}
+
+function renderTriggeredAlerts() {
+  const el = document.getElementById('triggeredAlertsList');
+  if (!el) return;
+  if (!currentAlerts.length) {
+    el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">No alerts triggered. ' + (getAlertRules().length ? 'All stores within thresholds.' : 'Add rules above to start monitoring.') + '</div>';
+    return;
+  }
+  el.innerHTML = currentAlerts.map(a => {
+    const opLabel = a.operator === 'lt' ? 'below' : 'above';
+    return `<div class="alert-item severity-${a.severity}">
+      <div class="alert-severity ${a.severity}"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px;"><strong>Store #${a.store}</strong> — ${a.metricLabel} is <strong>${a.valueFmt}</strong> (${opLabel} ${a.thresholdFmt} threshold)</div>
+      </div>
+      <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">${a.severity}</span>
+    </div>`;
+  }).join('');
+}
+
+function openAlerts() {
+  renderAlertRecipients();
+  renderAlertRules();
+  runAlertCheck();
+  document.getElementById('alertsModal').classList.add('active');
+}
+
+function closeAlerts() {
+  document.getElementById('alertsModal').classList.remove('active');
+}
+
+function sendAllAlerts() {
+  if (!currentAlerts.length) { alert('No alerts to send.'); return; }
+  const recipients = getAlertRecipients();
+  if (!recipients.length) { alert('Add at least one recipient first.'); return; }
+
+  const meta = getReportMeta();
+  const to = recipients.map(r => r.email).join(', ');
+  const names = recipients.map(r => r.name || r.email).join(', ');
+
+  let body = 'Hi ' + names + ',\n\n';
+  body += 'Butler Performance has detected ' + currentAlerts.length + ' store-level performance alert(s).\n\n';
+  body += 'Period: ' + (meta.dateFrom || 'Start') + ' to ' + (meta.dateTo || 'End') + '\n';
+  body += '—————————————————————\n\n';
+
+  currentAlerts.forEach(a => {
+    const opLabel = a.operator === 'lt' ? 'below' : 'above';
+    body += '[' + a.severity.toUpperCase() + '] Store #' + a.store + ': ' + a.metricLabel + ' is ' + a.valueFmt + ' (' + opLabel + ' ' + a.thresholdFmt + ' threshold)\n';
+  });
+
+  body += '\n—————————————————————\n';
+  body += 'Generated by Butler Performance Analytics Engine\n';
+  if (meta.company) body += meta.company + '\n';
+
+  const subject = '[' + (currentAlerts.some(a => a.severity === 'critical') ? 'CRITICAL' : 'ALERT') + '] ' + currentAlerts.length + ' Store Performance Alert' + (currentAlerts.length > 1 ? 's' : '') + (meta.company ? ' — ' + meta.company : '');
+
+  window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
+}
+
+document.getElementById('alertsModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('alertsModal')) closeAlerts();
 });
 
 // ============================================================
