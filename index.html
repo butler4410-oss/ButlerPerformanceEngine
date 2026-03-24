@@ -989,6 +989,28 @@
         <div class="chart-wrap"><canvas id="chartByHour"></canvas></div>
       </div>
     </div>
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportTable('tblStoreOps')">Export CSV</button>
+    </div>
+    <div class="table-wrap">
+      <h3>Store Service Times</h3>
+      <div class="table-scroll">
+        <table id="tblStoreOps">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="0">Store #</th>
+              <th class="sortable" data-col="1">Invoices</th>
+              <th class="sortable" data-col="2">Avg Bay Time</th>
+              <th class="sortable" data-col="3">Avg Wait Time</th>
+              <th class="sortable" data-col="4">Avg Total Time</th>
+              <th class="sortable" data-col="5">Revenue</th>
+              <th class="sortable" data-col="6">Avg Ticket</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- CUSTOMERS TAB -->
@@ -1791,7 +1813,7 @@ function renderRevenue() {
   });
   const svcRows = Object.values(svcMap).sort((a,b) => b.rev - a.rev).slice(0, 100);
   document.querySelector('#tblServices tbody').innerHTML = svcRows.map(r => `
-    <tr><td>${r.cat}</td><td>${r.desc}</td><td>${r.type}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${money(r.count ? r.rev / r.count : 0)}</td></tr>
+    <tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(r.desc||'').replace(/'/g,"\\'")}','${(r.type||'').replace(/'/g,"\\'")}')"><td>${r.cat}</td><td>${r.desc}</td><td>${r.type}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${money(r.count ? r.rev / r.count : 0)}</td></tr>
   `).join('');
 }
 
@@ -2172,6 +2194,37 @@ function renderOperations() {
       }
     }
   });
+
+  // Store Service Times table
+  const storeOpsMap = {};
+  cust.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeOpsMap[s]) storeOpsMap[s] = { inv: 0, rev: 0, bayTimes: [], waitTimes: [], totalTimes: [] };
+    storeOpsMap[s].inv++;
+    storeOpsMap[s].rev += (+r.Net_Sales || 0);
+    const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (bay !== null && bay > 0 && bay < 180) storeOpsMap[s].bayTimes.push(bay);
+    const wait = diffMinutes(r.Greet_Time, r.Bay_Start_Time);
+    if (wait !== null && wait >= 0 && wait < 120) storeOpsMap[s].waitTimes.push(wait);
+    const total = diffMinutes(r.Greet_Time, r.Ring_Out_End_Time);
+    if (total !== null && total > 0 && total < 300) storeOpsMap[s].totalTimes.push(total);
+  });
+  const storeOpsRows = Object.entries(storeOpsMap).sort((a,b) => b[1].inv - a[1].inv);
+  document.querySelector('#tblStoreOps tbody').innerHTML = storeOpsRows.map(([store, r]) => {
+    const avgBay = r.bayTimes.length ? (r.bayTimes.reduce((a,b)=>a+b,0)/r.bayTimes.length).toFixed(1) : '--';
+    const avgWait = r.waitTimes.length ? (r.waitTimes.reduce((a,b)=>a+b,0)/r.waitTimes.length).toFixed(1) : '--';
+    const avgTotal = r.totalTimes.length ? (r.totalTimes.reduce((a,b)=>a+b,0)/r.totalTimes.length).toFixed(1) : '--';
+    const avgTicket = r.inv ? r.rev / r.inv : 0;
+    return `<tr class="clickable-row" onclick="openStoreOpsDetail('${store}')">
+      <td><strong>#${store}</strong></td>
+      <td>${num(r.inv)}</td>
+      <td>${avgBay} min</td>
+      <td>${avgWait} min</td>
+      <td>${avgTotal} min</td>
+      <td>${money(r.rev)}</td>
+      <td>${money(avgTicket)}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ============================================================
@@ -2481,6 +2534,219 @@ document.getElementById('custDetailModal').addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && document.getElementById('custDetailModal').classList.contains('active')) closeCustDetail();
 });
+
+// ============================================================
+// SERVICE DETAIL MODAL
+// ============================================================
+function openServiceDetail(cat, desc, type) {
+  const det = FILTERED.details.filter(r =>
+    (r.JLI_Category_Code || '') === cat &&
+    (r.Invoice_Detail_Description || '') === desc &&
+    (r.Invoice_Detail_Type || '') === type
+  );
+
+  if (!det.length) return;
+
+  document.getElementById('custDetailName').textContent = desc || cat;
+
+  const totalRev = det.reduce((s, r) => s + (+r.Extended_Price || 0), 0);
+  const totalQty = det.reduce((s, r) => s + (+r.Quantity_Sold || 0), 0);
+  const invoiceNums = new Set(det.map(r => r.Invoice_Number));
+  const storeNums = new Set(det.map(r => r.Store_Number));
+  const avgPrice = invoiceNums.size ? totalRev / invoiceNums.size : 0;
+
+  // Revenue by store
+  const storeRev = {};
+  det.forEach(r => {
+    if (!storeRev[r.Store_Number]) storeRev[r.Store_Number] = { qty: 0, rev: 0, count: 0 };
+    storeRev[r.Store_Number].qty += (+r.Quantity_Sold || 0);
+    storeRev[r.Store_Number].rev += (+r.Extended_Price || 0);
+    storeRev[r.Store_Number].count++;
+  });
+  const storeRows = Object.entries(storeRev).sort((a,b) => b[1].rev - a[1].rev);
+
+  // Recent customers who purchased this
+  const custRows = [];
+  invoiceNums.forEach(inv => {
+    const c = FILTERED.customers.find(r => r.Invoice_Number === inv);
+    if (c) {
+      custRows.push({
+        name: ((c.Customer_First_Name || '') + ' ' + (c.Customer_Last_Name || '')).trim() || 'Unknown',
+        store: c.Store_Number,
+        date: c.Invoice_Date ? c.Invoice_Date.split(' ')[0] : '',
+        vehicle: [c.Vehicle_Year, c.ChekChart_Make, c.ChekChart_Model].filter(Boolean).join(' '),
+        sales: +c.Net_Sales || 0
+      });
+    }
+  });
+  custRows.sort((a,b) => b.sales - a.sales);
+  const displayCust = custRows.slice(0, 50);
+
+  document.getElementById('custDetailBody').innerHTML = `
+    <div class="cust-detail-grid">
+      <div class="cust-detail-section">
+        <h4>Service Summary</h4>
+        <div class="cust-field"><span class="label">Category</span><span class="value">${cat}</span></div>
+        <div class="cust-field"><span class="label">Description</span><span class="value">${desc}</span></div>
+        <div class="cust-field"><span class="label">Type</span><span class="value">${type}</span></div>
+        <div class="cust-field"><span class="label">Total Revenue</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(totalRev)}</span></div>
+      </div>
+      <div class="cust-detail-section">
+        <h4>Metrics</h4>
+        <div class="cust-field"><span class="label">Total Qty Sold</span><span class="value">${num(Math.round(totalQty))}</span></div>
+        <div class="cust-field"><span class="label">Invoices</span><span class="value">${num(invoiceNums.size)}</span></div>
+        <div class="cust-field"><span class="label">Stores Selling</span><span class="value">${storeNums.size}</span></div>
+        <div class="cust-field"><span class="label">Avg per Invoice</span><span class="value">${money(avgPrice)}</span></div>
+      </div>
+      <div class="cust-detail-section full-width">
+        <h4>Revenue by Store</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">QTY</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">INVOICES</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">REVENUE</th></tr></thead>
+          <tbody>${storeRows.map(([s, r]) => `<tr><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(Math.round(r.qty))}</td><td style="text-align:right;padding:4px 8px;">${num(r.count)}</td><td style="text-align:right;padding:4px 8px;">${money(r.rev)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      ${displayCust.length ? `<div class="cust-detail-section full-width">
+        <h4>Customers Who Purchased (${custRows.length > 50 ? 'Top 50 of ' + num(custRows.length) : num(custRows.length)})</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">CUSTOMER</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">VEHICLE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th></tr></thead>
+          <tbody>${displayCust.map(c => `<tr><td style="padding:4px 8px;">${c.name}</td><td style="padding:4px 8px;font-size:11px;">${c.vehicle}</td><td style="text-align:center;padding:4px 8px;">#${c.store}</td><td style="text-align:center;padding:4px 8px;">${c.date}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>` : ''}
+    </div>
+  `;
+
+  document.getElementById('custDetailModal').classList.add('active');
+}
+
+// ============================================================
+// STORE OPS DETAIL MODAL
+// ============================================================
+function openStoreOpsDetail(storeNum) {
+  const cust = FILTERED.customers.filter(r => r.Store_Number === storeNum);
+  if (!cust.length) return;
+
+  document.getElementById('custDetailName').textContent = 'Store #' + storeNum + ' — Operations Detail';
+
+  // Compute times
+  const bayTimes = [];
+  const waitTimes = [];
+  const totalTimes = [];
+  const hourCounts = Array(24).fill(0);
+
+  cust.forEach(r => {
+    const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (bay !== null && bay > 0 && bay < 180) bayTimes.push(bay);
+    const wait = diffMinutes(r.Greet_Time, r.Bay_Start_Time);
+    if (wait !== null && wait >= 0 && wait < 120) waitTimes.push(wait);
+    const total = diffMinutes(r.Greet_Time, r.Ring_Out_End_Time);
+    if (total !== null && total > 0 && total < 300) totalTimes.push(total);
+    const gm = (r.Greet_Time || '').match(/(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)/i);
+    if (gm) {
+      let h = +gm[1];
+      const ampm = gm[4].toUpperCase();
+      if (ampm === 'PM' && h < 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      hourCounts[h]++;
+    }
+  });
+
+  const avgBay = bayTimes.length ? (bayTimes.reduce((a,b) => a+b,0) / bayTimes.length) : 0;
+  const avgWait = waitTimes.length ? (waitTimes.reduce((a,b) => a+b,0) / waitTimes.length) : 0;
+  const avgTotal = totalTimes.length ? (totalTimes.reduce((a,b) => a+b,0) / totalTimes.length) : 0;
+  const totalRev = cust.reduce((s,r) => s + (+r.Net_Sales || 0), 0);
+  const avgTicket = cust.length ? totalRev / cust.length : 0;
+
+  // Busiest hour
+  let busiestHour = 0;
+  hourCounts.forEach((c, h) => { if (c > hourCounts[busiestHour]) busiestHour = h; });
+  const busiestLabel = (busiestHour > 12 ? busiestHour - 12 : busiestHour || 12) + (busiestHour >= 12 ? ' PM' : ' AM');
+
+  // Hourly breakdown
+  const hourRows = [];
+  for (let h = 6; h <= 21; h++) {
+    if (hourCounts[h] > 0) {
+      hourRows.push({ label: (h > 12 ? h - 12 : h) + (h >= 12 ? ' PM' : ' AM'), count: hourCounts[h] });
+    }
+  }
+
+  // Top services at this store
+  const storeDet = FILTERED.details.filter(r => r.Store_Number === storeNum);
+  const svcMap = {};
+  storeDet.forEach(r => {
+    if (r.Invoice_Detail_Type === 'SERVICE' || r.Invoice_Detail_Type === 'PACKAGE') {
+      const key = r.Invoice_Detail_Description || r.Invoice_Detail_Code;
+      if (!svcMap[key]) svcMap[key] = { rev: 0, count: 0 };
+      svcMap[key].rev += (+r.Extended_Price || 0);
+      svcMap[key].count++;
+    }
+  });
+  const topSvc = Object.entries(svcMap).sort((a,b) => b[1].rev - a[1].rev).slice(0, 10);
+
+  // Recent invoices
+  const invoiceRows = cust.map(r => {
+    const name = ((r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '')).trim() || 'Unknown';
+    const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    const total = diffMinutes(r.Greet_Time, r.Ring_Out_End_Time);
+    return {
+      name,
+      date: r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '',
+      vehicle: [r.Vehicle_Year, r.ChekChart_Make, r.ChekChart_Model].filter(Boolean).join(' '),
+      bayMin: bay !== null && bay > 0 ? bay.toFixed(0) : '--',
+      totalMin: total !== null && total > 0 ? total.toFixed(0) : '--',
+      sales: +r.Net_Sales || 0
+    };
+  }).sort((a,b) => b.sales - a.sales).slice(0, 50);
+
+  document.getElementById('custDetailBody').innerHTML = `
+    <div class="cust-detail-grid">
+      <div class="cust-detail-section">
+        <h4>Store Performance</h4>
+        <div class="cust-field"><span class="label">Total Invoices</span><span class="value">${num(cust.length)}</span></div>
+        <div class="cust-field"><span class="label">Total Revenue</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(totalRev)}</span></div>
+        <div class="cust-field"><span class="label">Avg Ticket</span><span class="value">${money(avgTicket)}</span></div>
+        <div class="cust-field"><span class="label">Busiest Hour</span><span class="value">${busiestLabel} (${hourCounts[busiestHour]} visits)</span></div>
+      </div>
+      <div class="cust-detail-section">
+        <h4>Timing Averages</h4>
+        <div class="cust-field"><span class="label">Avg Bay Time</span><span class="value">${avgBay.toFixed(1)} min</span></div>
+        <div class="cust-field"><span class="label">Avg Greet-to-Bay Wait</span><span class="value">${avgWait.toFixed(1)} min</span></div>
+        <div class="cust-field"><span class="label">Avg Total Visit</span><span class="value">${avgTotal.toFixed(1)} min</span></div>
+        <div class="cust-field"><span class="label">Bay Time Samples</span><span class="value">${num(bayTimes.length)}</span></div>
+      </div>
+      <div class="cust-detail-section">
+        <h4>Hourly Volume</h4>
+        ${hourRows.map(h => `<div class="cust-field"><span class="label">${h.label}</span><span class="value">${h.count}</span></div>`).join('')}
+      </div>
+      <div class="cust-detail-section">
+        <h4>Top Services</h4>
+        ${topSvc.map(([name, r]) => `<div class="cust-field"><span class="label">${name}</span><span class="value">${money(r.rev)}</span></div>`).join('')}
+      </div>
+      <div class="cust-detail-section full-width">
+        <h4>Recent Invoices (${invoiceRows.length < cust.length ? 'Top 50 of ' + num(cust.length) : num(cust.length)})</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr>
+            <th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">CUSTOMER</th>
+            <th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">VEHICLE</th>
+            <th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th>
+            <th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">BAY</th>
+            <th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">TOTAL</th>
+            <th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th>
+          </tr></thead>
+          <tbody>${invoiceRows.map(r => `<tr>
+            <td style="padding:4px 8px;">${r.name}</td>
+            <td style="padding:4px 8px;font-size:11px;">${r.vehicle}</td>
+            <td style="text-align:center;padding:4px 8px;">${r.date}</td>
+            <td style="text-align:right;padding:4px 8px;">${r.bayMin} min</td>
+            <td style="text-align:right;padding:4px 8px;">${r.totalMin} min</td>
+            <td style="text-align:right;padding:4px 8px;">${money(r.sales)}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('custDetailModal').classList.add('active');
+}
 
 // ============================================================
 // STORE RANKINGS TAB
