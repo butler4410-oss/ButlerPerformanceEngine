@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Butler Performance - Analytics Engine</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
@@ -1008,7 +1009,7 @@
 
 <!-- Settings Modal -->
 <div class="modal-overlay" id="settingsModal">
-  <div class="modal">
+  <div class="modal" style="width:480px;">
     <h3>Dashboard Settings</h3>
     <div class="form-group">
       <label>Company / Client Name</label>
@@ -1018,7 +1019,26 @@
       <label>User / Contact Name</label>
       <input type="text" id="settingUser" placeholder="e.g. Erin Ham">
     </div>
+    <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Gmail Integration (EmailJS)</div>
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Sends emails directly from your Gmail. Free at <a href="https://www.emailjs.com" target="_blank" style="color:var(--primary);">emailjs.com</a> — sign up, connect Gmail, create a template with variables: <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{to_email}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{subject}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{message}}</code></p>
+    <div class="form-group">
+      <label>EmailJS Public Key</label>
+      <input type="text" id="settingEjsKey" placeholder="e.g. abc123XYZ">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-group">
+        <label>Service ID</label>
+        <input type="text" id="settingEjsService" placeholder="e.g. service_gmail">
+      </div>
+      <div class="form-group">
+        <label>Template ID</label>
+        <input type="text" id="settingEjsTemplate" placeholder="e.g. template_report">
+      </div>
+    </div>
+    <div id="emailTestResult" style="font-size:12px;margin-top:4px;"></div>
     <div class="modal-buttons">
+      <button class="btn-cancel" onclick="testEmailSetup()" style="border-color:var(--green);color:var(--green);">Test Connection</button>
       <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
       <button class="btn-save" onclick="saveSettings()">Save</button>
     </div>
@@ -3683,25 +3703,41 @@ function sendEmail() {
 
   if (!to) { alert('Please enter at least one email address.'); return; }
 
-  const reportHTML = buildReportHTML(pendingEmailReport.tableId, pendingEmailReport.title);
+  if (isEmailConfigured()) {
+    // Send via Gmail/EmailJS
+    const btn = document.querySelector('#emailModal .btn-save');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
 
-  // Create the report as a downloadable blob first
-  const blob = new Blob([reportHTML], { type: 'text/html' });
-  const blobUrl = URL.createObjectURL(blob);
+    sendViaEmailJS(to, subject, body).then(() => {
+      btn.textContent = 'Sent!';
+      btn.style.background = 'var(--green)';
+      setTimeout(() => {
+        btn.textContent = 'Send Email';
+        btn.style.background = '';
+        btn.disabled = false;
+        closeEmailModal();
+      }, 1500);
+    }).catch(err => {
+      btn.textContent = 'Send Email';
+      btn.disabled = false;
+      alert('Email failed: ' + (err?.text || err?.message || 'Unknown error. Check Settings.'));
+    });
+  } else {
+    // Fallback: download report + mailto
+    const reportHTML = buildReportHTML(pendingEmailReport.tableId, pendingEmailReport.title);
+    const blob = new Blob([reportHTML], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = pendingEmailReport.title.replace(/[^a-zA-Z0-9]/g, '_') + '_Report.html';
+    a.click();
 
-  // Download the report file
-  const a = document.createElement('a');
-  a.href = blobUrl;
-  a.download = pendingEmailReport.title.replace(/[^a-zA-Z0-9]/g, '_') + '_Report.html';
-  a.click();
-
-  // Open mailto with pre-filled fields
-  const mailtoBody = body + '\n\n---\nReport file has been downloaded. Please attach it to this email.';
-  const mailto = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailtoBody);
-  window.open(mailto, '_self');
-
-  setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-  closeEmailModal();
+    const mailtoBody = body + '\n\n---\nReport file has been downloaded. Please attach it to this email.';
+    window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailtoBody), '_self');
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    closeEmailModal();
+  }
 }
 
 document.getElementById('emailModal').addEventListener('click', (e) => {
@@ -3814,31 +3850,43 @@ function sendScheduledReport(idx) {
   const s = list[idx];
   if (!s) return;
 
-  // Generate and download the report
   if (s.report === 'overview') {
-    // For overview, use the store rankings as a summary
     pendingEmailReport = { tableId: 'tblStores', title: 'Overview Summary - Store Rankings' };
   } else {
     pendingEmailReport = { tableId: s.report, title: REPORT_NAMES[s.report] || s.report };
   }
 
-  const reportHTML = buildReportHTML(pendingEmailReport.tableId, pendingEmailReport.title);
-  const blob = new Blob([reportHTML], { type: 'text/html' });
-  const blobUrl = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = blobUrl;
-  a.download = pendingEmailReport.title.replace(/[^a-zA-Z0-9]/g, '_') + '_Report.html';
-  a.click();
-
   const meta = getReportMeta();
   const subject = pendingEmailReport.title + ' — Butler Performance Report' + (meta.company ? ' (' + meta.company + ')' : '');
-  const body = 'Hi ' + (s.name || '') + ',\n\nPlease find the attached ' + pendingEmailReport.title + ' report.\n\nPeriod: ' + (meta.dateFrom || 'Start') + ' to ' + (meta.dateTo || 'End') + '\n\n---\nReport file has been downloaded. Please attach it to this email.';
-  window.open('mailto:' + encodeURIComponent(s.email) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
+  const body = 'Hi ' + (s.name || '') + ',\n\nPlease find the ' + pendingEmailReport.title + ' report below.\n\nPeriod: ' + (meta.dateFrom || 'Start') + ' to ' + (meta.dateTo || 'End') + '\n\nGenerated by Butler Performance Analytics Engine';
 
-  // Mark as sent
-  list[idx].lastSent = new Date().toISOString();
-  saveSchedules(list);
-  setTimeout(() => { URL.revokeObjectURL(blobUrl); renderScheduleList(); }, 1000);
+  function markSent() {
+    list[idx].lastSent = new Date().toISOString();
+    saveSchedules(list);
+    renderScheduleList();
+  }
+
+  if (isEmailConfigured()) {
+    sendViaEmailJS(s.email, subject, body).then(() => {
+      markSent();
+      alert('Report sent to ' + s.email);
+    }).catch(err => {
+      alert('Email failed: ' + (err?.text || err?.message || 'Check Settings.'));
+    });
+  } else {
+    // Fallback: download + mailto
+    const reportHTML = buildReportHTML(pendingEmailReport.tableId, pendingEmailReport.title);
+    const blob = new Blob([reportHTML], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = pendingEmailReport.title.replace(/[^a-zA-Z0-9]/g, '_') + '_Report.html';
+    a.click();
+    const mailtoBody = body + '\n\n---\nReport file has been downloaded. Please attach it to this email.';
+    window.open('mailto:' + encodeURIComponent(s.email) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailtoBody), '_self');
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    markSent();
+  }
 }
 
 // Check for due reports on page interaction
@@ -4123,7 +4171,23 @@ function sendAllAlerts() {
 
   const subject = '[' + (currentAlerts.some(a => a.severity === 'critical') ? 'CRITICAL' : 'ALERT') + '] ' + currentAlerts.length + ' Store Performance Alert' + (currentAlerts.length > 1 ? 's' : '') + (meta.company ? ' — ' + meta.company : '');
 
-  window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
+  if (isEmailConfigured()) {
+    const btn = document.querySelector('#alertsModal .btn-save');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+
+    sendViaEmailJS(to, subject, body).then(() => {
+      btn.textContent = 'Sent!';
+      btn.style.background = 'var(--green)';
+      setTimeout(() => { btn.textContent = 'Send All Alerts'; btn.style.background = ''; btn.disabled = false; }, 2000);
+    }).catch(err => {
+      btn.textContent = 'Send All Alerts';
+      btn.disabled = false;
+      alert('Email failed: ' + (err?.text || err?.message || 'Check Settings.'));
+    });
+  } else {
+    window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
+  }
 }
 
 document.getElementById('alertsModal').addEventListener('click', (e) => {
@@ -4137,6 +4201,32 @@ function loadSettings() {
   const company = localStorage.getItem('bp_company') || '';
   const user = localStorage.getItem('bp_user') || '';
   updateBadge(company, user);
+  initEmailJS();
+}
+
+function initEmailJS() {
+  const key = localStorage.getItem('bp_ejs_key');
+  if (key && typeof emailjs !== 'undefined') {
+    emailjs.init(key);
+  }
+}
+
+function isEmailConfigured() {
+  return !!(localStorage.getItem('bp_ejs_key') && localStorage.getItem('bp_ejs_service') && localStorage.getItem('bp_ejs_template'));
+}
+
+function sendViaEmailJS(to, subject, message) {
+  if (!isEmailConfigured()) {
+    alert('Gmail not configured. Go to Settings (click client badge) and add your EmailJS credentials.');
+    return Promise.reject('not configured');
+  }
+  const serviceId = localStorage.getItem('bp_ejs_service');
+  const templateId = localStorage.getItem('bp_ejs_template');
+  return emailjs.send(serviceId, templateId, {
+    to_email: to,
+    subject: subject,
+    message: message
+  });
 }
 
 function updateBadge(company, user) {
@@ -4149,6 +4239,10 @@ function updateBadge(company, user) {
 function openSettings() {
   document.getElementById('settingCompany').value = localStorage.getItem('bp_company') || '';
   document.getElementById('settingUser').value = localStorage.getItem('bp_user') || '';
+  document.getElementById('settingEjsKey').value = localStorage.getItem('bp_ejs_key') || '';
+  document.getElementById('settingEjsService').value = localStorage.getItem('bp_ejs_service') || '';
+  document.getElementById('settingEjsTemplate').value = localStorage.getItem('bp_ejs_template') || '';
+  document.getElementById('emailTestResult').textContent = '';
   document.getElementById('settingsModal').classList.add('active');
   document.getElementById('settingCompany').focus();
 }
@@ -4160,12 +4254,49 @@ function closeSettings() {
 function saveSettings() {
   const company = document.getElementById('settingCompany').value.trim();
   const user = document.getElementById('settingUser').value.trim();
-  if (company) localStorage.setItem('bp_company', company);
-  else localStorage.removeItem('bp_company');
-  if (user) localStorage.setItem('bp_user', user);
-  else localStorage.removeItem('bp_user');
+  const ejsKey = document.getElementById('settingEjsKey').value.trim();
+  const ejsService = document.getElementById('settingEjsService').value.trim();
+  const ejsTemplate = document.getElementById('settingEjsTemplate').value.trim();
+
+  if (company) localStorage.setItem('bp_company', company); else localStorage.removeItem('bp_company');
+  if (user) localStorage.setItem('bp_user', user); else localStorage.removeItem('bp_user');
+  if (ejsKey) localStorage.setItem('bp_ejs_key', ejsKey); else localStorage.removeItem('bp_ejs_key');
+  if (ejsService) localStorage.setItem('bp_ejs_service', ejsService); else localStorage.removeItem('bp_ejs_service');
+  if (ejsTemplate) localStorage.setItem('bp_ejs_template', ejsTemplate); else localStorage.removeItem('bp_ejs_template');
+
   updateBadge(company, user);
+  initEmailJS();
   closeSettings();
+}
+
+function testEmailSetup() {
+  const key = document.getElementById('settingEjsKey').value.trim();
+  const service = document.getElementById('settingEjsService').value.trim();
+  const template = document.getElementById('settingEjsTemplate').value.trim();
+  const resultEl = document.getElementById('emailTestResult');
+
+  if (!key || !service || !template) {
+    resultEl.innerHTML = '<span style="color:var(--red);">Please fill in all three EmailJS fields first.</span>';
+    return;
+  }
+
+  resultEl.innerHTML = '<span style="color:var(--text-muted);">Testing connection...</span>';
+
+  // Temporarily init with the entered key
+  if (typeof emailjs !== 'undefined') {
+    emailjs.init(key);
+    emailjs.send(service, template, {
+      to_email: 'test@test.com',
+      subject: 'Butler Performance - Test Connection',
+      message: 'This is a test email from Butler Performance Analytics Engine. If you received this, your Gmail integration is working.'
+    }).then(() => {
+      resultEl.innerHTML = '<span style="color:var(--green);">Connection successful! Gmail is ready to send.</span>';
+    }).catch(err => {
+      resultEl.innerHTML = '<span style="color:var(--red);">Failed: ' + (err?.text || err?.message || 'Check your IDs and try again.') + '</span>';
+    });
+  } else {
+    resultEl.innerHTML = '<span style="color:var(--red);">EmailJS library not loaded. Check your internet connection.</span>';
+  }
 }
 
 // Close modal on overlay click or Escape
