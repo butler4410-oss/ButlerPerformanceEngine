@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Analytics Dashboard</title>
+<title>Butler Performance - Analytics Engine</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
@@ -750,15 +750,17 @@
 
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
+  <div class="logo-text" style="margin-bottom:24px;"><span style="color:var(--primary);">BUTLER</span> PERFORMANCE</div>
   <div class="loading-spinner"></div>
-  <div class="loading-text" id="loadingText">Loading Analytics...</div>
+  <div class="loading-text" id="loadingText">Initializing Engine...</div>
 </div>
 
 <!-- Header -->
 <div class="header">
   <div class="logo-area">
     <div>
-      <div class="header-sub" style="font-size:14px;letter-spacing:2px;">Performance Analytics Dashboard</div>
+      <div class="logo-text"><span style="color:var(--primary);">BUTLER</span> PERFORMANCE</div>
+      <div class="header-sub">Analytics Engine</div>
     </div>
   </div>
   <div class="header-right">
@@ -2872,8 +2874,8 @@ function exportTable(tableId) {
 // USER SETTINGS (localStorage)
 // ============================================================
 function loadSettings() {
-  const company = localStorage.getItem('matrix_company') || '';
-  const user = localStorage.getItem('matrix_user') || '';
+  const company = localStorage.getItem('bp_company') || '';
+  const user = localStorage.getItem('bp_user') || '';
   updateBadge(company, user);
 }
 
@@ -2881,12 +2883,12 @@ function updateBadge(company, user) {
   const parts = [company, user].filter(Boolean);
   const badge = document.getElementById('clientBadgeText');
   badge.textContent = parts.length ? parts.join(' - ') : 'Click to set client';
-  document.title = (company ? company + ' - ' : '') + 'Performance Analytics';
+  document.title = 'Butler Performance' + (company ? ' - ' + company : '');
 }
 
 function openSettings() {
-  document.getElementById('settingCompany').value = localStorage.getItem('matrix_company') || '';
-  document.getElementById('settingUser').value = localStorage.getItem('matrix_user') || '';
+  document.getElementById('settingCompany').value = localStorage.getItem('bp_company') || '';
+  document.getElementById('settingUser').value = localStorage.getItem('bp_user') || '';
   document.getElementById('settingsModal').classList.add('active');
   document.getElementById('settingCompany').focus();
 }
@@ -2898,10 +2900,10 @@ function closeSettings() {
 function saveSettings() {
   const company = document.getElementById('settingCompany').value.trim();
   const user = document.getElementById('settingUser').value.trim();
-  if (company) localStorage.setItem('matrix_company', company);
-  else localStorage.removeItem('matrix_company');
-  if (user) localStorage.setItem('matrix_user', user);
-  else localStorage.removeItem('matrix_user');
+  if (company) localStorage.setItem('bp_company', company);
+  else localStorage.removeItem('bp_company');
+  if (user) localStorage.setItem('bp_user', user);
+  else localStorage.removeItem('bp_user');
   updateBadge(company, user);
   closeSettings();
 }
