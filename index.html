@@ -2059,11 +2059,14 @@ function renderOverview() {
   const svcRev = {};
   det.forEach(r => {
     if (r.Invoice_Detail_Type === 'SERVICE' || r.Invoice_Detail_Type === 'PACKAGE') {
-      const key = r.Invoice_Detail_Description || r.Invoice_Detail_Code;
-      svcRev[key] = (svcRev[key] || 0) + (+r.Extended_Price || 0);
+      const price = +r.Extended_Price || 0;
+      if (price > 0) {
+        const key = r.Invoice_Detail_Description || r.Invoice_Detail_Code;
+        svcRev[key] = (svcRev[key] || 0) + price;
+      }
     }
   });
-  const topSvc = Object.entries(svcRev).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const topSvc = Object.entries(svcRev).filter(s => s[1] > 0).sort((a,b) => b[1] - a[1]).slice(0, 10);
   makeChart('chartTopServices', {
     type: 'bar',
     data: {
