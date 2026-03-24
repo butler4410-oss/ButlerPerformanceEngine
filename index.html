@@ -881,6 +881,7 @@
     </div>
   </div>
   <div class="header-right">
+    <button class="btn-configure" onclick="openScheduler()" style="border-color:var(--primary);color:var(--primary);">Scheduled Reports</button>
     <div class="client-badge" id="clientBadge" onclick="openSettings()">
       <span id="clientBadgeText">Click to set client</span>
     </div>
@@ -927,6 +928,79 @@
     <div class="modal-buttons" style="margin-top:16px;">
       <button class="btn-cancel" onclick="resetTileDefaults()">Reset Defaults</button>
       <button class="btn-save" onclick="closeTilePicker()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scheduler Modal -->
+<div class="modal-overlay" id="schedulerModal">
+  <div class="modal" style="width:640px;">
+    <h3>Scheduled Reports</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Set up automatic report delivery. Reports are generated and emailed on schedule.</p>
+    <div id="scheduleList" style="margin-bottom:16px;"></div>
+    <div style="border:1px solid var(--border);border-radius:10px;padding:16px;background:rgba(255,255,255,0.02);">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:12px;">Add New Schedule</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="form-group">
+          <label>Recipient Email</label>
+          <input type="email" id="schedEmail" placeholder="name@company.com">
+        </div>
+        <div class="form-group">
+          <label>Recipient Name</label>
+          <input type="text" id="schedName" placeholder="Erin Ham">
+        </div>
+        <div class="form-group">
+          <label>Report</label>
+          <select id="schedReport" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;">
+            <option value="overview">Overview Summary</option>
+            <option value="tblServices">Service & Product Breakdown</option>
+            <option value="tblInsp">Inspection Items Summary</option>
+            <option value="tblPromos">Promotion Details</option>
+            <option value="tblStoreOps">Store Service Times</option>
+            <option value="tblCustomers">Customer Details</option>
+            <option value="tblStores">Store Performance Rankings</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Frequency</label>
+          <select id="schedFreq" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;">
+            <option value="daily">Daily</option>
+            <option value="weekly" selected>Weekly</option>
+            <option value="biweekly">Bi-Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+        <button class="btn-save" onclick="addSchedule()">Add Schedule</button>
+      </div>
+    </div>
+    <div class="modal-buttons" style="margin-top:16px;">
+      <button class="btn-save" onclick="closeScheduler()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email Compose Modal -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal" style="width:520px;">
+    <h3 id="emailModalTitle">Email Report</h3>
+    <div class="form-group">
+      <label>To (email addresses, comma-separated)</label>
+      <input type="text" id="emailTo" placeholder="name@company.com, name2@company.com">
+    </div>
+    <div class="form-group">
+      <label>Subject</label>
+      <input type="text" id="emailSubject">
+    </div>
+    <div class="form-group">
+      <label>Message (optional)</label>
+      <textarea id="emailBody" rows="3" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">The styled report will be attached as an HTML file. Recipient can view in any browser or print to PDF.</div>
+    <div class="modal-buttons">
+      <button class="btn-cancel" onclick="closeEmailModal()">Cancel</button>
+      <button class="btn-save" onclick="sendEmail()">Send Email</button>
     </div>
   </div>
 </div>
@@ -1014,7 +1088,8 @@
       </div>
     </div>
     <div class="export-bar">
-      <button class="btn-export" onclick="exportTable('tblServices')">Export CSV</button>
+      <button class="btn-export" onclick="exportReport('tblServices','Service & Product Breakdown')">Export Report</button>
+      <button class="btn-export" onclick="emailReport('tblServices','Service & Product Breakdown')">Email</button>
     </div>
     <div class="table-wrap">
       <h3>Service & Product Breakdown</h3>
@@ -1056,7 +1131,8 @@
       </div>
     </div>
     <div class="export-bar">
-      <button class="btn-export" onclick="exportTable('tblInsp')">Export CSV</button>
+      <button class="btn-export" onclick="exportReport('tblInsp','Inspection Items Summary')">Export Report</button>
+      <button class="btn-export" onclick="emailReport('tblInsp','Inspection Items Summary')">Email</button>
     </div>
     <div class="table-wrap">
       <h3>Inspection Items Summary</h3>
@@ -1093,7 +1169,8 @@
       </div>
     </div>
     <div class="export-bar">
-      <button class="btn-export" onclick="exportTable('tblPromos')">Export CSV</button>
+      <button class="btn-export" onclick="exportReport('tblPromos','Promotion Details')">Export Report</button>
+      <button class="btn-export" onclick="emailReport('tblPromos','Promotion Details')">Email</button>
     </div>
     <div class="table-wrap">
       <h3>Promotion Details</h3>
@@ -1139,7 +1216,8 @@
       </div>
     </div>
     <div class="export-bar">
-      <button class="btn-export" onclick="exportTable('tblStoreOps')">Export CSV</button>
+      <button class="btn-export" onclick="exportReport('tblStoreOps','Store Service Times')">Export Report</button>
+      <button class="btn-export" onclick="emailReport('tblStoreOps','Store Service Times')">Email</button>
     </div>
     <div class="table-wrap">
       <h3>Store Service Times</h3>
@@ -1186,7 +1264,8 @@
       </div>
     </div>
     <div class="export-bar">
-      <button class="btn-export" onclick="exportTable('tblCustomers')">Export CSV</button>
+      <button class="btn-export" onclick="exportReport('tblCustomers','Customer Details')">Export Report</button>
+      <button class="btn-export" onclick="emailReport('tblCustomers','Customer Details')">Email</button>
       <div class="filter-group" style="flex-direction:row;align-items:center;gap:8px;">
         <label style="margin:0;">Search:</label>
         <input type="text" id="custSearch" placeholder="Name, email, phone, VIN..." style="min-width:260px;" oninput="filterCustomerTable()">
@@ -1238,7 +1317,8 @@
   <!-- STORE RANKINGS TAB -->
   <div class="tab-content" id="tab-stores">
     <div class="export-bar">
-      <button class="btn-export" onclick="exportTable('tblStores')">Export CSV</button>
+      <button class="btn-export" onclick="exportReport('tblStores','Store Performance Rankings')">Export Report</button>
+      <button class="btn-export" onclick="emailReport('tblStores','Store Performance Rankings')">Email</button>
     </div>
     <div class="table-wrap">
       <h3>Store Performance Rankings</h3>
@@ -3244,25 +3324,329 @@ document.addEventListener('click', (e) => {
 // ============================================================
 // CSV EXPORT
 // ============================================================
-function exportTable(tableId) {
+// ============================================================
+// POLISHED REPORT GENERATOR
+// ============================================================
+function getReportMeta() {
+  const company = localStorage.getItem('bp_company') || '';
+  const user = localStorage.getItem('bp_user') || '';
+  const dateFrom = document.getElementById('filterFrom')?.value || '';
+  const dateTo = document.getElementById('filterTo')?.value || '';
+  const store = document.getElementById('filterStore')?.value || 'All Stores';
+  return { company, user, dateFrom, dateTo, store };
+}
+
+function buildReportHTML(tableId, title) {
+  const meta = getReportMeta();
   const table = document.getElementById(tableId);
-  if (!table) return;
-  const rows = [];
-  table.querySelectorAll('tr').forEach(tr => {
-    const cells = [];
-    tr.querySelectorAll('th, td').forEach(td => {
-      cells.push('"' + td.textContent.trim().replace(/"/g, '""') + '"');
+  if (!table) return '';
+
+  // Get KPI summary from overview tiles
+  const tiles = getSelectedTiles();
+  let kpiHTML = '';
+  tiles.slice(0, 6).forEach(id => {
+    const tile = TILE_CATALOG.find(t => t.id === id);
+    if (tile) {
+      try {
+        const r = tile.calc();
+        kpiHTML += `<div style="flex:1;min-width:140px;text-align:center;padding:12px;background:#f8f9fa;border-radius:8px;border:1px solid #e0e0e0;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#888;margin-bottom:4px;">${tile.label}</div>
+          <div style="font-size:20px;font-weight:700;color:#1a1a2e;">${r.value}</div>
+          ${r.sub ? '<div style="font-size:10px;color:#999;">'+r.sub+'</div>' : ''}
+        </div>`;
+      } catch(e) {}
+    }
+  });
+
+  // Build table HTML
+  let tableHTML = '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+  table.querySelectorAll('tr').forEach((tr, idx) => {
+    const tag = idx === 0 ? 'th' : 'td';
+    const bg = idx === 0 ? 'background:#1a1a2e;color:white;' : (idx % 2 === 0 ? 'background:#f8f9fa;' : '');
+    tableHTML += '<tr>';
+    tr.querySelectorAll('th, td').forEach(cell => {
+      const align = cell.style.textAlign || 'left';
+      tableHTML += `<${tag} style="${bg}padding:8px 12px;text-align:${align};border-bottom:1px solid #e0e0e0;font-size:12px;${idx===0?'font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;':''}">${cell.textContent.trim()}</${tag}>`;
     });
+    tableHTML += '</tr>';
+  });
+  tableHTML += '</table>';
+
+  const now = new Date();
+  const generated = (now.getMonth()+1) + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.toLocaleTimeString();
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>${title} - Butler Performance</title>
+<style>
+  @page { margin: 0.5in; size: landscape; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #222; margin: 0; padding: 40px; max-width: 1200px; margin: 0 auto; }
+  @media print { body { padding: 0; } .no-print { display: none !important; } }
+</style></head><body>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #e31837;">
+  <div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;"><span style="color:#e31837;">BUTLER</span> PERFORMANCE</div>
+    <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Analytics Engine</div>
+  </div>
+  <div style="text-align:right;">
+    ${meta.company ? '<div style="font-size:14px;font-weight:600;">'+meta.company+'</div>' : ''}
+    ${meta.user ? '<div style="font-size:12px;color:#666;">Prepared for: '+meta.user+'</div>' : ''}
+    <div style="font-size:11px;color:#888;">Generated: ${generated}</div>
+  </div>
+</div>
+
+<div style="margin-bottom:20px;">
+  <h1 style="font-size:18px;font-weight:700;margin:0 0 8px 0;color:#1a1a2e;">${title}</h1>
+  <div style="font-size:12px;color:#666;">
+    ${meta.store !== 'All Stores' ? 'Store: #'+meta.store+' | ' : ''}Period: ${meta.dateFrom || 'Start'} to ${meta.dateTo || 'End'}
+  </div>
+</div>
+
+${kpiHTML ? '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;">'+kpiHTML+'</div>' : ''}
+
+<div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">
+${tableHTML}
+</div>
+
+<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e0e0e0;display:flex;justify-content:space-between;font-size:10px;color:#aaa;">
+  <span>Butler Performance Analytics Engine</span>
+  <span>Confidential - ${meta.company || 'Internal Use'}</span>
+</div>
+
+<div class="no-print" style="margin-top:24px;text-align:center;">
+  <button onclick="window.print()" style="background:#e31837;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Print / Save as PDF</button>
+  <button onclick="downloadCSV()" style="background:#1a1a2e;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-left:10px;">Download CSV</button>
+</div>
+<script>
+function downloadCSV() {
+  const rows = [];
+  document.querySelectorAll('table tr').forEach(tr => {
+    const cells = [];
+    tr.querySelectorAll('th, td').forEach(td => cells.push('"'+td.textContent.trim().replace(/"/g,'""')+'"'));
     rows.push(cells.join(','));
   });
-  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
+  const blob = new Blob([rows.join('\\n')], {type:'text/csv'});
   const a = document.createElement('a');
-  a.href = url;
-  a.download = tableId + '_export.csv';
+  a.href = URL.createObjectURL(blob);
+  a.download = '${title.replace(/[^a-zA-Z0-9]/g,'_')}_${now.toISOString().slice(0,10)}.csv';
   a.click();
-  URL.revokeObjectURL(url);
 }
+</script>
+</body></html>`;
+}
+
+function exportReport(tableId, title) {
+  const html = buildReportHTML(tableId, title);
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
+// ============================================================
+// EMAIL SYSTEM
+// ============================================================
+let pendingEmailReport = {};
+
+function emailReport(tableId, title) {
+  pendingEmailReport = { tableId, title };
+  const meta = getReportMeta();
+  document.getElementById('emailModalTitle').textContent = 'Email: ' + title;
+  document.getElementById('emailTo').value = '';
+  document.getElementById('emailSubject').value = title + ' — Butler Performance Report' + (meta.company ? ' (' + meta.company + ')' : '');
+  document.getElementById('emailBody').value = 'Please find the attached ' + title + ' report from Butler Performance Analytics.\n\nPeriod: ' + (meta.dateFrom || 'Start') + ' to ' + (meta.dateTo || 'End');
+  document.getElementById('emailModal').classList.add('active');
+  document.getElementById('emailTo').focus();
+}
+
+function closeEmailModal() {
+  document.getElementById('emailModal').classList.remove('active');
+}
+
+function sendEmail() {
+  const to = document.getElementById('emailTo').value.trim();
+  const subject = document.getElementById('emailSubject').value.trim();
+  const body = document.getElementById('emailBody').value.trim();
+
+  if (!to) { alert('Please enter at least one email address.'); return; }
+
+  const reportHTML = buildReportHTML(pendingEmailReport.tableId, pendingEmailReport.title);
+
+  // Create the report as a downloadable blob first
+  const blob = new Blob([reportHTML], { type: 'text/html' });
+  const blobUrl = URL.createObjectURL(blob);
+
+  // Download the report file
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = pendingEmailReport.title.replace(/[^a-zA-Z0-9]/g, '_') + '_Report.html';
+  a.click();
+
+  // Open mailto with pre-filled fields
+  const mailtoBody = body + '\n\n---\nReport file has been downloaded. Please attach it to this email.';
+  const mailto = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailtoBody);
+  window.open(mailto, '_self');
+
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+  closeEmailModal();
+}
+
+document.getElementById('emailModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('emailModal')) closeEmailModal();
+});
+
+// ============================================================
+// REPORT SCHEDULER
+// ============================================================
+const REPORT_NAMES = {
+  overview: 'Overview Summary',
+  tblServices: 'Service & Product Breakdown',
+  tblInsp: 'Inspection Items Summary',
+  tblPromos: 'Promotion Details',
+  tblStoreOps: 'Store Service Times',
+  tblCustomers: 'Customer Details',
+  tblStores: 'Store Performance Rankings'
+};
+
+const FREQ_LABELS = { daily: 'Daily', weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly' };
+
+function getSchedules() {
+  try { return JSON.parse(localStorage.getItem('bp_schedules') || '[]'); } catch(e) { return []; }
+}
+
+function saveSchedules(list) {
+  localStorage.setItem('bp_schedules', JSON.stringify(list));
+}
+
+function openScheduler() {
+  renderScheduleList();
+  document.getElementById('schedulerModal').classList.add('active');
+}
+
+function closeScheduler() {
+  document.getElementById('schedulerModal').classList.remove('active');
+}
+
+function renderScheduleList() {
+  const list = getSchedules();
+  if (!list.length) {
+    document.getElementById('scheduleList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">No scheduled reports yet. Add one below.</div>';
+    return;
+  }
+  document.getElementById('scheduleList').innerHTML = list.map((s, i) => {
+    const nextDue = getNextDue(s);
+    const overdue = nextDue && new Date() > nextDue;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;${overdue?'border-color:var(--primary);':''}">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;color:white;">${s.name || s.email}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${s.email}</div>
+      </div>
+      <div style="text-align:center;min-width:140px;">
+        <div style="font-size:12px;font-weight:500;">${REPORT_NAMES[s.report] || s.report}</div>
+        <div style="font-size:11px;color:var(--text-muted);">${FREQ_LABELS[s.freq]}</div>
+      </div>
+      <div style="text-align:right;min-width:100px;">
+        ${overdue ? '<div style="font-size:11px;color:var(--primary);font-weight:600;">DUE NOW</div>' : '<div style="font-size:11px;color:var(--text-muted);">Next: '+fmtDate(nextDue)+'</div>'}
+        ${overdue ? '<button onclick="sendScheduledReport('+i+')" style="background:var(--primary);color:white;border:none;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;margin-top:4px;">Send Now</button>' : ''}
+      </div>
+      <button onclick="removeSchedule(${i})" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;" title="Remove">&times;</button>
+    </div>`;
+  }).join('');
+}
+
+function addSchedule() {
+  const email = document.getElementById('schedEmail').value.trim();
+  const name = document.getElementById('schedName').value.trim();
+  const report = document.getElementById('schedReport').value;
+  const freq = document.getElementById('schedFreq').value;
+
+  if (!email) { alert('Please enter an email address.'); return; }
+
+  const list = getSchedules();
+  list.push({
+    email,
+    name,
+    report,
+    freq,
+    created: new Date().toISOString(),
+    lastSent: null
+  });
+  saveSchedules(list);
+  document.getElementById('schedEmail').value = '';
+  document.getElementById('schedName').value = '';
+  renderScheduleList();
+}
+
+function removeSchedule(idx) {
+  const list = getSchedules();
+  list.splice(idx, 1);
+  saveSchedules(list);
+  renderScheduleList();
+}
+
+function getNextDue(schedule) {
+  const base = schedule.lastSent ? new Date(schedule.lastSent) : new Date(schedule.created);
+  const next = new Date(base);
+  switch (schedule.freq) {
+    case 'daily': next.setDate(next.getDate() + 1); break;
+    case 'weekly': next.setDate(next.getDate() + 7); break;
+    case 'biweekly': next.setDate(next.getDate() + 14); break;
+    case 'monthly': next.setMonth(next.getMonth() + 1); break;
+  }
+  return next;
+}
+
+function sendScheduledReport(idx) {
+  const list = getSchedules();
+  const s = list[idx];
+  if (!s) return;
+
+  // Generate and download the report
+  if (s.report === 'overview') {
+    // For overview, use the store rankings as a summary
+    pendingEmailReport = { tableId: 'tblStores', title: 'Overview Summary - Store Rankings' };
+  } else {
+    pendingEmailReport = { tableId: s.report, title: REPORT_NAMES[s.report] || s.report };
+  }
+
+  const reportHTML = buildReportHTML(pendingEmailReport.tableId, pendingEmailReport.title);
+  const blob = new Blob([reportHTML], { type: 'text/html' });
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = pendingEmailReport.title.replace(/[^a-zA-Z0-9]/g, '_') + '_Report.html';
+  a.click();
+
+  const meta = getReportMeta();
+  const subject = pendingEmailReport.title + ' — Butler Performance Report' + (meta.company ? ' (' + meta.company + ')' : '');
+  const body = 'Hi ' + (s.name || '') + ',\n\nPlease find the attached ' + pendingEmailReport.title + ' report.\n\nPeriod: ' + (meta.dateFrom || 'Start') + ' to ' + (meta.dateTo || 'End') + '\n\n---\nReport file has been downloaded. Please attach it to this email.';
+  window.open('mailto:' + encodeURIComponent(s.email) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
+
+  // Mark as sent
+  list[idx].lastSent = new Date().toISOString();
+  saveSchedules(list);
+  setTimeout(() => { URL.revokeObjectURL(blobUrl); renderScheduleList(); }, 1000);
+}
+
+// Check for due reports on page interaction
+function checkDueReports() {
+  const list = getSchedules();
+  const due = list.filter(s => {
+    const next = getNextDue(s);
+    return next && new Date() > next;
+  });
+  if (due.length > 0) {
+    const badge = document.querySelector('.btn-configure[onclick="openScheduler()"]');
+    if (badge) {
+      badge.style.background = 'var(--primary)';
+      badge.style.color = 'white';
+      badge.style.borderColor = 'var(--primary)';
+      badge.textContent = due.length + ' Report' + (due.length > 1 ? 's' : '') + ' Due';
+    }
+  }
+}
+
+document.getElementById('schedulerModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('schedulerModal')) closeScheduler();
+});
 
 // ============================================================
 // USER SETTINGS (localStorage)
@@ -3313,6 +3697,7 @@ document.addEventListener('keydown', (e) => {
 
 // Init
 loadSettings();
+checkDueReports();
 
 // ============================================================
 // AUTO-LOAD FROM SAME FOLDER
