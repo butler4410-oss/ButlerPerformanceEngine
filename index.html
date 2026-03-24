@@ -2164,22 +2164,26 @@ const PALETTE = {
 
 // Tooltip callback helpers
 function tooltipMoney(ctx) {
-  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed.x;
+  const isHorizontal = ctx.chart.options.indexAxis === 'y';
+  const val = isHorizontal ? ctx.parsed.x : ctx.parsed.y;
   return (ctx.dataset.label || '') + ': $' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function tooltipMoneyPie(ctx) {
   return (ctx.label || '') + ': $' + Number(ctx.parsed).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function tooltipCount(ctx) {
-  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed.x;
+  const isH = ctx.chart.options.indexAxis === 'y';
+  const val = isH ? ctx.parsed.x : ctx.parsed.y;
   return (ctx.dataset.label || '') + ': ' + Number(val).toLocaleString();
 }
 function tooltipPct(ctx) {
-  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed.x;
+  const isH = ctx.chart.options.indexAxis === 'y';
+  const val = isH ? ctx.parsed.x : ctx.parsed.y;
   return (ctx.dataset.label || '') + ': ' + Number(val).toFixed(1) + '%';
 }
 function tooltipMinutes(ctx) {
-  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed.x;
+  const isH = ctx.chart.options.indexAxis === 'y';
+  const val = isH ? ctx.parsed.x : ctx.parsed.y;
   return (ctx.dataset.label || '') + ': ' + Number(val).toFixed(1) + ' min';
 }
 function tooltipCountPie(ctx) {
