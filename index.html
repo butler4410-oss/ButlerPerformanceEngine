@@ -1611,55 +1611,119 @@
 
   <!-- MARKETING TAB -->
   <div class="tab-content" id="tab-marketing">
+
+    <!-- Hero KPIs -->
     <div class="kpi-grid" id="mktgKPIs"></div>
 
-    <!-- Campaign Builder -->
-    <div class="charts-row single">
-      <div class="chart-card" style="padding:24px;">
-        <h3 style="margin-bottom:16px;">New Triadex Campaign</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-          <div class="form-group"><label>Campaign Name</label><input type="text" id="mktgCampName" placeholder="e.g. Spring SSOC Push"></div>
-          <div class="form-group"><label>Client</label><input type="text" id="mktgClient" placeholder="e.g. Jiffy Lube"></div>
-          <div class="form-group"><label>Drop 1 Target Date</label><input type="date" id="mktgDrop1"></div>
-          <div class="form-group"><label>Cards per Drop</label><input type="number" id="mktgCardsPerDrop" placeholder="e.g. 5000"></div>
-          <div class="form-group"><label>Number of Drops</label><input type="number" id="mktgDrops" placeholder="e.g. 6" value="6"></div>
+    <!-- Two-Column Layout: Campaign Builder + Quick Actions -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+
+      <!-- Campaign Builder -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div>
+            <h3 style="font-size:16px;font-weight:700;color:white;margin:0;">New Campaign</h3>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Triadex Plastic Postcard Program</div>
+          </div>
+          <div style="background:rgba(227,24,55,0.1);border:1px solid rgba(227,24,55,0.2);border-radius:8px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;">Triadex</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group"><label>Campaign Name</label><input type="text" id="mktgCampName" placeholder="e.g. Spring SSOC Push — Q2 2026"></div>
+          <div class="form-group"><label>Client</label><input type="text" id="mktgClient" placeholder="e.g. South Bay Lube Inc."></div>
+          <div class="form-group"><label>Cards per Drop</label><input type="number" id="mktgCardsPerDrop" placeholder="e.g. 5,000 per store"></div>
+          <div class="form-group"><label>Number of Drops</label><input type="number" id="mktgDrops" placeholder="6" value="6"></div>
           <div class="form-group"><label>Drop Frequency</label>
-            <select id="mktgFreq" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;">
+            <select id="mktgFreq" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:13px;">
               <option value="monthly">Monthly</option>
               <option value="biweekly">Bi-Weekly</option>
               <option value="weekly">Weekly</option>
               <option value="quarterly">Quarterly</option>
             </select>
           </div>
-          <div class="form-group"><label>Per-Card Price</label><input type="number" step="0.01" id="mktgPricePerCard" placeholder="e.g. 0.42"></div>
-          <div class="form-group"><label>Expiration Date</label><input type="date" id="mktgExpDate"></div>
-          <div class="form-group"><label>Stores</label>
-            <select id="mktgStoreSelect" multiple style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;height:70px;"></select>
+          <div class="form-group"><label>Per-Card Price (all-in)</label><input type="number" step="0.01" id="mktgPricePerCard" placeholder="e.g. 0.42"></div>
+          <div class="form-group"><label>Drop 1 Target Date</label><input type="date" id="mktgDrop1"></div>
+          <div class="form-group"><label>Offer Expiration</label><input type="date" id="mktgExpDate"></div>
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label>Select Stores (Ctrl/Cmd+click for multiple)</label>
+          <select id="mktgStoreSelect" multiple style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;height:80px;"></select>
+        </div>
+        <!-- Live Budget Preview -->
+        <div id="mktgBudgetPreview" style="margin-top:16px;padding:14px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:8px;display:none;">
+        </div>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button class="btn-save" onclick="createCampaign()" style="padding:12px 28px;font-size:14px;">Create Campaign</button>
+        </div>
+      </div>
+
+      <!-- Quick Actions Sidebar -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Suppression Tool -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:36px;height:36px;background:rgba(227,24,55,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--primary);">&#9747;</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:white;">Suppression File</div>
+              <div style="font-size:11px;color:var(--text-muted);">Exclude existing customers</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Generates a deduplicated CSV from your loaded customer data — ready to attach to any Triadex handoff.</div>
+          <div id="suppressionCount" style="font-size:20px;font-weight:700;color:white;margin-bottom:12px;">—</div>
+          <button class="btn-configure" onclick="generateSuppression()" style="width:100%;justify-content:center;">Generate Suppression CSV</button>
+        </div>
+
+        <!-- Handoff Status -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:36px;height:36px;background:rgba(68,138,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--blue);">&#9993;</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:white;">Triadex Handoff</div>
+              <div style="font-size:11px;color:var(--text-muted);">Production email to Tim, Ryan, Riley</div>
+            </div>
+          </div>
+          <div id="checklistProgress" style="margin-bottom:12px;"></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-save" onclick="emailHandoff()" style="flex:1;justify-content:center;font-size:12px;padding:10px;">Send Handoff</button>
+            <button class="btn-configure" onclick="resetChecklist()" style="font-size:12px;padding:10px;">Reset</button>
           </div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:14px;">
-          <button class="btn-save" onclick="createCampaign()">Create Campaign</button>
-          <button class="btn-configure" onclick="generateSuppression()">Generate Suppression File</button>
+
+        <!-- Common Mistakes -->
+        <div style="background:rgba(255,145,0,0.06);border:1px solid rgba(255,145,0,0.15);border-radius:14px;padding:16px;">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--orange);margin-bottom:10px;">Watch Out</div>
+          <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">
+            &#10007; Missing phone numbers on stores<br>
+            &#10007; Abbreviated addresses (spell out)<br>
+            &#10007; Mismatched card counts vs deal sheet<br>
+            &#10007; Expiration &lt;60 days from drop<br>
+            &#10007; Creative is a draft/WIP<br>
+            &#10007; No NCOA PAF (USPS required)<br>
+            &#10007; No suppression file<br>
+            &#10007; Saying "ROI" — always <strong style="color:white;">ROAS</strong>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Active Campaigns -->
-    <div class="table-wrap" style="margin-top:20px;">
-      <h3>Campaigns</h3>
-      <div class="table-scroll" style="max-height:300px;">
+    <div class="table-wrap">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+        Campaigns
+        <span id="campaignCount" style="font-weight:400;font-size:12px;color:var(--text-muted);"></span>
+      </h3>
+      <div class="table-scroll" style="max-height:350px;">
         <table id="tblCampaigns">
           <thead>
             <tr>
-              <th>Campaign</th>
-              <th>Client</th>
-              <th>Stores</th>
-              <th>Cards/Drop</th>
-              <th>Drops</th>
-              <th>Annual Cards</th>
-              <th>Budget/Drop</th>
-              <th>Annual Budget</th>
-              <th>Drop 1</th>
+              <th class="sortable" data-col="0">Campaign</th>
+              <th class="sortable" data-col="1">Client</th>
+              <th class="sortable" data-col="2">Stores</th>
+              <th class="sortable" data-col="3">Cards/Drop</th>
+              <th class="sortable" data-col="4">Drops</th>
+              <th class="sortable" data-col="5">Annual Cards</th>
+              <th class="sortable" data-col="6">Budget/Drop</th>
+              <th class="sortable" data-col="7">Annual Budget</th>
+              <th class="sortable" data-col="8">Drop 1</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -1670,14 +1734,13 @@
     </div>
 
     <!-- Triadex Production Handoff Checklist -->
-    <div class="chart-card" style="margin-top:20px;padding:24px;">
-      <h3 style="margin-bottom:4px;">Triadex Production Handoff Checklist</h3>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Pre-send verification — complete all items before emailing Triadex</div>
-      <div id="handoffChecklist"></div>
-      <div style="margin-top:16px;display:flex;gap:10px;">
-        <button class="btn-save" onclick="emailHandoff()">Email Handoff to Triadex</button>
-        <button class="btn-configure" onclick="resetChecklist()">Reset Checklist</button>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-top:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <h3 style="font-size:16px;font-weight:700;color:white;margin:0;">Production Handoff Checklist</h3>
+        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Triadex QA Guide</div>
       </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Complete all items before emailing Triadex. Progress saves automatically.</div>
+      <div id="handoffChecklist"></div>
     </div>
   </div>
 
@@ -3583,13 +3646,16 @@ function renderMarketing() {
   const totalAnnualCards = campaigns.reduce((s, c) => s + ((+c.cardsPerDrop || 0) * (+c.drops || 0)), 0);
   const totalAnnualBudget = campaigns.reduce((s, c) => s + ((+c.cardsPerDrop || 0) * (+c.drops || 0) * (+c.pricePerCard || 0)), 0);
   const suppressionPool = cust.length;
+  // Deduplicated addresses for suppression
+  const addrSet = new Set();
+  cust.forEach(r => { if (r.Customer_Address) addrSet.add((r.Customer_Address||'').trim().toUpperCase() + '|' + (r.ZIP_Code||'')); });
 
   document.getElementById('mktgKPIs').innerHTML = `
-    <div class="kpi-card"><div class="kpi-label">Total Campaigns</div><div class="kpi-value">${totalCampaigns}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Active</div><div class="kpi-value">${activeCampaigns}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Total Annual Cards</div><div class="kpi-value">${num(totalAnnualCards)}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Total Annual Budget</div><div class="kpi-value">${money(totalAnnualBudget)}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Suppression Pool</div><div class="kpi-value">${num(suppressionPool)}</div><div class="kpi-sub">existing customers</div></div>
+    <div class="kpi-card"><div class="kpi-label">Campaigns</div><div class="kpi-value">${totalCampaigns}</div><div class="kpi-sub">${activeCampaigns} active</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Annual Cards</div><div class="kpi-value">${num(totalAnnualCards)}</div><div class="kpi-sub">across all campaigns</div></div>
+    <div class="kpi-card"><div class="kpi-label">Annual Budget</div><div class="kpi-value">${money(totalAnnualBudget)}</div><div class="kpi-sub">print + postage + tracking</div></div>
+    <div class="kpi-card"><div class="kpi-label">Suppression Pool</div><div class="kpi-value">${num(addrSet.size)}</div><div class="kpi-sub">unique addresses</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Cost/Card</div><div class="kpi-value">${totalAnnualCards ? money(totalAnnualBudget / totalAnnualCards) : '$—'}</div><div class="kpi-sub">all-in</div></div>
   `;
 
   // Populate store selector
@@ -3597,11 +3663,60 @@ function renderMarketing() {
   const stores = [...new Set(cust.map(r => r.Store_Number))].sort((a,b) => +a - +b);
   sel.innerHTML = stores.map(s => `<option value="${s}">#${s}</option>`).join('');
 
-  // Render campaigns table
-  renderCampaignTable();
+  // Suppression count
+  const suppEl = document.getElementById('suppressionCount');
+  if (suppEl) suppEl.textContent = num(addrSet.size) + ' unique addresses';
 
-  // Render checklist
+  // Campaign count
+  const countEl = document.getElementById('campaignCount');
+  if (countEl) countEl.textContent = totalCampaigns + ' total · ' + activeCampaigns + ' active';
+
+  // Budget preview listener
+  ['mktgCardsPerDrop','mktgDrops','mktgPricePerCard'].forEach(id => {
+    document.getElementById(id).onkeyup = updateBudgetPreview;
+    document.getElementById(id).onchange = updateBudgetPreview;
+  });
+
+  // Checklist progress in sidebar
+  updateChecklistSidebar();
+
+  renderCampaignTable();
   renderHandoffChecklist();
+}
+
+function updateBudgetPreview() {
+  const cards = +document.getElementById('mktgCardsPerDrop').value || 0;
+  const drops = +document.getElementById('mktgDrops').value || 0;
+  const price = +document.getElementById('mktgPricePerCard').value || 0;
+  const el = document.getElementById('mktgBudgetPreview');
+  if (cards && drops && price) {
+    const perDrop = cards * price;
+    const annual = perDrop * drops;
+    const totalCards = cards * drops;
+    el.style.display = 'block';
+    el.innerHTML = `<div style="display:flex;gap:20px;justify-content:center;text-align:center;">
+      <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Per Drop</div><div style="font-size:18px;font-weight:700;color:var(--green);">${money(perDrop)}</div><div style="font-size:11px;color:var(--text-muted);">${num(cards)} cards</div></div>
+      <div style="border-left:1px solid rgba(0,200,83,0.2);"></div>
+      <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Annual Total</div><div style="font-size:18px;font-weight:700;color:var(--green);">${money(annual)}</div><div style="font-size:11px;color:var(--text-muted);">${num(totalCards)} cards · ${drops} drops</div></div>
+    </div>`;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function updateChecklistSidebar() {
+  const state = getChecklistState();
+  let total = 0, checked = 0;
+  HANDOFF_CHECKLIST.forEach((s, si) => s.items.forEach((_, ii) => { total++; if (state[si+'-'+ii]) checked++; }));
+  const pctVal = total ? Math.round(checked / total * 100) : 0;
+  const el = document.getElementById('checklistProgress');
+  if (el) {
+    el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">
+      <div class="checklist-progress" style="flex:1;"><div class="checklist-progress-bar" style="width:${pctVal}%;${pctVal===100?'background:var(--green);':''}"></div></div>
+      <div style="font-size:13px;font-weight:600;color:${pctVal===100?'var(--green)':'white'};">${pctVal}%</div>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${checked} of ${total} items complete</div>`;
+  }
 }
 
 function renderCampaignTable() {
