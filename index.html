@@ -1835,6 +1835,11 @@ document.getElementById('tilePickerModal').addEventListener('click', (e) => {
 // OVERVIEW TAB
 // ============================================================
 function renderOverview() {
+  const cust = FILTERED.customers;
+  const det = FILTERED.details;
+  const promo = FILTERED.promos;
+  const insp = FILTERED.inspections;
+
   renderCustomTiles();
 
   // Revenue by date
