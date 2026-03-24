@@ -128,33 +128,45 @@
     color: white;
   }
 
-  .modal .form-group {
+  .form-group {
     margin-bottom: 14px;
   }
 
-  .modal .form-group label {
+  .form-group label {
     display: block;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-muted);
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    font-weight: 500;
   }
 
-  .modal .form-group input {
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
     width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 9px 12px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
 
-  .modal .form-group input:focus {
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
     outline: none;
     border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(227,24,55,0.1);
   }
+
+  .form-group input::placeholder { color: var(--text-muted); opacity: 0.5; }
+
+  .form-group select option { background: var(--bg); color: var(--text); }
 
   .modal-buttons {
     display: flex;
@@ -1615,91 +1627,111 @@
     <!-- Hero KPIs -->
     <div class="kpi-grid" id="mktgKPIs"></div>
 
-    <!-- Two-Column Layout: Campaign Builder + Quick Actions -->
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+    <!-- Campaign Builder + Sidebar -->
+    <div style="display:grid;grid-template-columns:7fr 3fr;gap:24px;margin-bottom:24px;">
 
-      <!-- Campaign Builder -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;overflow:hidden;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-          <div>
-            <h3 style="font-size:16px;font-weight:700;color:white;margin:0;">New Campaign</h3>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Triadex Plastic Postcard Program</div>
+      <!-- Campaign Builder Card -->
+      <div style="background:linear-gradient(135deg, var(--card) 0%, rgba(30,30,60,0.8) 100%);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+        <!-- Header Bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;">+</div>
+            <div>
+              <div style="font-size:16px;font-weight:700;color:white;">New Campaign</div>
+              <div style="font-size:11px;color:var(--text-muted);">Triadex Plastic Postcard Program</div>
+            </div>
           </div>
-          <div style="background:rgba(227,24,55,0.1);border:1px solid rgba(227,24,55,0.2);border-radius:8px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;">Triadex</div>
+          <div style="background:rgba(227,24,55,0.12);border:1px solid rgba(227,24,55,0.25);border-radius:8px;padding:8px 16px;font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;">Triadex</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-          <div class="form-group"><label>Campaign Name</label><input type="text" id="mktgCampName" placeholder="e.g. Spring SSOC Push — Q2 2026"></div>
-          <div class="form-group"><label>Client</label><input type="text" id="mktgClient" placeholder="e.g. South Bay Lube Inc."></div>
-          <div class="form-group"><label>Cards per Drop</label><input type="number" id="mktgCardsPerDrop" placeholder="e.g. 5,000 per store"></div>
-          <div class="form-group"><label>Number of Drops</label><input type="number" id="mktgDrops" placeholder="6" value="6"></div>
-          <div class="form-group"><label>Drop Frequency</label>
-            <select id="mktgFreq" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:13px;">
-              <option value="monthly">Monthly</option>
-              <option value="biweekly">Bi-Weekly</option>
-              <option value="weekly">Weekly</option>
-              <option value="quarterly">Quarterly</option>
-            </select>
+        <!-- Form Body -->
+        <div style="padding:24px;">
+          <!-- Row 1: Name + Client -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px;">
+            <div class="form-group"><label>Campaign Name</label><input type="text" id="mktgCampName" placeholder="Spring SSOC Push — Q2 2026"></div>
+            <div class="form-group"><label>Client</label><input type="text" id="mktgClient" placeholder="South Bay Lube Inc."></div>
           </div>
-          <div class="form-group"><label>Per-Card Price (all-in)</label><input type="number" step="0.01" id="mktgPricePerCard" placeholder="e.g. 0.42"></div>
-          <div class="form-group"><label>Drop 1 Target Date</label><input type="date" id="mktgDrop1"></div>
-          <div class="form-group"><label>Offer Expiration</label><input type="date" id="mktgExpDate"></div>
-        </div>
-        <div class="form-group" style="margin-top:14px;">
-          <label>Select Stores (Ctrl/Cmd+click for multiple)</label>
-          <select id="mktgStoreSelect" multiple style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;height:80px;"></select>
-        </div>
-        <!-- Live Budget Preview -->
-        <div id="mktgBudgetPreview" style="margin-top:16px;padding:14px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:8px;display:none;">
-        </div>
-        <div style="display:flex;gap:10px;margin-top:18px;">
-          <button class="btn-save" onclick="createCampaign()" style="padding:12px 28px;font-size:14px;">Create Campaign</button>
+          <!-- Section: Volume & Pricing -->
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:12px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);">Volume & Pricing</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:4px;">
+            <div class="form-group"><label>Cards / Drop</label><input type="number" id="mktgCardsPerDrop" placeholder="5,000"></div>
+            <div class="form-group"><label>Drops</label><input type="number" id="mktgDrops" placeholder="6" value="6"></div>
+            <div class="form-group"><label>Frequency</label>
+              <select id="mktgFreq">
+                <option value="monthly">Monthly</option>
+                <option value="biweekly">Bi-Weekly</option>
+                <option value="weekly">Weekly</option>
+                <option value="quarterly">Quarterly</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Price / Card (all-in)</label><input type="number" step="0.01" id="mktgPricePerCard" placeholder="0.42"></div>
+          </div>
+          <!-- Live Budget Preview -->
+          <div id="mktgBudgetPreview" style="margin:8px 0 16px;padding:16px 20px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;display:none;"></div>
+          <!-- Section: Schedule -->
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:12px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);">Schedule</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px;">
+            <div class="form-group"><label>Drop 1 Target Date</label><input type="date" id="mktgDrop1"></div>
+            <div class="form-group"><label>Offer Expiration</label><input type="date" id="mktgExpDate"></div>
+          </div>
+          <!-- Section: Stores -->
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:12px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);">Store Selection</div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Select Stores <span style="font-weight:400;text-transform:none;letter-spacing:0;">(hold Ctrl/Cmd to multi-select)</span></label>
+            <select id="mktgStoreSelect" multiple style="height:90px;"></select>
+          </div>
+          <!-- Action -->
+          <div style="margin-top:20px;display:flex;align-items:center;gap:16px;">
+            <button class="btn-save" onclick="createCampaign()" style="padding:14px 36px;font-size:14px;font-weight:700;border-radius:10px;">Create Campaign</button>
+            <span style="font-size:12px;color:var(--text-muted);">Campaign will be saved as Draft</span>
+          </div>
         </div>
       </div>
 
-      <!-- Quick Actions Sidebar -->
+      <!-- Right Sidebar -->
       <div style="display:flex;flex-direction:column;gap:16px;">
+
         <!-- Suppression Tool -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-            <div style="width:36px;height:36px;background:rgba(227,24,55,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--primary);">&#9747;</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="width:38px;height:38px;background:rgba(227,24,55,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--primary);font-weight:700;">S</div>
             <div>
-              <div style="font-size:14px;font-weight:600;color:white;">Suppression File</div>
+              <div style="font-size:14px;font-weight:700;color:white;">Suppression File</div>
               <div style="font-size:11px;color:var(--text-muted);">Exclude existing customers</div>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Generates a deduplicated CSV from your loaded customer data — ready to attach to any Triadex handoff.</div>
-          <div id="suppressionCount" style="font-size:20px;font-weight:700;color:white;margin-bottom:12px;">—</div>
-          <button class="btn-configure" onclick="generateSuppression()" style="width:100%;justify-content:center;">Generate Suppression CSV</button>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:14px;">Generates a deduplicated CSV from loaded customer data. Attach to Triadex handoff to prevent mailing existing customers.</div>
+          <div id="suppressionCount" style="font-size:22px;font-weight:800;color:white;margin-bottom:14px;">—</div>
+          <button class="btn-save" onclick="generateSuppression()" style="width:100%;justify-content:center;padding:12px;border-radius:10px;">Generate Suppression CSV</button>
         </div>
 
-        <!-- Handoff Status -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-            <div style="width:36px;height:36px;background:rgba(68,138,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--blue);">&#9993;</div>
+        <!-- Triadex Handoff -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="width:38px;height:38px;background:rgba(68,138,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);font-weight:700;">H</div>
             <div>
-              <div style="font-size:14px;font-weight:600;color:white;">Triadex Handoff</div>
-              <div style="font-size:11px;color:var(--text-muted);">Production email to Tim, Ryan, Riley</div>
+              <div style="font-size:14px;font-weight:700;color:white;">Triadex Handoff</div>
+              <div style="font-size:11px;color:var(--text-muted);">Email to Tim, Ryan, Riley</div>
             </div>
           </div>
-          <div id="checklistProgress" style="margin-bottom:12px;"></div>
+          <div id="checklistProgress" style="margin-bottom:14px;"></div>
           <div style="display:flex;gap:8px;">
-            <button class="btn-save" onclick="emailHandoff()" style="flex:1;justify-content:center;font-size:12px;padding:10px;">Send Handoff</button>
-            <button class="btn-configure" onclick="resetChecklist()" style="font-size:12px;padding:10px;">Reset</button>
+            <button class="btn-save" onclick="emailHandoff()" style="flex:1;justify-content:center;padding:12px;border-radius:10px;font-size:13px;">Send Handoff</button>
+            <button class="btn-configure" onclick="resetChecklist()" style="padding:12px;border-radius:10px;">Reset</button>
           </div>
         </div>
 
         <!-- Common Mistakes -->
-        <div style="background:rgba(255,145,0,0.06);border:1px solid rgba(255,145,0,0.15);border-radius:14px;padding:16px;">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--orange);margin-bottom:10px;">Watch Out</div>
-          <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">
-            &#10007; Missing phone numbers on stores<br>
-            &#10007; Abbreviated addresses (spell out)<br>
-            &#10007; Mismatched card counts vs deal sheet<br>
-            &#10007; Expiration &lt;60 days from drop<br>
-            &#10007; Creative is a draft/WIP<br>
-            &#10007; No NCOA PAF (USPS required)<br>
-            &#10007; No suppression file<br>
-            &#10007; Saying "ROI" — always <strong style="color:white;">ROAS</strong>
+        <div style="background:rgba(255,145,0,0.06);border:1px solid rgba(255,145,0,0.2);border-radius:16px;padding:18px;">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:10px;">Common Mistakes</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.8;">
+            <span style="color:var(--red);">&#10007;</span> Missing phone numbers on stores<br>
+            <span style="color:var(--red);">&#10007;</span> Abbreviated addresses (spell out)<br>
+            <span style="color:var(--red);">&#10007;</span> Mismatched card counts vs deal sheet<br>
+            <span style="color:var(--red);">&#10007;</span> Expiration &lt;60 days from drop<br>
+            <span style="color:var(--red);">&#10007;</span> Creative is a draft/WIP<br>
+            <span style="color:var(--red);">&#10007;</span> No NCOA PAF (USPS required)<br>
+            <span style="color:var(--red);">&#10007;</span> No suppression file<br>
+            <span style="color:var(--red);">&#10007;</span> Saying "ROI" — always <strong style="color:white;">ROAS</strong>
           </div>
         </div>
       </div>
