@@ -862,6 +862,95 @@
     background: rgba(227,24,55,0.2);
   }
 
+  /* Checklist */
+  .checklist-section {
+    margin-bottom: 16px;
+  }
+
+  .checklist-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.1s;
+    user-select: none;
+  }
+
+  .checklist-item:hover { background: rgba(255,255,255,0.03); }
+
+  .checklist-item .ck-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: transparent;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .checklist-item.checked .ck-box {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .checklist-item .ck-text {
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .checklist-item.checked .ck-text {
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+
+  .checklist-progress {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .checklist-progress-bar {
+    height: 100%;
+    background: var(--green);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+
+  .campaign-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .campaign-status.draft { background: rgba(136,136,168,0.15); color: var(--text-muted); }
+  .campaign-status.ready { background: rgba(0,200,83,0.15); color: var(--green); }
+  .campaign-status.sent { background: rgba(68,138,255,0.15); color: var(--blue); }
+  .campaign-status.active { background: rgba(227,24,55,0.15); color: var(--primary); }
+
   /* Alert Banner */
   .alert-banner {
     display: none;
@@ -1244,6 +1333,7 @@
     <button class="tab" data-tab="promos">Promotions</button>
     <button class="tab" data-tab="operations">Operations</button>
     <button class="tab" data-tab="customers">Customers</button>
+    <button class="tab" data-tab="marketing">Marketing</button>
     <button class="tab" data-tab="stores">Store Rankings</button>
   </div>
 
@@ -1512,6 +1602,78 @@
           </thead>
           <tbody></tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKETING TAB -->
+  <div class="tab-content" id="tab-marketing">
+    <div class="kpi-grid" id="mktgKPIs"></div>
+
+    <!-- Campaign Builder -->
+    <div class="charts-row single">
+      <div class="chart-card" style="padding:24px;">
+        <h3 style="margin-bottom:16px;">New Triadex Campaign</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div class="form-group"><label>Campaign Name</label><input type="text" id="mktgCampName" placeholder="e.g. Spring SSOC Push"></div>
+          <div class="form-group"><label>Client</label><input type="text" id="mktgClient" placeholder="e.g. Jiffy Lube"></div>
+          <div class="form-group"><label>Drop 1 Target Date</label><input type="date" id="mktgDrop1"></div>
+          <div class="form-group"><label>Cards per Drop</label><input type="number" id="mktgCardsPerDrop" placeholder="e.g. 5000"></div>
+          <div class="form-group"><label>Number of Drops</label><input type="number" id="mktgDrops" placeholder="e.g. 6" value="6"></div>
+          <div class="form-group"><label>Drop Frequency</label>
+            <select id="mktgFreq" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;">
+              <option value="monthly">Monthly</option>
+              <option value="biweekly">Bi-Weekly</option>
+              <option value="weekly">Weekly</option>
+              <option value="quarterly">Quarterly</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Per-Card Price</label><input type="number" step="0.01" id="mktgPricePerCard" placeholder="e.g. 0.42"></div>
+          <div class="form-group"><label>Expiration Date</label><input type="date" id="mktgExpDate"></div>
+          <div class="form-group"><label>Stores</label>
+            <select id="mktgStoreSelect" multiple style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;height:70px;"></select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <button class="btn-save" onclick="createCampaign()">Create Campaign</button>
+          <button class="btn-configure" onclick="generateSuppression()">Generate Suppression File</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Campaigns -->
+    <div class="table-wrap" style="margin-top:20px;">
+      <h3>Campaigns</h3>
+      <div class="table-scroll" style="max-height:300px;">
+        <table id="tblCampaigns">
+          <thead>
+            <tr>
+              <th>Campaign</th>
+              <th>Client</th>
+              <th>Stores</th>
+              <th>Cards/Drop</th>
+              <th>Drops</th>
+              <th>Annual Cards</th>
+              <th>Budget/Drop</th>
+              <th>Annual Budget</th>
+              <th>Drop 1</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="campaignTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Triadex Production Handoff Checklist -->
+    <div class="chart-card" style="margin-top:20px;padding:24px;">
+      <h3 style="margin-bottom:4px;">Triadex Production Handoff Checklist</h3>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Pre-send verification — complete all items before emailing Triadex</div>
+      <div id="handoffChecklist"></div>
+      <div style="margin-top:16px;display:flex;gap:10px;">
+        <button class="btn-save" onclick="emailHandoff()">Email Handoff to Triadex</button>
+        <button class="btn-configure" onclick="resetChecklist()">Reset Checklist</button>
       </div>
     </div>
   </div>
@@ -1852,6 +2014,7 @@ function renderDashboard() {
   renderPromos();
   renderOperations();
   renderCustomers();
+  renderMarketing();
   renderStores();
   runAlertCheck();
 }
@@ -3331,6 +3494,295 @@ function openStoreOpsDetail(storeNum) {
   `;
 
   document.getElementById('custDetailModal').classList.add('active');
+}
+
+// ============================================================
+// MARKETING TAB (Triadex Integration)
+// ============================================================
+const HANDOFF_CHECKLIST = [
+  { section: 'Required Attachments', items: [
+    'Approved Creative (PDF/AI) — final, not draft/WIP',
+    'Bought Mailing List (CSV/XLSX) — new prospect HH per store radius',
+    'NCOA PAF (PDF) — required for USPS compliance',
+    'Suppression File (CSV/XLSX) — existing customers to suppress'
+  ]},
+  { section: 'Conditional Attachments', items: [
+    'Store List Spreadsheet (if >5 stores) — address, phone, hours',
+    'Coupon Code Matrix — store to code to drop mapping',
+    'Radius Map Composite — PNG/PDF of store maps',
+    'Creative Revision Markup — annotated PDF or text notes',
+    'Deal Sheet (new programs) — PDF for program context'
+  ]},
+  { section: 'Store Details', items: [
+    'Every store has FULL street address (no abbreviations, no PO boxes)',
+    'Every store has phone number with area code',
+    'Store count in email matches actual store list',
+    'Cards/drop x drops = annual cards (math checks per store)',
+    'Total cards/drop = sum of all store cards/drop',
+    'Total annual cards = sum of all store annual cards'
+  ]},
+  { section: 'Creative Verification', items: [
+    'Creative filename matches actual attached file',
+    'Revision notes are specific — exact section, exact text',
+    '"Keep unchanged" list included',
+    'Per-store variable fields explicitly listed',
+    'Expiration date is specified',
+    'Card back treatment stated (individual vs. all-stores)',
+    'Version count matches store count'
+  ]},
+  { section: 'Mailing List', items: [
+    'List filename matches actual attached file',
+    'Total record count is stated',
+    'Targeting criteria described (radius, demographics, income)',
+    'Suppression details included (what was suppressed, record count)',
+    'Dedupe scope stated (across all stores in program)',
+    'NCOA processing confirmed and PAF attached'
+  ]},
+  { section: 'Pricing Confirmation', items: [
+    'Per-card price matches approved deal',
+    'Budget per drop = cards/drop x per-card price (list fee in budget)',
+    'Annual budget = budget/drop x drops',
+    '"All-in" noted (print + postage + tracking)'
+  ]},
+  { section: 'Drop Schedule', items: [
+    'Drop 1 target date is realistic (min 2 weeks for production)',
+    'Drop frequency stated',
+    'Future drop dates listed or noted as TBD'
+  ]},
+  { section: 'General / Final Check', items: [
+    'Subject: {Client} — Production Handoff — {N} Stores — Drop 1 Target: {Date}',
+    'All three Triadex contacts included: Tim, Ryan, Riley',
+    'CC includes sending AM + Chase Butler + Hollie Higgs',
+    'No {PLACEHOLDER} markers remain (or each noted as TBD with owner)',
+    'Closing asks for: production timeline, questions, proof delivery date',
+    'AM signature block is complete',
+    'Say "ROAS" not "ROI"'
+  ]}
+];
+
+function getCampaigns() {
+  try { return JSON.parse(localStorage.getItem('bp_campaigns') || '[]'); } catch(e) { return []; }
+}
+function saveCampaigns(list) { localStorage.setItem('bp_campaigns', JSON.stringify(list)); }
+
+function getChecklistState() {
+  try { return JSON.parse(localStorage.getItem('bp_checklist') || '{}'); } catch(e) { return {}; }
+}
+function saveChecklistState(state) { localStorage.setItem('bp_checklist', JSON.stringify(state)); }
+
+function renderMarketing() {
+  const cust = FILTERED.customers;
+  const campaigns = getCampaigns();
+
+  // KPIs
+  const totalCampaigns = campaigns.length;
+  const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'sent').length;
+  const totalAnnualCards = campaigns.reduce((s, c) => s + ((+c.cardsPerDrop || 0) * (+c.drops || 0)), 0);
+  const totalAnnualBudget = campaigns.reduce((s, c) => s + ((+c.cardsPerDrop || 0) * (+c.drops || 0) * (+c.pricePerCard || 0)), 0);
+  const suppressionPool = cust.length;
+
+  document.getElementById('mktgKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Total Campaigns</div><div class="kpi-value">${totalCampaigns}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Active</div><div class="kpi-value">${activeCampaigns}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Annual Cards</div><div class="kpi-value">${num(totalAnnualCards)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Annual Budget</div><div class="kpi-value">${money(totalAnnualBudget)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Suppression Pool</div><div class="kpi-value">${num(suppressionPool)}</div><div class="kpi-sub">existing customers</div></div>
+  `;
+
+  // Populate store selector
+  const sel = document.getElementById('mktgStoreSelect');
+  const stores = [...new Set(cust.map(r => r.Store_Number))].sort((a,b) => +a - +b);
+  sel.innerHTML = stores.map(s => `<option value="${s}">#${s}</option>`).join('');
+
+  // Render campaigns table
+  renderCampaignTable();
+
+  // Render checklist
+  renderHandoffChecklist();
+}
+
+function renderCampaignTable() {
+  const campaigns = getCampaigns();
+  document.getElementById('campaignTableBody').innerHTML = campaigns.length ? campaigns.map((c, i) => {
+    const annualCards = (+c.cardsPerDrop || 0) * (+c.drops || 0);
+    const budgetPerDrop = (+c.cardsPerDrop || 0) * (+c.pricePerCard || 0);
+    const annualBudget = budgetPerDrop * (+c.drops || 0);
+    return `<tr>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.client}</td>
+      <td>${(c.stores || []).length}</td>
+      <td>${num(+c.cardsPerDrop || 0)}</td>
+      <td>${c.drops}</td>
+      <td>${num(annualCards)}</td>
+      <td>${money(budgetPerDrop)}</td>
+      <td>${money(annualBudget)}</td>
+      <td>${c.drop1 || '—'}</td>
+      <td><span class="campaign-status ${c.status}">${c.status}</span></td>
+      <td style="white-space:nowrap;">
+        <select onchange="updateCampaignStatus(${i}, this.value)" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-size:11px;">
+          <option value="draft" ${c.status==='draft'?'selected':''}>Draft</option>
+          <option value="ready" ${c.status==='ready'?'selected':''}>Ready</option>
+          <option value="sent" ${c.status==='sent'?'selected':''}>Sent</option>
+          <option value="active" ${c.status==='active'?'selected':''}>Active</option>
+        </select>
+        <button onclick="removeCampaign(${i})" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:12px;margin-left:4px;">&times;</button>
+      </td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:20px;">No campaigns yet. Create one above.</td></tr>';
+}
+
+function createCampaign() {
+  const name = document.getElementById('mktgCampName').value.trim();
+  const client = document.getElementById('mktgClient').value.trim();
+  const drop1 = document.getElementById('mktgDrop1').value;
+  const cardsPerDrop = document.getElementById('mktgCardsPerDrop').value;
+  const drops = document.getElementById('mktgDrops').value;
+  const freq = document.getElementById('mktgFreq').value;
+  const pricePerCard = document.getElementById('mktgPricePerCard').value;
+  const expDate = document.getElementById('mktgExpDate').value;
+  const storeSelect = document.getElementById('mktgStoreSelect');
+  const stores = [...storeSelect.selectedOptions].map(o => o.value);
+
+  if (!name) { alert('Please enter a campaign name.'); return; }
+
+  const list = getCampaigns();
+  list.push({ name, client, drop1, cardsPerDrop, drops, freq, pricePerCard, expDate, stores, status: 'draft', created: new Date().toISOString() });
+  saveCampaigns(list);
+
+  // Reset form
+  document.getElementById('mktgCampName').value = '';
+  document.getElementById('mktgClient').value = '';
+  renderCampaignTable();
+  renderMarketing();
+}
+
+function removeCampaign(idx) {
+  const list = getCampaigns();
+  list.splice(idx, 1);
+  saveCampaigns(list);
+  renderCampaignTable();
+  renderMarketing();
+}
+
+function updateCampaignStatus(idx, status) {
+  const list = getCampaigns();
+  list[idx].status = status;
+  saveCampaigns(list);
+  renderCampaignTable();
+}
+
+function generateSuppression() {
+  const storeSelect = document.getElementById('mktgStoreSelect');
+  const selectedStores = [...storeSelect.selectedOptions].map(o => o.value);
+  const cust = selectedStores.length ? FILTERED.customers.filter(r => selectedStores.includes(r.Store_Number)) : FILTERED.customers;
+
+  if (!cust.length) { alert('No customer data loaded. Load CSVs first.'); return; }
+
+  // Build suppression CSV: name, address, city, state, zip
+  const rows = ['"First_Name","Last_Name","Address","City","State","ZIP"'];
+  const seen = new Set();
+  cust.forEach(r => {
+    const key = (r.Customer_Address || '').trim().toUpperCase() + '|' + (r.ZIP_Code || '');
+    if (seen.has(key) || !r.Customer_Address) return;
+    seen.add(key);
+    rows.push([r.Customer_First_Name, r.Customer_Last_Name, r.Customer_Address, r.City, r.Customer_State, r.ZIP_Code].map(v => '"' + (v || '').replace(/"/g, '""') + '"').join(','));
+  });
+
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Suppression_File_' + (selectedStores.length ? selectedStores.join('-') : 'All_Stores') + '_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  alert('Suppression file generated: ' + num(rows.length - 1) + ' unique addresses' + (selectedStores.length ? ' for store(s) #' + selectedStores.join(', #') : '') + '.');
+}
+
+function renderHandoffChecklist() {
+  const state = getChecklistState();
+  let totalItems = 0;
+  let checkedItems = 0;
+
+  let html = '';
+  HANDOFF_CHECKLIST.forEach((section, si) => {
+    html += `<div class="checklist-section"><div class="checklist-section-title">${section.section}</div>`;
+    section.items.forEach((item, ii) => {
+      const key = si + '-' + ii;
+      const checked = state[key] ? ' checked' : '';
+      totalItems++;
+      if (state[key]) checkedItems++;
+      html += `<div class="checklist-item${checked}" onclick="toggleChecklistItem('${key}', this)"><div class="ck-box">&#10003;</div><div class="ck-text">${item}</div></div>`;
+    });
+    html += '</div>';
+  });
+
+  const pct = totalItems ? Math.round(checkedItems / totalItems * 100) : 0;
+  document.getElementById('handoffChecklist').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <div class="checklist-progress" style="flex:1;"><div class="checklist-progress-bar" style="width:${pct}%;"></div></div>
+      <div style="font-size:13px;font-weight:600;color:${pct === 100 ? 'var(--green)' : 'var(--text-muted)'};">${pct}% (${checkedItems}/${totalItems})</div>
+    </div>
+    ${html}
+  `;
+}
+
+function toggleChecklistItem(key, el) {
+  const state = getChecklistState();
+  state[key] = !state[key];
+  saveChecklistState(state);
+  el.classList.toggle('checked');
+  // Update progress
+  renderHandoffChecklist();
+}
+
+function resetChecklist() {
+  localStorage.removeItem('bp_checklist');
+  renderHandoffChecklist();
+}
+
+function emailHandoff() {
+  const campaigns = getCampaigns();
+  const latest = campaigns.length ? campaigns[campaigns.length - 1] : null;
+  const meta = getReportMeta();
+  const client = latest ? latest.client : (meta.company || '{Client}');
+  const storeCount = latest ? (latest.stores || []).length : '{N}';
+  const drop1 = latest ? latest.drop1 : '{Date}';
+
+  const subject = client + ' — Production Handoff — ' + storeCount + ' Stores — Drop 1 Target: ' + drop1;
+
+  const state = getChecklistState();
+  let totalItems = 0, checkedItems = 0;
+  HANDOFF_CHECKLIST.forEach((s, si) => s.items.forEach((item, ii) => { totalItems++; if (state[si+'-'+ii]) checkedItems++; }));
+
+  let body = 'Hi Tim, Ryan, Riley,\n\n';
+  body += 'Please find the production handoff for ' + client + '.\n\n';
+  if (latest) {
+    const annual = (+latest.cardsPerDrop||0) * (+latest.drops||0);
+    body += 'Campaign: ' + latest.name + '\n';
+    body += 'Stores: ' + storeCount + '\n';
+    body += 'Cards/Drop: ' + num(+latest.cardsPerDrop||0) + '\n';
+    body += 'Drops: ' + latest.drops + '\n';
+    body += 'Annual Cards: ' + num(annual) + '\n';
+    body += 'Drop 1 Target: ' + drop1 + '\n';
+    body += 'Frequency: ' + latest.freq + '\n';
+    if (latest.expDate) body += 'Expiration Date: ' + latest.expDate + '\n';
+    body += '\n';
+  }
+  body += 'Checklist Status: ' + checkedItems + '/' + totalItems + ' complete\n\n';
+  body += 'Please confirm:\n- Production timeline\n- Any questions\n- Proof delivery date\n\n';
+  body += 'Best,\n';
+
+  const to = 'tim@triadex.com, ryan@triadex.com, riley@triadex.com';
+
+  if (isEmailConfigured()) {
+    sendViaEmailJS(to, subject, body).then(() => {
+      alert('Handoff email sent to Triadex!');
+    }).catch(err => {
+      alert('Failed: ' + (err?.text || err?.message || 'Check Settings.'));
+    });
+  } else {
+    window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + '&cc=' + encodeURIComponent('cbutler@matriximaging.com'), '_self');
+  }
 }
 
 // ============================================================
