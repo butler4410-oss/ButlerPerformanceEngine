@@ -1,0 +1,2648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance Analytics Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+  :root {
+    --primary: #e31837;
+    --primary-dark: #b8132d;
+    --accent: #1a1a2e;
+    --accent-light: #16213e;
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --card-hover: #1e2240;
+    --text: #e8e8f0;
+    --text-muted: #8888a8;
+    --border: #2a2a45;
+    --green: #00c853;
+    --yellow: #ffd600;
+    --orange: #ff9100;
+    --red: #ff1744;
+    --blue: #448aff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    border-bottom: 3px solid var(--primary);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-text {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .header-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .client-badge {
+    background: rgba(227,24,55,0.15);
+    border: 1px solid rgba(227,24,55,0.3);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .client-badge:hover {
+    background: rgba(227,24,55,0.25);
+    border-color: var(--primary);
+  }
+
+  .client-badge .edit-icon {
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .client-badge:hover .edit-icon {
+    opacity: 1;
+  }
+
+  /* Settings Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    width: 400px;
+    max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .modal h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: white;
+  }
+
+  .modal .form-group {
+    margin-bottom: 14px;
+  }
+
+  .modal .form-group label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+
+  .modal .form-group input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .modal .form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .modal-buttons .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .modal-buttons .btn-save {
+    background: var(--primary);
+    border: none;
+    color: white;
+    padding: 8px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Loading Screen */
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s;
+  }
+
+  .loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .drop-zone {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 60px 40px;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .drop-zone.drag-over {
+    border-color: var(--primary);
+    background: rgba(227,24,55,0.05);
+  }
+
+  .drop-zone h2 {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .drop-zone p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .file-input-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .file-input-btn:hover { background: var(--primary-dark); }
+
+  #fileInput { display: none; }
+
+  .file-list {
+    margin-top: 20px;
+    text-align: left;
+  }
+
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .file-item .check { color: var(--green); font-weight: bold; }
+  .file-item .name { flex: 1; }
+  .file-item .rows { color: var(--text-muted); }
+
+  /* Dashboard Layout */
+  .dashboard { display: none; padding: 24px 32px; }
+  .dashboard.active { display: block; }
+
+  /* Filters Bar */
+  .filters-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-group label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+  }
+
+  .filter-group select, .filter-group input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    min-width: 140px;
+  }
+
+  .filter-group select:focus, .filter-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .btn-apply {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: background 0.2s;
+  }
+
+  .btn-apply:hover { background: var(--primary-dark); }
+
+  .btn-reset {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+
+  .btn-reset:hover { color: var(--text); border-color: var(--text-muted); }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+  }
+
+  .kpi-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .kpi-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Chart containers */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .charts-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .charts-row.single { grid-template-columns: 1fr; }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .chart-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 300px;
+  }
+
+  /* Data Tables */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .table-wrap h3 {
+    padding: 16px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    background: #1e1e35;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 2px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  thead th.sortable { cursor: pointer; }
+  thead th.sortable:hover { color: var(--primary); }
+
+  tbody td {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  .status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  .status-dot.green { background: var(--green); }
+  .status-dot.yellow { background: var(--yellow); }
+  .status-dot.orange { background: var(--orange); }
+  .status-dot.red { background: var(--red); }
+
+  /* Export Button */
+  .export-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .btn-export {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .btn-export:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  /* Customer Detail Modal */
+  .cust-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .cust-modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .cust-modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 720px;
+    max-width: 94vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+
+  .cust-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cust-modal-header h2 {
+    font-size: 18px;
+    color: white;
+  }
+
+  .cust-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .cust-modal-close:hover {
+    color: var(--primary);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .cust-modal-body {
+    padding: 24px;
+  }
+
+  .cust-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .cust-detail-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .cust-detail-section h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cust-field {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+  }
+
+  .cust-field .label {
+    color: var(--text-muted);
+  }
+
+  .cust-field .value {
+    color: white;
+    font-weight: 500;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+  }
+
+  .cust-detail-section.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .cust-timeline {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .cust-timeline-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+  }
+
+  .cust-timeline-step .time {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .cust-timeline-step .step-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .cust-timeline-step .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin: 6px auto;
+  }
+
+  .cust-timeline-step .line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+  }
+
+  tbody tr.clickable-row {
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  tbody tr.clickable-row:hover {
+    background: rgba(227,24,55,0.08);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .charts-row { grid-template-columns: 1fr; }
+    .charts-row.three { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .header { padding: 12px 16px; }
+    .dashboard { padding: 16px; }
+  }
+
+  /* Print */
+  @media print {
+    .header { position: static; }
+    .filters-bar, .export-bar, .btn-apply, .btn-reset { display: none; }
+    body { background: white; color: #222; }
+    .kpi-card, .chart-card, .table-wrap { border-color: #ddd; background: white; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loadingText">Loading Analytics...</div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo-area">
+    <div>
+      <div class="header-sub" style="font-size:14px;letter-spacing:2px;">Performance Analytics Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="client-badge" id="clientBadge" onclick="openSettings()" title="Click to edit">
+      <span id="clientBadgeText">Click to set client</span>
+      <span class="edit-icon">&#9998;</span>
+    </div>
+    <div id="dateRange" style="font-size:12px;color:var(--text-muted);"></div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h3>Dashboard Settings</h3>
+    <div class="form-group">
+      <label>Company / Client Name</label>
+      <input type="text" id="settingCompany" placeholder="e.g. Jiffy Lube">
+    </div>
+    <div class="form-group">
+      <label>User / Contact Name</label>
+      <input type="text" id="settingUser" placeholder="e.g. Erin Ham">
+    </div>
+    <div class="modal-buttons">
+      <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
+      <button class="btn-save" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Detail Modal -->
+<div class="cust-modal-overlay" id="custDetailModal">
+  <div class="cust-modal">
+    <div class="cust-modal-header">
+      <h2 id="custDetailName">Customer Details</h2>
+      <button class="cust-modal-close" onclick="closeCustDetail()">&times;</button>
+    </div>
+    <div class="cust-modal-body" id="custDetailBody"></div>
+  </div>
+</div>
+
+<!-- Upload Zone (shown when no data) -->
+<div id="uploadZone" class="drop-zone">
+  <h2>Load Your Data</h2>
+  <p>Drop your CSV extract files here, or click to browse.<br>Accepts all 6 data extract CSVs.</p>
+  <button class="file-input-btn" onclick="document.getElementById('fileInput').click()">Choose Files</button>
+  <input type="file" id="fileInput" multiple accept=".csv,.CSV">
+  <div class="file-list" id="fileList"></div>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard" id="dashboard">
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label>Store</label>
+      <select id="filterStore"><option value="">All Stores</option></select>
+    </div>
+    <div class="filter-group">
+      <label>Date From</label>
+      <input type="date" id="filterFrom">
+    </div>
+    <div class="filter-group">
+      <label>Date To</label>
+      <input type="date" id="filterTo">
+    </div>
+    <button class="btn-apply" onclick="applyFilters()">Apply Filters</button>
+    <button class="btn-reset" onclick="resetFilters()">Reset</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="revenue">Revenue & Services</button>
+    <button class="tab" data-tab="inspections">Inspections</button>
+    <button class="tab" data-tab="promos">Promotions</button>
+    <button class="tab" data-tab="operations">Operations</button>
+    <button class="tab" data-tab="customers">Customers</button>
+    <button class="tab" data-tab="stores">Store Rankings</button>
+  </div>
+
+  <!-- OVERVIEW TAB -->
+  <div class="tab-content active" id="tab-overview">
+    <div class="kpi-grid" id="overviewKPIs"></div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Revenue by Date</h3>
+        <div class="chart-wrap"><canvas id="chartRevByDate"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Invoices by Date</h3>
+        <div class="chart-wrap"><canvas id="chartInvByDate"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Top 10 Services by Revenue</h3>
+        <div class="chart-wrap"><canvas id="chartTopServices"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Inspection Health Overview</h3>
+        <div class="chart-wrap"><canvas id="chartInspOverview"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUE TAB -->
+  <div class="tab-content" id="tab-revenue">
+    <div class="kpi-grid" id="revenueKPIs"></div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Revenue by Service Category</h3>
+        <div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Revenue by Detail Type</h3>
+        <div class="chart-wrap"><canvas id="chartRevByType"></canvas></div>
+      </div>
+    </div>
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportTable('tblServices')">Export CSV</button>
+    </div>
+    <div class="table-wrap">
+      <h3>Service & Product Breakdown</h3>
+      <div class="table-scroll">
+        <table id="tblServices">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="0">Category</th>
+              <th class="sortable" data-col="1">Description</th>
+              <th class="sortable" data-col="2">Type</th>
+              <th class="sortable" data-col="3">Qty Sold</th>
+              <th class="sortable" data-col="4">Revenue</th>
+              <th class="sortable" data-col="5">Avg Price</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSPECTIONS TAB -->
+  <div class="tab-content" id="tab-inspections">
+    <div class="kpi-grid" id="inspKPIs"></div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Inspection Status Distribution</h3>
+        <div class="chart-wrap"><canvas id="chartInspStatus"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Yellow/Red Conversion Rate (Purchased This Visit)</h3>
+        <div class="chart-wrap"><canvas id="chartConversion"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row single">
+      <div class="chart-card">
+        <h3>Top Upsell Opportunities (Yellow + Red Items Not Purchased)</h3>
+        <div class="chart-wrap"><canvas id="chartUpsell"></canvas></div>
+      </div>
+    </div>
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportTable('tblInsp')">Export CSV</button>
+    </div>
+    <div class="table-wrap">
+      <h3>Inspection Items Summary</h3>
+      <div class="table-scroll">
+        <table id="tblInsp">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="0">Service Item</th>
+              <th class="sortable" data-col="1">Green</th>
+              <th class="sortable" data-col="2">Yellow</th>
+              <th class="sortable" data-col="3">Orange</th>
+              <th class="sortable" data-col="4">Red</th>
+              <th class="sortable" data-col="5">Purchased</th>
+              <th class="sortable" data-col="6">Conversion %</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMOS TAB -->
+  <div class="tab-content" id="tab-promos">
+    <div class="kpi-grid" id="promoKPIs"></div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Top 10 Promos by Usage</h3>
+        <div class="chart-wrap"><canvas id="chartPromoUsage"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Top 10 Promos by Discount Amount</h3>
+        <div class="chart-wrap"><canvas id="chartPromoAmt"></canvas></div>
+      </div>
+    </div>
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportTable('tblPromos')">Export CSV</button>
+    </div>
+    <div class="table-wrap">
+      <h3>Promotion Details</h3>
+      <div class="table-scroll">
+        <table id="tblPromos">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="0">Promo Code</th>
+              <th class="sortable" data-col="1">Description</th>
+              <th class="sortable" data-col="2">Times Used</th>
+              <th class="sortable" data-col="3">Total Discount</th>
+              <th class="sortable" data-col="4">Avg Discount</th>
+              <th class="sortable" data-col="5">Stores Using</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPERATIONS TAB -->
+  <div class="tab-content" id="tab-operations">
+    <div class="kpi-grid" id="opsKPIs"></div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Average Service Time by Store (Top 15)</h3>
+        <div class="chart-wrap"><canvas id="chartSvcTime"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Service Time Distribution (Minutes)</h3>
+        <div class="chart-wrap"><canvas id="chartTimeHist"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Top Vehicle Makes</h3>
+        <div class="chart-wrap"><canvas id="chartMakes"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Invoices by Hour of Day</h3>
+        <div class="chart-wrap"><canvas id="chartByHour"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS TAB -->
+  <div class="tab-content" id="tab-customers">
+    <div class="kpi-grid" id="custKPIs"></div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Customers by State</h3>
+        <div class="chart-wrap"><canvas id="chartCustState"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Top 15 Cities</h3>
+        <div class="chart-wrap"><canvas id="chartCustCity"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Customer Spend Distribution</h3>
+        <div class="chart-wrap"><canvas id="chartCustSpend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Vehicle Year Distribution</h3>
+        <div class="chart-wrap"><canvas id="chartVehYear"></canvas></div>
+      </div>
+    </div>
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportTable('tblCustomers')">Export CSV</button>
+      <div class="filter-group" style="flex-direction:row;align-items:center;gap:8px;">
+        <label style="margin:0;">Search:</label>
+        <input type="text" id="custSearch" placeholder="Name, email, phone, VIN..." style="min-width:260px;" oninput="filterCustomerTable()">
+      </div>
+    </div>
+    <div class="table-wrap">
+      <h3>Customer Details <span id="custCount" style="font-weight:400;color:var(--text-muted);font-size:12px;margin-left:10px;"></span></h3>
+      <div class="table-scroll" style="max-height:500px;">
+        <table id="tblCustomers">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="0">Name</th>
+              <th class="sortable" data-col="1">Phone</th>
+              <th class="sortable" data-col="2">Email</th>
+              <th class="sortable" data-col="3">City</th>
+              <th class="sortable" data-col="4">State</th>
+              <th class="sortable" data-col="5">ZIP</th>
+              <th class="sortable" data-col="6">Vehicle</th>
+              <th class="sortable" data-col="7">Mileage</th>
+              <th class="sortable" data-col="8">Store</th>
+              <th class="sortable" data-col="9">Date</th>
+              <th class="sortable" data-col="10">Net Sales</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="table-wrap" style="margin-top:20px;">
+      <h3>Business Accounts</h3>
+      <div class="table-scroll" style="max-height:350px;">
+        <table id="tblBizAccounts">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="0">Account ID</th>
+              <th class="sortable" data-col="1">Processor</th>
+              <th class="sortable" data-col="2">Invoices</th>
+              <th class="sortable" data-col="3">Total Revenue</th>
+              <th class="sortable" data-col="4">Avg Ticket</th>
+              <th class="sortable" data-col="5">Stores</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORE RANKINGS TAB -->
+  <div class="tab-content" id="tab-stores">
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportTable('tblStores')">Export CSV</button>
+    </div>
+    <div class="table-wrap">
+      <h3>Store Performance Rankings</h3>
+      <div class="table-scroll">
+        <table id="tblStores">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="0">Store #</th>
+              <th class="sortable" data-col="1">Invoices</th>
+              <th class="sortable" data-col="2">Revenue</th>
+              <th class="sortable" data-col="3">Avg Ticket</th>
+              <th class="sortable" data-col="4">Avg Svc Time</th>
+              <th class="sortable" data-col="5">Promo Usage</th>
+              <th class="sortable" data-col="6">Promo Discounts</th>
+              <th class="sortable" data-col="7">Inspection Items</th>
+              <th class="sortable" data-col="8">Yellow/Red %</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA STORAGE
+// ============================================================
+let DATA = {
+  invoices: [],      // small invoice list
+  promos: [],        // promo details
+  odi: [],           // odi values
+  details: [],       // invoice line items
+  customers: [],     // customer/vehicle/timing
+  inspections: []    // inspection items
+};
+
+let FILTERED = {};
+let allCharts = {};
+
+// ============================================================
+// CSV PARSER
+// ============================================================
+function parseCSV(text) {
+  const lines = text.split('\n');
+  if (lines.length < 2) return [];
+  const headers = parseCSVLine(lines[0]);
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const vals = parseCSVLine(line);
+    const obj = {};
+    for (let h = 0; h < headers.length; h++) {
+      obj[headers[h]] = vals[h] || '';
+    }
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (i + 1 < line.length && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        current += c;
+      }
+    } else {
+      if (c === '"') {
+        inQuotes = true;
+      } else if (c === ',') {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += c;
+      }
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+// ============================================================
+// FILE DETECTION & LOADING
+// ============================================================
+function detectFileType(headers) {
+  const h = headers.join(',').toLowerCase();
+  if (h.includes('inspection_status')) return 'inspections';
+  if (h.includes('customer_first_name') || h.includes('greet_time')) return 'customers';
+  if (h.includes('invoice_detail_type') || h.includes('extended_price')) return 'details';
+  if (h.includes('promo_code')) return 'promos';
+  if (h.includes('odi_value')) return 'odi';
+  if (h.includes('store_number') && h.includes('invoice_number') && headers.length <= 4) return 'invoices';
+  return 'unknown';
+}
+
+const fileLabels = {
+  invoices: 'Invoices',
+  promos: 'Promotions',
+  odi: 'ODI Values',
+  details: 'Invoice Details',
+  customers: 'Customers & Vehicles',
+  inspections: 'Inspections'
+};
+
+let loadedFiles = {};
+
+function processFile(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const firstLine = text.split('\n')[0];
+      const headers = parseCSVLine(firstLine);
+      const type = detectFileType(headers);
+      if (type === 'unknown') {
+        resolve({ name: file.name, type: 'unknown', rows: 0 });
+        return;
+      }
+      const rows = parseCSV(text);
+      DATA[type] = rows;
+      loadedFiles[type] = true;
+      resolve({ name: file.name, type, rows: rows.length });
+    };
+    reader.readAsText(file);
+  });
+}
+
+// ============================================================
+// FILE UPLOAD HANDLING
+// ============================================================
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const fileListEl = document.getElementById('fileList');
+
+uploadZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadZone.classList.add('drag-over');
+});
+
+uploadZone.addEventListener('dragleave', () => {
+  uploadZone.classList.remove('drag-over');
+});
+
+uploadZone.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  await handleFiles(e.dataTransfer.files);
+});
+
+fileInput.addEventListener('change', async () => {
+  await handleFiles(fileInput.files);
+});
+
+async function handleFiles(files) {
+  const results = [];
+  for (const file of files) {
+    const r = await processFile(file);
+    results.push(r);
+  }
+
+  fileListEl.innerHTML = results.map(r => `
+    <div class="file-item">
+      <span class="check">${r.type !== 'unknown' ? '✓' : '?'}</span>
+      <span class="name">${r.name}</span>
+      <span class="rows">${r.type !== 'unknown' ? fileLabels[r.type] + ' — ' + r.rows.toLocaleString() + ' rows' : 'Unknown format'}</span>
+    </div>
+  `).join('');
+
+  const loadedCount = Object.keys(loadedFiles).length;
+  if (loadedCount >= 2) {
+    setTimeout(() => launchDashboard(), 500);
+  }
+}
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+function parseDate(str) {
+  if (!str) return null;
+  const match = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!match) return null;
+  return new Date(+match[3], +match[1] - 1, +match[2]);
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+}
+
+function fmtDateISO(d) {
+  if (!d) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function money(n) {
+  return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function pct(n) {
+  return Number(n).toFixed(1) + '%';
+}
+
+function num(n) {
+  return Number(n).toLocaleString();
+}
+
+function diffMinutes(start, end) {
+  const s = parseDate(start), e = parseDate(end);
+  if (!s || !e) return null;
+  // Parse full datetime
+  const sm = start.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)/i);
+  const em = end.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)/i);
+  if (!sm || !em) return null;
+  const toMs = (m) => {
+    let h = +m[4], min = +m[5], sec = +m[6];
+    const ampm = m[7].toUpperCase();
+    if (ampm === 'PM' && h < 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    return new Date(+m[3], +m[1]-1, +m[2], h, min, sec).getTime();
+  };
+  return (toMs(em) - toMs(sm)) / 60000;
+}
+
+// ============================================================
+// FILTERING
+// ============================================================
+function applyFilters() {
+  const store = document.getElementById('filterStore').value;
+  const from = document.getElementById('filterFrom').value ? new Date(document.getElementById('filterFrom').value + 'T00:00:00') : null;
+  const to = document.getElementById('filterTo').value ? new Date(document.getElementById('filterTo').value + 'T23:59:59') : null;
+
+  const filterRow = (row) => {
+    if (store && row.Store_Number !== store) return false;
+    const d = parseDate(row.Invoice_Date);
+    if (from && d && d < from) return false;
+    if (to && d && d > to) return false;
+    return true;
+  };
+
+  FILTERED.customers = DATA.customers.filter(filterRow);
+  FILTERED.details = DATA.details.filter(filterRow);
+  FILTERED.promos = DATA.promos.filter(filterRow);
+  FILTERED.odi = DATA.odi.filter(filterRow);
+  FILTERED.inspections = DATA.inspections.filter(r => {
+    if (store && r.Store_Number !== store) return false;
+    const d = parseDate(r.Update_Date);
+    if (from && d && d < from) return false;
+    if (to && d && d > to) return false;
+    return true;
+  });
+  FILTERED.invoices = DATA.invoices.filter(filterRow);
+
+  renderDashboard();
+}
+
+function resetFilters() {
+  document.getElementById('filterStore').value = '';
+  document.getElementById('filterFrom').value = '';
+  document.getElementById('filterTo').value = '';
+  applyFilters();
+}
+
+// ============================================================
+// LAUNCH DASHBOARD
+// ============================================================
+function launchDashboard() {
+  document.getElementById('loadingScreen').classList.add('hidden');
+  uploadZone.style.display = 'none';
+  document.getElementById('dashboard').classList.add('active');
+
+  // Populate store filter
+  const stores = new Set();
+  [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(arr => {
+    arr.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
+  });
+  const sel = document.getElementById('filterStore');
+  [...stores].sort((a,b) => +a - +b).forEach(s => {
+    sel.innerHTML += `<option value="${s}">${s}</option>`;
+  });
+
+  // Date range
+  let minD = null, maxD = null;
+  DATA.customers.forEach(r => {
+    const d = parseDate(r.Invoice_Date);
+    if (d) {
+      if (!minD || d < minD) minD = d;
+      if (!maxD || d > maxD) maxD = d;
+    }
+  });
+  if (minD && maxD) {
+    document.getElementById('dateRange').textContent = fmtDate(minD) + ' — ' + fmtDate(maxD);
+    document.getElementById('filterFrom').value = fmtDateISO(minD);
+    document.getElementById('filterTo').value = fmtDateISO(maxD);
+  }
+
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  applyFilters();
+}
+
+// ============================================================
+// RENDER DASHBOARD
+// ============================================================
+function renderDashboard() {
+  renderOverview();
+  renderRevenue();
+  renderInspections();
+  renderPromos();
+  renderOperations();
+  renderCustomers();
+  renderStores();
+}
+
+// ============================================================
+// CHART.JS GLOBAL DEFAULTS (Dark Theme)
+// ============================================================
+Chart.defaults.color = '#9999b8';
+Chart.defaults.font.family = "'Segoe UI', system-ui, -apple-system, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.labels.color = '#9999b8';
+Chart.defaults.plugins.legend.labels.font = { size: 11, family: "'Segoe UI', system-ui, sans-serif" };
+Chart.defaults.plugins.legend.labels.padding = 16;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15,15,26,0.95)';
+Chart.defaults.plugins.tooltip.titleColor = '#e8e8f0';
+Chart.defaults.plugins.tooltip.bodyColor = '#c8c8e0';
+Chart.defaults.plugins.tooltip.borderColor = 'rgba(227,24,55,0.3)';
+Chart.defaults.plugins.tooltip.borderWidth = 1;
+Chart.defaults.plugins.tooltip.padding = 12;
+Chart.defaults.plugins.tooltip.cornerRadius = 8;
+Chart.defaults.plugins.tooltip.titleFont = { size: 13, weight: '600' };
+Chart.defaults.plugins.tooltip.bodyFont = { size: 12 };
+Chart.defaults.plugins.tooltip.displayColors = true;
+Chart.defaults.plugins.tooltip.boxPadding = 4;
+Chart.defaults.elements.bar.borderRadius = 4;
+Chart.defaults.elements.bar.borderSkipped = false;
+Chart.defaults.elements.line.tension = 0.35;
+Chart.defaults.elements.line.borderWidth = 2.5;
+Chart.defaults.elements.point.radius = 3;
+Chart.defaults.elements.point.hoverRadius = 6;
+Chart.defaults.elements.point.hoverBorderWidth = 2;
+Chart.defaults.elements.arc.borderWidth = 2;
+Chart.defaults.elements.arc.borderColor = '#0f0f1a';
+
+// Cohesive color palette derived from brand red #e31837
+const PALETTE = {
+  red: '#e31837', redLight: 'rgba(227,24,55,0.65)', redFill: 'rgba(227,24,55,0.12)',
+  blue: '#448aff', blueLight: 'rgba(68,138,255,0.65)', blueFill: 'rgba(68,138,255,0.12)',
+  green: '#00c853', greenLight: 'rgba(0,200,83,0.65)', greenFill: 'rgba(0,200,83,0.12)',
+  yellow: '#ffd600', yellowLight: 'rgba(255,214,0,0.65)', yellowFill: 'rgba(255,214,0,0.12)',
+  orange: '#ff9100', orangeLight: 'rgba(255,145,0,0.65)',
+  purple: '#b388ff', purpleLight: 'rgba(179,136,255,0.65)',
+  teal: '#26c6da', tealLight: 'rgba(38,198,218,0.65)',
+  pink: '#f06292', pinkLight: 'rgba(240,98,146,0.65)',
+  multi: ['#e31837','#448aff','#00c853','#ffd600','#ff9100','#b388ff','#26c6da','#f06292','#ff6e40','#69f0ae','#40c4ff','#ffd740']
+};
+
+// Tooltip callback helpers
+function tooltipMoney(ctx) {
+  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed.x;
+  return (ctx.dataset.label || '') + ': $' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function tooltipMoneyPie(ctx) {
+  return (ctx.label || '') + ': $' + Number(ctx.parsed).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function tooltipCount(ctx) {
+  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed.x;
+  return (ctx.dataset.label || '') + ': ' + Number(val).toLocaleString();
+}
+function tooltipPct(ctx) {
+  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed.x;
+  return (ctx.dataset.label || '') + ': ' + Number(val).toFixed(1) + '%';
+}
+function tooltipMinutes(ctx) {
+  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed.x;
+  return (ctx.dataset.label || '') + ': ' + Number(val).toFixed(1) + ' min';
+}
+function tooltipCountPie(ctx) {
+  return (ctx.label || '') + ': ' + Number(ctx.parsed).toLocaleString();
+}
+function tickMoney(value) {
+  if (value >= 1000000) return '$' + (value/1000000).toFixed(1) + 'M';
+  if (value >= 1000) return '$' + (value/1000).toFixed(0) + 'K';
+  return '$' + value;
+}
+function tickCount(value) {
+  if (!Number.isInteger(value)) return '';
+  if (value >= 1000000) return (value/1000000).toFixed(1) + 'M';
+  if (value >= 1000) return (value/1000).toFixed(0) + 'K';
+  return value.toLocaleString();
+}
+function truncLabel(str, max) {
+  if (!str) return '';
+  return str.length > max ? str.substring(0, max - 1) + '\u2026' : str;
+}
+
+// Destroy and recreate chart with enhanced defaults
+function makeChart(canvasId, config) {
+  if (allCharts[canvasId]) { allCharts[canvasId].destroy(); }
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return null;
+  config.options = config.options || {};
+  config.options.maintainAspectRatio = false;
+  config.options.responsive = true;
+  config.options.animation = config.options.animation || { duration: 600, easing: 'easeOutQuart' };
+  config.options.layout = config.options.layout || {};
+  config.options.layout.padding = config.options.layout.padding || { top: 8, right: 12, bottom: 4, left: 4 };
+  config.options.plugins = config.options.plugins || {};
+  config.options.plugins.legend = config.options.plugins.legend || { labels: { color: '#9999b8', font: { size: 11 } } };
+  // Apply scale defaults for axes
+  if (config.options.scales) {
+    Object.entries(config.options.scales).forEach(([key, s]) => {
+      s.ticks = s.ticks || {};
+      s.ticks.color = s.ticks.color || '#8888a8';
+      s.ticks.font = s.ticks.font || { size: 11 };
+      s.ticks.padding = s.ticks.padding || 6;
+      s.grid = s.grid || {};
+      s.grid.color = s.grid.color || 'rgba(255,255,255,0.05)';
+      s.grid.drawBorder = false;
+      s.border = s.border || {};
+      s.border.color = 'rgba(255,255,255,0.08)';
+    });
+  }
+  // Doughnut / Pie specifics
+  if (config.type === 'doughnut' || config.type === 'pie') {
+    if (config.type === 'doughnut') config.options.cutout = config.options.cutout || '62%';
+    config.options.spacing = config.options.spacing || 3;
+    if (config.options.plugins.legend && config.options.plugins.legend.position === 'right') {
+      config.options.plugins.legend.labels = config.options.plugins.legend.labels || {};
+      config.options.plugins.legend.labels.padding = 14;
+      config.options.plugins.legend.labels.font = { size: 12 };
+      config.options.plugins.legend.labels.usePointStyle = true;
+      config.options.plugins.legend.labels.pointStyle = 'circle';
+    }
+  }
+  // Hover effects for bar charts
+  if (config.type === 'bar') {
+    config.options.interaction = config.options.interaction || { mode: 'index', intersect: false };
+    if (config.data && config.data.datasets) {
+      config.data.datasets.forEach(ds => {
+        if (!ds.hoverBackgroundColor && ds.backgroundColor && typeof ds.backgroundColor === 'string') {
+          ds.hoverBackgroundColor = ds.backgroundColor.replace(/[\d.]+\)$/, '0.85)');
+        }
+      });
+    }
+  }
+  const chart = new Chart(ctx, config);
+  allCharts[canvasId] = chart;
+  return chart;
+}
+
+// ============================================================
+// OVERVIEW TAB
+// ============================================================
+function renderOverview() {
+  const cust = FILTERED.customers;
+  const det = FILTERED.details;
+  const promo = FILTERED.promos;
+  const insp = FILTERED.inspections;
+
+  const totalRev = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+  const totalInv = cust.length;
+  const avgTicket = totalInv ? totalRev / totalInv : 0;
+  const uniqueStores = new Set(cust.map(r => r.Store_Number)).size;
+  const totalPromoDisc = promo.reduce((s, r) => s + (+r.Promo_Amount || 0), 0);
+  const inspCount = insp.length;
+
+  document.getElementById('overviewKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${money(totalRev)}</div><div class="kpi-sub">${num(totalInv)} invoices</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Ticket</div><div class="kpi-value">${money(avgTicket)}</div><div class="kpi-sub">per invoice</div></div>
+    <div class="kpi-card"><div class="kpi-label">Active Stores</div><div class="kpi-value">${uniqueStores}</div><div class="kpi-sub">in period</div></div>
+    <div class="kpi-card"><div class="kpi-label">Promo Discounts</div><div class="kpi-value">${money(totalPromoDisc)}</div><div class="kpi-sub">${num(promo.length)} uses</div></div>
+    <div class="kpi-card"><div class="kpi-label">Inspection Items</div><div class="kpi-value">${num(inspCount)}</div><div class="kpi-sub">checked</div></div>
+  `;
+
+  // Revenue by date
+  const revByDate = {};
+  cust.forEach(r => {
+    const d = parseDate(r.Invoice_Date);
+    if (!d) return;
+    const key = fmtDateISO(d);
+    revByDate[key] = (revByDate[key] || 0) + (+r.Net_Sales || 0);
+  });
+  const sortedDates = Object.keys(revByDate).sort();
+  makeChart('chartRevByDate', {
+    type: 'line',
+    data: {
+      labels: sortedDates,
+      datasets: [{
+        label: 'Revenue',
+        data: sortedDates.map(d => revByDate[d]),
+        borderColor: PALETTE.red,
+        backgroundColor: PALETTE.redFill,
+        fill: true,
+        tension: 0.35,
+        pointRadius: sortedDates.length > 60 ? 0 : 3,
+        pointBackgroundColor: PALETTE.red,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: PALETTE.red,
+        pointHoverBorderWidth: 2
+      }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { maxRotation: 45, maxTicksLimit: 15, font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickMoney } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipMoney } }
+      }
+    }
+  });
+
+  // Invoices by date
+  const invByDate = {};
+  cust.forEach(r => {
+    const d = parseDate(r.Invoice_Date);
+    if (!d) return;
+    const key = fmtDateISO(d);
+    invByDate[key] = (invByDate[key] || 0) + 1;
+  });
+  makeChart('chartInvByDate', {
+    type: 'bar',
+    data: {
+      labels: sortedDates,
+      datasets: [{
+        label: 'Invoices',
+        data: sortedDates.map(d => invByDate[d] || 0),
+        backgroundColor: PALETTE.blueLight,
+        hoverBackgroundColor: PALETTE.blue,
+        borderRadius: 4,
+        maxBarThickness: 40
+      }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { maxRotation: 45, maxTicksLimit: 15, font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+
+  // Top services by revenue
+  const svcRev = {};
+  det.forEach(r => {
+    if (r.Invoice_Detail_Type === 'SERVICE' || r.Invoice_Detail_Type === 'PACKAGE') {
+      const key = r.Invoice_Detail_Description || r.Invoice_Detail_Code;
+      svcRev[key] = (svcRev[key] || 0) + (+r.Extended_Price || 0);
+    }
+  });
+  const topSvc = Object.entries(svcRev).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  makeChart('chartTopServices', {
+    type: 'bar',
+    data: {
+      labels: topSvc.map(s => truncLabel(s[0], 28)),
+      datasets: [{
+        label: 'Revenue',
+        data: topSvc.map(s => s[1]),
+        backgroundColor: PALETTE.redLight,
+        hoverBackgroundColor: PALETTE.red,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      scales: {
+        x: { beginAtZero: true, ticks: { callback: tickMoney } },
+        y: { ticks: { font: { size: 11 } } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipMoney } }
+      }
+    }
+  });
+
+  // Inspection overview
+  const statusCounts = {};
+  insp.forEach(r => {
+    const s = r.Inspection_Status;
+    if (s && s !== 'NotCheck' && s !== 'NotEquip') {
+      statusCounts[s] = (statusCounts[s] || 0) + 1;
+    }
+  });
+  const statusColors = { Green: '#00c853', Yellow: '#ffd600', Orange: '#ff9100', Red: '#ff1744' };
+  const statusKeys = ['Green', 'Yellow', 'Orange', 'Red'].filter(k => statusCounts[k]);
+  const inspTotal = statusKeys.reduce((s, k) => s + statusCounts[k], 0);
+  makeChart('chartInspOverview', {
+    type: 'doughnut',
+    data: {
+      labels: statusKeys,
+      datasets: [{
+        data: statusKeys.map(k => statusCounts[k]),
+        backgroundColor: statusKeys.map(k => statusColors[k]),
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'right' },
+        tooltip: { callbacks: {
+          label: function(ctx) {
+            const val = ctx.parsed;
+            const pctVal = inspTotal ? (val / inspTotal * 100).toFixed(1) : 0;
+            return ctx.label + ': ' + val.toLocaleString() + ' (' + pctVal + '%)';
+          }
+        }}
+      }
+    }
+  });
+}
+
+// ============================================================
+// REVENUE TAB
+// ============================================================
+function renderRevenue() {
+  const det = FILTERED.details;
+
+  const totalRev = det.reduce((s, r) => s + (+r.Extended_Price || 0), 0);
+  const svcRev = det.filter(r => r.Invoice_Detail_Type === 'SERVICE').reduce((s, r) => s + (+r.Extended_Price || 0), 0);
+  const itemRev = det.filter(r => r.Invoice_Detail_Type === 'ITEM').reduce((s, r) => s + (+r.Extended_Price || 0), 0);
+  const totalQty = det.reduce((s, r) => s + (+r.Quantity_Sold || 0), 0);
+
+  document.getElementById('revenueKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Total Line Revenue</div><div class="kpi-value">${money(totalRev)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Service Revenue</div><div class="kpi-value">${money(svcRev)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Product Revenue</div><div class="kpi-value">${money(itemRev)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Qty Sold</div><div class="kpi-value">${num(Math.round(totalQty))}</div></div>
+  `;
+
+  // By category
+  const catRev = {};
+  det.forEach(r => {
+    const cat = r.JLI_Category_Code || 'Other';
+    catRev[cat] = (catRev[cat] || 0) + (+r.Extended_Price || 0);
+  });
+  const topCats = Object.entries(catRev).sort((a,b) => b[1] - a[1]).slice(0, 12);
+  const catColors = topCats.map((_, i) => PALETTE.multi[i % PALETTE.multi.length]);
+  makeChart('chartRevByCat', {
+    type: 'bar',
+    data: {
+      labels: topCats.map(c => truncLabel(c[0], 18)),
+      datasets: [{ label: 'Revenue', data: topCats.map(c => c[1]), backgroundColor: catColors, borderRadius: 4, maxBarThickness: 50 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickMoney } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipMoney } }
+      }
+    }
+  });
+
+  // By type
+  const typeRev = {};
+  det.forEach(r => {
+    const t = r.Invoice_Detail_Type || 'Other';
+    typeRev[t] = (typeRev[t] || 0) + (+r.Extended_Price || 0);
+  });
+  const typeEntries = Object.entries(typeRev).sort((a,b) => b[1] - a[1]);
+  const typeTotal = typeEntries.reduce((s, t) => s + t[1], 0);
+  makeChart('chartRevByType', {
+    type: 'pie',
+    data: {
+      labels: typeEntries.map(t => t[0]),
+      datasets: [{ data: typeEntries.map(t => t[1]), backgroundColor: PALETTE.multi.slice(0, typeEntries.length), hoverOffset: 8 }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'right' },
+        tooltip: { callbacks: {
+          label: function(ctx) {
+            const val = ctx.parsed;
+            const pctVal = typeTotal ? (val / typeTotal * 100).toFixed(1) : 0;
+            return ctx.label + ': $' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' (' + pctVal + '%)';
+          }
+        }}
+      }
+    }
+  });
+
+  // Table: group by category + description
+  const svcMap = {};
+  det.forEach(r => {
+    const key = (r.JLI_Category_Code || '') + '|' + (r.Invoice_Detail_Description || '') + '|' + (r.Invoice_Detail_Type || '');
+    if (!svcMap[key]) svcMap[key] = { cat: r.JLI_Category_Code, desc: r.Invoice_Detail_Description, type: r.Invoice_Detail_Type, qty: 0, rev: 0, count: 0 };
+    svcMap[key].qty += (+r.Quantity_Sold || 0);
+    svcMap[key].rev += (+r.Extended_Price || 0);
+    svcMap[key].count++;
+  });
+  const svcRows = Object.values(svcMap).sort((a,b) => b.rev - a.rev).slice(0, 100);
+  document.querySelector('#tblServices tbody').innerHTML = svcRows.map(r => `
+    <tr><td>${r.cat}</td><td>${r.desc}</td><td>${r.type}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${money(r.count ? r.rev / r.count : 0)}</td></tr>
+  `).join('');
+}
+
+// ============================================================
+// INSPECTIONS TAB
+// ============================================================
+function renderInspections() {
+  const insp = FILTERED.inspections;
+
+  const total = insp.length;
+  const green = insp.filter(r => r.Inspection_Status === 'Green').length;
+  const yellow = insp.filter(r => r.Inspection_Status === 'Yellow').length;
+  const orange = insp.filter(r => r.Inspection_Status === 'Orange').length;
+  const red = insp.filter(r => r.Inspection_Status === 'Red').length;
+  const purchased = insp.filter(r => r.Purchased_This_Visit === 'True').length;
+  const needsAttention = yellow + orange + red;
+  const convRate = needsAttention ? (purchased / needsAttention * 100) : 0;
+
+  document.getElementById('inspKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Total Inspections</div><div class="kpi-value">${num(total)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Green (Good)</div><div class="kpi-value" style="color:var(--green)">${pct(total ? green/total*100 : 0)}</div><div class="kpi-sub">${num(green)} items</div></div>
+    <div class="kpi-card"><div class="kpi-label">Needs Attention</div><div class="kpi-value" style="color:var(--yellow)">${num(needsAttention)}</div><div class="kpi-sub">Yellow + Orange + Red</div></div>
+    <div class="kpi-card"><div class="kpi-label">Purchased This Visit</div><div class="kpi-value">${num(purchased)}</div><div class="kpi-sub">${pct(convRate)} conversion</div></div>
+  `;
+
+  // Status chart
+  const inspStatusTotal = green + yellow + orange + red;
+  makeChart('chartInspStatus', {
+    type: 'doughnut',
+    data: {
+      labels: ['Green', 'Yellow', 'Orange', 'Red'],
+      datasets: [{ data: [green, yellow, orange, red], backgroundColor: ['#00c853','#ffd600','#ff9100','#ff1744'], hoverOffset: 8 }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'right' },
+        tooltip: { callbacks: {
+          label: function(ctx) {
+            const val = ctx.parsed;
+            const pctVal = inspStatusTotal ? (val / inspStatusTotal * 100).toFixed(1) : 0;
+            return ctx.label + ': ' + val.toLocaleString() + ' (' + pctVal + '%)';
+          }
+        }}
+      }
+    }
+  });
+
+  // Conversion by service title
+  const convMap = {};
+  insp.forEach(r => {
+    if (r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red') {
+      const key = r.Service_Title || r.Product_Code;
+      if (!convMap[key]) convMap[key] = { total: 0, purchased: 0 };
+      convMap[key].total++;
+      if (r.Purchased_This_Visit === 'True') convMap[key].purchased++;
+    }
+  });
+  const convEntries = Object.entries(convMap).filter(e => e[1].total >= 10).sort((a,b) => (b[1].purchased/b[1].total) - (a[1].purchased/a[1].total)).slice(0, 12);
+  makeChart('chartConversion', {
+    type: 'bar',
+    data: {
+      labels: convEntries.map(e => truncLabel(e[0], 24)),
+      datasets: [{
+        label: 'Conversion %',
+        data: convEntries.map(e => (e[1].purchased / e[1].total * 100)),
+        backgroundColor: PALETTE.greenLight,
+        hoverBackgroundColor: PALETTE.green,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      scales: {
+        x: { beginAtZero: true, max: 100, ticks: { callback: function(v) { return v + '%'; } } },
+        y: { ticks: { font: { size: 11 } } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          label: function(ctx) {
+            const entry = convEntries[ctx.dataIndex];
+            return 'Conversion: ' + Number(ctx.parsed.x).toFixed(1) + '% (' + entry[1].purchased + '/' + entry[1].total + ')';
+          }
+        }}
+      }
+    }
+  });
+
+  // Upsell opportunities (not purchased, yellow/red)
+  const upsellMap = {};
+  insp.forEach(r => {
+    if ((r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red') && r.Purchased_This_Visit !== 'True') {
+      const key = r.Service_Title || r.Product_Code;
+      upsellMap[key] = (upsellMap[key] || 0) + 1;
+    }
+  });
+  const upsellTop = Object.entries(upsellMap).sort((a,b) => b[1] - a[1]).slice(0, 15);
+  makeChart('chartUpsell', {
+    type: 'bar',
+    data: {
+      labels: upsellTop.map(u => truncLabel(u[0], 22)),
+      datasets: [{ label: 'Missed Opportunities', data: upsellTop.map(u => u[1]), backgroundColor: PALETTE.orangeLight, hoverBackgroundColor: PALETTE.orange, borderRadius: 4, maxBarThickness: 50 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+
+  // Table: inspection item summary
+  const inspMap = {};
+  insp.forEach(r => {
+    const key = r.Service_Title || r.Product_Code || 'Unknown';
+    if (!inspMap[key]) inspMap[key] = { green: 0, yellow: 0, orange: 0, red: 0, purchased: 0, total: 0 };
+    inspMap[key].total++;
+    if (r.Inspection_Status === 'Green') inspMap[key].green++;
+    if (r.Inspection_Status === 'Yellow') inspMap[key].yellow++;
+    if (r.Inspection_Status === 'Orange') inspMap[key].orange++;
+    if (r.Inspection_Status === 'Red') inspMap[key].red++;
+    if (r.Purchased_This_Visit === 'True') inspMap[key].purchased++;
+  });
+  const inspRows = Object.entries(inspMap).sort((a,b) => b[1].total - a[1].total);
+  document.querySelector('#tblInsp tbody').innerHTML = inspRows.map(([name, r]) => {
+    const needs = r.yellow + r.orange + r.red;
+    const conv = needs ? (r.purchased / needs * 100) : 0;
+    return `<tr><td>${name}</td><td>${num(r.green)}</td><td>${num(r.yellow)}</td><td>${num(r.orange)}</td><td>${num(r.red)}</td><td>${num(r.purchased)}</td><td>${pct(conv)}</td></tr>`;
+  }).join('');
+}
+
+// ============================================================
+// PROMOS TAB
+// ============================================================
+function renderPromos() {
+  const promo = FILTERED.promos;
+
+  const totalDisc = promo.reduce((s, r) => s + (+r.Promo_Amount || 0), 0);
+  const totalUses = promo.length;
+  const avgDisc = totalUses ? totalDisc / totalUses : 0;
+  const uniquePromos = new Set(promo.map(r => r.Promo_Code)).size;
+
+  document.getElementById('promoKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Total Discounts</div><div class="kpi-value">${money(totalDisc)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Promo Uses</div><div class="kpi-value">${num(totalUses)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Discount</div><div class="kpi-value">${money(avgDisc)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Unique Promos</div><div class="kpi-value">${uniquePromos}</div></div>
+  `;
+
+  // Group promos
+  const promoMap = {};
+  promo.forEach(r => {
+    const code = r.Promo_Code;
+    if (!promoMap[code]) promoMap[code] = { desc: r.Promo_Description, uses: 0, total: 0, stores: new Set() };
+    promoMap[code].uses++;
+    promoMap[code].total += (+r.Promo_Amount || 0);
+    promoMap[code].stores.add(r.Store_Number);
+  });
+
+  // Top by usage
+  const byUsage = Object.entries(promoMap).sort((a,b) => b[1].uses - a[1].uses).slice(0, 10);
+  makeChart('chartPromoUsage', {
+    type: 'bar',
+    data: {
+      labels: byUsage.map(p => truncLabel(p[0], 16)),
+      datasets: [{ label: 'Uses', data: byUsage.map(p => p[1].uses), backgroundColor: PALETTE.blueLight, hoverBackgroundColor: PALETTE.blue, borderRadius: 4, maxBarThickness: 50 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          label: function(ctx) {
+            const entry = byUsage[ctx.dataIndex];
+            return entry[0] + ': ' + entry[1].uses.toLocaleString() + ' uses';
+          }
+        }}
+      }
+    }
+  });
+
+  // Top by amount
+  const byAmt = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total).slice(0, 10);
+  makeChart('chartPromoAmt', {
+    type: 'bar',
+    data: {
+      labels: byAmt.map(p => truncLabel(p[0], 16)),
+      datasets: [{ label: 'Total Discount', data: byAmt.map(p => p[1].total), backgroundColor: PALETTE.redLight, hoverBackgroundColor: PALETTE.red, borderRadius: 4, maxBarThickness: 50 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickMoney } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipMoney } }
+      }
+    }
+  });
+
+  // Table
+  const promoRows = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total);
+  document.querySelector('#tblPromos tbody').innerHTML = promoRows.map(([code, r]) => `
+    <tr><td>${code}</td><td>${r.desc}</td><td>${num(r.uses)}</td><td>${money(r.total)}</td><td>${money(r.uses ? r.total / r.uses : 0)}</td><td>${r.stores.size}</td></tr>
+  `).join('');
+}
+
+// ============================================================
+// OPERATIONS TAB
+// ============================================================
+function renderOperations() {
+  const cust = FILTERED.customers;
+
+  // Compute service times
+  const svcTimes = [];
+  const storeTimesMap = {};
+  const hourCounts = Array(24).fill(0);
+
+  cust.forEach(r => {
+    const mins = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (mins !== null && mins > 0 && mins < 180) {
+      svcTimes.push(mins);
+      if (!storeTimesMap[r.Store_Number]) storeTimesMap[r.Store_Number] = [];
+      storeTimesMap[r.Store_Number].push(mins);
+    }
+    // Hour
+    const gm = (r.Greet_Time || '').match(/(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)/i);
+    if (gm) {
+      let h = +gm[1];
+      const ampm = gm[4].toUpperCase();
+      if (ampm === 'PM' && h < 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      hourCounts[h]++;
+    }
+  });
+
+  const avgSvcTime = svcTimes.length ? svcTimes.reduce((a,b) => a + b, 0) / svcTimes.length : 0;
+  const avgWaitToGreet = [];
+  // wait time = greet to bay start
+  cust.forEach(r => {
+    const mins = diffMinutes(r.Greet_Time, r.Bay_Start_Time);
+    if (mins !== null && mins >= 0 && mins < 120) avgWaitToGreet.push(mins);
+  });
+  const avgWait = avgWaitToGreet.length ? avgWaitToGreet.reduce((a,b) => a + b, 0) / avgWaitToGreet.length : 0;
+
+  // Makes
+  const makeCounts = {};
+  cust.forEach(r => {
+    if (r.ChekChart_Make) makeCounts[r.ChekChart_Make] = (makeCounts[r.ChekChart_Make] || 0) + 1;
+  });
+
+  document.getElementById('opsKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Avg Bay Time</div><div class="kpi-value">${avgSvcTime.toFixed(1)} min</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Greet-to-Bay Wait</div><div class="kpi-value">${avgWait.toFixed(1)} min</div></div>
+    <div class="kpi-card"><div class="kpi-label">Vehicles Serviced</div><div class="kpi-value">${num(cust.length)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Unique Makes</div><div class="kpi-value">${Object.keys(makeCounts).length}</div></div>
+  `;
+
+  // Avg service time by store
+  const storeAvgs = Object.entries(storeTimesMap).map(([s, times]) => ({
+    store: s,
+    avg: times.reduce((a,b) => a + b, 0) / times.length,
+    count: times.length
+  })).filter(s => s.count >= 5).sort((a,b) => a.avg - b.avg).slice(0, 15);
+
+  makeChart('chartSvcTime', {
+    type: 'bar',
+    data: {
+      labels: storeAvgs.map(s => 'Store ' + s.store),
+      datasets: [{ label: 'Avg Minutes', data: storeAvgs.map(s => s.avg), backgroundColor: PALETTE.greenLight, hoverBackgroundColor: PALETTE.green, borderRadius: 4 }]
+    },
+    options: {
+      indexAxis: 'y',
+      scales: {
+        x: { beginAtZero: true, ticks: { callback: function(v) { return v + ' min'; } } },
+        y: { ticks: { font: { size: 11 } } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          label: function(ctx) {
+            const entry = storeAvgs[ctx.dataIndex];
+            return 'Avg: ' + Number(ctx.parsed.x).toFixed(1) + ' min (' + entry.count + ' invoices)';
+          }
+        }}
+      }
+    }
+  });
+
+  // Time distribution histogram
+  const buckets = [0,5,10,15,20,25,30,40,50,60,90];
+  const histData = Array(buckets.length).fill(0);
+  svcTimes.forEach(t => {
+    for (let i = buckets.length - 1; i >= 0; i--) {
+      if (t >= buckets[i]) { histData[i]++; break; }
+    }
+  });
+  makeChart('chartTimeHist', {
+    type: 'bar',
+    data: {
+      labels: buckets.map((b, i) => i < buckets.length - 1 ? b + '-' + buckets[i+1] + ' min' : b + '+ min'),
+      datasets: [{ label: 'Invoices', data: histData, backgroundColor: PALETTE.blueLight, hoverBackgroundColor: PALETTE.blue, borderRadius: 4, maxBarThickness: 50 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+
+  // Top makes
+  const topMakes = Object.entries(makeCounts).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  makeChart('chartMakes', {
+    type: 'bar',
+    data: {
+      labels: topMakes.map(m => m[0]),
+      datasets: [{ label: 'Vehicles', data: topMakes.map(m => m[1]), backgroundColor: PALETTE.purpleLight, hoverBackgroundColor: PALETTE.purple, borderRadius: 4, maxBarThickness: 50 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { font: { size: 11 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+
+  // By hour
+  const hourLabels = [];
+  const hourData = [];
+  for (let h = 6; h <= 21; h++) {
+    hourLabels.push((h > 12 ? h - 12 : h) + (h >= 12 ? 'pm' : 'am'));
+    hourData.push(hourCounts[h]);
+  }
+  makeChart('chartByHour', {
+    type: 'line',
+    data: {
+      labels: hourLabels,
+      datasets: [{
+        label: 'Invoices',
+        data: hourData,
+        borderColor: PALETTE.yellow,
+        backgroundColor: PALETTE.yellowFill,
+        fill: true,
+        tension: 0.35,
+        pointRadius: 4,
+        pointBackgroundColor: PALETTE.yellow,
+        pointHoverRadius: 7,
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: PALETTE.yellow,
+        pointHoverBorderWidth: 2
+      }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { font: { size: 11 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+}
+
+// ============================================================
+// CUSTOMERS TAB
+// ============================================================
+let allCustRows = []; // for search filtering
+
+function renderCustomers() {
+  const cust = FILTERED.customers;
+
+  // KPIs
+  const totalCust = cust.length;
+  const withEmail = cust.filter(r => r.Customer_Email_Address && r.Customer_Email_Address.trim()).length;
+  const withPhone = cust.filter(r => r.Customer_Phone_Number && r.Customer_Phone_Number.trim()).length;
+  const bizAccounts = new Set(cust.filter(r => r.Business_Account_ID && r.Business_Account_ID.trim()).map(r => r.Business_Account_ID)).size;
+  const uniqueStates = new Set(cust.filter(r => r.Customer_State).map(r => r.Customer_State)).size;
+  const emailPct = totalCust ? (withEmail / totalCust * 100) : 0;
+  const phonePct = totalCust ? (withPhone / totalCust * 100) : 0;
+
+  document.getElementById('custKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Total Customers</div><div class="kpi-value">${num(totalCust)}</div><div class="kpi-sub">in filtered period</div></div>
+    <div class="kpi-card"><div class="kpi-label">Email Capture</div><div class="kpi-value">${pct(emailPct)}</div><div class="kpi-sub">${num(withEmail)} of ${num(totalCust)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Phone Capture</div><div class="kpi-value">${pct(phonePct)}</div><div class="kpi-sub">${num(withPhone)} of ${num(totalCust)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Business Accounts</div><div class="kpi-value">${num(bizAccounts)}</div><div class="kpi-sub">fleet / corporate</div></div>
+    <div class="kpi-card"><div class="kpi-label">States Served</div><div class="kpi-value">${uniqueStates}</div></div>
+  `;
+
+  // Customers by state
+  const stateCounts = {};
+  cust.forEach(r => {
+    if (r.Customer_State) stateCounts[r.Customer_State] = (stateCounts[r.Customer_State] || 0) + 1;
+  });
+  const topStates = Object.entries(stateCounts).sort((a,b) => b[1] - a[1]).slice(0, 15);
+  makeChart('chartCustState', {
+    type: 'bar',
+    data: {
+      labels: topStates.map(s => s[0]),
+      datasets: [{ label: 'Customers', data: topStates.map(s => s[1]), backgroundColor: PALETTE.blueLight, hoverBackgroundColor: PALETTE.blue, borderRadius: 4, maxBarThickness: 50 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { font: { size: 11 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+
+  // Top cities
+  const cityCounts = {};
+  cust.forEach(r => {
+    const city = (r.City || '').trim();
+    if (city && city !== 'NA') cityCounts[city] = (cityCounts[city] || 0) + 1;
+  });
+  const topCities = Object.entries(cityCounts).sort((a,b) => b[1] - a[1]).slice(0, 15);
+  makeChart('chartCustCity', {
+    type: 'bar',
+    data: {
+      labels: topCities.map(c => truncLabel(c[0], 22)),
+      datasets: [{ label: 'Customers', data: topCities.map(c => c[1]), backgroundColor: PALETTE.greenLight, hoverBackgroundColor: PALETTE.green, borderRadius: 4 }]
+    },
+    options: {
+      indexAxis: 'y',
+      scales: {
+        x: { beginAtZero: true, ticks: { callback: tickCount } },
+        y: { ticks: { font: { size: 11 } } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+
+  // Spend distribution
+  const spendBuckets = [0, 25, 50, 75, 100, 150, 200, 300, 500];
+  const spendData = Array(spendBuckets.length).fill(0);
+  cust.forEach(r => {
+    const s = +r.Net_Sales || 0;
+    for (let i = spendBuckets.length - 1; i >= 0; i--) {
+      if (s >= spendBuckets[i]) { spendData[i]++; break; }
+    }
+  });
+  makeChart('chartCustSpend', {
+    type: 'bar',
+    data: {
+      labels: spendBuckets.map((b, i) => i < spendBuckets.length - 1 ? '$' + b + '-$' + spendBuckets[i+1] : '$' + b + '+'),
+      datasets: [{ label: 'Customers', data: spendData, backgroundColor: PALETTE.redLight, hoverBackgroundColor: PALETTE.red, borderRadius: 4, maxBarThickness: 50 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+
+  // Vehicle year distribution
+  const yearCounts = {};
+  cust.forEach(r => {
+    const y = r.Vehicle_Year;
+    if (y && +y >= 1990 && +y <= 2030) yearCounts[y] = (yearCounts[y] || 0) + 1;
+  });
+  const sortedYears = Object.keys(yearCounts).sort();
+  makeChart('chartVehYear', {
+    type: 'bar',
+    data: {
+      labels: sortedYears,
+      datasets: [{ label: 'Vehicles', data: sortedYears.map(y => yearCounts[y]), backgroundColor: PALETTE.purpleLight, hoverBackgroundColor: PALETTE.purple, borderRadius: 4, maxBarThickness: 28 }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { maxRotation: 45, maxTicksLimit: 20, font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { callback: tickCount } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: tooltipCount } }
+      }
+    }
+  });
+
+  // Customer table
+  allCustRows = cust.map((r, idx) => {
+    const name = ((r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '')).trim();
+    const phone = r.Customer_Phone_Number || '';
+    const email = r.Customer_Email_Address || '';
+    const city = r.City || '';
+    const state = r.Customer_State || '';
+    const zip = r.ZIP_Code || '';
+    const veh = ((r.Vehicle_Year || '') + ' ' + (r.ChekChart_Make || '') + ' ' + (r.ChekChart_Model || '')).trim();
+    const mileage = r.Vehicle_Mileage ? num(+r.Vehicle_Mileage) : '';
+    const store = r.Store_Number || '';
+    const d = parseDate(r.Invoice_Date);
+    const date = d ? fmtDate(d) : '';
+    const sales = +r.Net_Sales || 0;
+    const vin = r.VIN || '';
+    return { name, phone, email, city, state, zip, veh, mileage, store, date, sales, vin, idx, raw: r, searchStr: (name + ' ' + phone + ' ' + email + ' ' + city + ' ' + zip + ' ' + veh + ' ' + vin + ' ' + store).toLowerCase() };
+  });
+
+  document.getElementById('custSearch').value = '';
+  renderCustomerTable(allCustRows);
+
+  // Business accounts table
+  const bizMap = {};
+  cust.forEach(r => {
+    const id = (r.Business_Account_ID || '').trim();
+    if (!id) return;
+    if (!bizMap[id]) bizMap[id] = { processor: r.BA_Processor_Code, inv: 0, rev: 0, stores: new Set() };
+    bizMap[id].inv++;
+    bizMap[id].rev += (+r.Net_Sales || 0);
+    bizMap[id].stores.add(r.Store_Number);
+  });
+  const bizRows = Object.entries(bizMap).sort((a,b) => b[1].rev - a[1].rev);
+  document.querySelector('#tblBizAccounts tbody').innerHTML = bizRows.map(([id, r]) => `
+    <tr><td>${id}</td><td>${r.processor || ''}</td><td>${num(r.inv)}</td><td>${money(r.rev)}</td><td>${money(r.inv ? r.rev / r.inv : 0)}</td><td>${[...r.stores].join(', ')}</td></tr>
+  `).join('');
+}
+
+function renderCustomerTable(rows) {
+  const maxRows = 500;
+  const display = rows.slice(0, maxRows);
+  document.getElementById('custCount').textContent = rows.length > maxRows ? `Showing ${maxRows} of ${num(rows.length)}` : `${num(rows.length)} records`;
+  document.querySelector('#tblCustomers tbody').innerHTML = display.map(r => `
+    <tr class="clickable-row" onclick="openCustDetail(${r.idx})">
+      <td>${r.name}</td>
+      <td>${r.phone}</td>
+      <td style="font-size:12px;">${r.email}</td>
+      <td>${r.city}</td>
+      <td>${r.state}</td>
+      <td>${r.zip}</td>
+      <td>${r.veh}</td>
+      <td>${r.mileage}</td>
+      <td>${r.store}</td>
+      <td>${r.date}</td>
+      <td>${money(r.sales)}</td>
+    </tr>
+  `).join('');
+}
+
+function filterCustomerTable() {
+  const q = (document.getElementById('custSearch').value || '').toLowerCase().trim();
+  if (!q) {
+    renderCustomerTable(allCustRows);
+    return;
+  }
+  const terms = q.split(/\s+/);
+  const filtered = allCustRows.filter(r => terms.every(t => r.searchStr.includes(t)));
+  renderCustomerTable(filtered);
+}
+
+// ============================================================
+// CUSTOMER DETAIL MODAL
+// ============================================================
+function extractTime(str) {
+  if (!str) return '--';
+  const m = str.match(/(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)/i);
+  if (!m) return '--';
+  return m[1] + ':' + m[2] + ' ' + m[4].toUpperCase();
+}
+
+function openCustDetail(idx) {
+  const r = FILTERED.customers[idx];
+  if (!r) return;
+
+  const name = ((r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '')).trim() || 'Unknown';
+  document.getElementById('custDetailName').textContent = name;
+
+  const greet = extractTime(r.Greet_Time);
+  const bayStart = extractTime(r.Bay_Start_Time);
+  const bayEnd = extractTime(r.Bay_End_Time);
+  const ringStart = extractTime(r.Ring_Out_Start_Time);
+  const ringEnd = extractTime(r.Ring_Out_End_Time);
+
+  const svcMins = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+  const totalMins = diffMinutes(r.Greet_Time, r.Ring_Out_End_Time);
+
+  // Find related invoice details
+  const invNum = r.Invoice_Number;
+  const relatedDetails = FILTERED.details.filter(d => d.Invoice_Number === invNum);
+  const relatedInsp = FILTERED.inspections.filter(d => d.Invoice_Number === invNum);
+  const relatedPromos = FILTERED.promos.filter(d => d.Invoice_Number === invNum);
+
+  let detailsHTML = '';
+  if (relatedDetails.length) {
+    detailsHTML = `<table style="width:100%;font-size:12px;">
+      <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">TYPE</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">DESCRIPTION</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">QTY</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">PRICE</th></tr></thead>
+      <tbody>${relatedDetails.map(d => `<tr><td style="padding:4px 8px;color:var(--text-muted);">${d.Invoice_Detail_Type}</td><td style="padding:4px 8px;">${d.Invoice_Detail_Description}</td><td style="text-align:right;padding:4px 8px;">${d.Quantity_Sold}</td><td style="text-align:right;padding:4px 8px;">${money(+d.Extended_Price || 0)}</td></tr>`).join('')}</tbody>
+    </table>`;
+  } else {
+    detailsHTML = '<div style="color:var(--text-muted);font-size:13px;">No line item details found for this invoice.</div>';
+  }
+
+  let inspHTML = '';
+  if (relatedInsp.length) {
+    const statusColor = { Green: 'var(--green)', Yellow: 'var(--yellow)', Orange: 'var(--orange)', Red: 'var(--red)' };
+    inspHTML = `<div style="display:flex;flex-wrap:wrap;gap:6px;">${relatedInsp.filter(i => i.Inspection_Status && i.Inspection_Status !== 'NotCheck' && i.Inspection_Status !== 'NotEquip').map(i => `<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:11px;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${statusColor[i.Inspection_Status] || 'var(--text-muted)'};display:inline-block;"></span>${i.Service_Title}${i.Purchased_This_Visit === 'True' ? ' <span style="color:var(--green);font-weight:600;">SOLD</span>' : ''}</div>`).join('')}</div>`;
+  }
+
+  let promoHTML = '';
+  if (relatedPromos.length) {
+    promoHTML = relatedPromos.map(p => `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;"><span>${p.Promo_Code} - ${p.Promo_Description}</span><span style="color:var(--green);font-weight:600;">-${money(+p.Promo_Amount || 0)}</span></div>`).join('');
+  }
+
+  document.getElementById('custDetailBody').innerHTML = `
+    <div class="cust-detail-grid">
+      <div class="cust-detail-section">
+        <h4>Contact Information</h4>
+        <div class="cust-field"><span class="label">Name</span><span class="value">${name}</span></div>
+        <div class="cust-field"><span class="label">Phone</span><span class="value">${r.Customer_Phone_Number || '--'}</span></div>
+        <div class="cust-field"><span class="label">Email</span><span class="value" style="font-size:12px;">${r.Customer_Email_Address || '--'}</span></div>
+        <div class="cust-field"><span class="label">Address</span><span class="value">${r.Customer_Address || '--'}</span></div>
+        <div class="cust-field"><span class="label">City / State / ZIP</span><span class="value">${[r.City, r.Customer_State, r.ZIP_Code].filter(Boolean).join(', ') || '--'}</span></div>
+        ${r.Business_Account_ID ? `<div class="cust-field"><span class="label">Business Acct</span><span class="value">${r.Business_Account_ID} (${r.BA_Processor_Code || ''})</span></div>` : ''}
+      </div>
+      <div class="cust-detail-section">
+        <h4>Vehicle Information</h4>
+        <div class="cust-field"><span class="label">Year / Make / Model</span><span class="value">${[r.Vehicle_Year, r.ChekChart_Make, r.ChekChart_Model].filter(Boolean).join(' ') || '--'}</span></div>
+        <div class="cust-field"><span class="label">Engine</span><span class="value">${r.ChekChart_Engine || '--'}</span></div>
+        <div class="cust-field"><span class="label">Mileage</span><span class="value">${r.Vehicle_Mileage ? num(+r.Vehicle_Mileage) : '--'}</span></div>
+        <div class="cust-field"><span class="label">VIN</span><span class="value" style="font-size:11px;font-family:monospace;">${r.VIN || '--'}</span></div>
+        <div class="cust-field"><span class="label">Tag</span><span class="value">${[r.Vehicle_Tag_State, r.Vehicle_Tag].filter(Boolean).join(' ') || '--'}</span></div>
+      </div>
+      <div class="cust-detail-section">
+        <h4>Visit Summary</h4>
+        <div class="cust-field"><span class="label">Store</span><span class="value">#${r.Store_Number}</span></div>
+        <div class="cust-field"><span class="label">Invoice</span><span class="value">#${r.Invoice_Number}</span></div>
+        <div class="cust-field"><span class="label">Date</span><span class="value">${r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '--'}</span></div>
+        <div class="cust-field"><span class="label">Net Sales</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(+r.Net_Sales || 0)}</span></div>
+        <div class="cust-field"><span class="label">Bay Time</span><span class="value">${svcMins !== null ? svcMins.toFixed(0) + ' min' : '--'}</span></div>
+        <div class="cust-field"><span class="label">Total Time</span><span class="value">${totalMins !== null ? totalMins.toFixed(0) + ' min' : '--'}</span></div>
+      </div>
+      <div class="cust-detail-section">
+        <h4>Service Timeline</h4>
+        <div class="cust-field"><span class="label">Greeted</span><span class="value">${greet}</span></div>
+        <div class="cust-field"><span class="label">Bay Start</span><span class="value">${bayStart}</span></div>
+        <div class="cust-field"><span class="label">Bay End</span><span class="value">${bayEnd}</span></div>
+        <div class="cust-field"><span class="label">Ring-Out Start</span><span class="value">${ringStart}</span></div>
+        <div class="cust-field"><span class="label">Ring-Out End</span><span class="value">${ringEnd}</span></div>
+      </div>
+      <div class="cust-detail-section full-width">
+        <h4>Services & Products (Invoice #${r.Invoice_Number})</h4>
+        ${detailsHTML}
+      </div>
+      ${inspHTML ? `<div class="cust-detail-section full-width"><h4>Inspection Results</h4>${inspHTML}</div>` : ''}
+      ${promoHTML ? `<div class="cust-detail-section full-width"><h4>Promotions Applied</h4>${promoHTML}</div>` : ''}
+    </div>
+  `;
+
+  document.getElementById('custDetailModal').classList.add('active');
+}
+
+function closeCustDetail() {
+  document.getElementById('custDetailModal').classList.remove('active');
+}
+
+document.getElementById('custDetailModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('custDetailModal')) closeCustDetail();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('custDetailModal').classList.contains('active')) closeCustDetail();
+});
+
+// ============================================================
+// STORE RANKINGS TAB
+// ============================================================
+function renderStores() {
+  const cust = FILTERED.customers;
+  const promo = FILTERED.promos;
+  const insp = FILTERED.inspections;
+
+  const storeMap = {};
+
+  cust.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeMap[s]) storeMap[s] = { inv: 0, rev: 0, times: [], promoUses: 0, promoDisc: 0, inspTotal: 0, inspBad: 0 };
+    storeMap[s].inv++;
+    storeMap[s].rev += (+r.Net_Sales || 0);
+    const mins = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (mins !== null && mins > 0 && mins < 180) storeMap[s].times.push(mins);
+  });
+
+  promo.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeMap[s]) storeMap[s] = { inv: 0, rev: 0, times: [], promoUses: 0, promoDisc: 0, inspTotal: 0, inspBad: 0 };
+    storeMap[s].promoUses++;
+    storeMap[s].promoDisc += (+r.Promo_Amount || 0);
+  });
+
+  insp.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeMap[s]) storeMap[s] = { inv: 0, rev: 0, times: [], promoUses: 0, promoDisc: 0, inspTotal: 0, inspBad: 0 };
+    if (r.Inspection_Status && r.Inspection_Status !== 'NotCheck' && r.Inspection_Status !== 'NotEquip') {
+      storeMap[s].inspTotal++;
+      if (r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red') {
+        storeMap[s].inspBad++;
+      }
+    }
+  });
+
+  const rows = Object.entries(storeMap).sort((a,b) => b[1].rev - a[1].rev);
+  document.querySelector('#tblStores tbody').innerHTML = rows.map(([store, r]) => {
+    const avgTicket = r.inv ? r.rev / r.inv : 0;
+    const avgTime = r.times.length ? (r.times.reduce((a,b) => a+b, 0) / r.times.length).toFixed(1) + ' min' : '—';
+    const yrPct = r.inspTotal ? (r.inspBad / r.inspTotal * 100) : 0;
+    return `<tr>
+      <td><strong>${store}</strong></td>
+      <td>${num(r.inv)}</td>
+      <td>${money(r.rev)}</td>
+      <td>${money(avgTicket)}</td>
+      <td>${avgTime}</td>
+      <td>${num(r.promoUses)}</td>
+      <td>${money(r.promoDisc)}</td>
+      <td>${num(r.inspTotal)}</td>
+      <td>${pct(yrPct)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// TABLE SORTING
+// ============================================================
+document.addEventListener('click', (e) => {
+  const th = e.target.closest('th.sortable');
+  if (!th) return;
+  const table = th.closest('table');
+  const tbody = table.querySelector('tbody');
+  const col = +th.dataset.col;
+  const rows = [...tbody.querySelectorAll('tr')];
+  const dir = th.dataset.dir === 'asc' ? 'desc' : 'asc';
+  th.dataset.dir = dir;
+
+  rows.sort((a, b) => {
+    let av = a.cells[col]?.textContent.trim() || '';
+    let bv = b.cells[col]?.textContent.trim() || '';
+    // Try numeric
+    const an = parseFloat(av.replace(/[$,%]/g, ''));
+    const bn = parseFloat(bv.replace(/[$,%]/g, ''));
+    if (!isNaN(an) && !isNaN(bn)) {
+      return dir === 'asc' ? an - bn : bn - an;
+    }
+    return dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+});
+
+// ============================================================
+// CSV EXPORT
+// ============================================================
+function exportTable(tableId) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const rows = [];
+  table.querySelectorAll('tr').forEach(tr => {
+    const cells = [];
+    tr.querySelectorAll('th, td').forEach(td => {
+      cells.push('"' + td.textContent.trim().replace(/"/g, '""') + '"');
+    });
+    rows.push(cells.join(','));
+  });
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = tableId + '_export.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// USER SETTINGS (localStorage)
+// ============================================================
+function loadSettings() {
+  const company = localStorage.getItem('matrix_company') || '';
+  const user = localStorage.getItem('matrix_user') || '';
+  updateBadge(company, user);
+}
+
+function updateBadge(company, user) {
+  const parts = [company, user].filter(Boolean);
+  const badge = document.getElementById('clientBadgeText');
+  badge.textContent = parts.length ? parts.join(' - ') : 'Click to set client';
+  document.title = (company ? company + ' - ' : '') + 'Performance Analytics';
+}
+
+function openSettings() {
+  document.getElementById('settingCompany').value = localStorage.getItem('matrix_company') || '';
+  document.getElementById('settingUser').value = localStorage.getItem('matrix_user') || '';
+  document.getElementById('settingsModal').classList.add('active');
+  document.getElementById('settingCompany').focus();
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('active');
+}
+
+function saveSettings() {
+  const company = document.getElementById('settingCompany').value.trim();
+  const user = document.getElementById('settingUser').value.trim();
+  if (company) localStorage.setItem('matrix_company', company);
+  else localStorage.removeItem('matrix_company');
+  if (user) localStorage.setItem('matrix_user', user);
+  else localStorage.removeItem('matrix_user');
+  updateBadge(company, user);
+  closeSettings();
+}
+
+// Close modal on overlay click or Escape
+document.getElementById('settingsModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('settingsModal')) closeSettings();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeSettings();
+  if (e.key === 'Enter' && document.getElementById('settingsModal').classList.contains('active')) saveSettings();
+});
+
+// Init
+loadSettings();
+
+// ============================================================
+// AUTO-LOAD FROM SAME FOLDER
+// ============================================================
+document.getElementById('loadingScreen').classList.add('hidden');
+</script>
+</body>
+</html>
