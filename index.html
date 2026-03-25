@@ -6659,10 +6659,17 @@ function sendViaEmailJS(to, subject, message) {
   }
   const serviceId = localStorage.getItem('bp_ejs_service');
   const templateId = localStorage.getItem('bp_ejs_template');
+
+  // Send with explicit recipient in template params
+  // Your EmailJS template MUST have the "To Email" field set to: {{to_email}}
+  // If using auto_reply or custom "To", also set {{email}} and {{email_to}}
   return emailjs.send(serviceId, templateId, {
     to_email: to,
+    email_to: to,
+    email: to,
+    to_name: to.split('@')[0],
     from_email: 'chase@butleranalytics.io',
-    from_name: 'Chase Butler — Butler Performance',
+    from_name: 'Chase Butler — Butler Performance Analytics',
     reply_to: 'chase@butleranalytics.io',
     subject: subject,
     message: message
@@ -6727,10 +6734,13 @@ function testEmailSetup() {
     emailjs.init(key);
     emailjs.send(service, template, {
       to_email: 'chase@butleranalytics.io',
+      email_to: 'chase@butleranalytics.io',
+      email: 'chase@butleranalytics.io',
+      to_name: 'Chase Butler',
       from_email: 'chase@butleranalytics.io',
-      from_name: 'Chase Butler — Butler Performance',
+      from_name: 'Chase Butler — Butler Performance Analytics',
       reply_to: 'chase@butleranalytics.io',
-      subject: 'Butler Performance - Test Connection',
+      subject: 'Butler Performance Analytics - Test Connection',
       message: 'This is a test email from Butler Performance Analytics. If you received this, your Gmail integration is working correctly.\n\n— Chase Butler\nchase@butleranalytics.io'
     }).then(() => {
       resultEl.innerHTML = '<span style="color:var(--green);">Connection successful! Gmail is ready to send.</span>';
