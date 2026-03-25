@@ -1476,6 +1476,7 @@
     <button class="tab" data-tab="promos">Promotions</button>
     <button class="tab" data-tab="operations">Operations</button>
     <button class="tab" data-tab="customers">Customers</button>
+    <button class="tab" data-tab="segments">Segments</button>
     <button class="tab" data-tab="marketing">Marketing</button>
     <button class="tab" data-tab="stores">Store Rankings</button>
   </div>
@@ -1750,6 +1751,85 @@
             </tr>
           </thead>
           <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEGMENTS TAB -->
+  <div class="tab-content" id="tab-segments">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+      <!-- Segment Builder -->
+      <div style="background:linear-gradient(135deg, var(--card) 0%, rgba(30,30,60,0.8) 100%);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;">S</div>
+            <div>
+              <div style="font-size:16px;font-weight:700;color:white;">Segment Builder</div>
+              <div style="font-size:11px;color:var(--text-muted);">Define criteria to segment your customer base</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:24px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+            <div class="form-group" style="margin-bottom:0;"><label>Segment Name</label><input type="text" id="segName" placeholder="e.g. High Value Customers"></div>
+            <div class="form-group" style="margin-bottom:0;"><label>Type</label>
+              <select id="segType"><option value="dynamic">Dynamic (auto-updates)</option><option value="static">Static (manual)</option></select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:16px;"><label>Description</label><input type="text" id="segDesc" placeholder="Describe who this segment targets..."></div>
+
+          <!-- Criteria Groups -->
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Criteria Rules</div>
+          <div id="segCriteriaGroups"></div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="bpa-action-btn blue" onclick="addSegCriteriaGroup()">+ Add Group (OR)</button>
+          </div>
+
+          <!-- Preview count -->
+          <div id="segPreview" style="margin-top:20px;padding:16px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;text-align:center;display:none;">
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn-save" onclick="previewSegment()" style="padding:12px 24px;border-radius:10px;">Preview Segment</button>
+            <button class="btn-save" onclick="saveSegment()" style="padding:12px 24px;border-radius:10px;background:var(--green);border-color:var(--green);">Save Segment</button>
+            <button class="btn-configure" onclick="exportSegment()" style="padding:12px 16px;">Export CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Results -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+        <div style="padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
+          <div style="font-size:16px;font-weight:700;color:white;">Segment Preview</div>
+          <div style="font-size:11px;color:var(--text-muted);">Live results from your loaded data</div>
+        </div>
+        <div style="padding:24px;">
+          <div id="segPreviewStats" style="margin-bottom:16px;"></div>
+          <div id="segPreviewTable" style="max-height:400px;overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved Segments -->
+    <div class="table-wrap">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+        Saved Segments
+        <span id="segCount" style="font-weight:400;font-size:12px;color:var(--text-muted);"></span>
+      </h3>
+      <div class="table-scroll" style="max-height:350px;">
+        <table id="tblSegments">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Criteria</th>
+              <th>Customers</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="segTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -2299,6 +2379,7 @@ function renderDashboard() {
   renderPromos();
   renderOperations();
   renderCustomers();
+  renderSegments();
   renderMarketing();
   renderStores();
   runAlertCheck();
@@ -4194,6 +4275,298 @@ function openStoreOpsDetail(storeNum) {
   `;
 
   document.getElementById('custDetailModal').classList.add('active');
+}
+
+// ============================================================
+// SEGMENTS TAB
+// ============================================================
+const SEG_CRITERIA_TYPES = [
+  { id: 'net_sales', label: 'Net Sales ($)', type: 'number', field: r => +r.Net_Sales || 0 },
+  { id: 'vehicle_year', label: 'Vehicle Year', type: 'number', field: r => +r.Vehicle_Year || 0 },
+  { id: 'vehicle_make', label: 'Vehicle Make', type: 'select', field: r => (r.ChekChart_Make || '').toUpperCase() },
+  { id: 'vehicle_model', label: 'Vehicle Model', type: 'select', field: r => (r.ChekChart_Model || '').toUpperCase().trim() },
+  { id: 'mileage', label: 'Vehicle Mileage', type: 'number', field: r => +r.Vehicle_Mileage || 0 },
+  { id: 'store', label: 'Store Number', type: 'select', field: r => r.Store_Number },
+  { id: 'state', label: 'Customer State', type: 'select', field: r => r.Customer_State || '' },
+  { id: 'city', label: 'City', type: 'select', field: r => (r.City || '').toUpperCase().trim() },
+  { id: 'zip', label: 'ZIP Code', type: 'text', field: r => r.ZIP_Code || '' },
+  { id: 'has_email', label: 'Has Email', type: 'bool', field: r => !!(r.Customer_Email_Address && r.Customer_Email_Address.trim()) },
+  { id: 'has_phone', label: 'Has Phone', type: 'bool', field: r => !!(r.Customer_Phone_Number && r.Customer_Phone_Number.trim()) },
+  { id: 'is_fleet', label: 'Fleet / Business Acct', type: 'bool', field: r => !!(r.Business_Account_ID && r.Business_Account_ID.trim()) },
+  { id: 'engine', label: 'Engine Type', type: 'select', field: r => (r.ChekChart_Engine || '').toUpperCase().trim() },
+];
+
+const SEG_COMPARISONS = {
+  number: [
+    { id: 'gt', label: 'greater than' },
+    { id: 'gte', label: 'at least' },
+    { id: 'lt', label: 'less than' },
+    { id: 'lte', label: 'at most' },
+    { id: 'eq', label: 'equals' },
+    { id: 'between', label: 'between' },
+  ],
+  select: [
+    { id: 'eq', label: 'is' },
+    { id: 'neq', label: 'is not' },
+    { id: 'in', label: 'is one of' },
+  ],
+  text: [
+    { id: 'eq', label: 'equals' },
+    { id: 'contains', label: 'contains' },
+    { id: 'starts', label: 'starts with' },
+  ],
+  bool: [
+    { id: 'eq', label: 'is' },
+  ]
+};
+
+let segGroups = []; // [{operator:'and', criteria:[{type,comp,value,value2}]}]
+let segPreviewResults = [];
+
+function getSegments() { try { return JSON.parse(localStorage.getItem('bp_segments') || '[]'); } catch(e) { return []; } }
+function saveSegments(list) { localStorage.setItem('bp_segments', JSON.stringify(list)); }
+
+function getSelectOptions(criteriaId) {
+  const ct = SEG_CRITERIA_TYPES.find(c => c.id === criteriaId);
+  if (!ct || ct.type !== 'select') return [];
+  const vals = new Set();
+  FILTERED.customers.forEach(r => { const v = ct.field(r); if (v) vals.add(v); });
+  return [...vals].sort();
+}
+
+function renderSegments() {
+  if (!segGroups.length) addSegCriteriaGroup();
+  renderSegCriteriaGroups();
+  renderSavedSegments();
+}
+
+function addSegCriteriaGroup() {
+  segGroups.push({ operator: 'and', criteria: [{ type: 'net_sales', comp: 'gt', value: '', value2: '' }] });
+  renderSegCriteriaGroups();
+}
+
+function renderSegCriteriaGroups() {
+  const el = document.getElementById('segCriteriaGroups');
+  el.innerHTML = segGroups.map((g, gi) => {
+    let html = `<div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span style="font-size:12px;color:var(--text-muted);">Match</span>
+        <select onchange="segGroups[${gi}].operator=this.value" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-size:12px;">
+          <option value="and" ${g.operator==='and'?'selected':''}>ALL</option>
+          <option value="or" ${g.operator==='or'?'selected':''}>ANY</option>
+        </select>
+        <span style="font-size:12px;color:var(--text-muted);">of these conditions</span>
+        <div style="flex:1;"></div>
+        ${segGroups.length > 1 ? '<button onclick="segGroups.splice('+gi+',1);renderSegCriteriaGroups()" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button>' : ''}
+      </div>`;
+    g.criteria.forEach((c, ci) => {
+      const ct = SEG_CRITERIA_TYPES.find(t => t.id === c.type) || SEG_CRITERIA_TYPES[0];
+      const comps = SEG_COMPARISONS[ct.type] || [];
+      html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <select onchange="segGroups[${gi}].criteria[${ci}].type=this.value;segGroups[${gi}].criteria[${ci}].comp=SEG_COMPARISONS[(SEG_CRITERIA_TYPES.find(t=>t.id===this.value)||{}).type||'number'][0].id;segGroups[${gi}].criteria[${ci}].value='';renderSegCriteriaGroups()" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;min-width:140px;">
+          ${SEG_CRITERIA_TYPES.map(t => `<option value="${t.id}" ${c.type===t.id?'selected':''}>${t.label}</option>`).join('')}
+        </select>
+        <select onchange="segGroups[${gi}].criteria[${ci}].comp=this.value;renderSegCriteriaGroups()" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;min-width:110px;">
+          ${comps.map(op => `<option value="${op.id}" ${c.comp===op.id?'selected':''}>${op.label}</option>`).join('')}
+        </select>`;
+      if (ct.type === 'bool') {
+        html += `<select onchange="segGroups[${gi}].criteria[${ci}].value=this.value" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
+          <option value="true" ${c.value==='true'?'selected':''}>Yes</option>
+          <option value="false" ${c.value==='false'?'selected':''}>No</option>
+        </select>`;
+      } else if (ct.type === 'select' && c.comp === 'in') {
+        const opts = getSelectOptions(c.type);
+        html += `<select multiple onchange="segGroups[${gi}].criteria[${ci}].value=[...this.selectedOptions].map(o=>o.value).join('|||')" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:11px;min-width:160px;height:60px;">
+          ${opts.map(o => `<option value="${o}" ${(c.value||'').split('|||').includes(o)?'selected':''}>${o}</option>`).join('')}
+        </select>`;
+      } else if (ct.type === 'select') {
+        const opts = getSelectOptions(c.type);
+        html += `<select onchange="segGroups[${gi}].criteria[${ci}].value=this.value" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;min-width:140px;">
+          <option value="">Select...</option>
+          ${opts.map(o => `<option value="${o}" ${c.value===o?'selected':''}>${o}</option>`).join('')}
+        </select>`;
+      } else if (c.comp === 'between') {
+        html += `<input type="${ct.type==='number'?'number':'text'}" value="${c.value||''}" onchange="segGroups[${gi}].criteria[${ci}].value=this.value" placeholder="Min" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:80px;">
+        <span style="color:var(--text-muted);">—</span>
+        <input type="${ct.type==='number'?'number':'text'}" value="${c.value2||''}" onchange="segGroups[${gi}].criteria[${ci}].value2=this.value" placeholder="Max" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:80px;">`;
+      } else {
+        html += `<input type="${ct.type==='number'?'number':'text'}" value="${c.value||''}" onchange="segGroups[${gi}].criteria[${ci}].value=this.value" placeholder="Value" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:120px;">`;
+      }
+      html += `<button onclick="segGroups[${gi}].criteria.splice(${ci},1);if(!segGroups[${gi}].criteria.length)segGroups[${gi}].criteria.push({type:'net_sales',comp:'gt',value:''});renderSegCriteriaGroups()" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button>
+      </div>`;
+    });
+    html += `<button class="bpa-action-btn" onclick="segGroups[${gi}].criteria.push({type:'net_sales',comp:'gt',value:''});renderSegCriteriaGroups()" style="font-size:11px;">+ Add Condition</button></div>`;
+    if (gi < segGroups.length - 1) html += '<div style="text-align:center;padding:4px;font-size:11px;color:var(--text-muted);font-weight:700;">OR</div>';
+    return html;
+  }).join('');
+}
+
+function evaluateSegment() {
+  const results = [];
+  FILTERED.customers.forEach(r => {
+    // Groups are OR'd together; criteria within a group use the group operator
+    const match = segGroups.some(g => {
+      const critResults = g.criteria.map(c => {
+        const ct = SEG_CRITERIA_TYPES.find(t => t.id === c.type);
+        if (!ct) return true;
+        const val = ct.field(r);
+        const cv = c.value;
+        const cv2 = c.value2;
+        if (ct.type === 'bool') return String(val) === cv;
+        if (ct.type === 'number') {
+          const nv = +cv; const nv2 = +cv2;
+          if (c.comp === 'gt') return val > nv;
+          if (c.comp === 'gte') return val >= nv;
+          if (c.comp === 'lt') return val < nv;
+          if (c.comp === 'lte') return val <= nv;
+          if (c.comp === 'eq') return val === nv;
+          if (c.comp === 'between') return val >= nv && val <= nv2;
+        }
+        if (ct.type === 'select') {
+          if (c.comp === 'eq') return val === cv;
+          if (c.comp === 'neq') return val !== cv;
+          if (c.comp === 'in') return (cv||'').split('|||').includes(val);
+        }
+        if (ct.type === 'text') {
+          if (c.comp === 'eq') return val === cv;
+          if (c.comp === 'contains') return val.toLowerCase().includes((cv||'').toLowerCase());
+          if (c.comp === 'starts') return val.toLowerCase().startsWith((cv||'').toLowerCase());
+        }
+        return true;
+      });
+      return g.operator === 'and' ? critResults.every(Boolean) : critResults.some(Boolean);
+    });
+    if (match) results.push(r);
+  });
+  return results;
+}
+
+function previewSegment() {
+  segPreviewResults = evaluateSegment();
+  const count = segPreviewResults.length;
+  const totalRev = segPreviewResults.reduce((s,r) => s+(+r.Net_Sales||0), 0);
+  const avgTicket = count ? totalRev / count : 0;
+  const withEmail = segPreviewResults.filter(r => r.Customer_Email_Address && r.Customer_Email_Address.trim()).length;
+
+  // Preview stats
+  document.getElementById('segPreview').style.display = 'block';
+  document.getElementById('segPreview').innerHTML = `<div style="font-size:32px;font-weight:800;color:var(--green);">${num(count)}</div><div style="font-size:13px;color:var(--text-muted);">customers match this segment</div>`;
+
+  document.getElementById('segPreviewStats').innerHTML = `
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:100px;text-align:center;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
+        <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);">Matched</div>
+        <div style="font-size:20px;font-weight:700;color:var(--green);">${num(count)}</div>
+      </div>
+      <div style="flex:1;min-width:100px;text-align:center;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
+        <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);">Revenue</div>
+        <div style="font-size:20px;font-weight:700;color:white;">${money(totalRev)}</div>
+      </div>
+      <div style="flex:1;min-width:100px;text-align:center;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
+        <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);">Avg Ticket</div>
+        <div style="font-size:20px;font-weight:700;color:white;">${money(avgTicket)}</div>
+      </div>
+      <div style="flex:1;min-width:100px;text-align:center;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
+        <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);">Has Email</div>
+        <div style="font-size:20px;font-weight:700;color:white;">${pct(count ? withEmail/count*100 : 0)}</div>
+      </div>
+    </div>`;
+
+  // Preview table
+  const display = segPreviewResults.slice(0, 100);
+  document.getElementById('segPreviewTable').innerHTML = display.length ? `
+    <table style="width:100%;font-size:12px;border-collapse:collapse;">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">NAME</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">VEHICLE</th>
+        <th style="text-align:center;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">STORE</th>
+        <th style="text-align:right;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">MILEAGE</th>
+        <th style="text-align:right;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">NET SALES</th>
+      </tr></thead>
+      <tbody>${display.map(r => `<tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+        <td style="padding:6px 10px;">${((r.Customer_First_Name||'')+' '+(r.Customer_Last_Name||'')).trim()||'Unknown'}</td>
+        <td style="padding:6px 10px;font-size:11px;">${[r.Vehicle_Year,r.ChekChart_Make,r.ChekChart_Model].filter(Boolean).join(' ')}</td>
+        <td style="text-align:center;padding:6px 10px;">#${r.Store_Number}</td>
+        <td style="text-align:right;padding:6px 10px;">${r.Vehicle_Mileage ? num(+r.Vehicle_Mileage) : '—'}</td>
+        <td style="text-align:right;padding:6px 10px;">${money(+r.Net_Sales||0)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    ${segPreviewResults.length > 100 ? '<div style="text-align:center;padding:10px;font-size:11px;color:var(--text-muted);">Showing 100 of '+num(segPreviewResults.length)+'</div>' : ''}
+  ` : '<div style="text-align:center;padding:24px;color:var(--text-muted);">Click "Preview Segment" to see results</div>';
+}
+
+function saveSegment() {
+  const name = document.getElementById('segName').value.trim();
+  if (!name) { alert('Enter a segment name.'); return; }
+  if (!segPreviewResults.length) previewSegment();
+
+  const list = getSegments();
+  list.push({
+    name,
+    type: document.getElementById('segType').value,
+    desc: document.getElementById('segDesc').value.trim(),
+    groups: JSON.parse(JSON.stringify(segGroups)),
+    count: segPreviewResults.length,
+    created: new Date().toISOString()
+  });
+  saveSegments(list);
+  document.getElementById('segName').value = '';
+  document.getElementById('segDesc').value = '';
+  renderSavedSegments();
+  alert('Segment "' + name + '" saved with ' + num(segPreviewResults.length) + ' customers.');
+}
+
+function exportSegment() {
+  if (!segPreviewResults.length) previewSegment();
+  if (!segPreviewResults.length) { alert('No customers match.'); return; }
+  const rows = ['"First_Name","Last_Name","Email","Phone","Address","City","State","ZIP","Vehicle","Mileage","Store","Net_Sales"'];
+  segPreviewResults.forEach(r => {
+    rows.push([r.Customer_First_Name,r.Customer_Last_Name,r.Customer_Email_Address,r.Customer_Phone_Number,r.Customer_Address,r.City,r.Customer_State,r.ZIP_Code,[r.Vehicle_Year,r.ChekChart_Make,r.ChekChart_Model].filter(Boolean).join(' '),r.Vehicle_Mileage,r.Store_Number,r.Net_Sales].map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"').join(','));
+  });
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (document.getElementById('segName').value.trim()||'Segment') + '_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+function renderSavedSegments() {
+  const list = getSegments();
+  document.getElementById('segCount').textContent = list.length + ' saved';
+  document.getElementById('segTableBody').innerHTML = list.length ? list.map((s, i) => {
+    const critSummary = (s.groups||[]).map(g => g.criteria.map(c => {
+      const ct = SEG_CRITERIA_TYPES.find(t => t.id === c.type);
+      return (ct ? ct.label : c.type) + ' ' + c.comp + ' ' + (c.value||'');
+    }).join(' AND ')).join(' OR ');
+    return `<tr class="clickable-row" onclick="loadSegment(${i})">
+      <td><strong>${s.name}</strong><div style="font-size:11px;color:var(--text-muted);">${s.desc||''}</div></td>
+      <td><span class="campaign-status ${s.type==='dynamic'?'active':'draft'}">${s.type}</span></td>
+      <td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${critSummary}</td>
+      <td>${num(s.count)}</td>
+      <td style="font-size:11px;">${s.created ? new Date(s.created).toLocaleDateString() : ''}</td>
+      <td><button onclick="event.stopPropagation();deleteSegment(${i})" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">No saved segments. Build one above.</td></tr>';
+}
+
+function loadSegment(idx) {
+  const list = getSegments();
+  const s = list[idx];
+  if (!s) return;
+  document.getElementById('segName').value = s.name;
+  document.getElementById('segDesc').value = s.desc || '';
+  document.getElementById('segType').value = s.type || 'dynamic';
+  segGroups = JSON.parse(JSON.stringify(s.groups || []));
+  if (!segGroups.length) addSegCriteriaGroup();
+  renderSegCriteriaGroups();
+  previewSegment();
+}
+
+function deleteSegment(idx) {
+  const list = getSegments();
+  list.splice(idx, 1);
+  saveSegments(list);
+  renderSavedSegments();
 }
 
 // ============================================================
