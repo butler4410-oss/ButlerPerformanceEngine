@@ -3393,7 +3393,7 @@ function renderInspections() {
   document.querySelector('#tblInsp tbody').innerHTML = inspRows.map(([name, r]) => {
     const needs = r.yellow + r.orange + r.red;
     const conv = needs ? (r.purchased / needs * 100) : 0;
-    return `<tr><td>${name}</td><td>${num(r.green)}</td><td>${num(r.yellow)}</td><td>${num(r.orange)}</td><td>${num(r.red)}</td><td>${num(r.purchased)}</td><td>${pct(conv)}</td></tr>`;
+    return `<tr class="clickable-row" onclick="openInspDetail('${name.replace(/'/g,"\\'")}')"><td>${name}</td><td>${num(r.green)}</td><td>${num(r.yellow)}</td><td>${num(r.orange)}</td><td>${num(r.red)}</td><td>${num(r.purchased)}</td><td>${pct(conv)}</td></tr>`;
   }).join('');
 }
 
@@ -3473,7 +3473,7 @@ function renderPromos() {
   // Table
   const promoRows = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total);
   document.querySelector('#tblPromos tbody').innerHTML = promoRows.map(([code, r]) => `
-    <tr><td>${code}</td><td>${r.desc}</td><td>${num(r.uses)}</td><td>${money(r.total)}</td><td>${money(r.uses ? r.total / r.uses : 0)}</td><td>${r.stores.size}</td></tr>
+    <tr class="clickable-row" onclick="openPromoDetail('${code.replace(/'/g,"\\'")}')"><td>${code}</td><td>${r.desc}</td><td>${num(r.uses)}</td><td>${money(r.total)}</td><td>${money(r.uses ? r.total / r.uses : 0)}</td><td>${r.stores.size}</td></tr>
   `).join('');
 }
 
@@ -3835,7 +3835,7 @@ function renderCustomers() {
   });
   const bizRows = Object.entries(bizMap).sort((a,b) => b[1].rev - a[1].rev);
   document.querySelector('#tblBizAccounts tbody').innerHTML = bizRows.map(([id, r]) => `
-    <tr><td>${id}</td><td>${r.processor || ''}</td><td>${num(r.inv)}</td><td>${money(r.rev)}</td><td>${money(r.inv ? r.rev / r.inv : 0)}</td><td>${[...r.stores].join(', ')}</td></tr>
+    <tr class="clickable-row" onclick="openBizAcctDetail('${id.replace(/'/g,"\\'")}')"><td>${id}</td><td>${r.processor || ''}</td><td>${num(r.inv)}</td><td>${money(r.rev)}</td><td>${money(r.inv ? r.rev / r.inv : 0)}</td><td>${[...r.stores].join(', ')}</td></tr>
   `).join('');
 }
 
@@ -4759,6 +4759,213 @@ function renderStores() {
 }
 
 // ============================================================
+// INSPECTION ITEM DETAIL MODAL
+function openInspDetail(serviceName) {
+  const insp = FILTERED.inspections.filter(r => (r.Service_Title || r.Product_Code) === serviceName);
+  if (!insp.length) return;
+
+  document.getElementById('custDetailName').textContent = serviceName;
+
+  const green = insp.filter(r => r.Inspection_Status === 'Green').length;
+  const yellow = insp.filter(r => r.Inspection_Status === 'Yellow').length;
+  const orange = insp.filter(r => r.Inspection_Status === 'Orange').length;
+  const red = insp.filter(r => r.Inspection_Status === 'Red').length;
+  const purchased = insp.filter(r => r.Purchased_This_Visit === 'True').length;
+  const needs = yellow + orange + red;
+  const conv = needs ? (purchased / needs * 100) : 0;
+
+  // By store
+  const storeMap = {};
+  insp.forEach(r => {
+    if (!storeMap[r.Store_Number]) storeMap[r.Store_Number] = { total: 0, bad: 0, purchased: 0 };
+    storeMap[r.Store_Number].total++;
+    if (r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red') {
+      storeMap[r.Store_Number].bad++;
+      if (r.Purchased_This_Visit === 'True') storeMap[r.Store_Number].purchased++;
+    }
+  });
+  const storeRows = Object.entries(storeMap).sort((a,b) => b[1].bad - a[1].bad);
+
+  // Recent customers who purchased
+  const purchasedInv = new Set(insp.filter(r => r.Purchased_This_Visit === 'True').map(r => r.Invoice_Number));
+  const custRows = [];
+  purchasedInv.forEach(inv => {
+    const c = FILTERED.customers.find(r => r.Invoice_Number === inv);
+    if (c) custRows.push({ name: ((c.Customer_First_Name||'')+' '+(c.Customer_Last_Name||'')).trim()||'Unknown', store: c.Store_Number, date: c.Invoice_Date ? c.Invoice_Date.split(' ')[0] : '', sales: +c.Net_Sales||0 });
+  });
+  custRows.sort((a,b) => b.sales - a.sales);
+
+  const statusColor = { Green: 'var(--green)', Yellow: 'var(--yellow)', Orange: 'var(--orange)', Red: 'var(--red)' };
+
+  document.getElementById('custDetailBody').innerHTML = `
+    <div class="cust-detail-grid">
+      <div class="cust-detail-section">
+        <h4>Inspection Summary</h4>
+        <div class="cust-field"><span class="label">Total Checked</span><span class="value">${num(insp.length)}</span></div>
+        <div class="cust-field"><span class="label"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusColor.Green};margin-right:6px;"></span>Green</span><span class="value">${num(green)}</span></div>
+        <div class="cust-field"><span class="label"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusColor.Yellow};margin-right:6px;"></span>Yellow</span><span class="value">${num(yellow)}</span></div>
+        <div class="cust-field"><span class="label"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusColor.Orange};margin-right:6px;"></span>Orange</span><span class="value">${num(orange)}</span></div>
+        <div class="cust-field"><span class="label"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusColor.Red};margin-right:6px;"></span>Red</span><span class="value">${num(red)}</span></div>
+      </div>
+      <div class="cust-detail-section">
+        <h4>Conversion</h4>
+        <div class="cust-field"><span class="label">Needs Attention</span><span class="value">${num(needs)}</span></div>
+        <div class="cust-field"><span class="label">Purchased</span><span class="value">${num(purchased)}</span></div>
+        <div class="cust-field"><span class="label">Conversion Rate</span><span class="value" style="font-weight:700;font-size:16px;color:${conv>=20?'var(--green)':conv>=10?'var(--orange)':'var(--red)'};">${pct(conv)}</span></div>
+        <div class="cust-field"><span class="label">Missed Opportunities</span><span class="value" style="color:var(--red);">${num(needs - purchased)}</span></div>
+        <div class="cust-field"><span class="label">Stores Affected</span><span class="value">${Object.keys(storeMap).length}</span></div>
+      </div>
+      <div class="cust-detail-section full-width">
+        <h4>Breakdown by Store</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">CHECKED</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NEEDS ATTN</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">PURCHASED</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">CONV %</th></tr></thead>
+          <tbody>${storeRows.map(([s,d]) => `<tr><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.total)}</td><td style="text-align:right;padding:4px 8px;">${num(d.bad)}</td><td style="text-align:right;padding:4px 8px;">${num(d.purchased)}</td><td style="text-align:right;padding:4px 8px;">${pct(d.bad?(d.purchased/d.bad*100):0)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      ${custRows.length ? `<div class="cust-detail-section full-width">
+        <h4>Customers Who Purchased (${Math.min(custRows.length,30)})</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">CUSTOMER</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th></tr></thead>
+          <tbody>${custRows.slice(0,30).map(c => `<tr><td style="padding:4px 8px;">${c.name}</td><td style="text-align:center;padding:4px 8px;">#${c.store}</td><td style="text-align:center;padding:4px 8px;">${c.date}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>` : ''}
+    </div>`;
+  document.getElementById('custDetailModal').classList.add('active');
+}
+
+// PROMO DETAIL MODAL
+function openPromoDetail(promoCode) {
+  const promoRows = FILTERED.promos.filter(r => r.Promo_Code === promoCode);
+  if (!promoRows.length) return;
+
+  document.getElementById('custDetailName').textContent = promoCode + ' — ' + (promoRows[0].Promo_Description || '');
+
+  const totalDisc = promoRows.reduce((s,r) => s+(+r.Promo_Amount||0), 0);
+  const avgDisc = promoRows.length ? totalDisc / promoRows.length : 0;
+  const storeSet = new Set(promoRows.map(r => r.Store_Number));
+
+  // By store
+  const storeMap = {};
+  promoRows.forEach(r => {
+    if (!storeMap[r.Store_Number]) storeMap[r.Store_Number] = { uses: 0, total: 0 };
+    storeMap[r.Store_Number].uses++;
+    storeMap[r.Store_Number].total += (+r.Promo_Amount||0);
+  });
+  const storeEntries = Object.entries(storeMap).sort((a,b) => b[1].uses - a[1].uses);
+
+  // Customers who used this promo
+  const invoiceNums = new Set(promoRows.map(r => r.Invoice_Number));
+  const custRows = [];
+  invoiceNums.forEach(inv => {
+    const c = FILTERED.customers.find(r => r.Invoice_Number === inv);
+    const p = promoRows.find(r => r.Invoice_Number === inv);
+    if (c) custRows.push({ name: ((c.Customer_First_Name||'')+' '+(c.Customer_Last_Name||'')).trim()||'Unknown', store: c.Store_Number, date: c.Invoice_Date ? c.Invoice_Date.split(' ')[0] : '', sales: +c.Net_Sales||0, disc: +(p?.Promo_Amount||0) });
+  });
+  custRows.sort((a,b) => b.disc - a.disc);
+
+  document.getElementById('custDetailBody').innerHTML = `
+    <div class="cust-detail-grid">
+      <div class="cust-detail-section">
+        <h4>Promo Summary</h4>
+        <div class="cust-field"><span class="label">Code</span><span class="value" style="font-family:monospace;">${promoCode}</span></div>
+        <div class="cust-field"><span class="label">Description</span><span class="value">${promoRows[0].Promo_Description || '—'}</span></div>
+        <div class="cust-field"><span class="label">Total Uses</span><span class="value">${num(promoRows.length)}</span></div>
+        <div class="cust-field"><span class="label">Total Discount</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(totalDisc)}</span></div>
+      </div>
+      <div class="cust-detail-section">
+        <h4>Metrics</h4>
+        <div class="cust-field"><span class="label">Avg Discount</span><span class="value">${money(avgDisc)}</span></div>
+        <div class="cust-field"><span class="label">Stores Using</span><span class="value">${storeSet.size}</span></div>
+        <div class="cust-field"><span class="label">Avg Net Sale</span><span class="value">${money(custRows.length ? custRows.reduce((s,c)=>s+c.sales,0)/custRows.length : 0)}</span></div>
+      </div>
+      <div class="cust-detail-section full-width">
+        <h4>Usage by Store</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">USES</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">TOTAL DISCOUNT</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">AVG DISCOUNT</th></tr></thead>
+          <tbody>${storeEntries.map(([s,d]) => `<tr><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.uses)}</td><td style="text-align:right;padding:4px 8px;">${money(d.total)}</td><td style="text-align:right;padding:4px 8px;">${money(d.uses?d.total/d.uses:0)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      ${custRows.length ? `<div class="cust-detail-section full-width">
+        <h4>Customers Who Used This Promo (${Math.min(custRows.length,50)})</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">CUSTOMER</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">DISCOUNT</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th></tr></thead>
+          <tbody>${custRows.slice(0,50).map(c => `<tr><td style="padding:4px 8px;">${c.name}</td><td style="text-align:center;padding:4px 8px;">#${c.store}</td><td style="text-align:center;padding:4px 8px;">${c.date}</td><td style="text-align:right;padding:4px 8px;color:var(--green);">-${money(c.disc)}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>` : ''}
+    </div>`;
+  document.getElementById('custDetailModal').classList.add('active');
+}
+
+// BUSINESS ACCOUNT DETAIL MODAL
+function openBizAcctDetail(acctId) {
+  const cust = FILTERED.customers.filter(r => (r.Business_Account_ID||'').trim() === acctId);
+  if (!cust.length) return;
+
+  document.getElementById('custDetailName').textContent = 'Account: ' + acctId + (cust[0].BA_Processor_Code ? ' (' + cust[0].BA_Processor_Code + ')' : '');
+
+  const totalRev = cust.reduce((s,r) => s+(+r.Net_Sales||0), 0);
+  const avgTicket = cust.length ? totalRev / cust.length : 0;
+  const storeSet = new Set(cust.map(r => r.Store_Number));
+
+  // By store
+  const storeMap = {};
+  cust.forEach(r => {
+    if (!storeMap[r.Store_Number]) storeMap[r.Store_Number] = { inv: 0, rev: 0 };
+    storeMap[r.Store_Number].inv++;
+    storeMap[r.Store_Number].rev += (+r.Net_Sales||0);
+  });
+  const storeEntries = Object.entries(storeMap).sort((a,b) => b[1].rev - a[1].rev);
+
+  // Vehicles
+  const vehicles = {};
+  cust.forEach(r => {
+    const v = [r.Vehicle_Year, r.ChekChart_Make, r.ChekChart_Model].filter(Boolean).join(' ');
+    if (v) vehicles[v] = (vehicles[v]||0) + 1;
+  });
+  const topVehicles = Object.entries(vehicles).sort((a,b) => b[1] - a[1]).slice(0, 10);
+
+  // Invoice list
+  const invoiceRows = cust.map(r => ({
+    name: ((r.Customer_First_Name||'')+' '+(r.Customer_Last_Name||'')).trim()||'Fleet',
+    store: r.Store_Number,
+    date: r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '',
+    vehicle: [r.Vehicle_Year, r.ChekChart_Make, r.ChekChart_Model].filter(Boolean).join(' '),
+    sales: +r.Net_Sales||0
+  })).sort((a,b) => b.sales - a.sales);
+
+  document.getElementById('custDetailBody').innerHTML = `
+    <div class="cust-detail-grid">
+      <div class="cust-detail-section">
+        <h4>Account Summary</h4>
+        <div class="cust-field"><span class="label">Account ID</span><span class="value">${acctId}</span></div>
+        <div class="cust-field"><span class="label">Processor</span><span class="value">${cust[0].BA_Processor_Code || '—'}</span></div>
+        <div class="cust-field"><span class="label">Total Revenue</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(totalRev)}</span></div>
+        <div class="cust-field"><span class="label">Invoices</span><span class="value">${num(cust.length)}</span></div>
+        <div class="cust-field"><span class="label">Avg Ticket</span><span class="value">${money(avgTicket)}</span></div>
+        <div class="cust-field"><span class="label">Stores Visited</span><span class="value">${storeSet.size}</span></div>
+      </div>
+      <div class="cust-detail-section">
+        <h4>Top Vehicles</h4>
+        ${topVehicles.map(([v,c]) => `<div class="cust-field"><span class="label">${v}</span><span class="value">${c}x</span></div>`).join('')}
+      </div>
+      <div class="cust-detail-section full-width">
+        <h4>Revenue by Store</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">INVOICES</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">REVENUE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">AVG TICKET</th></tr></thead>
+          <tbody>${storeEntries.map(([s,d]) => `<tr><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.inv)}</td><td style="text-align:right;padding:4px 8px;">${money(d.rev)}</td><td style="text-align:right;padding:4px 8px;">${money(d.inv?d.rev/d.inv:0)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="cust-detail-section full-width">
+        <h4>Invoices (${Math.min(invoiceRows.length,50)})</h4>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">NAME</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">VEHICLE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th></tr></thead>
+          <tbody>${invoiceRows.slice(0,50).map(r => `<tr><td style="padding:4px 8px;">${r.name}</td><td style="padding:4px 8px;font-size:11px;">${r.vehicle}</td><td style="text-align:center;padding:4px 8px;">#${r.store}</td><td style="text-align:center;padding:4px 8px;">${r.date}</td><td style="text-align:right;padding:4px 8px;">${money(r.sales)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+  document.getElementById('custDetailModal').classList.add('active');
+}
+
 // STORE RANKING DETAIL MODAL
 // ============================================================
 function openStoreRankDetail(storeNum) {
