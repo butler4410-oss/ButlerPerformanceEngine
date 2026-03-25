@@ -6519,14 +6519,24 @@ function saveUsers(list) { localStorage.setItem('bp_users', JSON.stringify(list)
 function getCurrentUser() { try { return JSON.parse(sessionStorage.getItem('bp_current_user')); } catch(e) { return null; } }
 function setCurrentUser(user) { sessionStorage.setItem('bp_current_user', JSON.stringify(user)); }
 
-// Ensure default admin always exists
+// Ensure default accounts always exist
+const DEFAULT_ACCOUNTS = [
+  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', password: 'bpa2026', role: 'admin' },
+  { name: 'Andrew Thomas', email: 'andrew@southbaylube.com', company: 'South Bay Lube Inc.', password: 'sbl2026', role: 'manager' },
+  { name: 'Jason Thomas', email: 'jason@southbaylube.com', company: 'South Bay Lube Inc.', password: 'sbl2026', role: 'manager' },
+  { name: 'Demo User', email: 'demo@butleranalytics.io', company: 'Demo Account', password: 'demo', role: 'viewer' },
+];
+
 function seedDefaultUser() {
   const users = getUsers();
-  const defaultEmail = 'chase@butleranalytics.io';
-  if (!users.find(u => u.email.toLowerCase() === defaultEmail)) {
-    users.push({ name: 'Chase Butler', email: defaultEmail, company: 'Butler Performance Analytics', password: 'bpa2026', role: 'admin', created: new Date().toISOString() });
-    saveUsers(users);
-  }
+  let changed = false;
+  DEFAULT_ACCOUNTS.forEach(acct => {
+    if (!users.find(u => u.email.toLowerCase() === acct.email.toLowerCase())) {
+      users.push({ ...acct, created: new Date().toISOString() });
+      changed = true;
+    }
+  });
+  if (changed) saveUsers(users);
 }
 
 function doLogin() {
