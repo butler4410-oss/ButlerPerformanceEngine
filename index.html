@@ -6499,11 +6499,12 @@ function saveUsers(list) { localStorage.setItem('bp_users', JSON.stringify(list)
 function getCurrentUser() { try { return JSON.parse(sessionStorage.getItem('bp_current_user')); } catch(e) { return null; } }
 function setCurrentUser(user) { sessionStorage.setItem('bp_current_user', JSON.stringify(user)); }
 
-// Seed default admin if no users exist
+// Ensure default admin always exists
 function seedDefaultUser() {
   const users = getUsers();
-  if (!users.length) {
-    users.push({ name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', password: 'bpa2026', role: 'admin', created: new Date().toISOString() });
+  const defaultEmail = 'chase@butleranalytics.io';
+  if (!users.find(u => u.email.toLowerCase() === defaultEmail)) {
+    users.push({ name: 'Chase Butler', email: defaultEmail, company: 'Butler Performance Analytics', password: 'bpa2026', role: 'admin', created: new Date().toISOString() });
     saveUsers(users);
   }
 }
