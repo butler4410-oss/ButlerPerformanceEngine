@@ -3788,6 +3788,23 @@ function renderPromos() {
 // ============================================================
 // OPERATIONS TAB
 // ============================================================
+const CHEKCHART_MAKES = {
+  'AA':'Acura','AB':'Alfa Romeo','AM':'AMC','AR':'Aston Martin','AU':'Audi',
+  'BK':'Buick','BM':'BMW','BU':'Bugatti','CA':'Cadillac','CF':'Chevrolet',
+  'CR':'Chrysler','CT':'Chevrolet','DA':'Daihatsu','DE':'Dodge','DL':'Datsun',
+  'EA':'Eagle','FD':'Ford','FI':'Fiat','FR':'Ferrari','GE':'Geo','GM':'GMC',
+  'HA':'Honda','HI':'Hyundai','HU':'Hummer','IF':'Infiniti','IH':'Intl Harvester',
+  'IS':'Isuzu','JG':'Jaguar','JP':'Jeep','KA':'Kia','LA':'Lancia','LB':'Lamborghini',
+  'LN':'Lincoln','LS':'Lexus','LR':'Land Rover','MA':'Mazda','MB':'Mercedes-Benz',
+  'MC':'Mercury','MI':'Mitsubishi','MN':'MINI','ND':'Hyundai','NS':'Nissan',
+  'OL':'Oldsmobile','PL':'Plymouth','PN':'Pontiac','PO':'Porsche','RM':'RAM',
+  'RO':'Rolls-Royce','SA':'Saab','SB':'Subaru','SC':'Scion','SM':'Smart',
+  'ST':'Saturn','SU':'Subaru','SZ':'Suzuki','TA':'Toyota','TC':'Chevrolet',
+  'TF':'Ford','TE':'Tesla','VO':'Volvo','VW':'Volkswagen'
+};
+
+function decodeMake(code) { return CHEKCHART_MAKES[code] || code; }
+
 function renderOperations() {
   const cust = FILTERED.customers;
 
@@ -3826,7 +3843,10 @@ function renderOperations() {
   // Makes
   const makeCounts = {};
   cust.forEach(r => {
-    if (r.ChekChart_Make) makeCounts[r.ChekChart_Make] = (makeCounts[r.ChekChart_Make] || 0) + 1;
+    if (r.ChekChart_Make) {
+      const decoded = decodeMake(r.ChekChart_Make);
+      makeCounts[decoded] = (makeCounts[decoded] || 0) + 1;
+    }
   });
 
   document.getElementById('opsKPIs').innerHTML = `
