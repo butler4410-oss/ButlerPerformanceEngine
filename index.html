@@ -1558,7 +1558,7 @@
 
 <!-- Alerts Modal -->
 <div class="modal-overlay" id="alertsModal">
-  <div class="modal" style="width:700px;">
+  <div class="modal" style="width:700px;max-height:88vh;overflow-y:auto;">
     <h3>Performance Alerts</h3>
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Configure store-level thresholds. When data is loaded, stores that breach these thresholds trigger alerts.</p>
 
@@ -1602,10 +1602,11 @@
 
     <div style="margin-bottom:16px;">
       <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Triggered Alerts</div>
-      <div id="triggeredAlertsList"></div>
+      <div id="triggeredAlertsList" style="max-height:300px;overflow-y:auto;"></div>
     </div>
 
     <div class="modal-buttons">
+      <button class="btn-cancel" onclick="clearAllAlertRules()" style="border-color:var(--red);color:var(--red);">Clear All Rules</button>
       <button class="btn-cancel" onclick="closeAlerts()">Close</button>
       <button class="btn-save" onclick="sendAllAlerts()">Send All Alerts</button>
     </div>
@@ -6577,6 +6578,15 @@ function openAlerts() {
   renderAlertRules();
   runAlertCheck();
   document.getElementById('alertsModal').classList.add('active');
+}
+
+function clearAllAlertRules() {
+  if (!confirm('Remove all alert rules and recipients?')) return;
+  saveAlertRules([]);
+  saveAlertRecipients([]);
+  renderAlertRules();
+  renderAlertRecipients();
+  runAlertCheck();
 }
 
 function closeAlerts() {
