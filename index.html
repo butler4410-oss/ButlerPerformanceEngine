@@ -1660,6 +1660,7 @@
     <button class="tab" data-tab="customers">Customers</button>
     <button class="tab" data-tab="segments">Segments</button>
     <button class="tab" data-tab="marketing">Marketing</button>
+    <button class="tab" data-tab="reporting">Reporting</button>
     <button class="tab" data-tab="stores">Store Rankings</button>
   </div>
 
@@ -1712,16 +1713,20 @@
   <!-- REVENUE TAB -->
   <div class="tab-content" id="tab-revenue">
     <div class="kpi-grid" id="revenueKPIs"></div>
-    <div class="bpa-panel" id="bpaRevenue"></div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Revenue by Service Category</h3>
-        <div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+      <div>
+        <div class="charts-row" style="margin-bottom:0;">
+          <div class="chart-card">
+            <h3>Revenue by Category</h3>
+            <div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Revenue by Type</h3>
+            <div class="chart-wrap"><canvas id="chartRevByType"></canvas></div>
+          </div>
+        </div>
       </div>
-      <div class="chart-card">
-        <h3>Revenue by Detail Type</h3>
-        <div class="chart-wrap"><canvas id="chartRevByType"></canvas></div>
-      </div>
+      <div><div class="bpa-panel" id="bpaRevenue" style="margin-bottom:0;"></div></div>
     </div>
     <div class="export-bar">
       <button class="btn-export" onclick="exportReport('tblServices','Service & Product Breakdown')">Export Report</button>
@@ -1750,22 +1755,24 @@
   <!-- INSPECTIONS TAB -->
   <div class="tab-content" id="tab-inspections">
     <div class="kpi-grid" id="inspKPIs"></div>
-    <div class="bpa-panel" id="bpaInspections"></div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Inspection Status Distribution</h3>
-        <div class="chart-wrap"><canvas id="chartInspStatus"></canvas></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+      <div>
+        <div class="charts-row" style="margin-bottom:20px;">
+          <div class="chart-card">
+            <h3>Status Distribution</h3>
+            <div class="chart-wrap"><canvas id="chartInspStatus"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Conversion Rate</h3>
+            <div class="chart-wrap"><canvas id="chartConversion"></canvas></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Top Upsell Opportunities</h3>
+          <div class="chart-wrap" style="height:240px;"><canvas id="chartUpsell"></canvas></div>
+        </div>
       </div>
-      <div class="chart-card">
-        <h3>Yellow/Red Conversion Rate (Purchased This Visit)</h3>
-        <div class="chart-wrap"><canvas id="chartConversion"></canvas></div>
-      </div>
-    </div>
-    <div class="charts-row single">
-      <div class="chart-card">
-        <h3>Top Upsell Opportunities (Yellow + Red Items Not Purchased)</h3>
-        <div class="chart-wrap"><canvas id="chartUpsell"></canvas></div>
-      </div>
+      <div><div class="bpa-panel" id="bpaInspections" style="margin-bottom:0;"></div></div>
     </div>
     <div class="export-bar">
       <button class="btn-export" onclick="exportReport('tblInsp','Inspection Items Summary')">Export Report</button>
@@ -1795,16 +1802,18 @@
   <!-- PROMOS TAB -->
   <div class="tab-content" id="tab-promos">
     <div class="kpi-grid" id="promoKPIs"></div>
-    <div class="bpa-panel" id="bpaPromos"></div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Top 10 Promos by Usage</h3>
-        <div class="chart-wrap"><canvas id="chartPromoUsage"></canvas></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+      <div class="charts-row" style="margin-bottom:0;">
+        <div class="chart-card">
+          <h3>Top Promos by Usage</h3>
+          <div class="chart-wrap"><canvas id="chartPromoUsage"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Top Promos by Discount</h3>
+          <div class="chart-wrap"><canvas id="chartPromoAmt"></canvas></div>
+        </div>
       </div>
-      <div class="chart-card">
-        <h3>Top 10 Promos by Discount Amount</h3>
-        <div class="chart-wrap"><canvas id="chartPromoAmt"></canvas></div>
-      </div>
+      <div><div class="bpa-panel" id="bpaPromos" style="margin-bottom:0;"></div></div>
     </div>
     <div class="export-bar">
       <button class="btn-export" onclick="exportReport('tblPromos','Promotion Details')">Export Report</button>
@@ -1833,26 +1842,30 @@
   <!-- OPERATIONS TAB -->
   <div class="tab-content" id="tab-operations">
     <div class="kpi-grid" id="opsKPIs"></div>
-    <div class="bpa-panel" id="bpaOps"></div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Average Service Time by Store (Top 15)</h3>
-        <div class="chart-wrap"><canvas id="chartSvcTime"></canvas></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+      <div>
+        <div class="charts-row" style="margin-bottom:20px;">
+          <div class="chart-card">
+            <h3>Service Time by Store</h3>
+            <div class="chart-wrap"><canvas id="chartSvcTime"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Time Distribution</h3>
+            <div class="chart-wrap"><canvas id="chartTimeHist"></canvas></div>
+          </div>
+        </div>
+        <div class="charts-row" style="margin-bottom:0;">
+          <div class="chart-card">
+            <h3>Top Vehicle Makes</h3>
+            <div class="chart-wrap"><canvas id="chartMakes"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Volume by Hour</h3>
+            <div class="chart-wrap"><canvas id="chartByHour"></canvas></div>
+          </div>
+        </div>
       </div>
-      <div class="chart-card">
-        <h3>Service Time Distribution (Minutes)</h3>
-        <div class="chart-wrap"><canvas id="chartTimeHist"></canvas></div>
-      </div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Top Vehicle Makes</h3>
-        <div class="chart-wrap"><canvas id="chartMakes"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Invoices by Hour of Day</h3>
-        <div class="chart-wrap"><canvas id="chartByHour"></canvas></div>
-      </div>
+      <div><div class="bpa-panel" id="bpaOps" style="margin-bottom:0;"></div></div>
     </div>
     <div class="export-bar">
       <button class="btn-export" onclick="exportReport('tblStoreOps','Store Service Times')">Export Report</button>
@@ -1882,26 +1895,30 @@
   <!-- CUSTOMERS TAB -->
   <div class="tab-content" id="tab-customers">
     <div class="kpi-grid" id="custKPIs"></div>
-    <div class="bpa-panel" id="bpaCustomers"></div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Customers by State</h3>
-        <div class="chart-wrap"><canvas id="chartCustState"></canvas></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+      <div>
+        <div class="charts-row" style="margin-bottom:20px;">
+          <div class="chart-card">
+            <h3>Customers by State</h3>
+            <div class="chart-wrap"><canvas id="chartCustState"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Top 15 Cities</h3>
+            <div class="chart-wrap"><canvas id="chartCustCity"></canvas></div>
+          </div>
+        </div>
+        <div class="charts-row" style="margin-bottom:0;">
+          <div class="chart-card">
+            <h3>Spend Distribution</h3>
+            <div class="chart-wrap"><canvas id="chartCustSpend"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Vehicle Year</h3>
+            <div class="chart-wrap"><canvas id="chartVehYear"></canvas></div>
+          </div>
+        </div>
       </div>
-      <div class="chart-card">
-        <h3>Top 15 Cities</h3>
-        <div class="chart-wrap"><canvas id="chartCustCity"></canvas></div>
-      </div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Customer Spend Distribution</h3>
-        <div class="chart-wrap"><canvas id="chartCustSpend"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Vehicle Year Distribution</h3>
-        <div class="chart-wrap"><canvas id="chartVehYear"></canvas></div>
-      </div>
+      <div><div class="bpa-panel" id="bpaCustomers" style="margin-bottom:0;"></div></div>
     </div>
     <div class="export-bar">
       <button class="btn-export" onclick="exportReport('tblCustomers','Customer Details')">Export Report</button>
@@ -2238,6 +2255,103 @@
       </div>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Complete all items before emailing Triadex. Progress saves automatically.</div>
       <div id="handoffChecklist"></div>
+    </div>
+  </div>
+
+  <!-- REPORTING TAB -->
+  <div class="tab-content" id="tab-reporting">
+    <div class="kpi-grid" id="reportingKPIs"></div>
+    <div class="bpa-panel" id="bpaReporting"></div>
+
+    <!-- Main layout: 2/3 + 1/3 -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+      <div>
+        <!-- Warranty Services -->
+        <div class="table-wrap" style="margin-bottom:20px;">
+          <h3 style="display:flex;align-items:center;justify-content:space-between;">
+            Warranty Services
+            <div style="display:flex;gap:6px;">
+              <button class="btn-export" onclick="exportReport('tblWarranty','Warranty Services Report')">Export Report</button>
+              <button class="btn-export" onclick="emailReport('tblWarranty','Warranty Services Report')">Email</button>
+            </div>
+          </h3>
+          <div class="table-scroll" style="max-height:350px;">
+            <table id="tblWarranty">
+              <thead>
+                <tr>
+                  <th class="sortable" data-col="0">Service</th>
+                  <th class="sortable" data-col="1">Category</th>
+                  <th class="sortable" data-col="2">Qty Sold</th>
+                  <th class="sortable" data-col="3">Revenue</th>
+                  <th class="sortable" data-col="4">Invoices</th>
+                  <th class="sortable" data-col="5">Stores</th>
+                  <th class="sortable" data-col="6">Avg Price</th>
+                </tr>
+              </thead>
+              <tbody id="warrantyTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Sales (low-ticket / fast turnaround) -->
+        <div class="table-wrap">
+          <h3 style="display:flex;align-items:center;justify-content:space-between;">
+            Quick Sales (Under $50)
+            <div style="display:flex;gap:6px;">
+              <button class="btn-export" onclick="exportReport('tblQuickSales','Quick Sales Report')">Export Report</button>
+              <button class="btn-export" onclick="emailReport('tblQuickSales','Quick Sales Report')">Email</button>
+            </div>
+          </h3>
+          <div class="table-scroll" style="max-height:350px;">
+            <table id="tblQuickSales">
+              <thead>
+                <tr>
+                  <th class="sortable" data-col="0">Customer</th>
+                  <th class="sortable" data-col="1">Store</th>
+                  <th class="sortable" data-col="2">Date</th>
+                  <th class="sortable" data-col="3">Services</th>
+                  <th class="sortable" data-col="4">Net Sales</th>
+                  <th class="sortable" data-col="5">Bay Time</th>
+                </tr>
+              </thead>
+              <tbody id="quickSalesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right sidebar -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <!-- Mailable Address Stats -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="width:38px;height:38px;background:rgba(0,200,83,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--green);font-weight:700;">M</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:white;">Mailable Customers</div>
+              <div style="font-size:11px;color:var(--text-muted);">Full address on file</div>
+            </div>
+          </div>
+          <div id="mailableStats"></div>
+        </div>
+
+        <!-- Data Quality -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="width:38px;height:38px;background:rgba(68,138,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--blue);font-weight:700;">Q</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:white;">Data Quality</div>
+              <div style="font-size:11px;color:var(--text-muted);">Contact info coverage</div>
+            </div>
+          </div>
+          <div id="dataQualityStats"></div>
+        </div>
+
+        <!-- Store Mailing Coverage -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;">Store Mailing Coverage</div>
+          <div id="storeMailStats" style="max-height:250px;overflow-y:auto;"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2579,6 +2693,7 @@ function renderDashboard() {
   renderCustomers();
   renderSegments();
   renderMarketing();
+  renderReporting();
   renderStores();
   runAlertCheck();
   runBPAInsights();
@@ -3140,6 +3255,10 @@ function makeChart(canvasId, config) {
 // ============================================================
 // CUSTOMIZABLE TILE ENGINE
 // ============================================================
+function hasValidAddress(r) {
+  return !!(r.Customer_Address && r.Customer_Address.trim() && r.Customer_Address.trim() !== 'NA' && r.City && r.City.trim() && r.City.trim() !== 'NA' && r.Customer_State && r.Customer_State.trim() && r.ZIP_Code && r.ZIP_Code.trim());
+}
+
 const TILE_CATALOG = [
   // Revenue
   { id: 'total_revenue',    cat: 'Revenue',      label: 'Total Revenue',        desc: 'Sum of net sales',                 calc: () => { const v = FILTERED.customers.reduce((s,r) => s+(+r.Net_Sales||0),0); return { value: money(v), sub: num(FILTERED.customers.length)+' invoices' }; }},
@@ -3180,6 +3299,7 @@ const TILE_CATALOG = [
   { id: 'biz_accounts',     cat: 'Customers',    label: 'Business Accounts',    desc: 'Distinct fleet/corporate accts',   calc: () => ({ value: String(new Set(FILTERED.customers.filter(r=>r.Business_Account_ID&&r.Business_Account_ID.trim()).map(r=>r.Business_Account_ID)).size), sub: 'fleet / corporate' })},
   { id: 'states_served',    cat: 'Customers',    label: 'States Served',        desc: 'Distinct customer states',         calc: () => ({ value: String(new Set(FILTERED.customers.filter(r=>r.Customer_State).map(r=>r.Customer_State)).size) })},
   { id: 'cities_served',    cat: 'Customers',    label: 'Cities Served',        desc: 'Distinct customer cities',         calc: () => ({ value: String(new Set(FILTERED.customers.filter(r=>r.City&&r.City.trim()&&r.City!=='NA').map(r=>r.City)).size) })},
+  { id: 'valid_mailing',    cat: 'Customers',    label: 'Mailable Addresses',   desc: 'Customers with full mailing address', calc: () => { const c=FILTERED.customers; const v=c.filter(hasValidAddress).length; return { value: pct(c.length?v/c.length*100:0), sub: num(v)+' of '+num(c.length) }; }},
 ];
 
 const DEFAULT_TILES = ['total_revenue','avg_ticket','active_stores','promo_discounts','insp_total'];
@@ -4541,6 +4661,7 @@ const SEG_CRITERIA_TYPES = [
   { id: 'has_phone', label: 'Has Phone', type: 'bool', field: r => !!(r.Customer_Phone_Number && r.Customer_Phone_Number.trim()) },
   { id: 'is_fleet', label: 'Fleet / Business Acct', type: 'bool', field: r => !!(r.Business_Account_ID && r.Business_Account_ID.trim()) },
   { id: 'engine', label: 'Engine Type', type: 'select', field: r => (r.ChekChart_Engine || '').toUpperCase().trim() },
+  { id: 'has_address', label: 'Valid Mailing Address', type: 'bool', field: r => hasValidAddress(r) },
 ];
 
 const SEG_COMPARISONS = {
@@ -5320,6 +5441,125 @@ function emailHandoff() {
   } else {
     window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + '&cc=' + encodeURIComponent('chase@butleranalytics.io'), '_self');
   }
+}
+
+// ============================================================
+// REPORTING TAB
+// ============================================================
+function renderReporting() {
+  const cust = FILTERED.customers;
+  const det = FILTERED.details;
+  const insp = FILTERED.inspections;
+
+  // KPIs
+  const mailable = cust.filter(hasValidAddress).length;
+  const mailPct = cust.length ? (mailable / cust.length * 100) : 0;
+  const quickSales = cust.filter(r => (+r.Net_Sales || 0) > 0 && (+r.Net_Sales || 0) < 50);
+  const quickRev = quickSales.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+
+  // Warranty-type services (look for warranty, tire, brake, fluid keywords)
+  const warrantyKeywords = ['WARRANT','TIRE','BRAKE','FLUID','COOLANT','TRANSMIS','TRANSFER','FLUSH','REPLACE','REPAIR','BATTERY','WIPER','BELT','HOSE','LIGHT','BULB'];
+  const warrantySvc = {};
+  det.forEach(r => {
+    const desc = (r.Invoice_Detail_Description || '').toUpperCase();
+    const isWarranty = warrantyKeywords.some(k => desc.includes(k));
+    if (isWarranty && (+r.Extended_Price || 0) > 0) {
+      const key = r.Invoice_Detail_Description;
+      if (!warrantySvc[key]) warrantySvc[key] = { cat: r.JLI_Category_Code, qty: 0, rev: 0, invoices: new Set(), stores: new Set() };
+      warrantySvc[key].qty += (+r.Quantity_Sold || 0);
+      warrantySvc[key].rev += (+r.Extended_Price || 0);
+      warrantySvc[key].invoices.add(r.Invoice_Number);
+      warrantySvc[key].stores.add(r.Store_Number);
+    }
+  });
+  const warrantyEntries = Object.entries(warrantySvc).sort((a, b) => b[1].rev - a[1].rev);
+  const totalWarrantyRev = warrantyEntries.reduce((s, e) => s + e[1].rev, 0);
+
+  document.getElementById('reportingKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Mailable Addresses</div><div class="kpi-value" style="color:${mailPct>=90?'var(--green)':mailPct>=70?'var(--orange)':'var(--red)'};">${pct(mailPct)}</div><div class="kpi-sub">${num(mailable)} of ${num(cust.length)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Warranty / Maintenance Rev</div><div class="kpi-value">${money(totalWarrantyRev)}</div><div class="kpi-sub">${num(warrantyEntries.length)} service types</div></div>
+    <div class="kpi-card"><div class="kpi-label">Quick Sales (&lt;$50)</div><div class="kpi-value">${num(quickSales.length)}</div><div class="kpi-sub">${money(quickRev)} revenue</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Quick Sale</div><div class="kpi-value">${money(quickSales.length ? quickRev / quickSales.length : 0)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Data Completeness</div><div class="kpi-value">${pct(cust.length ? ((cust.filter(r => hasValidAddress(r) && r.Customer_Email_Address && r.Customer_Email_Address.trim() && r.Customer_Phone_Number && r.Customer_Phone_Number.trim()).length) / cust.length * 100) : 0)}</div><div class="kpi-sub">addr + email + phone</div></div>
+  `;
+
+  // Warranty table
+  document.getElementById('warrantyTableBody').innerHTML = warrantyEntries.length ? warrantyEntries.slice(0, 80).map(([name, r]) =>
+    `<tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(name||'').replace(/'/g,"\\'")}','SERVICE')"><td>${name}</td><td>${r.cat}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${num(r.invoices.size)}</td><td>${num(r.stores.size)}</td><td>${money(r.invoices.size ? r.rev / r.invoices.size : 0)}</td></tr>`
+  ).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:20px;">No warranty services found.</td></tr>';
+
+  // Quick sales table
+  const qsRows = quickSales.map(r => {
+    const name = ((r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '')).trim() || 'Unknown';
+    const relDet = det.filter(d => d.Invoice_Number === r.Invoice_Number && d.Invoice_Detail_Type === 'SERVICE').map(d => d.Invoice_Detail_Description).join(', ');
+    const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    return { name, store: r.Store_Number, date: r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '', services: relDet || '—', sales: +r.Net_Sales || 0, bay: bay !== null && bay > 0 ? bay.toFixed(0) + ' min' : '—', idx: FILTERED.customers.indexOf(r) };
+  }).sort((a, b) => a.sales - b.sales).slice(0, 100);
+
+  document.getElementById('quickSalesTableBody').innerHTML = qsRows.length ? qsRows.map(r =>
+    `<tr class="clickable-row" onclick="openCustDetail(${r.idx})"><td>${r.name}</td><td>#${r.store}</td><td>${r.date}</td><td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.services}</td><td>${money(r.sales)}</td><td>${r.bay}</td></tr>`
+  ).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">No quick sales found.</td></tr>';
+
+  // Mailable stats sidebar
+  document.getElementById('mailableStats').innerHTML = `
+    <div style="font-size:28px;font-weight:800;color:${mailPct>=90?'var(--green)':mailPct>=70?'var(--orange)':'var(--red)'};">${pct(mailPct)}</div>
+    <div style="font-size:12px;color:var(--text-muted);margin:4px 0 12px;">${num(mailable)} of ${num(cust.length)} customers</div>
+    <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${mailPct}%;background:${mailPct>=90?'var(--green)':mailPct>=70?'var(--orange)':'var(--red)'};border-radius:3px;"></div></div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">${num(cust.length - mailable)} missing address data</div>
+  `;
+
+  // Data quality sidebar
+  const withEmail = cust.filter(r => r.Customer_Email_Address && r.Customer_Email_Address.trim()).length;
+  const withPhone = cust.filter(r => r.Customer_Phone_Number && r.Customer_Phone_Number.trim()).length;
+  const emailPctV = cust.length ? (withEmail / cust.length * 100) : 0;
+  const phonePctV = cust.length ? (withPhone / cust.length * 100) : 0;
+
+  document.getElementById('dataQualityStats').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-muted);">Mailing Address</span><span style="font-weight:600;color:${mailPct>=90?'var(--green)':'var(--orange)'};">${pct(mailPct)}</span></div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${mailPct}%;background:${mailPct>=90?'var(--green)':'var(--orange)'};border-radius:2px;"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-muted);">Email Address</span><span style="font-weight:600;color:${emailPctV>=75?'var(--green)':'var(--orange)'};">${pct(emailPctV)}</span></div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${emailPctV}%;background:${emailPctV>=75?'var(--green)':'var(--orange)'};border-radius:2px;"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-muted);">Phone Number</span><span style="font-weight:600;color:${phonePctV>=80?'var(--green)':'var(--orange)'};">${pct(phonePctV)}</span></div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${phonePctV}%;background:${phonePctV>=80?'var(--green)':'var(--orange)'};border-radius:2px;"></div></div></div>
+    </div>
+  `;
+
+  // Store mailing coverage
+  const storeMail = {};
+  cust.forEach(r => {
+    if (!storeMail[r.Store_Number]) storeMail[r.Store_Number] = { total: 0, mailable: 0 };
+    storeMail[r.Store_Number].total++;
+    if (hasValidAddress(r)) storeMail[r.Store_Number].mailable++;
+  });
+  const storeMailEntries = Object.entries(storeMail).sort((a, b) => (a[1].mailable / a[1].total) - (b[1].mailable / b[1].total));
+
+  document.getElementById('storeMailStats').innerHTML = storeMailEntries.map(([s, d]) => {
+    const p = d.total ? (d.mailable / d.total * 100) : 0;
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;">
+      <span style="color:var(--text-muted);min-width:50px;">#${s}</span>
+      <div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${p}%;background:${p>=90?'var(--green)':p>=70?'var(--orange)':'var(--red)'};border-radius:2px;"></div></div>
+      <span style="font-weight:600;color:${p>=90?'var(--green)':p>=70?'var(--orange)':'var(--red)'};">${pct(p)}</span>
+    </div>`;
+  }).join('');
+
+  // BPA insights for reporting
+  const repInsights = [];
+  if (mailPct < 90) {
+    const worstStore = storeMailEntries[0];
+    repInsights.push({ type: 'warning', msg: `Mailing address coverage is <strong>${pct(mailPct)}</strong> — ${num(cust.length - mailable)} customers can't receive direct mail.`, detail: 'Worst: Store #' + (worstStore ? worstStore[0] : '—') + ' at ' + (worstStore ? pct(worstStore[1].mailable / worstStore[1].total * 100) : '—'), actions: [
+      { label: 'Alert Managers', onclick: "bpaAlertStores('All','Low Mailing Coverage')", color: 'orange' }
+    ]});
+  } else {
+    repInsights.push({ type: 'positive', msg: `Mailing address coverage is excellent at <strong>${pct(mailPct)}</strong>.` });
+  }
+  if (quickSales.length > cust.length * 0.15) {
+    repInsights.push({ type: 'suggestion', msg: `<strong>${pct(cust.length ? quickSales.length / cust.length * 100 : 0)}</strong> of invoices are under $50 (${num(quickSales.length)} quick sales).`, detail: 'Review if these are missed upsell opportunities or intentional express services.', actions: [
+      { label: 'View Inspections', onclick: "bpaSwitchTab('inspections')", color: 'blue' }
+    ]});
+  }
+  if (totalWarrantyRev > 0) {
+    const topWarranty = warrantyEntries[0];
+    repInsights.push({ type: 'suggestion', msg: `Top warranty/maintenance service: <strong>${topWarranty[0]}</strong> at ${money(topWarranty[1].rev)}.`, detail: warrantyEntries.length > 1 ? 'Also: ' + warrantyEntries.slice(1, 3).map(e => e[0] + ' (' + money(e[1].rev) + ')').join(', ') : '' });
+  }
+  bpaHTML('bpaReporting', 'Reporting Insights', repInsights);
 }
 
 // ============================================================
