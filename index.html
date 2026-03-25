@@ -6512,34 +6512,87 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
-// AUTH / LOGIN SYSTEM
+// AUTH / LOGIN SYSTEM (Secured)
 // ============================================================
-function getUsers() { try { return JSON.parse(localStorage.getItem('bp_users') || '[]'); } catch(e) { return []; } }
-function saveUsers(list) { localStorage.setItem('bp_users', JSON.stringify(list)); }
-function getCurrentUser() { try { return JSON.parse(sessionStorage.getItem('bp_current_user')); } catch(e) { return null; } }
-function setCurrentUser(user) { sessionStorage.setItem('bp_current_user', JSON.stringify(user)); }
 
-// Ensure default accounts always exist
+// SHA-256 hash function (Web Crypto API)
+async function hashPassword(password, salt) {
+  const data = new TextEncoder().encode(salt + password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function generateSalt() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function generateSessionToken() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(32))).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function getUsers() { try { return JSON.parse(localStorage.getItem('bp_users_v2') || '[]'); } catch(e) { return []; } }
+function saveUsers(list) { localStorage.setItem('bp_users_v2', JSON.stringify(list)); }
+
+function getCurrentUser() {
+  try {
+    const session = JSON.parse(sessionStorage.getItem('bp_session'));
+    if (!session || !session.token || !session.user) return null;
+    // Check session expiry (8 hours)
+    if (session.expires && Date.now() > session.expires) {
+      sessionStorage.removeItem('bp_session');
+      return null;
+    }
+    return session.user;
+  } catch(e) { return null; }
+}
+
+function setSession(user) {
+  const safeUser = { name: user.name, email: user.email, company: user.company, role: user.role };
+  sessionStorage.setItem('bp_session', JSON.stringify({
+    token: generateSessionToken(),
+    user: safeUser,
+    expires: Date.now() + (8 * 60 * 60 * 1000), // 8 hours
+    created: Date.now()
+  }));
+}
+
+// Default accounts with pre-hashed passwords
 const DEFAULT_ACCOUNTS = [
-  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', password: 'bpa2026', role: 'admin' },
-  { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', password: 'sbl2026', role: 'admin' },
-  { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', password: 'sbl2026', role: 'admin' },
-  { name: 'Demo User', email: 'demo@butleranalytics.io', company: 'Demo Account', password: 'demo', role: 'viewer' },
+  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', _pw: 'bpa2026', role: 'admin' },
+  { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'admin' },
+  { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'admin' },
+  { name: 'Demo User', email: 'demo@butleranalytics.io', company: 'Demo Account', _pw: 'demo2026', role: 'viewer' },
 ];
 
-function seedDefaultUser() {
+async function seedDefaultUser() {
   const users = getUsers();
   let changed = false;
-  DEFAULT_ACCOUNTS.forEach(acct => {
+  for (const acct of DEFAULT_ACCOUNTS) {
     if (!users.find(u => u.email.toLowerCase() === acct.email.toLowerCase())) {
-      users.push({ ...acct, created: new Date().toISOString() });
+      const salt = generateSalt();
+      const hash = await hashPassword(acct._pw, salt);
+      users.push({
+        name: acct.name,
+        email: acct.email,
+        company: acct.company,
+        role: acct.role,
+        passwordHash: hash,
+        salt: salt,
+        created: new Date().toISOString(),
+        failedAttempts: 0,
+        lockedUntil: null
+      });
       changed = true;
     }
-  });
+  }
   if (changed) saveUsers(users);
 }
 
-function doLogin() {
+// Rate limiting: lock after 5 failed attempts for 5 minutes
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS = 5 * 60 * 1000;
+
+async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const password = document.getElementById('loginPassword').value;
   const errorEl = document.getElementById('loginError');
@@ -6547,27 +6600,53 @@ function doLogin() {
   if (!email || !password) { errorEl.textContent = 'Please enter email and password.'; return; }
 
   const users = getUsers();
-  const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
+  const user = users.find(u => u.email.toLowerCase() === email);
 
   if (!user) { errorEl.textContent = 'Invalid email or password.'; return; }
 
-  setCurrentUser(user);
+  // Check lockout
+  if (user.lockedUntil && Date.now() < user.lockedUntil) {
+    const mins = Math.ceil((user.lockedUntil - Date.now()) / 60000);
+    errorEl.textContent = 'Account locked. Try again in ' + mins + ' minute' + (mins > 1 ? 's' : '') + '.';
+    return;
+  }
+
+  // Hash and compare
+  const hash = await hashPassword(password, user.salt);
+  if (hash !== user.passwordHash) {
+    user.failedAttempts = (user.failedAttempts || 0) + 1;
+    if (user.failedAttempts >= MAX_ATTEMPTS) {
+      user.lockedUntil = Date.now() + LOCKOUT_MS;
+      user.failedAttempts = 0;
+      errorEl.textContent = 'Too many failed attempts. Account locked for 5 minutes.';
+    } else {
+      errorEl.textContent = 'Invalid email or password. (' + (MAX_ATTEMPTS - user.failedAttempts) + ' attempts remaining)';
+    }
+    saveUsers(users);
+    return;
+  }
+
+  // Success — reset failed attempts
+  user.failedAttempts = 0;
+  user.lockedUntil = null;
+  user.lastLogin = new Date().toISOString();
+  saveUsers(users);
+
+  setSession(user);
   document.getElementById('loginScreen').classList.add('hidden');
 
-  // Set client badge to user's company
   if (user.company) {
     localStorage.setItem('bp_company', user.company);
     localStorage.setItem('bp_user', user.name);
     updateBadge(user.company, user.name);
   }
 
-  // Set avatar
-  updateUserAvatar(user);
+  updateUserAvatar(getCurrentUser());
 }
 
 function doLogout() {
   if (!confirm('Sign out?')) return;
-  sessionStorage.removeItem('bp_current_user');
+  sessionStorage.removeItem('bp_session');
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPassword').value = '';
@@ -6589,18 +6668,25 @@ function openCreateAccount() {
 }
 
 function openForgotPassword() {
-  const email = prompt('Enter your email address:');
+  const email = prompt('Enter your email address to receive a password reset:');
   if (!email) return;
   const users = getUsers();
   const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
   if (user) {
-    alert('Your password is: ' + user.password + '\n\n(In production this would send a reset email.)');
+    if (isEmailConfigured()) {
+      const resetCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+      sendViaEmailJS(email, 'Butler Performance Analytics — Password Reset', 'Your temporary reset code is: ' + resetCode + '\n\nPlease contact your administrator to complete the password reset.\n\n— Butler Performance Analytics')
+        .then(() => alert('Reset instructions sent to ' + email))
+        .catch(() => alert('Could not send email. Contact your administrator.'));
+    } else {
+      alert('Password reset requested. Contact your administrator at chase@butleranalytics.io');
+    }
   } else {
-    alert('No account found for ' + email);
+    alert('If an account exists for ' + email + ', reset instructions will be sent.');
   }
 }
 
-function doCreateAccount() {
+async function doCreateAccount() {
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim().toLowerCase();
   const company = document.getElementById('regCompany').value.trim();
@@ -6610,11 +6696,15 @@ function doCreateAccount() {
 
   if (!name || !email || !password) { errorEl.textContent = 'Name, email, and password are required.'; return; }
   if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
+  if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) { errorEl.textContent = 'Password must contain at least one uppercase letter and one number.'; return; }
 
   const users = getUsers();
   if (users.find(u => u.email.toLowerCase() === email)) { errorEl.textContent = 'An account with this email already exists.'; return; }
 
-  users.push({ name, email, company, password, role, created: new Date().toISOString() });
+  const salt = generateSalt();
+  const hash = await hashPassword(password, salt);
+
+  users.push({ name, email, company, role, passwordHash: hash, salt, created: new Date().toISOString(), failedAttempts: 0, lockedUntil: null });
   saveUsers(users);
 
   document.getElementById('createAccountModal').classList.remove('active');
@@ -6624,13 +6714,29 @@ function doCreateAccount() {
   alert('Account created! Please sign in.');
 }
 
-// Init auth
-seedDefaultUser();
-const currentUser = getCurrentUser();
-if (currentUser) {
-  document.getElementById('loginScreen').classList.add('hidden');
-  updateUserAvatar(currentUser);
+// Session timeout: auto-logout after inactivity
+let inactivityTimer;
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    if (getCurrentUser()) {
+      sessionStorage.removeItem('bp_session');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      alert('Session expired due to inactivity. Please sign in again.');
+    }
+  }, 30 * 60 * 1000); // 30 minutes
 }
+['mousemove','keydown','click','scroll','touchstart'].forEach(evt => document.addEventListener(evt, resetInactivityTimer, { passive: true }));
+resetInactivityTimer();
+
+// Init auth
+seedDefaultUser().then(() => {
+  const currentUser = getCurrentUser();
+  if (currentUser) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    updateUserAvatar(currentUser);
+  }
+});
 
 // Init
 loadSettings();
