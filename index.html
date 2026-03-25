@@ -877,6 +877,104 @@
     background: rgba(227,24,55,0.2);
   }
 
+  /* BPA Insights Panel */
+  .bpa-panel {
+    background: linear-gradient(135deg, rgba(26,26,46,0.95) 0%, rgba(22,33,62,0.95) 100%);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+
+  .bpa-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .bpa-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bpa-logo {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: rgba(227,24,55,0.1);
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+
+  .bpa-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .bpa-toggle {
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    background: none;
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 5px;
+    transition: all 0.15s;
+  }
+
+  .bpa-toggle:hover { color: white; border-color: var(--text-muted); }
+
+  .bpa-insights { display: flex; flex-direction: column; gap: 8px; }
+
+  .bpa-insight {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition: background 0.1s;
+  }
+
+  .bpa-insight:hover { background: rgba(255,255,255,0.02); }
+
+  .bpa-insight .bpa-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .bpa-insight.critical .bpa-icon { background: rgba(255,23,68,0.15); color: var(--red); }
+  .bpa-insight.warning .bpa-icon { background: rgba(255,145,0,0.15); color: var(--orange); }
+  .bpa-insight.suggestion .bpa-icon { background: rgba(68,138,255,0.15); color: var(--blue); }
+  .bpa-insight.positive .bpa-icon { background: rgba(0,200,83,0.15); color: var(--green); }
+
+  .bpa-insight .bpa-msg { color: var(--text); }
+  .bpa-insight .bpa-msg strong { color: white; }
+  .bpa-insight .bpa-msg .bpa-detail { color: var(--text-muted); font-size: 11px; display: block; margin-top: 2px; }
+
+  .bpa-empty {
+    text-align: center;
+    padding: 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-style: italic;
+  }
+
   /* Checklist */
   .checklist-section {
     margin-bottom: 16px;
@@ -1359,6 +1457,7 @@
       <button class="btn-configure" onclick="openTilePicker()">Configure Tiles</button>
     </div>
     <div class="kpi-grid" id="overviewKPIs"></div>
+    <div class="bpa-panel" id="bpaOverview"></div>
     <div class="charts-row">
       <div class="chart-card">
         <h3>Revenue by Date</h3>
@@ -1384,6 +1483,7 @@
   <!-- REVENUE TAB -->
   <div class="tab-content" id="tab-revenue">
     <div class="kpi-grid" id="revenueKPIs"></div>
+    <div class="bpa-panel" id="bpaRevenue"></div>
     <div class="charts-row">
       <div class="chart-card">
         <h3>Revenue by Service Category</h3>
@@ -1421,6 +1521,7 @@
   <!-- INSPECTIONS TAB -->
   <div class="tab-content" id="tab-inspections">
     <div class="kpi-grid" id="inspKPIs"></div>
+    <div class="bpa-panel" id="bpaInspections"></div>
     <div class="charts-row">
       <div class="chart-card">
         <h3>Inspection Status Distribution</h3>
@@ -1465,6 +1566,7 @@
   <!-- PROMOS TAB -->
   <div class="tab-content" id="tab-promos">
     <div class="kpi-grid" id="promoKPIs"></div>
+    <div class="bpa-panel" id="bpaPromos"></div>
     <div class="charts-row">
       <div class="chart-card">
         <h3>Top 10 Promos by Usage</h3>
@@ -1502,6 +1604,7 @@
   <!-- OPERATIONS TAB -->
   <div class="tab-content" id="tab-operations">
     <div class="kpi-grid" id="opsKPIs"></div>
+    <div class="bpa-panel" id="bpaOps"></div>
     <div class="charts-row">
       <div class="chart-card">
         <h3>Average Service Time by Store (Top 15)</h3>
@@ -1550,6 +1653,7 @@
   <!-- CUSTOMERS TAB -->
   <div class="tab-content" id="tab-customers">
     <div class="kpi-grid" id="custKPIs"></div>
+    <div class="bpa-panel" id="bpaCustomers"></div>
     <div class="charts-row">
       <div class="chart-card">
         <h3>Customers by State</h3>
@@ -2168,6 +2272,306 @@ function renderDashboard() {
   renderMarketing();
   renderStores();
   runAlertCheck();
+  runBPAInsights();
+}
+
+// ============================================================
+// BPA INSIGHTS ENGINE
+// ============================================================
+function bpaHTML(panelId, title, insights) {
+  const el = document.getElementById(panelId);
+  if (!el) return;
+  if (!insights.length) {
+    el.innerHTML = '';
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'block';
+  const icons = { critical: '!', warning: '!', suggestion: '?', positive: '&#10003;' };
+  el.innerHTML = `
+    <div class="bpa-header">
+      <div class="bpa-header-left">
+        <span class="bpa-logo">BPA</span>
+        <span class="bpa-title">${title}</span>
+      </div>
+      <span style="font-size:11px;color:var(--text-muted);">${insights.length} insight${insights.length>1?'s':''}</span>
+    </div>
+    <div class="bpa-insights">
+      ${insights.map(i => `<div class="bpa-insight ${i.type}"><div class="bpa-icon">${icons[i.type]||'?'}</div><div class="bpa-msg">${i.msg}${i.detail ? '<span class="bpa-detail">'+i.detail+'</span>' : ''}</div></div>`).join('')}
+    </div>
+  `;
+}
+
+function runBPAInsights() {
+  const cust = FILTERED.customers;
+  const det = FILTERED.details;
+  const promo = FILTERED.promos;
+  const insp = FILTERED.inspections;
+
+  if (!cust.length) {
+    ['bpaOverview','bpaRevenue','bpaInspections','bpaPromos','bpaOps','bpaCustomers'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    return;
+  }
+
+  // ---- OVERVIEW INSIGHTS ----
+  const ovInsights = [];
+  const totalRev = cust.reduce((s,r) => s+(+r.Net_Sales||0), 0);
+  const totalInv = cust.length;
+  const avgTicket = totalInv ? totalRev/totalInv : 0;
+  const stores = [...new Set(cust.map(r=>r.Store_Number))];
+
+  // Find underperforming stores
+  const storeRevs = {};
+  cust.forEach(r => { storeRevs[r.Store_Number] = (storeRevs[r.Store_Number]||0) + (+r.Net_Sales||0); });
+  const avgStoreRev = stores.length ? totalRev / stores.length : 0;
+  const underStores = stores.filter(s => storeRevs[s] < avgStoreRev * 0.5);
+  if (underStores.length) {
+    ovInsights.push({ type: 'warning', msg: `<strong>${underStores.length} store${underStores.length>1?'s':''}</strong> performing below 50% of average store revenue.`, detail: 'Stores: #' + underStores.join(', #') + ' — average is ' + money(avgStoreRev) });
+  }
+
+  // Revenue concentration
+  const topStoreRev = Math.max(...Object.values(storeRevs));
+  const topStorePct = totalRev ? (topStoreRev / totalRev * 100) : 0;
+  if (topStorePct > 25 && stores.length > 3) {
+    const topStore = Object.entries(storeRevs).sort((a,b)=>b[1]-a[1])[0];
+    ovInsights.push({ type: 'suggestion', msg: `<strong>${pct(topStorePct)}</strong> of total revenue comes from a single store (#${topStore[0]}).`, detail: 'Revenue concentration risk — diversify marketing efforts across locations.' });
+  }
+
+  // Promo dependency
+  const promoTotal = promo.reduce((s,r) => s+(+r.Promo_Amount||0), 0);
+  const promoPct = totalRev ? (promoTotal / totalRev * 100) : 0;
+  if (promoPct > 10) {
+    ovInsights.push({ type: 'warning', msg: `Promo discounts are <strong>${pct(promoPct)}</strong> of total revenue (${money(promoTotal)}).`, detail: 'High promo dependency may compress margins. Review which promos drive incremental visits vs. discount leakage.' });
+  } else if (promoPct < 3 && promo.length > 0) {
+    ovInsights.push({ type: 'positive', msg: `Promo spend is well-controlled at <strong>${pct(promoPct)}</strong> of revenue.` });
+  }
+
+  // Low ticket alert
+  if (avgTicket < 80) {
+    ovInsights.push({ type: 'critical', msg: `Average ticket is <strong>${money(avgTicket)}</strong> — below the $80 threshold.`, detail: 'Consider upselling premium services, adding tire rotations, or reviewing pricing.' });
+  } else if (avgTicket > 160) {
+    ovInsights.push({ type: 'positive', msg: `Average ticket is strong at <strong>${money(avgTicket)}</strong>.` });
+  }
+
+  bpaHTML('bpaOverview', 'Overview Insights', ovInsights);
+
+  // ---- REVENUE INSIGHTS ----
+  const revInsights = [];
+  const svcRev = det.filter(r=>r.Invoice_Detail_Type==='SERVICE').reduce((s,r)=>s+(+r.Extended_Price||0),0);
+  const itemRev = det.filter(r=>r.Invoice_Detail_Type==='ITEM').reduce((s,r)=>s+(+r.Extended_Price||0),0);
+  const totalDetRev = det.reduce((s,r)=>s+(+r.Extended_Price||0),0);
+  const svcPct = totalDetRev ? (svcRev/totalDetRev*100) : 0;
+
+  // Service vs product mix
+  if (svcPct > 80) {
+    revInsights.push({ type: 'suggestion', msg: `Services account for <strong>${pct(svcPct)}</strong> of line revenue — product attach is low.`, detail: 'Opportunity: push cabin air filters, wiper blades, and battery cleaning as add-ons to increase ticket.' });
+  }
+
+  // Zero-revenue line items
+  const zeroItems = det.filter(r => (+r.Extended_Price||0) === 0 && (+r.Quantity_Sold||0) > 0);
+  if (zeroItems.length > 100) {
+    revInsights.push({ type: 'suggestion', msg: `<strong>${num(zeroItems.length)}</strong> line items with quantity sold but $0 revenue.`, detail: 'These are typically package-included items (oil, filter). Review if any should be priced separately.' });
+  }
+
+  // Top service dominance
+  const svcMap = {};
+  det.filter(r=>r.Invoice_Detail_Type==='SERVICE'&&(+r.Extended_Price||0)>0).forEach(r => {
+    const k = r.Invoice_Detail_Description||r.Invoice_Detail_Code;
+    svcMap[k] = (svcMap[k]||0) + (+r.Extended_Price||0);
+  });
+  const svcEntries = Object.entries(svcMap).sort((a,b)=>b[1]-a[1]);
+  if (svcEntries.length > 2) {
+    const top1Pct = svcRev ? (svcEntries[0][1]/svcRev*100) : 0;
+    if (top1Pct > 50) {
+      revInsights.push({ type: 'suggestion', msg: `<strong>${svcEntries[0][0]}</strong> is ${pct(top1Pct)} of all service revenue.`, detail: 'Heavy reliance on one service. Consider promoting secondary services to balance the mix.' });
+    }
+  }
+
+  bpaHTML('bpaRevenue', 'Revenue Insights', revInsights);
+
+  // ---- INSPECTION INSIGHTS ----
+  const inspInsights = [];
+  const inspValid = insp.filter(r=>r.Inspection_Status && r.Inspection_Status!=='NotCheck' && r.Inspection_Status!=='NotEquip');
+  const inspGreen = inspValid.filter(r=>r.Inspection_Status==='Green').length;
+  const inspBad = inspValid.filter(r=>r.Inspection_Status==='Yellow'||r.Inspection_Status==='Orange'||r.Inspection_Status==='Red');
+  const inspPurchased = inspBad.filter(r=>r.Purchased_This_Visit==='True').length;
+  const inspConv = inspBad.length ? (inspPurchased/inspBad.length*100) : 0;
+
+  if (inspConv < 10 && inspBad.length > 50) {
+    inspInsights.push({ type: 'critical', msg: `Inspection conversion is only <strong>${pct(inspConv)}</strong> — ${num(inspBad.length - inspPurchased)} upsell opportunities missed.`, detail: 'Train technicians on consultative selling. Yellow/Red items represent revenue left on the table.' });
+  } else if (inspConv < 20 && inspBad.length > 50) {
+    inspInsights.push({ type: 'warning', msg: `Inspection conversion is <strong>${pct(inspConv)}</strong>.`, detail: 'Industry target is 20-30%. Focus on wiper blades, cabin air filters, and brake fluid as easy upsells.' });
+  } else if (inspConv >= 25) {
+    inspInsights.push({ type: 'positive', msg: `Inspection conversion at <strong>${pct(inspConv)}</strong> — solid performance.` });
+  }
+
+  // Top missed upsells
+  const upsellMap = {};
+  inspBad.filter(r=>r.Purchased_This_Visit!=='True').forEach(r => {
+    const k = r.Service_Title||r.Product_Code;
+    upsellMap[k] = (upsellMap[k]||0)+1;
+  });
+  const topMissed = Object.entries(upsellMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  if (topMissed.length && topMissed[0][1] > 50) {
+    inspInsights.push({ type: 'suggestion', msg: `Top missed upsell: <strong>${topMissed[0][0]}</strong> (${num(topMissed[0][1])} opportunities).`, detail: topMissed.slice(1).map(m => m[0] + ' (' + num(m[1]) + ')').join(', ') });
+  }
+
+  // Stores with high red rate
+  const storeInsp = {};
+  inspValid.forEach(r => {
+    if (!storeInsp[r.Store_Number]) storeInsp[r.Store_Number] = { total: 0, red: 0 };
+    storeInsp[r.Store_Number].total++;
+    if (r.Inspection_Status === 'Red') storeInsp[r.Store_Number].red++;
+  });
+  const highRedStores = Object.entries(storeInsp).filter(([s,d]) => d.total > 20 && (d.red/d.total) > 0.05).sort((a,b) => (b[1].red/b[1].total) - (a[1].red/a[1].total));
+  if (highRedStores.length) {
+    inspInsights.push({ type: 'warning', msg: `<strong>${highRedStores.length} store${highRedStores.length>1?'s':''}</strong> have elevated Red inspection rates.`, detail: 'Stores: ' + highRedStores.slice(0,5).map(([s,d]) => '#'+s+' ('+pct(d.red/d.total*100)+')').join(', ') });
+  }
+
+  bpaHTML('bpaInspections', 'Inspection Insights', inspInsights);
+
+  // ---- PROMO INSIGHTS ----
+  const promoInsights = [];
+  const promoMap = {};
+  promo.forEach(r => {
+    if (!promoMap[r.Promo_Code]) promoMap[r.Promo_Code] = { desc: r.Promo_Description, uses: 0, total: 0 };
+    promoMap[r.Promo_Code].uses++;
+    promoMap[r.Promo_Code].total += (+r.Promo_Amount||0);
+  });
+  const promoEntries = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total);
+
+  // High-discount promos
+  const heavyPromos = promoEntries.filter(([c,d]) => d.uses > 10 && (d.total/d.uses) > 15);
+  if (heavyPromos.length) {
+    promoInsights.push({ type: 'warning', msg: `<strong>${heavyPromos.length} promo${heavyPromos.length>1?'s':''}</strong> averaging over $15 discount per use.`, detail: heavyPromos.slice(0,3).map(([c,d]) => c + ' @ ' + money(d.total/d.uses) + '/use').join(' · ') });
+  }
+
+  // Promo usage concentration
+  if (promoEntries.length > 3) {
+    const top3Uses = promoEntries.slice(0,3).reduce((s,e)=>s+e[1].uses,0);
+    const totalUses = promo.length;
+    const top3Pct = totalUses ? (top3Uses/totalUses*100) : 0;
+    if (top3Pct > 70) {
+      promoInsights.push({ type: 'suggestion', msg: `Top 3 promos account for <strong>${pct(top3Pct)}</strong> of all redemptions.`, detail: 'Consider testing new offers to diversify. Heavy reliance on few promos limits marketing flexibility.' });
+    }
+  }
+
+  // Low-usage promos
+  const lowPromos = promoEntries.filter(([c,d]) => d.uses <= 5);
+  if (lowPromos.length > 5) {
+    promoInsights.push({ type: 'suggestion', msg: `<strong>${lowPromos.length} promos</strong> have 5 or fewer uses — consider retiring.`, detail: 'Low-usage promos add complexity without driving volume.' });
+  }
+
+  bpaHTML('bpaPromos', 'Promotion Insights', promoInsights);
+
+  // ---- OPERATIONS INSIGHTS ----
+  const opsInsights = [];
+  const bayTimes = [];
+  const waitTimes = [];
+  const storeTimes = {};
+
+  cust.forEach(r => {
+    const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (bay !== null && bay > 0 && bay < 180) {
+      bayTimes.push(bay);
+      if (!storeTimes[r.Store_Number]) storeTimes[r.Store_Number] = { bays: [], waits: [] };
+      storeTimes[r.Store_Number].bays.push(bay);
+    }
+    const wait = diffMinutes(r.Greet_Time, r.Bay_Start_Time);
+    if (wait !== null && wait >= 0 && wait < 120) {
+      waitTimes.push(wait);
+      if (!storeTimes[r.Store_Number]) storeTimes[r.Store_Number] = { bays: [], waits: [] };
+      storeTimes[r.Store_Number].waits.push(wait);
+    }
+  });
+
+  const avgBay = bayTimes.length ? bayTimes.reduce((a,b)=>a+b,0)/bayTimes.length : 0;
+  const avgWait = waitTimes.length ? waitTimes.reduce((a,b)=>a+b,0)/waitTimes.length : 0;
+
+  // Slow bay time
+  if (avgBay > 15) {
+    opsInsights.push({ type: 'warning', msg: `Average bay time is <strong>${avgBay.toFixed(1)} min</strong> — above the 15-minute target.`, detail: 'Review staffing levels during peak hours and check for bottleneck services.' });
+  } else if (avgBay <= 10) {
+    opsInsights.push({ type: 'positive', msg: `Bay time averaging <strong>${avgBay.toFixed(1)} min</strong> — excellent throughput.` });
+  }
+
+  // Long wait time
+  if (avgWait > 10) {
+    opsInsights.push({ type: 'critical', msg: `Average greet-to-bay wait is <strong>${avgWait.toFixed(1)} min</strong>.`, detail: 'Customers waiting over 10 minutes to enter a bay. This impacts satisfaction and return rates.' });
+  }
+
+  // Stores with slow times
+  const slowStores = Object.entries(storeTimes).filter(([s,d]) => d.bays.length > 10 && (d.bays.reduce((a,b)=>a+b,0)/d.bays.length) > 20);
+  if (slowStores.length) {
+    opsInsights.push({ type: 'warning', msg: `<strong>${slowStores.length} store${slowStores.length>1?'s':''}</strong> averaging over 20 min bay time.`, detail: slowStores.sort((a,b) => (b[1].bays.reduce((x,y)=>x+y,0)/b[1].bays.length) - (a[1].bays.reduce((x,y)=>x+y,0)/a[1].bays.length)).slice(0,5).map(([s,d]) => '#'+s+' ('+((d.bays.reduce((a,b)=>a+b,0)/d.bays.length).toFixed(1))+' min)').join(', ') });
+  }
+
+  // Stores with long waits
+  const longWaitStores = Object.entries(storeTimes).filter(([s,d]) => d.waits.length > 10 && (d.waits.reduce((a,b)=>a+b,0)/d.waits.length) > 15);
+  if (longWaitStores.length) {
+    opsInsights.push({ type: 'critical', msg: `<strong>${longWaitStores.length} store${longWaitStores.length>1?'s':''}</strong> have average wait times over 15 minutes.`, detail: longWaitStores.slice(0,5).map(([s,d]) => '#'+s+' ('+(d.waits.reduce((a,b)=>a+b,0)/d.waits.length).toFixed(1)+' min)').join(', ') });
+  }
+
+  // Peak hour staffing
+  const hourCounts = Array(24).fill(0);
+  cust.forEach(r => {
+    const gm = (r.Greet_Time||'').match(/(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)/i);
+    if (gm) { let h=+gm[1]; const ap=gm[4].toUpperCase(); if(ap==='PM'&&h<12)h+=12; if(ap==='AM'&&h===12)h=0; hourCounts[h]++; }
+  });
+  const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+  const peakLabel = (peakHour>12?peakHour-12:peakHour||12) + (peakHour>=12?' PM':' AM');
+  const peakPct = totalInv ? (hourCounts[peakHour]/totalInv*100) : 0;
+  if (peakPct > 15) {
+    opsInsights.push({ type: 'suggestion', msg: `<strong>${pct(peakPct)}</strong> of all invoices happen at <strong>${peakLabel}</strong>.`, detail: 'Ensure full staffing during peak. Consider appointment scheduling to spread demand.' });
+  }
+
+  bpaHTML('bpaOps', 'Operations Insights', opsInsights);
+
+  // ---- CUSTOMER INSIGHTS ----
+  const custInsights = [];
+  const withEmail = cust.filter(r=>r.Customer_Email_Address&&r.Customer_Email_Address.trim()).length;
+  const emailPct = totalInv ? (withEmail/totalInv*100) : 0;
+  const withPhone = cust.filter(r=>r.Customer_Phone_Number&&r.Customer_Phone_Number.trim()).length;
+  const phonePct = totalInv ? (withPhone/totalInv*100) : 0;
+
+  if (emailPct < 50) {
+    custInsights.push({ type: 'critical', msg: `Email capture is only <strong>${pct(emailPct)}</strong> — over half of customers have no email.`, detail: 'Without email, remarketing and loyalty programs cannot reach these customers. Incentivize email collection at checkout.' });
+  } else if (emailPct < 75) {
+    custInsights.push({ type: 'warning', msg: `Email capture at <strong>${pct(emailPct)}</strong> — room for improvement.`, detail: 'Target 80%+. Train staff to ask for email during ring-out.' });
+  } else {
+    custInsights.push({ type: 'positive', msg: `Email capture at <strong>${pct(emailPct)}</strong> — strong data collection.` });
+  }
+
+  // Business account opportunity
+  const bizAccts = new Set(cust.filter(r=>r.Business_Account_ID&&r.Business_Account_ID.trim()).map(r=>r.Business_Account_ID));
+  const bizInvoices = cust.filter(r=>r.Business_Account_ID&&r.Business_Account_ID.trim()).length;
+  const bizPct = totalInv ? (bizInvoices/totalInv*100) : 0;
+  if (bizPct > 15) {
+    custInsights.push({ type: 'positive', msg: `<strong>${pct(bizPct)}</strong> of invoices are business/fleet accounts (${bizAccts.size} accounts).`, detail: 'Strong fleet presence. Consider dedicated fleet pricing or account managers.' });
+  }
+
+  // State concentration
+  const stateCounts = {};
+  cust.forEach(r => { if(r.Customer_State) stateCounts[r.Customer_State]=(stateCounts[r.Customer_State]||0)+1; });
+  const stateEntries = Object.entries(stateCounts).sort((a,b)=>b[1]-a[1]);
+  if (stateEntries.length > 1) {
+    const topStatePct = totalInv ? (stateEntries[0][1]/totalInv*100) : 0;
+    if (topStatePct > 80) {
+      custInsights.push({ type: 'suggestion', msg: `<strong>${pct(topStatePct)}</strong> of customers from <strong>${stateEntries[0][0]}</strong>.`, detail: stateEntries.length > 1 ? 'Also serving: ' + stateEntries.slice(1,4).map(e=>e[0]+' ('+num(e[1])+')').join(', ') : '' });
+    }
+  }
+
+  // High mileage vehicles — service opportunity
+  const highMileage = cust.filter(r => (+r.Vehicle_Mileage||0) > 100000);
+  const highMilePct = totalInv ? (highMileage.length/totalInv*100) : 0;
+  if (highMilePct > 30) {
+    custInsights.push({ type: 'suggestion', msg: `<strong>${pct(highMilePct)}</strong> of vehicles have over 100K miles.`, detail: 'High-mileage fleet = opportunity for transmission fluid, coolant exchange, and high-mileage oil change upsells.' });
+  }
+
+  bpaHTML('bpaCustomers', 'Customer Insights', custInsights);
 }
 
 // ============================================================
