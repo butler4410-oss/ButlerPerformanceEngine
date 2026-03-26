@@ -1390,6 +1390,23 @@
   </div>
 </div>
 
+<!-- Audit Log Modal -->
+<div class="modal-overlay" id="auditLogModal" style="z-index:10001;">
+  <div class="modal" style="width:800px;max-height:88vh;overflow-y:auto;">
+    <h3>Audit Log</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">All authentication events. Stored locally — last 500 entries.</p>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="btn-configure" onclick="exportAuditLog()">Export CSV</button>
+      <button class="btn-configure" onclick="emailAuditLog()">Email Log</button>
+      <button class="btn-cancel" onclick="clearAuditLog()" style="border-color:var(--red);color:var(--red);font-size:12px;padding:4px 12px;">Clear Log</button>
+    </div>
+    <div id="auditLogTable" style="max-height:500px;overflow-y:auto;"></div>
+    <div class="modal-buttons" style="margin-top:12px;">
+      <button class="btn-save" onclick="document.getElementById('auditLogModal').classList.remove('active')">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
   <div style="margin-bottom:24px;text-align:center;">
@@ -1417,6 +1434,7 @@
       <span id="clientBadgeText">Click to set client</span>
     </div>
     <div id="dateRange" style="font-size:12px;color:var(--text-muted);"></div>
+    <button class="btn-configure" id="auditLogBtn" onclick="openAuditLog()" style="font-size:10px;padding:4px 10px;display:none;">Audit Log</button>
     <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
   </div>
 </div>
@@ -6806,6 +6824,88 @@ function getCurrentUser() {
   } catch(e) { return null; }
 }
 
+// Audit Log
+function getAuditLog() { try { return JSON.parse(localStorage.getItem('bp_audit_log') || '[]'); } catch(e) { return []; } }
+function logAudit(action, email, detail) {
+  const log = getAuditLog();
+  log.unshift({
+    timestamp: new Date().toISOString(),
+    action,
+    email: email || '—',
+    detail: detail || '',
+    userAgent: navigator.userAgent.slice(0, 80),
+    ip: '—' // client-side only
+  });
+  // Keep last 500 entries
+  if (log.length > 500) log.length = 500;
+  localStorage.setItem('bp_audit_log', JSON.stringify(log));
+}
+
+function openAuditLog() {
+  const log = getAuditLog();
+  const actionColors = {
+    LOGIN_SUCCESS: 'var(--green)', LOGOUT: 'var(--text-muted)', LOGIN_FAILED: 'var(--orange)',
+    LOGIN_BLOCKED: 'var(--red)', ACCOUNT_LOCKED: 'var(--red)', ACCOUNT_CREATED: 'var(--blue)',
+    SESSION_EXPIRED: 'var(--text-muted)', PASSWORD_RESET: 'var(--orange)'
+  };
+  document.getElementById('auditLogTable').innerHTML = log.length ? `
+    <table style="width:100%;font-size:12px;border-collapse:collapse;">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;position:sticky;top:0;z-index:1;">Time</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;position:sticky;top:0;z-index:1;">Action</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;position:sticky;top:0;z-index:1;">Email</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;position:sticky;top:0;z-index:1;">Detail</th>
+      </tr></thead>
+      <tbody>${log.map(e => {
+        const d = new Date(e.timestamp);
+        const time = (d.getMonth()+1)+'/'+d.getDate()+' '+d.toLocaleTimeString();
+        const color = actionColors[e.action] || 'var(--text)';
+        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.03);">' +
+          '<td style="padding:5px 10px;white-space:nowrap;">'+time+'</td>' +
+          '<td style="padding:5px 10px;"><span style="color:'+color+';font-weight:600;">'+e.action+'</span></td>' +
+          '<td style="padding:5px 10px;">'+e.email+'</td>' +
+          '<td style="padding:5px 10px;font-size:11px;color:var(--text-muted);">'+e.detail+'</td></tr>';
+      }).join('')}</tbody>
+    </table>
+  ` : '<div style="text-align:center;padding:24px;color:var(--text-muted);">No audit events yet.</div>';
+  document.getElementById('auditLogModal').classList.add('active');
+}
+
+function exportAuditLog() {
+  const log = getAuditLog();
+  const rows = ['"Timestamp","Action","Email","Detail","User Agent"'];
+  log.forEach(e => rows.push([e.timestamp, e.action, e.email, e.detail, e.userAgent].map(v => '"'+(v||'').replace(/"/g,'""')+'"').join(',')));
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'BPA_Audit_Log_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+function emailAuditLog() {
+  const log = getAuditLog();
+  const meta = getReportMeta();
+  let body = 'Butler Performance Analytics — Audit Log\n';
+  body += 'Generated: ' + new Date().toLocaleString() + '\n';
+  body += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  log.slice(0, 50).forEach(e => {
+    body += new Date(e.timestamp).toLocaleString() + ' | ' + e.action + ' | ' + e.email + ' | ' + e.detail + '\n';
+  });
+  if (log.length > 50) body += '\n... and ' + (log.length - 50) + ' more entries (export CSV for full log)\n';
+  const subject = 'BPA Audit Log — ' + (meta.company || 'Butler Performance');
+  if (isEmailConfigured()) {
+    sendViaEmailJS('chase@butleranalytics.io', subject, body).then(() => alert('Audit log emailed.')).catch(e => alert('Failed: '+(e?.text||e?.message||'Error')));
+  } else {
+    window.open('mailto:chase@butleranalytics.io?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_self');
+  }
+}
+
+function clearAuditLog() {
+  if (!confirm('Clear all audit log entries? This cannot be undone.')) return;
+  localStorage.removeItem('bp_audit_log');
+  openAuditLog();
+}
+
 function setSession(user) {
   const safeUser = { name: user.name, email: user.email, company: user.company, role: user.role };
   sessionStorage.setItem('bp_session', JSON.stringify({
@@ -6862,11 +6962,12 @@ async function doLogin() {
   const users = getUsers();
   const user = users.find(u => u.email.toLowerCase() === email);
 
-  if (!user) { errorEl.textContent = 'Invalid email or password.'; return; }
+  if (!user) { logAudit('LOGIN_FAILED', email, 'Unknown email'); errorEl.textContent = 'Invalid email or password.'; return; }
 
   // Check lockout
   if (user.lockedUntil && Date.now() < user.lockedUntil) {
     const mins = Math.ceil((user.lockedUntil - Date.now()) / 60000);
+    logAudit('LOGIN_BLOCKED', email, 'Account locked');
     errorEl.textContent = 'Account locked. Try again in ' + mins + ' minute' + (mins > 1 ? 's' : '') + '.';
     return;
   }
@@ -6878,8 +6979,10 @@ async function doLogin() {
     if (user.failedAttempts >= MAX_ATTEMPTS) {
       user.lockedUntil = Date.now() + LOCKOUT_MS;
       user.failedAttempts = 0;
+      logAudit('ACCOUNT_LOCKED', email, 'Too many failed attempts');
       errorEl.textContent = 'Too many failed attempts. Account locked for 5 minutes.';
     } else {
+      logAudit('LOGIN_FAILED', email, 'Wrong password (' + user.failedAttempts + '/' + MAX_ATTEMPTS + ')');
       errorEl.textContent = 'Invalid email or password. (' + (MAX_ATTEMPTS - user.failedAttempts) + ' attempts remaining)';
     }
     saveUsers(users);
@@ -6891,6 +6994,7 @@ async function doLogin() {
   user.lockedUntil = null;
   user.lastLogin = new Date().toISOString();
   saveUsers(users);
+  logAudit('LOGIN_SUCCESS', email, user.name + ' (' + user.role + ')');
 
   setSession(user);
   document.getElementById('loginScreen').classList.add('hidden');
@@ -6906,6 +7010,8 @@ async function doLogin() {
 
 function doLogout() {
   if (!confirm('Sign out?')) return;
+  const cu = getCurrentUser();
+  logAudit('LOGOUT', cu?.email || '—', cu?.name || '');
   sessionStorage.removeItem('bp_session');
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('loginEmail').value = '';
@@ -6920,6 +7026,9 @@ function updateUserAvatar(user) {
     el.textContent = initials;
     el.title = user.name + ' (' + user.role + ') — Click to sign out';
   }
+  // Show audit log button only for admins
+  const auditBtn = document.getElementById('auditLogBtn');
+  if (auditBtn) auditBtn.style.display = (user && user.role === 'admin') ? 'inline-block' : 'none';
 }
 
 function openCreateAccount() {
@@ -6971,6 +7080,7 @@ async function doCreateAccount() {
   document.getElementById('loginEmail').value = email;
   document.getElementById('loginPassword').value = '';
   document.getElementById('loginError').textContent = '';
+  logAudit('ACCOUNT_CREATED', email, name + ' (' + role + ') — ' + company);
   alert('Account created! Please sign in.');
 }
 
@@ -6979,7 +7089,9 @@ let inactivityTimer;
 function resetInactivityTimer() {
   clearTimeout(inactivityTimer);
   inactivityTimer = setTimeout(() => {
-    if (getCurrentUser()) {
+    const cu = getCurrentUser();
+    if (cu) {
+      logAudit('SESSION_EXPIRED', cu.email, 'Inactivity timeout');
       sessionStorage.removeItem('bp_session');
       document.getElementById('loginScreen').classList.remove('hidden');
       alert('Session expired due to inactivity. Please sign in again.');
