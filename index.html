@@ -1430,19 +1430,19 @@
 
 <!-- Create Account Modal (over login) -->
 <div class="modal-overlay" id="createAccountModal" style="z-index:10001;">
-  <div class="modal" style="width:420px;">
-    <h3>Create Account</h3>
-    <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Chase Butler"></div>
+  <div class="modal" style="width:460px;">
+    <h3 id="regTitle">Create Account</h3>
+    <div id="regRoleNote" style="font-size:12px;color:var(--text-muted);margin-bottom:16px;"></div>
+    <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Full name"></div>
     <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="you@company.com"></div>
-    <div class="form-group"><label>Company</label><input type="text" id="regCompany" placeholder="South Bay Lube Inc."></div>
-    <div class="form-group"><label>Password</label><input type="password" id="regPassword" placeholder="Min 6 characters"></div>
-    <div class="form-group"><label>Role</label>
-      <select id="regRole">
-        <option value="admin">Admin</option>
-        <option value="manager">Manager</option>
-        <option value="analyst">Analyst</option>
-        <option value="viewer">Viewer</option>
-      </select>
+    <div class="form-group" id="regCompanyGroup"><label>Company</label><input type="text" id="regCompany" placeholder="South Bay Lube Inc."></div>
+    <div class="form-group"><label>Password</label><input type="password" id="regPassword" placeholder="Min 6 chars, 1 uppercase, 1 number"></div>
+    <div class="form-group" id="regRoleGroup"><label>Role</label>
+      <select id="regRole"></select>
+    </div>
+    <div class="form-group" id="regStoresGroup" style="display:none;">
+      <label>Assigned Stores (hold Ctrl to multi-select, leave empty for all)</label>
+      <select id="regStores" multiple style="height:80px;"></select>
     </div>
     <div class="modal-buttons">
       <button class="btn-cancel" onclick="document.getElementById('createAccountModal').classList.remove('active')">Cancel</button>
@@ -1496,10 +1496,11 @@
     <input type="date" id="filterTo" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:130px;">
     <button class="btn-configure" onclick="applyFilters()" style="background:var(--primary);color:white;border-color:var(--primary);font-size:11px;padding:6px 12px;">Apply</button>
     <div style="width:1px;height:24px;background:var(--border);"></div>
-    <button class="btn-configure" id="alertsBtn" onclick="openAlerts()" style="border-color:var(--orange);color:var(--orange);font-size:11px;padding:5px 10px;">Alerts</button>
+    <button class="btn-configure admin-only" id="alertsBtn" onclick="openAlerts()" style="border-color:var(--orange);color:var(--orange);font-size:11px;padding:5px 10px;">Alerts</button>
     <div class="client-badge" id="clientBadge" onclick="openSettings()">
       <span id="clientBadgeText">Click to set client</span>
     </div>
+    <button class="btn-configure admin-only" onclick="openCreateAccount()" style="font-size:10px;padding:4px 10px;">+ User</button>
     <button class="btn-configure" onclick="toggleTheme()" id="themeToggle" style="font-size:11px;padding:5px 10px;" title="Toggle light/dark mode">Light</button>
     <button class="btn-configure" id="auditLogBtn" onclick="openAuditLog()" style="font-size:10px;padding:4px 10px;display:none;">Audit</button>
     <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
@@ -1728,8 +1729,8 @@
     <button class="tab" data-tab="promos">Promotions</button>
     <button class="tab" data-tab="operations">Operations</button>
     <button class="tab" data-tab="customers">Customers</button>
-    <button class="tab" data-tab="segments">Segments</button>
-    <button class="tab" data-tab="marketing">Marketing</button>
+    <button class="tab company-admin-only" data-tab="segments">Segments</button>
+    <button class="tab company-admin-only" data-tab="marketing">Marketing</button>
     <button class="tab" data-tab="reporting">Reporting</button>
     <button class="tab" data-tab="stores">Store Rankings</button>
   </div>
@@ -6956,22 +6957,32 @@ function clearAuditLog() {
 }
 
 function setSession(user) {
-  const safeUser = { name: user.name, email: user.email, company: user.company, role: user.role };
+  const safeUser = { name: user.name, email: user.email, company: user.company, role: user.role, stores: user.stores || [] };
   sessionStorage.setItem('bp_session', JSON.stringify({
     token: generateSessionToken(),
     user: safeUser,
-    expires: Date.now() + (8 * 60 * 60 * 1000), // 8 hours
+    expires: Date.now() + (8 * 60 * 60 * 1000),
     created: Date.now()
   }));
 }
 
 // Default accounts with pre-hashed passwords
+// ROLES:
+// company_admin — Chase only. Sees everything. Creates client_admin accounts. Full platform access.
+// client_admin  — Paid seat. Sees only their company's stores. Can create client_viewer accounts for their company.
+// client_viewer — Free under client_admin. Read-only. Sees only their company's stores. Cannot change settings/alerts/segments.
+const ROLE_LABELS = { company_admin: 'Company Admin', client_admin: 'Client Admin', client_viewer: 'Client Viewer' };
+
 const DEFAULT_ACCOUNTS = [
-  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', _pw: 'bpa2026', role: 'admin' },
-  { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'admin' },
-  { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'admin' },
-  { name: 'Demo User', email: 'demo@butleranalytics.io', company: 'Demo Account', _pw: 'demo2026', role: 'viewer' },
+  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', _pw: 'bpa2026', role: 'company_admin', stores: [] },
+  { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'client_admin', stores: [] },
+  { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'client_admin', stores: [] },
+  { name: 'Demo User', email: 'demo@butleranalytics.io', company: 'Demo Account', _pw: 'demo2026', role: 'client_viewer', stores: [] },
 ];
+
+function isCompanyAdmin() { const u = getCurrentUser(); return u && u.role === 'company_admin'; }
+function isClientAdmin() { const u = getCurrentUser(); return u && u.role === 'client_admin'; }
+function isViewer() { const u = getCurrentUser(); return u && u.role === 'client_viewer'; }
 
 async function seedDefaultUser() {
   const users = getUsers();
@@ -7073,14 +7084,59 @@ function updateUserAvatar(user) {
   if (el && user) {
     const initials = user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
     el.textContent = initials;
-    el.title = user.name + ' (' + user.role + ') — Click to sign out';
+    el.title = user.name + ' (' + (ROLE_LABELS[user.role] || user.role) + ') — Click to sign out';
   }
-  // Show audit log button only for admins
+  // Audit log: company_admin only
   const auditBtn = document.getElementById('auditLogBtn');
-  if (auditBtn) auditBtn.style.display = (user && user.role === 'admin') ? 'inline-block' : 'none';
+  if (auditBtn) auditBtn.style.display = (user && user.role === 'company_admin') ? 'inline-block' : 'none';
+
+  // Hide write features from viewers
+  const isViewerRole = user && user.role === 'client_viewer';
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = (user && (user.role === 'company_admin' || user.role === 'client_admin')) ? '' : 'none');
+  document.querySelectorAll('.company-admin-only').forEach(el => el.style.display = (user && user.role === 'company_admin') ? '' : 'none');
 }
 
 function openCreateAccount() {
+  const cu = getCurrentUser();
+  const roleSel = document.getElementById('regRole');
+  const companyInput = document.getElementById('regCompany');
+  const storesGroup = document.getElementById('regStoresGroup');
+  const storesSel = document.getElementById('regStores');
+  const noteEl = document.getElementById('regRoleNote');
+
+  roleSel.innerHTML = '';
+  storesGroup.style.display = 'none';
+
+  if (!cu) {
+    // Login screen — no user yet, only allow self-registration as viewer
+    roleSel.innerHTML = '<option value="client_viewer">Viewer</option>';
+    noteEl.textContent = 'Create a viewer account. Contact your administrator for admin access.';
+    document.getElementById('regCompanyGroup').style.display = '';
+    document.getElementById('regRoleGroup').style.display = 'none';
+  } else if (cu.role === 'company_admin') {
+    // Chase — can create any role, any company
+    roleSel.innerHTML = '<option value="client_admin">Client Admin (paid seat)</option><option value="client_viewer">Client Viewer</option>';
+    noteEl.textContent = 'Company Admin: you can create client admin (paid) and viewer accounts for any company.';
+    document.getElementById('regCompanyGroup').style.display = '';
+    document.getElementById('regRoleGroup').style.display = '';
+    storesGroup.style.display = 'block';
+    // Populate stores from loaded data
+    const stores = FILTERED.customers ? [...new Set(FILTERED.customers.map(r => r.Store_Number))].sort((a,b) => +a - +b) : [];
+    storesSel.innerHTML = stores.map(s => '<option value="'+s+'">#'+s+'</option>').join('');
+  } else if (cu.role === 'client_admin') {
+    // Client admin — can only create viewers for their own company
+    roleSel.innerHTML = '<option value="client_viewer">Client Viewer</option>';
+    companyInput.value = cu.company;
+    noteEl.textContent = 'You can create viewer accounts for ' + cu.company + '. Contact Butler Performance for additional admin seats.';
+    document.getElementById('regCompanyGroup').style.display = 'none';
+    document.getElementById('regRoleGroup').style.display = 'none';
+  } else {
+    // Viewers can't create accounts
+    alert('You do not have permission to create accounts.');
+    return;
+  }
+
+  document.getElementById('regError').textContent = '';
   document.getElementById('createAccountModal').classList.add('active');
   document.getElementById('regName').focus();
 }
@@ -7105,32 +7161,60 @@ function openForgotPassword() {
 }
 
 async function doCreateAccount() {
+  const cu = getCurrentUser();
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim().toLowerCase();
-  const company = document.getElementById('regCompany').value.trim();
   const password = document.getElementById('regPassword').value;
-  const role = document.getElementById('regRole').value;
+  let role = document.getElementById('regRole').value;
   const errorEl = document.getElementById('regError');
 
+  // Company: client_admin sets their own, company_admin types it in, no-login defaults to input
+  let company = '';
+  if (cu && cu.role === 'client_admin') {
+    company = cu.company;
+    role = 'client_viewer'; // enforce
+  } else {
+    company = document.getElementById('regCompany').value.trim();
+  }
+
+  // Enforce: only company_admin can create client_admin
+  if (role === 'client_admin' && (!cu || cu.role !== 'company_admin')) {
+    errorEl.textContent = 'Only the Company Admin can create Client Admin accounts.';
+    return;
+  }
+
   if (!name || !email || !password) { errorEl.textContent = 'Name, email, and password are required.'; return; }
+  if (!company) { errorEl.textContent = 'Company is required.'; return; }
   if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
   if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) { errorEl.textContent = 'Password must contain at least one uppercase letter and one number.'; return; }
 
   const users = getUsers();
   if (users.find(u => u.email.toLowerCase() === email)) { errorEl.textContent = 'An account with this email already exists.'; return; }
 
+  // Store assignment (company_admin can assign stores)
+  let stores = [];
+  if (cu && cu.role === 'company_admin') {
+    stores = [...document.getElementById('regStores').selectedOptions].map(o => o.value);
+  }
+
   const salt = generateSalt();
   const hash = await hashPassword(password, salt);
 
-  users.push({ name, email, company, role, passwordHash: hash, salt, created: new Date().toISOString(), failedAttempts: 0, lockedUntil: null });
+  users.push({ name, email, company, role, stores, passwordHash: hash, salt, created: new Date().toISOString(), failedAttempts: 0, lockedUntil: null });
   saveUsers(users);
 
   document.getElementById('createAccountModal').classList.remove('active');
-  document.getElementById('loginEmail').value = email;
-  document.getElementById('loginPassword').value = '';
-  document.getElementById('loginError').textContent = '';
-  logAudit('ACCOUNT_CREATED', email, name + ' (' + role + ') — ' + company);
-  alert('Account created! Please sign in.');
+  logAudit('ACCOUNT_CREATED', email, name + ' (' + ROLE_LABELS[role] + ') — ' + company + (cu ? ' by ' + cu.email : ''));
+
+  if (!cu) {
+    // From login screen
+    document.getElementById('loginEmail').value = email;
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginError').textContent = '';
+    alert('Account created! Please sign in.');
+  } else {
+    alert('Account created for ' + name + ' (' + ROLE_LABELS[role] + ')');
+  }
 }
 
 // Session timeout: auto-logout after inactivity
