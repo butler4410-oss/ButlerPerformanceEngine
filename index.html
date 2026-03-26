@@ -6223,20 +6223,103 @@ function closeEmailModal() {
   document.getElementById('emailModal').classList.remove('active');
 }
 
+function buildReportCSV(tableId) {
+  const table = document.getElementById(tableId);
+  if (!table) return '';
+  const rows = [];
+  table.querySelectorAll('tr').forEach(tr => {
+    const cells = [];
+    tr.querySelectorAll('th, td').forEach(td => {
+      cells.push('"' + td.textContent.trim().replace(/"/g, '""') + '"');
+    });
+    rows.push(cells.join(','));
+  });
+  return rows.join('\n');
+}
+
+function buildEmailReportBody(tableId, title, userMessage) {
+  const meta = getReportMeta();
+  const table = document.getElementById(tableId);
+  if (!table) return userMessage;
+
+  // Build a clean text table for the email
+  let report = userMessage + '\n\n';
+  report += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  report += title.toUpperCase() + '\n';
+  report += (meta.store !== 'All Stores' ? 'Store: #' + meta.store + ' | ' : '') + 'Period: ' + (meta.dateFrom || 'Start') + ' to ' + (meta.dateTo || 'End') + '\n';
+  report += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+  // KPI summary from tiles
+  const tiles = getSelectedTiles();
+  tiles.slice(0, 6).forEach(id => {
+    const tile = TILE_CATALOG.find(t => t.id === id);
+    if (tile) { try { const r = tile.calc(); report += tile.label + ': ' + r.value + (r.sub ? ' (' + r.sub + ')' : '') + '\n'; } catch(e) {} }
+  });
+  report += '\n';
+
+  // Table data as aligned text
+  const rows = [];
+  table.querySelectorAll('tr').forEach((tr, idx) => {
+    const cells = [];
+    tr.querySelectorAll('th, td').forEach(td => cells.push(td.textContent.trim()));
+    rows.push(cells);
+  });
+
+  if (rows.length) {
+    // Column widths
+    const colWidths = [];
+    rows.forEach(r => r.forEach((c, i) => { colWidths[i] = Math.max(colWidths[i] || 0, Math.min(c.length, 20)); }));
+
+    rows.forEach((r, idx) => {
+      report += r.map((c, i) => c.slice(0, 20).padEnd(colWidths[i] + 2)).join('') + '\n';
+      if (idx === 0) report += colWidths.map(w => '—'.repeat(w + 2)).join('') + '\n';
+    });
+  }
+
+  report += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  report += 'Butler Performance Analytics\n';
+  report += 'chase@butleranalytics.io | (706) 676-5110\n';
+
+  return report;
+}
+
 function sendEmail() {
   const to = document.getElementById('emailTo').value.trim();
   const subject = document.getElementById('emailSubject').value.trim();
-  const body = document.getElementById('emailBody').value.trim();
+  const userMsg = document.getElementById('emailBody').value.trim();
 
   if (!to) { alert('Please enter at least one email address.'); return; }
 
+  // Build full report body with table data inline
+  const fullBody = buildEmailReportBody(pendingEmailReport.tableId, pendingEmailReport.title, userMsg);
+
+  // Also download the HTML report and CSV
+  const reportHTML = buildReportHTML(pendingEmailReport.tableId, pendingEmailReport.title);
+  const csvData = buildReportCSV(pendingEmailReport.tableId);
+  const fileName = pendingEmailReport.title.replace(/[^a-zA-Z0-9]/g, '_');
+
+  // Download HTML report
+  const htmlBlob = new Blob([reportHTML], { type: 'text/html' });
+  const htmlUrl = URL.createObjectURL(htmlBlob);
+  const a1 = document.createElement('a');
+  a1.href = htmlUrl; a1.download = fileName + '_Report.html'; a1.click();
+
+  // Download CSV
+  if (csvData) {
+    const csvBlob = new Blob([csvData], { type: 'text/csv' });
+    const csvUrl = URL.createObjectURL(csvBlob);
+    const a2 = document.createElement('a');
+    a2.href = csvUrl; a2.download = fileName + '.csv';
+    setTimeout(() => a2.click(), 200);
+    setTimeout(() => URL.revokeObjectURL(csvUrl), 2000);
+  }
+
   if (isEmailConfigured()) {
-    // Send via Gmail/EmailJS
     const btn = document.querySelector('#emailModal .btn-save');
     btn.textContent = 'Sending...';
     btn.disabled = true;
 
-    sendViaEmailJS(to, subject, body).then(() => {
+    sendViaEmailJS(to, subject, fullBody).then(() => {
       btn.textContent = 'Sent!';
       btn.style.background = 'var(--green)';
       setTimeout(() => {
@@ -6245,26 +6328,19 @@ function sendEmail() {
         btn.disabled = false;
         closeEmailModal();
       }, 1500);
+      alert('Email sent to ' + to + '.\n\nThe HTML report and CSV have also been downloaded — attach them to a follow-up if needed.');
     }).catch(err => {
       btn.textContent = 'Send Email';
       btn.disabled = false;
-      alert('Email failed: ' + (err?.text || err?.message || 'Unknown error. Check Settings.'));
+      alert('Email failed: ' + (err?.text || err?.message || 'Check Settings.'));
     });
   } else {
-    // Fallback: download report + mailto
-    const reportHTML = buildReportHTML(pendingEmailReport.tableId, pendingEmailReport.title);
-    const blob = new Blob([reportHTML], { type: 'text/html' });
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = pendingEmailReport.title.replace(/[^a-zA-Z0-9]/g, '_') + '_Report.html';
-    a.click();
-
-    const mailtoBody = body + '\n\n---\nReport file has been downloaded. Please attach it to this email.';
+    const mailtoBody = fullBody + '\n\n---\nReport files have been downloaded. Please attach them to this email.';
     window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailtoBody), '_self');
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
     closeEmailModal();
   }
+
+  setTimeout(() => URL.revokeObjectURL(htmlUrl), 2000);
 }
 
 document.getElementById('emailModal').addEventListener('click', (e) => {
@@ -7007,6 +7083,18 @@ function isViewer() { const u = getCurrentUser(); return u && u.role === 'client
 
 async function seedDefaultUser() {
   const users = getUsers();
+
+  // Update roles on existing default accounts (handles old 'admin'/'viewer' → new role names)
+  let roleUpdated = false;
+  DEFAULT_ACCOUNTS.forEach(acct => {
+    const existing = users.find(u => u.email.toLowerCase() === acct.email.toLowerCase());
+    if (existing && existing.role !== acct.role) {
+      existing.role = acct.role;
+      roleUpdated = true;
+    }
+  });
+  if (roleUpdated) saveUsers(users);
+
   // Quick check — if all defaults exist, skip entirely (no async hashing)
   const missing = DEFAULT_ACCOUNTS.filter(a => !users.find(u => u.email.toLowerCase() === a.email.toLowerCase()));
   if (!missing.length) return;
