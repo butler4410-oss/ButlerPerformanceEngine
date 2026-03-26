@@ -612,7 +612,7 @@
 
   .chart-wrap {
     position: relative;
-    height: 300px;
+    height: 340px;
     overflow: hidden;
   }
 
@@ -1328,9 +1328,71 @@
   }
 
   /* Print */
+  /* Light Mode */
+  body.light-mode {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --card-hover: #f8f9fa;
+    --text: #1a1a2e;
+    --text-muted: #6b7280;
+    --border: #e0e0e0;
+    --accent: #ffffff;
+    --accent-light: #f8f9fa;
+  }
+
+  body.light-mode .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+
+  body.light-mode .login-screen {
+    background: linear-gradient(135deg, #e8ecf1 0%, #f0f2f5 100%);
+  }
+
+  body.light-mode .login-box {
+    background: white;
+    border-color: #e0e0e0;
+  }
+
+  body.light-mode .login-box h2,
+  body.light-mode .login-box .login-sub { color: #1a1a2e; }
+  body.light-mode .login-box .login-sub { color: #6b7280; }
+
+  body.light-mode thead th {
+    background: #f0f2f5;
+    color: #6b7280;
+    border-bottom-color: #e0e0e0;
+  }
+
+  body.light-mode tbody td { border-bottom-color: #f0f2f5; }
+  body.light-mode tbody tr:hover { background: rgba(0,0,0,0.02); }
+  body.light-mode tbody tr.clickable-row:hover { background: rgba(227,24,55,0.06); }
+
+  body.light-mode .bpa-panel {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-color: #e0e0e0;
+  }
+
+  body.light-mode .kpi-value { color: #1a1a2e; }
+  body.light-mode .chart-card h3 { color: #1a1a2e; }
+
+  body.light-mode .modal { background: white; border-color: #e0e0e0; }
+  body.light-mode .cust-modal { background: white; border-color: #e0e0e0; }
+  body.light-mode .cust-detail-section { background: #f8f9fa; border-color: #e0e0e0; }
+  body.light-mode .cust-field .value { color: #1a1a2e; }
+
+  body.light-mode .form-group input,
+  body.light-mode .form-group select,
+  body.light-mode .form-group textarea {
+    background: #f8f9fa;
+    border-color: #e0e0e0;
+    color: #1a1a2e;
+  }
+
+  body.light-mode .logo-line { background: rgba(255,255,255,0.3); }
+
   @media print {
     .header { position: static; }
-    .filters-bar, .export-bar, .btn-apply, .btn-reset { display: none; }
+    .export-bar, .btn-apply, .btn-reset { display: none; }
     body { background: white; color: #222; }
     .kpi-card, .chart-card, .table-wrap { border-color: #ddd; background: white; }
   }
@@ -1427,14 +1489,19 @@
       <div class="logo-analytics">ANALYTICS</div>
     </div>
   </div>
-  <div class="header-right">
-    <button class="btn-configure" id="alertsBtn" onclick="openAlerts()" style="border-color:var(--orange);color:var(--orange);">Alerts</button>
-    <button class="btn-configure" onclick="openScheduler()" style="border-color:var(--primary);color:var(--primary);">Scheduled Reports</button>
+  <div class="header-right" style="gap:10px;">
+    <!-- Filters in header -->
+    <select id="filterStore" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;min-width:100px;"><option value="">All Stores</option></select>
+    <input type="date" id="filterFrom" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:130px;">
+    <input type="date" id="filterTo" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:130px;">
+    <button class="btn-configure" onclick="applyFilters()" style="background:var(--primary);color:white;border-color:var(--primary);font-size:11px;padding:6px 12px;">Apply</button>
+    <div style="width:1px;height:24px;background:var(--border);"></div>
+    <button class="btn-configure" id="alertsBtn" onclick="openAlerts()" style="border-color:var(--orange);color:var(--orange);font-size:11px;padding:5px 10px;">Alerts</button>
     <div class="client-badge" id="clientBadge" onclick="openSettings()">
       <span id="clientBadgeText">Click to set client</span>
     </div>
-    <div id="dateRange" style="font-size:12px;color:var(--text-muted);"></div>
-    <button class="btn-configure" id="auditLogBtn" onclick="openAuditLog()" style="font-size:10px;padding:4px 10px;display:none;">Audit Log</button>
+    <button class="btn-configure" onclick="toggleTheme()" id="themeToggle" style="font-size:11px;padding:5px 10px;" title="Toggle light/dark mode">Light</button>
+    <button class="btn-configure" id="auditLogBtn" onclick="openAuditLog()" style="font-size:10px;padding:4px 10px;display:none;">Audit</button>
     <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
   </div>
 </div>
@@ -1523,7 +1590,7 @@
           <select id="schedReport" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;">
             <option value="overview">Overview Summary</option>
             <option value="tblServices">Service & Product Breakdown</option>
-            <option value="tblInsp">Inspection Items Summary</option>
+            <option value="tblInsp">Vehicle Inspection Summary</option>
             <option value="tblPromos">Promotion Details</option>
             <option value="tblStoreOps">Store Service Times</option>
             <option value="tblCustomers">Customer Details</option>
@@ -1642,23 +1709,7 @@
 
 <!-- Dashboard -->
 <div class="dashboard" id="dashboard">
-  <!-- Filters -->
-  <div class="filters-bar">
-    <div class="filter-group">
-      <label>Store</label>
-      <select id="filterStore"><option value="">All Stores</option></select>
-    </div>
-    <div class="filter-group">
-      <label>Date From</label>
-      <input type="date" id="filterFrom">
-    </div>
-    <div class="filter-group">
-      <label>Date To</label>
-      <input type="date" id="filterTo">
-    </div>
-    <button class="btn-apply" onclick="applyFilters()">Apply Filters</button>
-    <button class="btn-reset" onclick="resetFilters()">Reset</button>
-  </div>
+  <!-- Filters moved to header -->
 
   <!-- Alert Banner -->
   <div class="alert-banner" id="alertBanner" onclick="openAlerts()">
@@ -1701,18 +1752,12 @@
             <h3 style="margin-bottom:0;">Revenue Trend</h3>
             <div id="ovRevSummary" style="font-size:12px;color:var(--text-muted);"></div>
           </div>
-          <div class="chart-wrap" style="height:260px;"><canvas id="chartRevByDate"></canvas></div>
+          <div class="chart-wrap" style="height:320px;"><canvas id="chartRevByDate"></canvas></div>
         </div>
         <!-- Two smaller charts side by side -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-          <div class="chart-card">
-            <h3>Top Services</h3>
-            <div class="chart-wrap" style="height:240px;"><canvas id="chartTopServices"></canvas></div>
-          </div>
-          <div class="chart-card">
-            <h3>Inspection Health</h3>
-            <div class="chart-wrap" style="height:240px;"><canvas id="chartInspOverview"></canvas></div>
-          </div>
+        <div class="chart-card">
+          <h3>Top Services by Revenue</h3>
+          <div class="chart-wrap" style="height:340px;"><canvas id="chartTopServices"></canvas></div>
         </div>
       </div>
 
@@ -1721,7 +1766,7 @@
         <div class="bpa-panel" id="bpaOverview" style="margin-bottom:0;"></div>
         <div class="chart-card">
           <h3>Daily Volume</h3>
-          <div class="chart-wrap" style="height:200px;"><canvas id="chartInvByDate"></canvas></div>
+          <div class="chart-wrap" style="height:260px;"><canvas id="chartInvByDate"></canvas></div>
         </div>
         <!-- Quick Stats -->
         <div id="ovQuickStats" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;"></div>
@@ -1788,17 +1833,17 @@
         </div>
         <div class="chart-card">
           <h3>Top Upsell Opportunities</h3>
-          <div class="chart-wrap" style="height:240px;"><canvas id="chartUpsell"></canvas></div>
+          <div class="chart-wrap" style="height:300px;"><canvas id="chartUpsell"></canvas></div>
         </div>
       </div>
       <div><div class="bpa-panel" id="bpaInspections" style="margin-bottom:0;"></div></div>
     </div>
     <div class="export-bar">
-      <button class="btn-export" onclick="exportReport('tblInsp','Inspection Items Summary')">Export Report</button>
-      <button class="btn-export" onclick="emailReport('tblInsp','Inspection Items Summary')">Email</button>
+      <button class="btn-export" onclick="exportReport('tblInsp','Vehicle Inspection Summary')">Export Report</button>
+      <button class="btn-export" onclick="emailReport('tblInsp','Vehicle Inspection Summary')">Email</button>
     </div>
     <div class="table-wrap">
-      <h3>Inspection Items Summary</h3>
+      <h3>Vehicle Inspection Summary</h3>
       <div class="table-scroll">
         <table id="tblInsp">
           <thead>
@@ -2279,6 +2324,10 @@
 
   <!-- REPORTING TAB -->
   <div class="tab-content" id="tab-reporting">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Reporting</div>
+      <button class="btn-configure" onclick="openScheduler()" style="border-color:var(--primary);color:var(--primary);">Scheduled Reports</button>
+    </div>
     <div class="kpi-grid" id="reportingKPIs"></div>
     <div class="bpa-panel" id="bpaReporting"></div>
 
@@ -2393,7 +2442,7 @@
               <th class="sortable" data-col="4">Avg Svc Time</th>
               <th class="sortable" data-col="5">Promo Usage</th>
               <th class="sortable" data-col="6">Promo Discounts</th>
-              <th class="sortable" data-col="7">Inspection Items</th>
+              <th class="sortable" data-col="7">Vehicle Inspections</th>
               <th class="sortable" data-col="8">Yellow/Red %</th>
             </tr>
           </thead>
@@ -3300,7 +3349,7 @@ const TILE_CATALOG = [
   { id: 'unique_promos',    cat: 'Promotions',   label: 'Unique Promos',        desc: 'Distinct promo codes used',        calc: () => ({ value: String(new Set(FILTERED.promos.map(r=>r.Promo_Code)).size) })},
 
   // Inspections
-  { id: 'insp_total',       cat: 'Inspections',  label: 'Inspection Items',     desc: 'Total items inspected',            calc: () => ({ value: num(FILTERED.inspections.length), sub: 'checked' })},
+  { id: 'insp_total',       cat: 'Inspections',  label: 'Vehicle Inspections',  desc: 'Unique vehicles inspected',        calc: () => { const v = new Set(FILTERED.inspections.map(r=>r.Invoice_Number)).size; return { value: num(v), sub: 'vehicles' }; }},
   { id: 'insp_green_pct',   cat: 'Inspections',  label: 'Green Rate',           desc: '% of inspections passing',         calc: () => { const i=FILTERED.inspections; const g=i.filter(r=>r.Inspection_Status==='Green').length; return { value: pct(i.length?g/i.length*100:0), sub: num(g)+' green' }; }},
   { id: 'insp_needs_attn',  cat: 'Inspections',  label: 'Needs Attention',      desc: 'Yellow + Orange + Red items',      calc: () => { const i=FILTERED.inspections; const v=i.filter(r=>r.Inspection_Status==='Yellow'||r.Inspection_Status==='Orange'||r.Inspection_Status==='Red').length; return { value: num(v) }; }},
   { id: 'insp_conversion',  cat: 'Inspections',  label: 'Upsell Conversion',    desc: 'Purchased / needs attention',      calc: () => { const i=FILTERED.inspections; const bad=i.filter(r=>r.Inspection_Status==='Yellow'||r.Inspection_Status==='Orange'||r.Inspection_Status==='Red'); const bought=bad.filter(r=>r.Purchased_This_Visit==='True').length; return { value: pct(bad.length?bought/bad.length*100:0), sub: num(bought)+' sold' }; }},
@@ -6206,7 +6255,7 @@ document.getElementById('emailModal').addEventListener('click', (e) => {
 const REPORT_NAMES = {
   overview: 'Overview Summary',
   tblServices: 'Service & Product Breakdown',
-  tblInsp: 'Inspection Items Summary',
+  tblInsp: 'Vehicle Inspection Summary',
   tblPromos: 'Promotion Details',
   tblStoreOps: 'Store Service Times',
   tblCustomers: 'Customer Details',
@@ -7100,6 +7149,23 @@ function resetInactivityTimer() {
 }
 ['mousemove','keydown','click','scroll','touchstart'].forEach(evt => document.addEventListener(evt, resetInactivityTimer, { passive: true }));
 resetInactivityTimer();
+
+// Light/Dark mode
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('bp_theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeToggle').textContent = isLight ? 'Dark' : 'Light';
+}
+
+function loadTheme() {
+  const theme = localStorage.getItem('bp_theme');
+  if (theme === 'light') {
+    document.body.classList.add('light-mode');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = 'Dark';
+  }
+}
+loadTheme();
 
 // Init auth
 seedDefaultUser().then(() => {
