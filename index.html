@@ -616,29 +616,88 @@
     color: var(--text-muted);
   }
 
-  .drop-zone {
-    max-width: 700px;
-    margin: 60px auto;
-    padding: 60px 40px;
+  /* Upload Screen */
+  .upload-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 130px);
+    padding: 24px;
+  }
+
+  .upload-card {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .upload-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .upload-drop {
     border: 2px dashed var(--border);
-    border-radius: 16px;
+    border-radius: 14px;
+    padding: 48px 32px;
     text-align: center;
-    transition: all 0.3s;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: rgba(255,255,255,0.01);
   }
 
-  .drop-zone.drag-over {
+  .upload-drop.drag-over {
     border-color: var(--primary);
-    background: rgba(227,24,55,0.05);
+    background: rgba(227,24,55,0.04);
   }
 
-  .drop-zone h2 {
-    font-size: 22px;
+  .upload-drop-icon {
+    color: var(--text-muted);
+    opacity: 0.4;
     margin-bottom: 12px;
   }
 
-  .drop-zone p {
+  .upload-drop-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .upload-drop-sub {
+    font-size: 13px;
     color: var(--text-muted);
-    margin-bottom: 20px;
+  }
+
+  .upload-file-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 16px;
+  }
+
+  .upload-type-group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .upload-type-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+
+  .upload-type-items {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
   }
 
   .file-input-btn {
@@ -2490,9 +2549,9 @@
   body.light-mode .tab { color: #6b7280; }
   body.light-mode .tab:hover { color: #1a1a2e; background: rgba(0,0,0,0.03); }
   body.light-mode .tab.active { color: #e31837; border-bottom-color: #e31837; background: rgba(227,24,55,0.04); }
-  body.light-mode .drop-zone { background: white; border-color: #e0e0e0; color: #1a1a2e; }
-  body.light-mode .drop-zone h2 { color: #1a1a2e; }
-  body.light-mode .drop-zone p { color: #6b7280; }
+  body.light-mode .upload-drop { border-color: #e0e0e0; background: rgba(0,0,0,0.01); }
+  body.light-mode .upload-drop.drag-over { border-color: var(--primary); background: rgba(227,24,55,0.03); }
+  body.light-mode .upload-type-group { background: white; border-color: #e0e0e0; }
   body.light-mode .bpa-insight { color: #1a1a2e; }
   body.light-mode .bpa-panel h4, body.light-mode .bpa-panel .bpa-title { color: #1a1a2e; }
   body.light-mode .bpa-action-btn { background: rgba(0,0,0,0.03); border-color: #e0e0e0; color: #1a1a2e; }
@@ -2775,7 +2834,7 @@
     <button class="tab company-admin-only" data-tab="segments">Segments</button>
     <button class="tab company-admin-only" data-tab="marketing">Marketing</button>
     <button class="tab" data-tab="reporting">Reporting</button>
-    <button class="tab" data-tab="grow">GROW Reports</button>
+    <button class="tab" data-tab="grow">POS Reports</button>
     <button class="tab" data-tab="stores">Rankings</button>
   </div>
 </div>
@@ -2973,16 +3032,47 @@
 </div>
 
 <!-- Upload Zone (shown when no data) -->
-<div id="uploadZone" class="drop-zone">
-  <h2>Load Your Data</h2>
-  <p>Drop your CSV extract files here, or click to browse.<br>Accepts all 6 data extract CSVs.</p>
-  <button class="file-input-btn" onclick="document.getElementById('fileInput').click()">Choose Files</button>
-  <input type="file" id="fileInput" multiple accept=".csv,.CSV">
-  <div class="file-list" id="fileList"></div>
-  <div id="restoreDataHint" style="display:none;margin-top:16px;padding:14px 20px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;text-align:center;">
-    <div style="font-size:13px;color:var(--green);font-weight:600;margin-bottom:4px;">Previously saved data found</div>
-    <div id="restoreDataInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;"></div>
-    <button class="btn-save" onclick="if(loadUserData()){launchDashboard();updateDataSavedIndicator(true);}" style="padding:10px 24px;border-radius:8px;font-size:13px;">Restore Saved Data</button>
+<div id="uploadZone" class="upload-screen">
+  <div class="upload-card">
+    <div class="upload-header">
+      <div class="logo-mark" style="width:40px;height:40px;font-size:18px;">BP</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);">Butler Performance Analytics</div>
+        <div style="font-size:12px;color:var(--text-muted);">Upload your data to get started</div>
+      </div>
+    </div>
+
+    <div id="restoreDataHint" style="display:none;margin-bottom:20px;padding:16px 20px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:8px;height:8px;background:var(--green);border-radius:50%;"></div>
+        <div style="font-size:13px;font-weight:600;color:var(--green);">Previously saved data found</div>
+      </div>
+      <div id="restoreDataInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:12px;"></div>
+      <button class="btn-save" onclick="if(loadUserData()){launchDashboard();updateDataSavedIndicator(true);}" style="width:100%;padding:10px;border-radius:8px;font-size:13px;">Restore Saved Data</button>
+    </div>
+
+    <div class="upload-drop" id="uploadDropInner">
+      <div class="upload-drop-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="upload-drop-text">Drop CSV files here</div>
+      <div class="upload-drop-sub">or click to browse</div>
+      <button class="file-input-btn" onclick="document.getElementById('fileInput').click()" style="margin-top:16px;">Choose Files</button>
+      <input type="file" id="fileInput" multiple accept=".csv,.CSV">
+    </div>
+
+    <div class="upload-file-types">
+      <div class="upload-type-group">
+        <div class="upload-type-label">POS Reports</div>
+        <div class="upload-type-items">Sales Summary · KPI Actuals · Time Analysis · System Impact · KPI Retail Comp</div>
+      </div>
+      <div class="upload-type-group">
+        <div class="upload-type-label">Transaction Data</div>
+        <div class="upload-type-items">Customers · Invoice Details · Promotions · Inspections · Invoices · ODI</div>
+      </div>
+    </div>
+
+    <div class="file-list" id="fileList"></div>
   </div>
 </div>
 
@@ -3864,12 +3954,12 @@
   <!-- GROW REPORTS TAB -->
   <div class="tab-content" id="tab-grow">
     <div class="export-bar">
-      <button class="btn-export" onclick="exportGrowReport()">Export All GROW Data</button>
+      <button class="btn-export" onclick="exportGrowReport()">Export POS Report Data</button>
     </div>
     <div id="growContent">
       <div class="grow-no-data">
-        <strong>No GROW Data Loaded</strong>
-        Upload GROW POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact, KPI Retail Comp) to view reports.
+        <strong>No POS Report Data</strong>
+        Upload your POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact) to view reports.
       </div>
     </div>
   </div>
@@ -4009,11 +4099,11 @@ const fileLabels = {
   details: 'Invoice Details',
   customers: 'Customers & Vehicles',
   inspections: 'Inspections',
-  grow_sales_summary: 'GROW Sales Summary',
-  grow_kpi_actuals: 'GROW KPI Actuals',
-  grow_time_analysis: 'GROW Time Analysis',
-  grow_system_impact: 'GROW System Impact',
-  grow_kpi_retail_comp: 'GROW KPI Retail Comp'
+  grow_sales_summary: 'Sales Summary',
+  grow_kpi_actuals: 'KPI Actuals',
+  grow_time_analysis: 'Time Analysis',
+  grow_system_impact: 'System Impact',
+  grow_kpi_retail_comp: 'KPI Retail Comp'
 };
 
 let loadedFiles = {};
@@ -4166,21 +4256,27 @@ const fileListEl = document.getElementById('fileList');
 
 uploadZone.addEventListener('dragover', (e) => {
   e.preventDefault();
-  uploadZone.classList.add('drag-over');
+  document.getElementById('uploadDropInner').classList.add('drag-over');
 });
 
 uploadZone.addEventListener('dragleave', () => {
-  uploadZone.classList.remove('drag-over');
+  document.getElementById('uploadDropInner').classList.remove('drag-over');
 });
 
 uploadZone.addEventListener('drop', async (e) => {
   e.preventDefault();
-  uploadZone.classList.remove('drag-over');
+  document.getElementById('uploadDropInner').classList.remove('drag-over');
   await handleFiles(e.dataTransfer.files);
 });
 
 fileInput.addEventListener('change', async () => {
   await handleFiles(fileInput.files);
+});
+
+document.getElementById('uploadDropInner').addEventListener('click', function(e) {
+  if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+    document.getElementById('fileInput').click();
+  }
 });
 
 // Show restore hint if user has saved data
@@ -9978,7 +10074,7 @@ function exportGrowReport() {
   const blob = new Blob([csv], {type: 'text/csv'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'GROW_Reports_Export.csv';
+  a.download = 'POS_Reports_Export.csv';
   a.click();
 }
 
@@ -9987,7 +10083,7 @@ function renderGrow() {
   if (!container) return;
 
   if (!hasAnyGrowData()) {
-    container.innerHTML = '<div class="grow-no-data"><strong>No GROW Data Loaded</strong>Upload GROW POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact, KPI Retail Comp) to view reports.</div>';
+    container.innerHTML = '<div class="grow-no-data"><strong>No POS Report Data</strong>Upload your POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact) to view reports.</div>';
     return;
   }
 
@@ -9995,7 +10091,7 @@ function renderGrow() {
 
   // ── Section A: System Impact KPI Cards ──
   if (GROW.system_impact.length > 0) {
-    html += '<div class="grow-section-title">Company-Wide KPIs <span class="grow-badge">System Impact</span></div>';
+    html += '<div class="grow-section-title">Company-Wide KPIs</div>';
     html += '<div class="grow-kpi-row">';
     const kpiOrder = ['Cars Per Day', 'Ticket Average', 'Net Sales Adjusted', 'Base Price', '$ Over Base', 'Store Count'];
     const data = GROW.system_impact;
@@ -10021,7 +10117,7 @@ function renderGrow() {
   // ── Section B: Store Performance Grid (Sales Summary) ──
   if (GROW.sales_summary.length > 0) {
     html += '<div class="ops-grid-wrap">';
-    html += '<h3>Store Performance — Sales Summary <span class="grow-badge" style="margin-left:auto">GROW POS</span></h3>';
+    html += '<h3>Store Performance — Sales Summary</h3>';
     html += '<div class="ops-grid-scroll" style="max-height:620px;">';
     html += '<table class="ops-grid" id="growSalesGrid">';
     html += '<thead><tr>';
@@ -10226,7 +10322,7 @@ function renderGrow() {
   // ── Section C: KPI Actuals Grid ──
   if (GROW.kpi_actuals.length > 0) {
     html += '<div class="ops-grid-wrap">';
-    html += '<h3>KPI Actuals <span class="grow-badge" style="margin-left:auto">GROW POS</span></h3>';
+    html += '<h3>KPI Actuals — Current Period</h3>';
     html += '<div class="ops-grid-scroll" style="max-height:520px;">';
     html += '<table class="ops-grid" id="growKpiGrid">';
     html += '<thead><tr>';
@@ -10272,7 +10368,7 @@ function renderGrow() {
   // ── Section D: Time Analysis Grid ──
   if (GROW.time_analysis.length > 0) {
     html += '<div class="ops-grid-wrap">';
-    html += '<h3>Time Analysis — Service Speed <span class="grow-badge" style="margin-left:auto">GROW POS</span></h3>';
+    html += '<h3>Time Analysis — Service Speed</h3>';
     html += '<div class="ops-grid-scroll" style="max-height:520px;">';
     html += '<table class="ops-grid" id="growTimeGrid">';
     html += '<thead><tr>';
@@ -10368,6 +10464,29 @@ function renderGrow() {
   }
 
   container.innerHTML = html;
+
+  // Cross-populate: if GROW data loaded but no transaction data, update overview KPIs
+  if (GROW.system_impact.length > 0 && DATA.customers.length === 0) {
+    const overviewKPIs = document.getElementById('overviewKPIs');
+    if (overviewKPIs && !overviewKPIs.innerHTML.trim()) {
+      const si = GROW.system_impact;
+      const findMeasure = (name) => { const r = si.find(x => x.Measure && x.Measure.trim() === name); return r ? parseGrowNum(r.Current_Comp) : null; };
+      const cpd = findMeasure('Cars Per Day');
+      const ta = findMeasure('Ticket Average');
+      const ns = findMeasure('Net Sales Adjusted');
+      const bp = findMeasure('Base Price');
+      const dob = findMeasure('$ Over Base');
+      const sc = findMeasure('Store Count');
+      overviewKPIs.innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Cars Per Day</div><div class="kpi-value">${cpd !== null ? cpd.toFixed(1) : '--'}</div><div class="kpi-sub">company avg</div></div>
+        <div class="kpi-card"><div class="kpi-label">Ticket Average</div><div class="kpi-value">${ta !== null ? fmtGrowDollar(ta) : '--'}</div><div class="kpi-sub">company avg</div></div>
+        <div class="kpi-card"><div class="kpi-label">Net Sales</div><div class="kpi-value">${ns !== null ? fmtGrowDollarFull(ns) : '--'}</div><div class="kpi-sub">adjusted</div></div>
+        <div class="kpi-card"><div class="kpi-label">Base Price</div><div class="kpi-value">${bp !== null ? fmtGrowDollar(bp) : '--'}</div><div class="kpi-sub">avg oil change</div></div>
+        <div class="kpi-card"><div class="kpi-label">$ Over Base</div><div class="kpi-value">${dob !== null ? fmtGrowDollar(dob) : '--'}</div><div class="kpi-sub">upsell avg</div></div>
+        <div class="kpi-card"><div class="kpi-label">Active Stores</div><div class="kpi-value">${sc !== null ? Math.round(sc) : '--'}</div><div class="kpi-sub">reporting</div></div>
+      `;
+    }
+  }
 }
 
 // Init auth — seed in background, don't block page
