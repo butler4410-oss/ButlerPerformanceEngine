@@ -3387,9 +3387,10 @@
 
     <!-- District Builder Modal -->
     <div class="modal-overlay" id="districtModal">
-      <div class="modal" style="width:600px;max-height:85vh;overflow-y:auto;">
-        <h3>District / Group Builder</h3>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Create districts or groups to organize stores. Saved locally and used in the Operations grid.</div>
+      <div class="modal" style="width:700px;max-height:85vh;overflow-y:auto;">
+        <h3>District Settings</h3>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Organize stores into districts and assign district managers. Changes are saved locally and reflected in the Operations grid.</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;font-family:'JetBrains Mono',monospace;opacity:0.7;">Each district can have a manager name and email for reporting.</div>
         <div class="district-list" id="districtList"></div>
         <div class="district-unassigned" id="districtUnassigned">
           <div class="district-unassigned-title">Unassigned Stores</div>
@@ -7417,6 +7418,7 @@ document.getElementById('tokenModal').addEventListener('click', function(e) {
 // DISTRICT BUILDER
 // ============================================================
 let bp_districts = JSON.parse(localStorage.getItem('bp_districts') || '[]');
+bp_districts.forEach(d => { if (!d.manager) d.manager = ''; if (!d.managerEmail) d.managerEmail = ''; });
 
 function openDistrictModal() {
   document.getElementById('districtModal').classList.add('active');
@@ -7447,8 +7449,12 @@ function renderDistrictModal() {
   bp_districts.forEach((d, idx) => {
     html += `<div class="district-item" data-idx="${idx}">
       <div class="district-item-header">
-        <input type="text" value="${d.name}" onchange="bp_districts[${idx}].name=this.value" placeholder="District Name">
+        <input type="text" value="${d.name}" onchange="bp_districts[${idx}].name=this.value" placeholder="District Name" style="flex:1;">
         <button class="btn-cancel" onclick="removeDistrict(${idx})" style="padding:3px 10px;font-size:11px;">Delete</button>
+      </div>
+      <div style="display:flex;gap:8px;margin:8px 0 10px 0;">
+        <input type="text" value="${d.manager||''}" onchange="bp_districts[${idx}].manager=this.value" placeholder="Manager Name" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;">
+        <input type="email" value="${d.managerEmail||''}" onchange="bp_districts[${idx}].managerEmail=this.value" placeholder="Manager Email" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;">
       </div>
       <div class="district-stores-wrap">
         ${d.stores.map(s => `<div class="district-store-chip" onclick="unassignStore(${idx},'${s}')">#${s} <span class="remove-store">x</span></div>`).join('')}
@@ -7464,7 +7470,7 @@ function renderDistrictModal() {
 
 function addNewDistrict() {
   const num = bp_districts.length + 1;
-  bp_districts.push({ name: 'District ' + num, stores: [] });
+  bp_districts.push({ name: 'District ' + num, manager: '', managerEmail: '', stores: [] });
   renderDistrictModal();
 }
 
@@ -7680,7 +7686,7 @@ function renderOpsGrid() {
       const yrPct = agg.inspTotal ? (agg.inspBad / agg.inspTotal * 100) : 0;
 
       html += `<tr class="district-row" onclick="toggleDistrictRows(this, 'dist-${dIdx}')">
-        <td>${dist.name} (${dStores.length})</td>
+        <td>${dist.name}${dist.manager ? ' &middot; ' + dist.manager : ''} (${dStores.length})</td>
         <td>${num(agg.gc)}</td>
         <td class="${cellColor(cpd, 15, 8, true)}">${cpd.toFixed(1)}</td>
         <td>${money(agg.sales)}</td>
