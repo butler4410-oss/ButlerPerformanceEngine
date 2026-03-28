@@ -2504,6 +2504,129 @@
   /* ===== Light Mode: Sidebar cards in reporting/marketing ===== */
   body.light-mode [style*="background:var(--card)"] { background: white !important; }
 
+  /* ═══════════════════════════════════════════
+     GROW REPORTS — KPI Cards & Grids
+     ═══════════════════════════════════════════ */
+  .grow-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 24px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .grow-section-title .grow-badge {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(227,24,55,0.12);
+    color: var(--primary);
+  }
+
+  .grow-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .grow-kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .grow-kpi-card:hover {
+    border-color: rgba(227,24,55,0.3);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+  .grow-kpi-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .grow-kpi-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .grow-kpi-prior {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .grow-kpi-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    width: fit-content;
+  }
+  .grow-kpi-change.up {
+    color: #00c853;
+    background: rgba(0,200,83,0.1);
+  }
+  .grow-kpi-change.down {
+    color: #ff1744;
+    background: rgba(255,23,68,0.1);
+  }
+  .grow-kpi-change.flat {
+    color: var(--text-muted);
+    background: rgba(120,120,160,0.1);
+  }
+
+  /* Percentage color classes for table cells */
+  .pct-up { color: #00c853; font-weight: 600; }
+  .pct-down { color: #ff1744; font-weight: 600; }
+  .pct-flat { color: var(--text-muted); }
+
+  .grow-no-data {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .grow-no-data strong {
+    display: block;
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  /* ===== Light Mode: GROW Reports ===== */
+  body.light-mode .grow-section-title { color: #1a1a2e; }
+  body.light-mode .grow-kpi-card { background: white; border-color: #e0e0e0; }
+  body.light-mode .grow-kpi-card:hover { border-color: rgba(227,24,55,0.3); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  body.light-mode .grow-kpi-value { color: #1a1a2e; }
+  body.light-mode .grow-kpi-label { color: #6b7280; }
+  body.light-mode .grow-kpi-prior { color: #6b7280; }
+  body.light-mode .grow-kpi-change.up { color: #00913c; background: rgba(0,200,83,0.08); }
+  body.light-mode .grow-kpi-change.down { color: #c41230; background: rgba(255,23,68,0.08); }
+  body.light-mode .grow-kpi-change.flat { color: #6b7280; background: rgba(0,0,0,0.04); }
+  body.light-mode .pct-up { color: #00913c; }
+  body.light-mode .pct-down { color: #c41230; }
+  body.light-mode .pct-flat { color: #6b7280; }
+  body.light-mode .grow-no-data { color: #6b7280; }
+  body.light-mode .grow-no-data strong { color: #1a1a2e; }
+  body.light-mode .grow-badge { color: #e31837; background: rgba(227,24,55,0.08); }
+
   @media print {
     .header { position: static; }
     .export-bar, .btn-apply, .btn-reset { display: none; }
@@ -2652,6 +2775,7 @@
     <button class="tab company-admin-only" data-tab="segments">Segments</button>
     <button class="tab company-admin-only" data-tab="marketing">Marketing</button>
     <button class="tab" data-tab="reporting">Reporting</button>
+    <button class="tab" data-tab="grow">GROW Reports</button>
     <button class="tab" data-tab="stores">Rankings</button>
   </div>
 </div>
@@ -3737,6 +3861,19 @@
     </div>
   </div>
 
+  <!-- GROW REPORTS TAB -->
+  <div class="tab-content" id="tab-grow">
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportGrowReport()">Export All GROW Data</button>
+    </div>
+    <div id="growContent">
+      <div class="grow-no-data">
+        <strong>No GROW Data Loaded</strong>
+        Upload GROW POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact, KPI Retail Comp) to view reports.
+      </div>
+    </div>
+  </div>
+
   <!-- STORE RANKINGS TAB -->
   <div class="tab-content" id="tab-stores">
     <div class="export-bar">
@@ -3778,6 +3915,14 @@ let DATA = {
   details: [],       // invoice line items
   customers: [],     // customer/vehicle/timing
   inspections: []    // inspection items
+};
+
+let GROW = {
+  sales_summary: [],
+  kpi_actuals: [],
+  time_analysis: [],
+  system_impact: [],
+  kpi_retail_comp: []
 };
 
 let FILTERED = {};
@@ -3841,6 +3986,13 @@ function parseCSVLine(line) {
 // ============================================================
 function detectFileType(headers) {
   const h = headers.join(',').toLowerCase();
+  // GROW POS file detection (check before generic types)
+  if (h.includes('cy_comp_gross_sales') && h.includes('py_comp_gross_sales')) return 'grow_sales_summary';
+  if (h.includes('labor_pct_sales') && h.includes('labor_hours_per_vehicle')) return 'grow_kpi_actuals';
+  if (h.includes('start_to_finish') && h.includes('bay_start_to_bay_end')) return 'grow_time_analysis';
+  if (h.includes('measure') && h.includes('current_comp') && h.includes('prior_comp')) return 'grow_system_impact';
+  if (h.includes('cy_comp_net_sales') && h.includes('cy_comp_labor_pct_sales')) return 'grow_kpi_retail_comp';
+  // Standard file detection
   if (h.includes('inspection_status')) return 'inspections';
   if (h.includes('customer_first_name') || h.includes('greet_time')) return 'customers';
   if (h.includes('invoice_detail_type') || h.includes('extended_price')) return 'details';
@@ -3856,7 +4008,12 @@ const fileLabels = {
   odi: 'ODI Values',
   details: 'Invoice Details',
   customers: 'Customers & Vehicles',
-  inspections: 'Inspections'
+  inspections: 'Inspections',
+  grow_sales_summary: 'GROW Sales Summary',
+  grow_kpi_actuals: 'GROW KPI Actuals',
+  grow_time_analysis: 'GROW Time Analysis',
+  grow_system_impact: 'GROW System Impact',
+  grow_kpi_retail_comp: 'GROW KPI Retail Comp'
 };
 
 let loadedFiles = {};
@@ -3875,9 +4032,10 @@ function saveUserData() {
   try {
     const payload = {
       data: DATA,
+      grow: GROW,
       loadedFiles: loadedFiles,
       savedAt: new Date().toISOString(),
-      version: 2
+      version: 3
     };
     const json = JSON.stringify(payload);
     // Check size — localStorage typically allows ~5-10MB
@@ -3912,6 +4070,14 @@ function loadUserData() {
         DATA[type] = payload.data[type];
       }
     });
+    // Restore GROW data if present
+    if (payload.grow) {
+      Object.keys(payload.grow).forEach(type => {
+        if (payload.grow[type] && payload.grow[type].length > 0) {
+          GROW[type] = payload.grow[type];
+        }
+      });
+    }
     Object.assign(loadedFiles, payload.loadedFiles);
     return true;
   } catch(e) {
@@ -3977,7 +4143,13 @@ function processFile(file) {
         return;
       }
       const rows = parseCSV(text);
-      DATA[type] = rows;
+      // Route GROW files to GROW object, others to DATA
+      if (type.startsWith('grow_')) {
+        const growKey = type.replace('grow_', '');
+        GROW[growKey] = rows;
+      } else {
+        DATA[type] = rows;
+      }
       loadedFiles[type] = true;
       resolve({ name: file.name, type, rows: rows.length });
     };
@@ -4043,7 +4215,8 @@ async function handleFiles(files) {
   `).join('');
 
   const loadedCount = Object.keys(loadedFiles).length;
-  if (loadedCount >= 2) {
+  const hasGrow = Object.keys(loadedFiles).some(k => k.startsWith('grow_'));
+  if (loadedCount >= 2 || hasGrow) {
     setTimeout(() => {
       launchDashboard();
       saveUserData(); // Persist data for this account
@@ -4172,9 +4345,12 @@ function launchDashboard() {
   const cu = getCurrentUser();
   if (cu) updateUserAvatar(cu);
 
-  // Populate store filter
+  // Populate store filter (include GROW stores too)
   const stores = new Set();
   [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(arr => {
+    arr.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
+  });
+  [GROW.sales_summary, GROW.kpi_actuals, GROW.time_analysis, GROW.kpi_retail_comp].forEach(arr => {
     arr.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
   });
   const sel = document.getElementById('filterStore');
@@ -4196,10 +4372,28 @@ function launchDashboard() {
     document.getElementById('dateRange').textContent = fmtDate(minD) + ' — ' + fmtDate(maxD);
     document.getElementById('filterFrom').value = fmtDateISO(minD);
     document.getElementById('filterTo').value = fmtDateISO(maxD);
+  } else if (GROW.sales_summary.length > 0 && GROW.sales_summary[0].From_Date) {
+    // Use GROW date range as fallback
+    const fromStr = GROW.sales_summary[0].From_Date || '';
+    const toStr = GROW.sales_summary[0].To_Date || '';
+    if (fromStr && toStr) {
+      document.getElementById('dateRange').textContent = fromStr.replace(/["']/g,'') + ' — ' + toStr.replace(/["']/g,'');
+    }
   }
 
-  // Ensure first tab is active
-  ensureActiveTab();
+  // If only GROW data loaded (no standard DATA), switch to GROW tab
+  const hasStandardData = DATA.customers.length > 0 || DATA.details.length > 0 || DATA.promos.length > 0 || DATA.inspections.length > 0 || DATA.invoices.length > 0 || DATA.odi.length > 0;
+  if (!hasStandardData && hasAnyGrowData()) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    const growTab = document.querySelector('.tab[data-tab="grow"]');
+    const growContent = document.getElementById('tab-grow');
+    if (growTab) growTab.classList.add('active');
+    if (growContent) growContent.classList.add('active');
+  } else {
+    // Ensure first tab is active
+    ensureActiveTab();
+  }
 
   applyFilters();
   updateFilterSummary();
@@ -4219,6 +4413,7 @@ function renderDashboard() {
   renderMarketing();
   renderReporting();
   renderStores();
+  renderGrow();
   runAlertCheck();
   runBPAInsights();
 }
@@ -9686,6 +9881,494 @@ function loadTheme() {
   }
 }
 loadTheme();
+
+// ============================================================
+// GROW REPORTS — PARSING & RENDERING
+// ============================================================
+function parseGrowNum(str) {
+  if (str == null || str === '') return null;
+  let s = String(str).trim();
+  // Remove surrounding quotes
+  s = s.replace(/^["']+|["']+$/g, '');
+  if (s === '' || s === '-' || s === 'N/A') return null;
+  // Check for parenthesized negative: (3.0%) or ($468.62)
+  const parenMatch = s.match(/^\((.+)\)$/);
+  let isNeg = false;
+  if (parenMatch) {
+    s = parenMatch[1];
+    isNeg = true;
+  }
+  // Check for leading negative sign
+  if (s.startsWith('-')) {
+    isNeg = !isNeg;
+    s = s.substring(1);
+  }
+  // Remove $ and %
+  const isPct = s.includes('%');
+  s = s.replace(/[$%,]/g, '');
+  const val = parseFloat(s);
+  if (isNaN(val)) return null;
+  return isNeg ? -val : val;
+}
+
+function fmtGrowDollar(v) {
+  if (v == null) return '—';
+  const abs = Math.abs(v);
+  const formatted = abs >= 1000 ? '$' + abs.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}) : '$' + abs.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  return v < 0 ? '(' + formatted + ')' : formatted;
+}
+
+function fmtGrowDollarFull(v) {
+  if (v == null) return '—';
+  const abs = Math.abs(v);
+  const formatted = '$' + abs.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  return v < 0 ? '(' + formatted + ')' : formatted;
+}
+
+function fmtGrowPct(v) {
+  if (v == null) return '—';
+  const abs = Math.abs(v);
+  return (v < 0 ? '-' : '') + abs.toFixed(1) + '%';
+}
+
+function fmtGrowNum(v, decimals) {
+  if (v == null) return '—';
+  const d = decimals != null ? decimals : 0;
+  return v.toLocaleString('en-US', {minimumFractionDigits: d, maximumFractionDigits: d});
+}
+
+function pctClass(v) {
+  if (v == null) return 'pct-flat';
+  if (v > 0.05) return 'pct-up';
+  if (v < -0.05) return 'pct-down';
+  return 'pct-flat';
+}
+
+function pctArrow(v) {
+  if (v == null) return '';
+  if (v > 0.05) return '&#9650; ';
+  if (v < -0.05) return '&#9660; ';
+  return '';
+}
+
+function hasAnyGrowData() {
+  return GROW.sales_summary.length > 0 || GROW.kpi_actuals.length > 0 ||
+         GROW.time_analysis.length > 0 || GROW.system_impact.length > 0 ||
+         GROW.kpi_retail_comp.length > 0;
+}
+
+function exportGrowReport() {
+  // Export whatever GROW grids are visible
+  const tables = document.querySelectorAll('#growContent .ops-grid');
+  if (tables.length === 0) { alert('No GROW data to export.'); return; }
+  let csv = '';
+  tables.forEach((tbl, idx) => {
+    if (idx > 0) csv += '\n\n';
+    const title = tbl.closest('.ops-grid-wrap');
+    if (title) {
+      const h3 = title.querySelector('h3');
+      if (h3) csv += h3.textContent.trim() + '\n';
+    }
+    tbl.querySelectorAll('tr').forEach(tr => {
+      const cells = [];
+      tr.querySelectorAll('th, td').forEach(c => cells.push('"' + c.textContent.replace(/"/g, '""').trim() + '"'));
+      csv += cells.join(',') + '\n';
+    });
+  });
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'GROW_Reports_Export.csv';
+  a.click();
+}
+
+function renderGrow() {
+  const container = document.getElementById('growContent');
+  if (!container) return;
+
+  if (!hasAnyGrowData()) {
+    container.innerHTML = '<div class="grow-no-data"><strong>No GROW Data Loaded</strong>Upload GROW POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact, KPI Retail Comp) to view reports.</div>';
+    return;
+  }
+
+  let html = '';
+
+  // ── Section A: System Impact KPI Cards ──
+  if (GROW.system_impact.length > 0) {
+    html += '<div class="grow-section-title">Company-Wide KPIs <span class="grow-badge">System Impact</span></div>';
+    html += '<div class="grow-kpi-row">';
+    const kpiOrder = ['Cars Per Day', 'Ticket Average', 'Net Sales Adjusted', 'Base Price', '$ Over Base', 'Store Count'];
+    const data = GROW.system_impact;
+    kpiOrder.forEach(measure => {
+      const row = data.find(r => r.Measure && r.Measure.trim() === measure);
+      if (!row) return;
+      const current = parseGrowNum(row.Current_Comp);
+      const prior = parseGrowNum(row.Prior_Comp);
+      const pctChange = parseGrowNum(row.PCT_Change);
+      const isDollar = measure.includes('Sales') || measure.includes('Price') || measure.includes('$') || measure.includes('Ticket');
+      const changeDir = pctChange == null ? 'flat' : (pctChange > 0.05 ? 'up' : (pctChange < -0.05 ? 'down' : 'flat'));
+      const arrow = pctChange == null ? '' : (pctChange > 0.05 ? '&#9650; ' : (pctChange < -0.05 ? '&#9660; ' : ''));
+      html += '<div class="grow-kpi-card">';
+      html += '<div class="grow-kpi-label">' + measure + '</div>';
+      html += '<div class="grow-kpi-value">' + (isDollar ? fmtGrowDollar(current) : fmtGrowNum(current, measure === 'Cars Per Day' ? 1 : 0)) + '</div>';
+      html += '<div class="grow-kpi-prior">Prior: ' + (isDollar ? fmtGrowDollar(prior) : fmtGrowNum(prior, measure === 'Cars Per Day' ? 1 : 0)) + '</div>';
+      html += '<div class="grow-kpi-change ' + changeDir + '">' + arrow + fmtGrowPct(pctChange) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // ── Section B: Store Performance Grid (Sales Summary) ──
+  if (GROW.sales_summary.length > 0) {
+    html += '<div class="ops-grid-wrap">';
+    html += '<h3>Store Performance — Sales Summary <span class="grow-badge" style="margin-left:auto">GROW POS</span></h3>';
+    html += '<div class="ops-grid-scroll" style="max-height:620px;">';
+    html += '<table class="ops-grid" id="growSalesGrid">';
+    html += '<thead><tr>';
+    html += '<th title="Store Number">Store</th>';
+    html += '<th title="Current Year Comp Gross Sales">GC (CY)</th>';
+    html += '<th title="Prior Year Comp Gross Sales">GC (PY)</th>';
+    html += '<th title="Gross Comp Dollar Change">GC +/-</th>';
+    html += '<th title="Gross Comp % Change">GC %</th>';
+    html += '<th title="Current Year Comp Net Sales Adjusted">Net (CY)</th>';
+    html += '<th title="Prior Year Comp Net Sales Adjusted">Net (PY)</th>';
+    html += '<th title="Net Sales Dollar Change">NS +/-</th>';
+    html += '<th title="Net Sales % Change">NS %</th>';
+    html += '<th title="Current Year Comp Ticket Average">TA (CY)</th>';
+    html += '<th title="Prior Year Comp Ticket Average">TA (PY)</th>';
+    html += '<th title="Ticket Average % Change">TA %</th>';
+    html += '<th title="Current Year Comp Cars Per Day">CPD (CY)</th>';
+    html += '<th title="Prior Year Comp Cars Per Day">CPD (PY)</th>';
+    html += '<th title="Cars Per Day % Change">CPD %</th>';
+    html += '<th title="Oil Change Sales">Oil $</th>';
+    html += '<th title="Ancillary Sales">Anc $</th>';
+    html += '<th title="Promotion Discounts">Promo $</th>';
+    html += '</tr></thead><tbody>';
+
+    // Group by District
+    const districtGroups = {};
+    GROW.sales_summary.forEach(r => {
+      const dist = (r.District || 'Unassigned').trim();
+      if (!districtGroups[dist]) districtGroups[dist] = [];
+      districtGroups[dist].push(r);
+    });
+
+    // Totals accumulators
+    let totalGCCY = 0, totalGCPY = 0, totalNSCY = 0, totalNSPY = 0;
+    let totalVehCY = 0, totalVehPY = 0, totalOil = 0, totalAnc = 0, totalPromo = 0;
+    let storeCount = 0;
+
+    Object.keys(districtGroups).sort().forEach(dist => {
+      const stores = districtGroups[dist];
+      const distId = 'grow-dist-' + dist.replace(/[^a-zA-Z0-9]/g, '_');
+      // District aggregate
+      let dGCCY = 0, dGCPY = 0, dNSCY = 0, dNSPY = 0, dVehCY = 0, dVehPY = 0, dOil = 0, dAnc = 0, dPromo = 0;
+      let dTACY = 0, dTAPY = 0, dCPDCY = 0, dCPDPY = 0, dCount = 0;
+      stores.forEach(r => {
+        const gccy = parseGrowNum(r.CY_Comp_Gross_Sales) || 0;
+        const gcpy = parseGrowNum(r.PY_Comp_Gross_Sales) || 0;
+        const nscy = parseGrowNum(r.CY_Comp_Net_Sales_Adjusted) || 0;
+        const nspy = parseGrowNum(r.PY_Comp_Net_Sales_Adjusted) || 0;
+        const vcy = parseGrowNum(r.CY_Comp_Total_Vehicles) || 0;
+        const vpy = parseGrowNum(r.PY_Comp_Total_Vehicles) || 0;
+        const tacy = parseGrowNum(r.CY_Comp_Ticket_Average) || 0;
+        const tapy = parseGrowNum(r.PY_Comp_Ticket_Average) || 0;
+        const cpdcy = parseGrowNum(r.CY_Comp_Cars_Per_Day) || 0;
+        const cpdpy = parseGrowNum(r.PY_Comp_Cars_Per_Day) || 0;
+        const oil = parseGrowNum(r.CY_Comp_Oil_Change_Sales) || 0;
+        const anc = parseGrowNum(r.CY_Comp_Ancillaries_Sales) || 0;
+        const promo = parseGrowNum(r.CY_Comp_Promotion_Discount) || 0;
+        dGCCY += gccy; dGCPY += gcpy; dNSCY += nscy; dNSPY += nspy;
+        dVehCY += vcy; dVehPY += vpy; dTACY += tacy; dTAPY += tapy;
+        dCPDCY += cpdcy; dCPDPY += cpdpy; dOil += oil; dAnc += anc; dPromo += promo;
+        dCount++;
+      });
+      const dGCDiff = dGCCY - dGCPY;
+      const dGCPctVal = dGCPY !== 0 ? ((dGCCY - dGCPY) / Math.abs(dGCPY)) * 100 : 0;
+      const dNSDiff = dNSCY - dNSPY;
+      const dNSPctVal = dNSPY !== 0 ? ((dNSCY - dNSPY) / Math.abs(dNSPY)) * 100 : 0;
+      const dTACYAvg = dCount > 0 ? dTACY / dCount : 0;
+      const dTAPYAvg = dCount > 0 ? dTAPY / dCount : 0;
+      const dTAPctVal = dTAPYAvg !== 0 ? ((dTACYAvg - dTAPYAvg) / Math.abs(dTAPYAvg)) * 100 : 0;
+      const dCPDCYAvg = dCount > 0 ? dCPDCY / dCount : 0;
+      const dCPDPYAvg = dCount > 0 ? dCPDPY / dCount : 0;
+      const dCPDPctVal = dCPDPYAvg !== 0 ? ((dCPDCYAvg - dCPDPYAvg) / Math.abs(dCPDPYAvg)) * 100 : 0;
+
+      html += '<tr class="district-row" onclick="this.classList.toggle(\'expanded\');this.closest(\'tbody\').querySelectorAll(\'.' + distId + '\').forEach(r=>r.classList.toggle(\'visible\'))">';
+      html += '<td>' + dist + ' (' + dCount + ')</td>';
+      html += '<td>' + fmtGrowDollar(dGCCY) + '</td>';
+      html += '<td>' + fmtGrowDollar(dGCPY) + '</td>';
+      html += '<td class="' + pctClass(dGCDiff) + '">' + fmtGrowDollar(dGCDiff) + '</td>';
+      html += '<td class="' + pctClass(dGCPctVal) + '">' + pctArrow(dGCPctVal) + fmtGrowPct(dGCPctVal) + '</td>';
+      html += '<td>' + fmtGrowDollar(dNSCY) + '</td>';
+      html += '<td>' + fmtGrowDollar(dNSPY) + '</td>';
+      html += '<td class="' + pctClass(dNSDiff) + '">' + fmtGrowDollar(dNSDiff) + '</td>';
+      html += '<td class="' + pctClass(dNSPctVal) + '">' + pctArrow(dNSPctVal) + fmtGrowPct(dNSPctVal) + '</td>';
+      html += '<td>' + fmtGrowDollarFull(dTACYAvg) + '</td>';
+      html += '<td>' + fmtGrowDollarFull(dTAPYAvg) + '</td>';
+      html += '<td class="' + pctClass(dTAPctVal) + '">' + pctArrow(dTAPctVal) + fmtGrowPct(dTAPctVal) + '</td>';
+      html += '<td>' + fmtGrowNum(dCPDCYAvg, 1) + '</td>';
+      html += '<td>' + fmtGrowNum(dCPDPYAvg, 1) + '</td>';
+      html += '<td class="' + pctClass(dCPDPctVal) + '">' + pctArrow(dCPDPctVal) + fmtGrowPct(dCPDPctVal) + '</td>';
+      html += '<td>' + fmtGrowDollar(dOil) + '</td>';
+      html += '<td>' + fmtGrowDollar(dAnc) + '</td>';
+      html += '<td>' + fmtGrowDollar(dPromo) + '</td>';
+      html += '</tr>';
+
+      // Store rows
+      stores.sort((a, b) => (a.Store_Number || '').localeCompare(b.Store_Number || '', undefined, {numeric: true}));
+      stores.forEach(r => {
+        const gccy = parseGrowNum(r.CY_Comp_Gross_Sales);
+        const gcpy = parseGrowNum(r.PY_Comp_Gross_Sales);
+        const gcDiff = (gccy != null && gcpy != null) ? gccy - gcpy : null;
+        const gcPct = parseGrowNum(r.Comp_Gross_Sales_PCT_Change);
+        const nscy = parseGrowNum(r.CY_Comp_Net_Sales_Adjusted);
+        const nspy = parseGrowNum(r.PY_Comp_Net_Sales_Adjusted);
+        const nsDiff = (nscy != null && nspy != null) ? nscy - nspy : null;
+        const nsPct = parseGrowNum(r.Comp_Net_Sales_Adjusted_PCT_Change);
+        const tacy = parseGrowNum(r.CY_Comp_Ticket_Average);
+        const tapy = parseGrowNum(r.PY_Comp_Ticket_Average);
+        const taPct = parseGrowNum(r.Comp_Ticket_Average_PCT_Change);
+        const cpdcy = parseGrowNum(r.CY_Comp_Cars_Per_Day);
+        const cpdpy = parseGrowNum(r.PY_Comp_Cars_Per_Day);
+        const cpdPct = parseGrowNum(r.Comp_Cars_Per_Day_PCT_Change);
+        const oil = parseGrowNum(r.CY_Comp_Oil_Change_Sales);
+        const anc = parseGrowNum(r.CY_Comp_Ancillaries_Sales);
+        const promo = parseGrowNum(r.CY_Comp_Promotion_Discount);
+
+        totalGCCY += (gccy || 0); totalGCPY += (gcpy || 0);
+        totalNSCY += (nscy || 0); totalNSPY += (nspy || 0);
+        totalOil += (oil || 0); totalAnc += (anc || 0); totalPromo += (promo || 0);
+        totalVehCY += parseGrowNum(r.CY_Comp_Total_Vehicles) || 0;
+        totalVehPY += parseGrowNum(r.PY_Comp_Total_Vehicles) || 0;
+        storeCount++;
+
+        html += '<tr class="store-child ' + distId + '">';
+        html += '<td>' + (r.Store_Number || '—') + '</td>';
+        html += '<td>' + fmtGrowDollar(gccy) + '</td>';
+        html += '<td>' + fmtGrowDollar(gcpy) + '</td>';
+        html += '<td class="' + pctClass(gcDiff) + '">' + fmtGrowDollar(gcDiff) + '</td>';
+        html += '<td class="' + pctClass(gcPct) + '">' + pctArrow(gcPct) + fmtGrowPct(gcPct) + '</td>';
+        html += '<td>' + fmtGrowDollar(nscy) + '</td>';
+        html += '<td>' + fmtGrowDollar(nspy) + '</td>';
+        html += '<td class="' + pctClass(nsDiff) + '">' + fmtGrowDollar(nsDiff) + '</td>';
+        html += '<td class="' + pctClass(nsPct) + '">' + pctArrow(nsPct) + fmtGrowPct(nsPct) + '</td>';
+        html += '<td>' + fmtGrowDollarFull(tacy) + '</td>';
+        html += '<td>' + fmtGrowDollarFull(tapy) + '</td>';
+        html += '<td class="' + pctClass(taPct) + '">' + pctArrow(taPct) + fmtGrowPct(taPct) + '</td>';
+        html += '<td>' + fmtGrowNum(cpdcy, 1) + '</td>';
+        html += '<td>' + fmtGrowNum(cpdpy, 1) + '</td>';
+        html += '<td class="' + pctClass(cpdPct) + '">' + pctArrow(cpdPct) + fmtGrowPct(cpdPct) + '</td>';
+        html += '<td>' + fmtGrowDollar(oil) + '</td>';
+        html += '<td>' + fmtGrowDollar(anc) + '</td>';
+        html += '<td>' + fmtGrowDollar(promo) + '</td>';
+        html += '</tr>';
+      });
+
+      totalGCCY -= dGCCY; totalGCPY -= dGCPY; totalNSCY -= dNSCY; totalNSPY -= dNSPY;
+      totalOil -= dOil; totalAnc -= dAnc; totalPromo -= dPromo;
+      totalVehCY -= (dVehCY); totalVehPY -= (dVehPY);
+      storeCount -= dCount;
+    });
+
+    // Recalculate totals properly from raw data
+    let tGCCY = 0, tGCPY = 0, tNSCY = 0, tNSPY = 0, tOil = 0, tAnc = 0, tPromo = 0;
+    let tTACY = 0, tTAPY = 0, tCPDCY = 0, tCPDPY = 0, tCount = 0;
+    GROW.sales_summary.forEach(r => {
+      tGCCY += parseGrowNum(r.CY_Comp_Gross_Sales) || 0;
+      tGCPY += parseGrowNum(r.PY_Comp_Gross_Sales) || 0;
+      tNSCY += parseGrowNum(r.CY_Comp_Net_Sales_Adjusted) || 0;
+      tNSPY += parseGrowNum(r.PY_Comp_Net_Sales_Adjusted) || 0;
+      tTACY += parseGrowNum(r.CY_Comp_Ticket_Average) || 0;
+      tTAPY += parseGrowNum(r.PY_Comp_Ticket_Average) || 0;
+      tCPDCY += parseGrowNum(r.CY_Comp_Cars_Per_Day) || 0;
+      tCPDPY += parseGrowNum(r.PY_Comp_Cars_Per_Day) || 0;
+      tOil += parseGrowNum(r.CY_Comp_Oil_Change_Sales) || 0;
+      tAnc += parseGrowNum(r.CY_Comp_Ancillaries_Sales) || 0;
+      tPromo += parseGrowNum(r.CY_Comp_Promotion_Discount) || 0;
+      tCount++;
+    });
+    const tGCDiff = tGCCY - tGCPY;
+    const tGCPct = tGCPY !== 0 ? ((tGCCY - tGCPY) / Math.abs(tGCPY)) * 100 : 0;
+    const tNSDiff = tNSCY - tNSPY;
+    const tNSPct = tNSPY !== 0 ? ((tNSCY - tNSPY) / Math.abs(tNSPY)) * 100 : 0;
+    const tTACYAvg = tCount > 0 ? tTACY / tCount : 0;
+    const tTAPYAvg = tCount > 0 ? tTAPY / tCount : 0;
+    const tTAPct = tTAPYAvg !== 0 ? ((tTACYAvg - tTAPYAvg) / Math.abs(tTAPYAvg)) * 100 : 0;
+    const tCPDCYAvg = tCount > 0 ? tCPDCY / tCount : 0;
+    const tCPDPYAvg = tCount > 0 ? tCPDPY / tCount : 0;
+    const tCPDPct = tCPDPYAvg !== 0 ? ((tCPDCYAvg - tCPDPYAvg) / Math.abs(tCPDPYAvg)) * 100 : 0;
+
+    html += '<tr class="totals-row">';
+    html += '<td>TOTAL (' + tCount + ' stores)</td>';
+    html += '<td>' + fmtGrowDollar(tGCCY) + '</td>';
+    html += '<td>' + fmtGrowDollar(tGCPY) + '</td>';
+    html += '<td class="' + pctClass(tGCDiff) + '">' + fmtGrowDollar(tGCDiff) + '</td>';
+    html += '<td class="' + pctClass(tGCPct) + '">' + pctArrow(tGCPct) + fmtGrowPct(tGCPct) + '</td>';
+    html += '<td>' + fmtGrowDollar(tNSCY) + '</td>';
+    html += '<td>' + fmtGrowDollar(tNSPY) + '</td>';
+    html += '<td class="' + pctClass(tNSDiff) + '">' + fmtGrowDollar(tNSDiff) + '</td>';
+    html += '<td class="' + pctClass(tNSPct) + '">' + pctArrow(tNSPct) + fmtGrowPct(tNSPct) + '</td>';
+    html += '<td>' + fmtGrowDollarFull(tTACYAvg) + '</td>';
+    html += '<td>' + fmtGrowDollarFull(tTAPYAvg) + '</td>';
+    html += '<td class="' + pctClass(tTAPct) + '">' + pctArrow(tTAPct) + fmtGrowPct(tTAPct) + '</td>';
+    html += '<td>' + fmtGrowNum(tCPDCYAvg, 1) + '</td>';
+    html += '<td>' + fmtGrowNum(tCPDPYAvg, 1) + '</td>';
+    html += '<td class="' + pctClass(tCPDPct) + '">' + pctArrow(tCPDPct) + fmtGrowPct(tCPDPct) + '</td>';
+    html += '<td>' + fmtGrowDollar(tOil) + '</td>';
+    html += '<td>' + fmtGrowDollar(tAnc) + '</td>';
+    html += '<td>' + fmtGrowDollar(tPromo) + '</td>';
+    html += '</tr>';
+
+    html += '</tbody></table></div></div>';
+  }
+
+  // ── Section C: KPI Actuals Grid ──
+  if (GROW.kpi_actuals.length > 0) {
+    html += '<div class="ops-grid-wrap">';
+    html += '<h3>KPI Actuals <span class="grow-badge" style="margin-left:auto">GROW POS</span></h3>';
+    html += '<div class="ops-grid-scroll" style="max-height:520px;">';
+    html += '<table class="ops-grid" id="growKpiGrid">';
+    html += '<thead><tr>';
+    html += '<th title="Store Number">Store</th>';
+    html += '<th title="Net Sales">Net Sales</th>';
+    html += '<th title="Vehicle Count">Vehicles</th>';
+    html += '<th title="Ticket Average">Ticket Avg</th>';
+    html += '<th title="Labor % of Sales">Labor %</th>';
+    html += '<th title="Man-Hours Per Vehicle">MHPV</th>';
+    html += '<th title="Air Filter Sales">AF Sales</th>';
+    html += '<th title="Air Filter Count">AF Cnt</th>';
+    html += '<th title="Cabin Air Filter Sales">CAF Sales</th>';
+    html += '<th title="Cabin Air Filter Count">CAF Cnt</th>';
+    html += '<th title="Wiper Blade Sales">WB Sales</th>';
+    html += '<th title="Differential Sales">DIF Sales</th>';
+    html += '<th title="Light Sales">LGT Sales</th>';
+    html += '</tr></thead><tbody>';
+
+    GROW.kpi_actuals.sort((a, b) => (a.Store_Number || '').localeCompare(b.Store_Number || '', undefined, {numeric: true}));
+    GROW.kpi_actuals.forEach(r => {
+      const laborPct = parseGrowNum(r.Labor_PCT_Sales);
+      const laborClass = laborPct != null ? (laborPct > 30 ? 'pct-down' : (laborPct < 20 ? 'pct-up' : 'pct-flat')) : '';
+      html += '<tr>';
+      html += '<td>' + (r.Store_Number || '—') + '</td>';
+      html += '<td>' + fmtGrowDollar(parseGrowNum(r.Net_Sales)) + '</td>';
+      html += '<td>' + fmtGrowNum(parseGrowNum(r.Vehicle_Count), 0) + '</td>';
+      html += '<td>' + fmtGrowDollarFull(parseGrowNum(r.Ticket_Avg)) + '</td>';
+      html += '<td class="' + laborClass + '">' + fmtGrowPct(laborPct) + '</td>';
+      html += '<td>' + fmtGrowNum(parseGrowNum(r.Labor_Hours_Per_Vehicle), 2) + '</td>';
+      html += '<td>' + fmtGrowDollar(parseGrowNum(r.AF_Sales)) + '</td>';
+      html += '<td>' + fmtGrowNum(parseGrowNum(r.AF_Count), 0) + '</td>';
+      html += '<td>' + fmtGrowDollar(parseGrowNum(r.CAF_Sales)) + '</td>';
+      html += '<td>' + fmtGrowNum(parseGrowNum(r.CAF_Count), 0) + '</td>';
+      html += '<td>' + fmtGrowDollar(parseGrowNum(r.WB_Sales)) + '</td>';
+      html += '<td>' + fmtGrowDollar(parseGrowNum(r.DIF_Sales)) + '</td>';
+      html += '<td>' + fmtGrowDollar(parseGrowNum(r.LGT_Sales)) + '</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+  }
+
+  // ── Section D: Time Analysis Grid ──
+  if (GROW.time_analysis.length > 0) {
+    html += '<div class="ops-grid-wrap">';
+    html += '<h3>Time Analysis — Service Speed <span class="grow-badge" style="margin-left:auto">GROW POS</span></h3>';
+    html += '<div class="ops-grid-scroll" style="max-height:520px;">';
+    html += '<table class="ops-grid" id="growTimeGrid">';
+    html += '<thead><tr>';
+    html += '<th title="Store Number">Store</th>';
+    html += '<th title="Start to Finish Current Year">S2F (CY)</th>';
+    html += '<th title="Start to Finish Prior Year">S2F (PY)</th>';
+    html += '<th title="Start to Finish % Change">S2F %</th>';
+    html += '<th title="Bay Start to Bay End Current Year">Bay (CY)</th>';
+    html += '<th title="Bay Start to Bay End Prior Year">Bay (PY)</th>';
+    html += '<th title="Bay Time % Change">Bay %</th>';
+    html += '<th title="Ring Start to End Current Year">Ring (CY)</th>';
+    html += '<th title="Ring Start to End Prior Year">Ring (PY)</th>';
+    html += '<th title="Ring Time % Change">Ring %</th>';
+    html += '</tr></thead><tbody>';
+
+    // Group by District
+    const timeDistGroups = {};
+    GROW.time_analysis.forEach(r => {
+      const dist = (r.District || 'Unassigned').trim();
+      if (!timeDistGroups[dist]) timeDistGroups[dist] = [];
+      timeDistGroups[dist].push(r);
+    });
+
+    Object.keys(timeDistGroups).sort().forEach(dist => {
+      const stores = timeDistGroups[dist];
+      const tdId = 'grow-time-' + dist.replace(/[^a-zA-Z0-9]/g, '_');
+
+      // District averages
+      let ds2fCY = 0, ds2fPY = 0, dbayCY = 0, dbayPY = 0, dringCY = 0, dringPY = 0, dc = 0;
+      stores.forEach(r => {
+        ds2fCY += parseGrowNum(r.CY_Comp_Start_To_Finish) || 0;
+        ds2fPY += parseGrowNum(r.PY_Comp_Start_To_Finish) || 0;
+        dbayCY += parseGrowNum(r.CY_Comp_Bay_Start_To_Bay_End) || 0;
+        dbayPY += parseGrowNum(r.PY_Comp_Bay_Start_To_Bay_End) || 0;
+        dringCY += parseGrowNum(r.CY_Comp_Ring_Start_To_End) || 0;
+        dringPY += parseGrowNum(r.PY_Comp_Ring_Start_To_End) || 0;
+        dc++;
+      });
+      const ds2fCYA = dc > 0 ? ds2fCY / dc : 0;
+      const ds2fPYA = dc > 0 ? ds2fPY / dc : 0;
+      const ds2fPct = ds2fPYA !== 0 ? ((ds2fCYA - ds2fPYA) / Math.abs(ds2fPYA)) * 100 : 0;
+      const dbayCYA = dc > 0 ? dbayCY / dc : 0;
+      const dbayPYA = dc > 0 ? dbayPY / dc : 0;
+      const dbayPct = dbayPYA !== 0 ? ((dbayCYA - dbayPYA) / Math.abs(dbayPYA)) * 100 : 0;
+      const dringCYA = dc > 0 ? dringCY / dc : 0;
+      const dringPYA = dc > 0 ? dringPY / dc : 0;
+      const dringPct = dringPYA !== 0 ? ((dringCYA - dringPYA) / Math.abs(dringPYA)) * 100 : 0;
+
+      // For time, lower is better — invert color logic
+      const timePctClass = (v) => v == null ? 'pct-flat' : (v < -0.05 ? 'pct-up' : (v > 0.05 ? 'pct-down' : 'pct-flat'));
+
+      html += '<tr class="district-row" onclick="this.classList.toggle(\'expanded\');this.closest(\'tbody\').querySelectorAll(\'.' + tdId + '\').forEach(r=>r.classList.toggle(\'visible\'))">';
+      html += '<td>' + dist + ' (' + dc + ')</td>';
+      html += '<td>' + fmtGrowNum(ds2fCYA, 1) + '</td>';
+      html += '<td>' + fmtGrowNum(ds2fPYA, 1) + '</td>';
+      html += '<td class="' + timePctClass(ds2fPct) + '">' + fmtGrowPct(ds2fPct) + '</td>';
+      html += '<td>' + fmtGrowNum(dbayCYA, 1) + '</td>';
+      html += '<td>' + fmtGrowNum(dbayPYA, 1) + '</td>';
+      html += '<td class="' + timePctClass(dbayPct) + '">' + fmtGrowPct(dbayPct) + '</td>';
+      html += '<td>' + fmtGrowNum(dringCYA, 1) + '</td>';
+      html += '<td>' + fmtGrowNum(dringPYA, 1) + '</td>';
+      html += '<td class="' + timePctClass(dringPct) + '">' + fmtGrowPct(dringPct) + '</td>';
+      html += '</tr>';
+
+      stores.sort((a, b) => (a.Store_Number || '').localeCompare(b.Store_Number || '', undefined, {numeric: true}));
+      stores.forEach(r => {
+        const s2fCY = parseGrowNum(r.CY_Comp_Start_To_Finish);
+        const s2fPY = parseGrowNum(r.PY_Comp_Start_To_Finish);
+        const s2fPctV = (s2fCY != null && s2fPY != null && s2fPY !== 0) ? ((s2fCY - s2fPY) / Math.abs(s2fPY)) * 100 : null;
+        const bayCY = parseGrowNum(r.CY_Comp_Bay_Start_To_Bay_End);
+        const bayPY = parseGrowNum(r.PY_Comp_Bay_Start_To_Bay_End);
+        const bayPctV = (bayCY != null && bayPY != null && bayPY !== 0) ? ((bayCY - bayPY) / Math.abs(bayPY)) * 100 : null;
+        const ringCY = parseGrowNum(r.CY_Comp_Ring_Start_To_End);
+        const ringPY = parseGrowNum(r.PY_Comp_Ring_Start_To_End);
+        const ringPctV = (ringCY != null && ringPY != null && ringPY !== 0) ? ((ringCY - ringPY) / Math.abs(ringPY)) * 100 : null;
+
+        html += '<tr class="store-child ' + tdId + '">';
+        html += '<td>' + (r.Store_Number || '—') + '</td>';
+        html += '<td>' + fmtGrowNum(s2fCY, 1) + '</td>';
+        html += '<td>' + fmtGrowNum(s2fPY, 1) + '</td>';
+        html += '<td class="' + timePctClass(s2fPctV) + '">' + fmtGrowPct(s2fPctV) + '</td>';
+        html += '<td>' + fmtGrowNum(bayCY, 1) + '</td>';
+        html += '<td>' + fmtGrowNum(bayPY, 1) + '</td>';
+        html += '<td class="' + timePctClass(bayPctV) + '">' + fmtGrowPct(bayPctV) + '</td>';
+        html += '<td>' + fmtGrowNum(ringCY, 1) + '</td>';
+        html += '<td>' + fmtGrowNum(ringPY, 1) + '</td>';
+        html += '<td class="' + timePctClass(ringPctV) + '">' + fmtGrowPct(ringPctV) + '</td>';
+        html += '</tr>';
+      });
+    });
+
+    html += '</tbody></table></div></div>';
+  }
+
+  container.innerHTML = html;
+}
 
 // Init auth — seed in background, don't block page
 (async function initAuth() {
