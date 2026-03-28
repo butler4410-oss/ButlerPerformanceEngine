@@ -999,9 +999,14 @@
   }
 
   .table-scroll {
-    overflow-x: auto;
-    max-height: 400px;
-    overflow-y: auto;
+    overflow: auto;
+    max-height: 450px;
+  }
+
+  .table-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
   }
 
   table {
@@ -1922,18 +1927,24 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 20px;
     margin-bottom: 24px;
-    overflow-x: auto;
+    overflow: hidden;
   }
   .ops-grid-wrap h3 {
     font-size: 15px;
     font-weight: 700;
-    margin-bottom: 14px;
+    margin: 0;
+    padding: 16px 20px;
     color: var(--text);
     display: flex;
     align-items: center;
     gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ops-grid-scroll {
+    max-height: 520px;
+    overflow: auto;
   }
   .ops-grid {
     width: 100%;
@@ -1941,17 +1952,18 @@
     font-size: 12px;
   }
   .ops-grid th {
-    background: rgba(0,0,0,0.3);
+    background: var(--card);
     color: var(--text-muted);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 8px 10px;
+    padding: 10px 10px;
     text-align: right;
     white-space: nowrap;
     border-bottom: 2px solid var(--border);
     position: sticky;
     top: 0;
+    z-index: 2;
   }
   .ops-grid th:first-child { text-align: left; }
   .ops-grid th[title] { cursor: help; text-decoration: underline dotted var(--text-muted); text-underline-offset: 3px; }
@@ -1962,8 +1974,16 @@
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
-  .ops-grid td:first-child { text-align: left; font-weight: 600; }
+  .ops-grid td:first-child {
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--card);
+  }
   .ops-grid tr:hover td { background: rgba(255,255,255,0.03); }
+  .ops-grid tr:hover td:first-child { background: var(--card-hover); }
   .ops-grid .district-row td {
     background: rgba(227,24,55,0.06);
     font-weight: 700;
@@ -1971,7 +1991,9 @@
     border-bottom: 2px solid var(--border);
     cursor: pointer;
   }
+  .ops-grid .district-row td:first-child { background: rgba(227,24,55,0.06); }
   .ops-grid .district-row:hover td { background: rgba(227,24,55,0.12); }
+  .ops-grid .district-row:hover td:first-child { background: rgba(227,24,55,0.12); }
   .ops-grid .district-row td:first-child::before {
     content: '';
     display: inline-block;
@@ -1995,6 +2017,7 @@
     border-top: 2px solid var(--primary);
     font-size: 12px;
   }
+  .ops-grid .totals-row td:first-child { background: rgba(0,0,0,0.3); }
 
   /* Cell color coding */
   .cell-green { background: rgba(0,200,83,0.12) !important; color: var(--green); }
@@ -2384,7 +2407,11 @@
   body.light-mode .ops-quick-btn.active { background: #e31837; border-color: #e31837; color: white; }
   body.light-mode .ops-grid-wrap { background: white; border-color: #e0e0e0; }
   body.light-mode .ops-grid-wrap h3 { color: #1a1a2e; }
-  body.light-mode .ops-grid th { background: #f0f2f5; color: #6b7280; border-bottom-color: #e0e0e0; }
+  body.light-mode .ops-grid th { background: white; color: #6b7280; border-bottom-color: #e0e0e0; }
+  body.light-mode .ops-grid td:first-child { background: white; }
+  body.light-mode .ops-grid tr:hover td:first-child { background: #f8f9fa; }
+  body.light-mode .ops-grid .district-row td:first-child { background: rgba(227,24,55,0.04); }
+  body.light-mode .ops-grid .totals-row td:first-child { background: #f0f2f5; }
   body.light-mode .ops-grid td { border-bottom-color: #f0f2f5; color: #1a1a2e; }
   body.light-mode .ops-grid td:first-child { color: #1a1a2e; }
   body.light-mode .ops-grid tr:hover td { background: rgba(0,0,0,0.02); }
@@ -2999,11 +3026,11 @@
     <!-- Operations Command Grid -->
     <div class="ops-grid-wrap">
       <h3>Operations Command Grid <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Performance by Store</span></h3>
-      <div style="max-height:500px;overflow-y:auto;">
+      <div class="ops-grid-scroll">
         <table class="ops-grid" id="opsCommandGrid">
           <thead>
             <tr>
-              <th style="min-width:120px;">Store / District</th>
+              <th style="min-width:140px;position:sticky;left:0;z-index:3;background:var(--card);">Store / District</th>
               <th title="Guest Count — Total invoices/vehicles serviced">GC</th>
               <th title="Cars Per Day — Guest count divided by business days in the selected range">CPD</th>
               <th title="Net Sales — Total revenue after discounts">Net Sales</th>
