@@ -2078,6 +2078,9 @@
     <input type="date" id="filterTo" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:130px;">
     <button class="btn-configure" onclick="applyFilters()" style="background:var(--primary);color:white;border-color:var(--primary);font-size:11px;padding:6px 12px;">Apply</button>
     <button class="btn-configure" onclick="openDistrictModal()" style="border-color:var(--blue);color:var(--blue);font-size:11px;padding:5px 10px;">Districts</button>
+    <div id="dataSavedBadge" style="display:none;align-items:center;gap:6px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:6px;padding:4px 10px;font-size:10px;color:var(--green);font-weight:600;cursor:pointer;" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Data persisted. Click to clear and re-upload.">
+      <span style="width:6px;height:6px;background:var(--green);border-radius:50%;"></span> Data Saved
+    </div>
     <div style="width:1px;height:24px;background:var(--border);"></div>
     <button class="btn-configure admin-only" id="alertsBtn" onclick="openAlerts()" style="border-color:var(--orange);color:var(--orange);font-size:11px;padding:5px 10px;">Alerts</button>
     <div class="client-badge" id="clientBadge" onclick="openSettings()">
@@ -2289,6 +2292,11 @@
   <button class="file-input-btn" onclick="document.getElementById('fileInput').click()">Choose Files</button>
   <input type="file" id="fileInput" multiple accept=".csv,.CSV">
   <div class="file-list" id="fileList"></div>
+  <div id="restoreDataHint" style="display:none;margin-top:16px;padding:14px 20px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;text-align:center;">
+    <div style="font-size:13px;color:var(--green);font-weight:600;margin-bottom:4px;">Previously saved data found</div>
+    <div id="restoreDataInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;"></div>
+    <button class="btn-save" onclick="if(loadUserData()){launchDashboard();updateDataSavedIndicator(true);}" style="padding:10px 24px;border-radius:8px;font-size:13px;">Restore Saved Data</button>
+  </div>
 </div>
 
 <!-- Dashboard -->
@@ -3301,6 +3309,109 @@ const fileLabels = {
 
 let loadedFiles = {};
 
+// ============================================================
+// DATA PERSISTENCE PER ACCOUNT
+// ============================================================
+function getDataStorageKey() {
+  const cu = getCurrentUser();
+  return cu ? 'bp_data_' + cu.email.replace(/[^a-zA-Z0-9]/g, '_') : null;
+}
+
+function saveUserData() {
+  const key = getDataStorageKey();
+  if (!key) return;
+  try {
+    const payload = {
+      data: DATA,
+      loadedFiles: loadedFiles,
+      savedAt: new Date().toISOString(),
+      version: 2
+    };
+    const json = JSON.stringify(payload);
+    // Check size — localStorage typically allows ~5-10MB
+    if (json.length > 8 * 1024 * 1024) {
+      console.warn('Data too large for localStorage (' + (json.length / 1024 / 1024).toFixed(1) + 'MB). Skipping save.');
+      return false;
+    }
+    localStorage.setItem(key, json);
+    updateDataSavedIndicator(true);
+    return true;
+  } catch(e) {
+    console.warn('Failed to save user data:', e.message);
+    // Try to free space by removing old data keys
+    if (e.name === 'QuotaExceededError') {
+      console.warn('Storage quota exceeded. Data will not persist between sessions.');
+    }
+    return false;
+  }
+}
+
+function loadUserData() {
+  const key = getDataStorageKey();
+  if (!key) return false;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return false;
+    const payload = JSON.parse(raw);
+    if (!payload.data || !payload.loadedFiles) return false;
+    // Restore DATA and loadedFiles
+    Object.keys(payload.data).forEach(type => {
+      if (payload.data[type] && payload.data[type].length > 0) {
+        DATA[type] = payload.data[type];
+      }
+    });
+    Object.assign(loadedFiles, payload.loadedFiles);
+    return true;
+  } catch(e) {
+    console.warn('Failed to load user data:', e.message);
+    return false;
+  }
+}
+
+function clearUserData() {
+  const key = getDataStorageKey();
+  if (key) localStorage.removeItem(key);
+  // Reset DATA
+  DATA = { invoices: [], promos: [], odi: [], details: [], customers: [], inspections: [] };
+  loadedFiles = {};
+  FILTERED = {};
+  // Show upload zone, hide dashboard
+  document.getElementById('uploadZone').style.display = '';
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('fileList').innerHTML = '';
+  updateDataSavedIndicator(false);
+}
+
+function getUserDataInfo() {
+  const key = getDataStorageKey();
+  if (!key) return null;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const payload = JSON.parse(raw);
+    const types = Object.keys(payload.loadedFiles || {});
+    const totalRows = types.reduce((sum, t) => sum + (payload.data[t]?.length || 0), 0);
+    return {
+      savedAt: payload.savedAt,
+      types: types,
+      totalRows: totalRows,
+      sizeKB: Math.round(raw.length / 1024)
+    };
+  } catch(e) { return null; }
+}
+
+function updateDataSavedIndicator(saved) {
+  const el = document.getElementById('dataSavedBadge');
+  if (!el) return;
+  if (saved) {
+    const info = getUserDataInfo();
+    el.style.display = 'flex';
+    el.title = info ? 'Data saved: ' + info.totalRows.toLocaleString() + ' rows (' + info.sizeKB + 'KB) — Last saved: ' + new Date(info.savedAt).toLocaleString() : 'Data saved';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
 function processFile(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -3348,6 +3459,22 @@ fileInput.addEventListener('change', async () => {
   await handleFiles(fileInput.files);
 });
 
+// Show restore hint if user has saved data
+setTimeout(() => {
+  const cu = getCurrentUser();
+  if (cu) {
+    const info = getUserDataInfo();
+    if (info && info.totalRows > 0) {
+      const hint = document.getElementById('restoreDataHint');
+      const infoEl = document.getElementById('restoreDataInfo');
+      if (hint && infoEl) {
+        infoEl.textContent = info.totalRows.toLocaleString() + ' rows across ' + info.types.length + ' files — saved ' + new Date(info.savedAt).toLocaleDateString();
+        hint.style.display = 'block';
+      }
+    }
+  }
+}, 500);
+
 async function handleFiles(files) {
   const results = [];
   for (const file of files) {
@@ -3365,7 +3492,10 @@ async function handleFiles(files) {
 
   const loadedCount = Object.keys(loadedFiles).length;
   if (loadedCount >= 2) {
-    setTimeout(() => launchDashboard(), 500);
+    setTimeout(() => {
+      launchDashboard();
+      saveUserData(); // Persist data for this account
+    }, 500);
   }
 }
 
@@ -8771,6 +8901,17 @@ async function doLogin() {
   }
 
   updateUserAvatar(getCurrentUser());
+
+  // Auto-restore saved data for this account
+  if (loadUserData()) {
+    const info = getUserDataInfo();
+    const fileListEl = document.getElementById('fileList');
+    if (fileListEl && info) {
+      fileListEl.innerHTML = `<div class="file-item"><span class="check">✓</span><span class="name">Saved Data</span><span class="rows">${info.totalRows.toLocaleString()} rows restored from ${new Date(info.savedAt).toLocaleDateString()}</span></div>`;
+    }
+    launchDashboard();
+    updateDataSavedIndicator(true);
+  }
 }
 
 function doLogout() {
@@ -8963,6 +9104,11 @@ loadTheme();
   if (currentUser) {
     document.getElementById('loginScreen').classList.add('hidden');
     updateUserAvatar(currentUser);
+    // Auto-restore saved data if available
+    if (loadUserData()) {
+      launchDashboard();
+      updateDataSavedIndicator(true);
+    }
   }
   document.getElementById('loadingScreen').classList.add('hidden');
 })();
