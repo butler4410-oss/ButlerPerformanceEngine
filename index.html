@@ -1275,12 +1275,13 @@
 
   /* BPA Insights Panel */
   .bpa-panel {
-    background: linear-gradient(135deg, rgba(26,26,46,0.95) 0%, rgba(22,33,62,0.95) 100%);
+    background: var(--card);
     border: 1px solid var(--border);
-    border-left: 4px solid var(--primary);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 24px;
+    border-left: 3px solid var(--primary);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    font-family: 'DM Sans', sans-serif;
   }
 
   .bpa-header {
@@ -1297,20 +1298,22 @@
   }
 
   .bpa-logo {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
     text-transform: uppercase;
     color: var(--primary);
-    background: rgba(227,24,55,0.1);
-    padding: 5px 10px;
-    border-radius: 5px;
+    background: rgba(227,24,55,0.06);
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
   }
 
   .bpa-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
+    font-family: 'DM Sans', sans-serif;
   }
 
   .bpa-toggle {
@@ -1324,48 +1327,57 @@
     transition: all 0.15s;
   }
 
-  .bpa-toggle:hover { color: white; border-color: var(--text-muted); }
+  .bpa-toggle:hover { color: var(--text); border-color: var(--text-muted); }
 
   .bpa-insights { display: flex; flex-direction: column; gap: 8px; }
 
   .bpa-insight {
+    background: rgba(255,255,255,0.015);
+    border: 1px solid var(--border);
+    border-left: 4px solid transparent;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bpa-insight:hover { background: rgba(255,255,255,0.035); }
+
+  .bpa-insight.critical { border-left-color: var(--red); }
+  .bpa-insight.warning { border-left-color: var(--orange); }
+  .bpa-insight.suggestion { border-left-color: var(--blue); }
+  .bpa-insight.positive { border-left-color: var(--green); }
+
+  .bpa-insight-top {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    line-height: 1.4;
-    transition: background 0.1s;
   }
-
-  .bpa-insight:hover { background: rgba(255,255,255,0.02); }
 
   .bpa-insight .bpa-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     flex-shrink: 0;
-    margin-top: 1px;
+    margin-top: 6px;
   }
 
-  .bpa-insight.critical .bpa-icon { background: rgba(255,23,68,0.15); color: var(--red); }
-  .bpa-insight.warning .bpa-icon { background: rgba(255,145,0,0.15); color: var(--orange); }
-  .bpa-insight.suggestion .bpa-icon { background: rgba(68,138,255,0.15); color: var(--blue); }
-  .bpa-insight.positive .bpa-icon { background: rgba(0,200,83,0.15); color: var(--green); }
+  .bpa-insight.critical .bpa-icon { background: var(--red); }
+  .bpa-insight.warning .bpa-icon { background: var(--orange); }
+  .bpa-insight.suggestion .bpa-icon { background: var(--blue); }
+  .bpa-insight.positive .bpa-icon { background: var(--green); }
 
-  .bpa-insight .bpa-msg { color: var(--text); }
-  .bpa-insight .bpa-msg strong { color: white; }
-  .bpa-insight .bpa-msg .bpa-detail { color: var(--text-muted); font-size: 11px; display: block; margin-top: 2px; }
+  .bpa-insight .bpa-msg { color: var(--text); font-family: 'DM Sans', sans-serif; flex: 1; }
+  .bpa-insight .bpa-msg strong { color: var(--text); }
+  .bpa-insight .bpa-msg .bpa-detail { color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px; line-height: 1.4; }
 
   .bpa-empty {
     text-align: center;
-    padding: 12px;
+    padding: 16px;
     color: var(--text-muted);
     font-size: 12px;
     font-style: italic;
@@ -1375,20 +1387,22 @@
     display: flex;
     gap: 6px;
     margin-top: 6px;
+    margin-left: 18px;
     flex-wrap: wrap;
   }
 
   .bpa-action-btn {
-    background: rgba(255,255,255,0.05);
+    background: transparent;
     border: 1px solid var(--border);
-    color: var(--text);
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-size: 11px;
+    color: var(--text-muted);
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-size: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
   }
 
   .bpa-action-btn:hover {
@@ -1400,6 +1414,36 @@
   .bpa-action-btn.green:hover { background: var(--green); border-color: var(--green); }
   .bpa-action-btn.blue:hover { background: var(--blue); border-color: var(--blue); }
   .bpa-action-btn.orange:hover { background: var(--orange); border-color: var(--orange); }
+
+  /* Filter Summary Pill */
+  .filter-summary {
+    background: rgba(227,24,55,0.06);
+    border: 1px solid rgba(227,24,55,0.15);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    padding: 4px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .filter-summary:empty { display: none; }
+  body.light-mode .filter-summary {
+    background: rgba(227,24,55,0.05);
+    border-color: rgba(227,24,55,0.12);
+    color: #1a1a2e;
+  }
+
+  /* BPA Light Mode Overrides */
+  body.light-mode .bpa-panel { background: #fff; border-color: #e0e0e0; }
+  body.light-mode .bpa-insight { background: #fafafa; border-color: #e8e8e8; }
+  body.light-mode .bpa-insight:hover { background: #f3f3f3; }
+  body.light-mode .bpa-insight.critical { border-left-color: var(--red); }
+  body.light-mode .bpa-insight.warning { border-left-color: var(--orange); }
+  body.light-mode .bpa-insight.suggestion { border-left-color: var(--blue); }
+  body.light-mode .bpa-insight.positive { border-left-color: var(--green); }
+  body.light-mode .bpa-action-btn { background: transparent; border-color: #ddd; color: #555; }
+  body.light-mode .bpa-action-btn:hover { color: white; }
+  body.light-mode .bpa-logo { background: rgba(227,24,55,0.06); }
 
   /* Checklist */
   .checklist-section {
@@ -2348,7 +2392,7 @@
   body.light-mode tbody tr.clickable-row:hover { background: rgba(227,24,55,0.06); }
 
   body.light-mode .bpa-panel {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    background: #ffffff;
     border-color: #e0e0e0;
   }
 
@@ -2581,13 +2625,15 @@
 
   <!-- Tier 2: Command Bar -->
   <div class="command-bar">
-    <span class="cmd-label">Store</span>
+    <span class="cmd-label" style="font-weight:600;color:var(--text);font-size:11px;">Viewing:</span>
     <select id="filterStore" class="cmd-select"><option value="">All Stores</option></select>
     <span class="cmd-label" style="margin-left:8px;">From</span>
     <input type="date" id="filterFrom" class="cmd-input">
     <span class="cmd-label">To</span>
     <input type="date" id="filterTo" class="cmd-input">
-    <button class="cmd-btn cmd-btn-primary" onclick="applyFilters()">Apply</button>
+    <button class="cmd-btn cmd-btn-primary" onclick="applyFilters()" style="font-weight:700;padding:5px 16px;">Apply</button>
+    <button class="cmd-btn" onclick="resetFilters()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:11px;padding:4px 10px;">Reset</button>
+    <span id="filterSummary" class="filter-summary"></span>
     <button class="cmd-btn cmd-btn-accent" onclick="openDistrictModal()">Districts</button>
     <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Data persisted — click to clear and re-upload">
       <span class="data-saved-dot"></span> Saved
@@ -4083,6 +4129,27 @@ function applyFilters() {
   FILTERED.invoices = DATA.invoices.filter(filterRow);
 
   renderDashboard();
+  updateFilterSummary();
+}
+
+function updateFilterSummary() {
+  const el = document.getElementById('filterSummary');
+  if (!el) return;
+  const sel = document.getElementById('filterStore');
+  const storeTxt = sel.value ? 'Store #' + sel.value : (sel.options[0] ? sel.options[0].textContent : 'All Stores');
+  const fromVal = document.getElementById('filterFrom').value;
+  const toVal = document.getElementById('filterTo').value;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function niceDate(iso) {
+    if (!iso) return '';
+    const p = iso.split('-');
+    return months[+p[1]-1] + ' ' + +p[2] + ', ' + p[0];
+  }
+  let txt = storeTxt;
+  if (fromVal && toVal) txt += ' \u00B7 ' + niceDate(fromVal) + ' \u2013 ' + niceDate(toVal);
+  else if (fromVal) txt += ' \u00B7 From ' + niceDate(fromVal);
+  else if (toVal) txt += ' \u00B7 To ' + niceDate(toVal);
+  el.textContent = txt;
 }
 
 function resetFilters() {
@@ -4110,6 +4177,7 @@ function launchDashboard() {
     arr.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
   });
   const sel = document.getElementById('filterStore');
+  sel.innerHTML = `<option value="">All Stores (${stores.size})</option>`;
   [...stores].sort((a,b) => +a - +b).forEach(s => {
     sel.innerHTML += `<option value="${s}">${s}</option>`;
   });
@@ -4133,6 +4201,7 @@ function launchDashboard() {
   ensureActiveTab();
 
   applyFilters();
+  updateFilterSummary();
 }
 
 // ============================================================
@@ -4189,7 +4258,6 @@ function bpaHTML(panelId, title, insights) {
     return;
   }
   el.style.display = 'block';
-  const icons = { critical: '!', warning: '!', suggestion: '?', positive: '&#10003;' };
   el.innerHTML = `
     <div class="bpa-header">
       <div class="bpa-header-left">
@@ -4197,12 +4265,22 @@ function bpaHTML(panelId, title, insights) {
         <span class="bpa-title">${title}</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:11px;color:var(--text-muted);">${insights.length} insight${insights.length>1?'s':''}</span>
+        <span style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">${insights.length} insight${insights.length>1?'s':''}</span>
         <button class="bpa-action-btn green" onclick="bpaExportInsights('${panelId}')" style="font-size:10px;padding:3px 8px;">Email All</button>
       </div>
     </div>
     <div class="bpa-insights">
-      ${insights.map(i => `<div class="bpa-insight ${i.type}"><div class="bpa-icon">${icons[i.type]||'?'}</div><div class="bpa-msg">${i.msg}${i.detail ? '<span class="bpa-detail">'+i.detail+'</span>' : ''}${i.actions ? '<div class="bpa-actions">'+i.actions.map(a => '<button class="bpa-action-btn '+(a.color||'')+'" onclick="'+a.onclick.replace(/"/g,'&quot;')+'">'+a.label+'</button>').join('')+'</div>' : ''}</div></div>`).join('')}
+      ${insights.map(i => `
+        <div class="bpa-insight ${i.type}">
+          <div class="bpa-insight-top">
+            <div class="bpa-icon"></div>
+            <div class="bpa-msg">
+              ${i.msg}
+              ${i.detail ? '<span class="bpa-detail">'+i.detail+'</span>' : ''}
+            </div>
+          </div>
+          ${i.actions ? '<div class="bpa-actions">'+i.actions.map(a => '<button class="bpa-action-btn '+(a.color||'')+'" onclick="'+a.onclick.replace(/"/g,'&quot;')+'">'+a.label+'</button>').join('')+'</div>' : ''}
+        </div>`).join('')}
     </div>
   `;
 }
