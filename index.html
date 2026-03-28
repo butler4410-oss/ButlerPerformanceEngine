@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Butler Performance - Analytics</title>
+<title>Butler Performance Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -11,61 +14,110 @@
   :root {
     --primary: #e31837;
     --primary-dark: #b8132d;
-    --accent: #1a1a2e;
-    --accent-light: #16213e;
-    --bg: #0f0f1a;
-    --card: #1a1a2e;
-    --card-hover: #1e2240;
+    --accent: #0d0d1a;
+    --accent-light: #131328;
+    --bg: #0a0a14;
+    --card: #12122a;
+    --card-hover: #1a1a3a;
     --text: #e8e8f0;
-    --text-muted: #8888a8;
-    --border: #2a2a45;
+    --text-muted: #7878a0;
+    --border: #1e1e3a;
     --green: #00c853;
     --yellow: #ffd600;
     --orange: #ff9100;
     --red: #ff1744;
     --blue: #448aff;
+    --nav-height: 0px;
+    --surface-glass: rgba(18,18,42,0.85);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* Header */
+  /* ═══════════════════════════════════════════
+     NAVIGATION SYSTEM — 3-tier command center
+     ═══════════════════════════════════════════ */
+
+  .nav-shell {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: var(--accent);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* ── Tier 1: Top Bar ── */
   .header {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-    border-bottom: 3px solid var(--primary);
-    padding: 16px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    padding: 0 24px;
+    height: 48px;
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
   }
 
   .logo-area {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: -1px;
   }
 
   .logo-text {
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: 1px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
     color: white;
-    text-transform: uppercase;
-    line-height: 1.1;
-    font-style: italic;
+    text-transform: none;
+    letter-spacing: -0.3px;
+    line-height: 1;
+    font-style: normal;
   }
 
   .logo-text .red { color: var(--primary); }
 
+  .logo-divider {
+    width: 1px;
+    height: 16px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 4px;
+  }
+
+  .logo-analytics {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* Keep old .logo-line for loading screen compat */
   .logo-line {
     width: 100%;
     height: 2px;
@@ -73,12 +125,39 @@
     margin: 5px 0 4px;
   }
 
-  .logo-analytics {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 8px;
-    color: var(--primary);
-    text-transform: uppercase;
+  .header-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .date-range-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 4px 12px;
+    cursor: default;
+  }
+
+  .date-range-display .date-icon {
+    font-size: 11px;
+    opacity: 0.5;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .header-sub {
@@ -86,31 +165,318 @@
     color: var(--text-muted);
     letter-spacing: 1px;
     text-transform: uppercase;
+    display: none;
   }
 
-  .header-right {
+  .nav-action {
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .nav-action:hover {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+  }
+
+  .nav-action.has-badge::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    background: var(--orange);
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+  }
+
+  .nav-action-text {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .nav-action-text:hover {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+  }
+
+  .nav-sep {
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,0.06);
+    margin: 0 4px;
   }
 
   .client-badge {
-    background: rgba(227,24,55,0.15);
-    border: 1px solid rgba(227,24,55,0.3);
-    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    background: rgba(227,24,55,0.08);
+    border: 1px solid rgba(227,24,55,0.15);
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--primary);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
+    white-space: nowrap;
   }
 
   .client-badge:hover {
-    background: rgba(227,24,55,0.3);
-    border-color: var(--primary);
-    transform: scale(1.02);
+    background: rgba(227,24,55,0.15);
+    border-color: rgba(227,24,55,0.3);
   }
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: 4px;
+  }
+
+  .user-avatar:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 3px rgba(227,24,55,0.2);
+  }
+
+  /* ── Tier 2: Command Bar ── */
+  .command-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 24px;
+    height: 42px;
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .command-bar::-webkit-scrollbar { display: none; }
+
+  .cmd-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    opacity: 0.6;
+    white-space: nowrap;
+    margin-right: 2px;
+  }
+
+  .cmd-select {
+    height: 28px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    padding: 0 10px;
+    padding-right: 24px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237878a0'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+  }
+
+  .cmd-select:hover {
+    border-color: rgba(255,255,255,0.15);
+    background-color: rgba(255,255,255,0.06);
+  }
+
+  .cmd-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(227,24,55,0.15);
+  }
+
+  .cmd-select option { background: var(--accent); color: var(--text); }
+
+  .cmd-input {
+    height: 28px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    padding: 0 10px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    width: 120px;
+    transition: all 0.15s;
+  }
+
+  .cmd-input:hover {
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .cmd-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(227,24,55,0.15);
+  }
+
+  .cmd-btn {
+    height: 28px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .cmd-btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .cmd-btn-primary:hover { background: var(--primary-dark); }
+
+  .cmd-btn-ghost {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-muted);
+  }
+
+  .cmd-btn-ghost:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .cmd-btn-accent {
+    background: rgba(68,138,255,0.1);
+    border: 1px solid rgba(68,138,255,0.2);
+    color: var(--blue);
+  }
+
+  .cmd-btn-accent:hover {
+    background: rgba(68,138,255,0.2);
+    border-color: var(--blue);
+  }
+
+  .data-saved-pill {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 10px;
+    background: rgba(0,200,83,0.06);
+    border: 1px solid rgba(0,200,83,0.15);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--green);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .data-saved-pill.visible { display: flex; }
+
+  .data-saved-pill:hover { background: rgba(0,200,83,0.12); }
+
+  .data-saved-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+
+  .cmd-spacer { flex: 1; min-width: 8px; }
+
+  /* ── Tier 3: Tab Rail ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    padding: 0 24px;
+    height: 38px;
+    align-items: stretch;
+    border-bottom: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: rgba(0,0,0,0.15);
+  }
+
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 0 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .tab:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .tab.active {
+    color: white;
+    border-bottom-color: var(--primary);
+    background: rgba(227,24,55,0.06);
+    font-weight: 600;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
   /* Settings Modal */
   .modal-overlay {
@@ -312,7 +678,7 @@
   .file-item .rows { color: var(--text-muted); }
 
   /* Dashboard Layout */
-  .dashboard { display: none; padding: 24px 32px; }
+  .dashboard { display: none; padding: 24px; }
   .dashboard.active { display: block; }
 
   /* Filters Bar */
@@ -1890,48 +2256,49 @@
     display: inline-block;
   }
 
-  .user-avatar {
-    width: 34px;
-    height: 34px;
-    background: var(--primary);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: white;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .user-avatar:hover { transform: scale(1.08); box-shadow: 0 0 0 3px rgba(227,24,55,0.2); }
-
-  /* Responsive */
-  @media (max-width: 900px) {
-    .charts-row { grid-template-columns: 1fr; }
-    .charts-row.three { grid-template-columns: 1fr; }
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    .header { padding: 12px 16px; }
-    .dashboard { padding: 16px; }
-  }
-
   /* Print */
   /* Light Mode */
   body.light-mode {
-    --bg: #f0f2f5;
+    --bg: #f3f4f6;
     --card: #ffffff;
     --card-hover: #f8f9fa;
-    --text: #1a1a2e;
+    --text: #111827;
     --text-muted: #6b7280;
-    --border: #e0e0e0;
+    --border: #e5e7eb;
     --accent: #ffffff;
     --accent-light: #f8f9fa;
+    --surface-glass: rgba(255,255,255,0.92);
   }
 
-  body.light-mode .header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  body.light-mode .nav-shell {
+    background: #111827;
+    border-bottom-color: rgba(255,255,255,0.08);
   }
+
+  body.light-mode .header { border-bottom-color: rgba(255,255,255,0.06); }
+  body.light-mode .command-bar { background: rgba(0,0,0,0.15); border-bottom-color: rgba(255,255,255,0.04); }
+  body.light-mode .tabs { background: rgba(0,0,0,0.1); }
+
+  /* Nav shell always stays dark even in light mode */
+  body.light-mode .logo-text { color: white; }
+  body.light-mode .logo-mark { background: var(--primary); color: white; }
+  body.light-mode .cmd-select { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #e8e8f0; }
+  body.light-mode .cmd-select option { background: #111827; color: #e8e8f0; }
+  body.light-mode .cmd-input { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #e8e8f0; }
+  body.light-mode .cmd-btn-ghost { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #9ca3af; }
+  body.light-mode .cmd-btn-ghost:hover { background: rgba(255,255,255,0.1); color: #e8e8f0; }
+  body.light-mode .cmd-label { color: #6b7280; }
+  body.light-mode .nav-action { color: #9ca3af; }
+  body.light-mode .nav-action:hover { color: #e8e8f0; background: rgba(255,255,255,0.08); }
+  body.light-mode .nav-action-text { color: #9ca3af; }
+  body.light-mode .nav-action-text:hover { color: #e8e8f0; background: rgba(255,255,255,0.08); }
+  body.light-mode .nav-sep { background: rgba(255,255,255,0.08); }
+  body.light-mode .tab { color: #9ca3af; }
+  body.light-mode .tab:hover { color: #e8e8f0; background: rgba(255,255,255,0.04); }
+  body.light-mode .tab.active { color: white; background: rgba(227,24,55,0.1); border-bottom-color: var(--primary); }
+  body.light-mode .date-range-display { color: #9ca3af; background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+  body.light-mode .client-badge { color: #f87171; background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.2); }
+  body.light-mode .data-saved-pill { color: #34d399; background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.15); }
 
   body.light-mode .login-screen {
     background: linear-gradient(135deg, #e8ecf1 0%, #f0f2f5 100%);
@@ -2156,34 +2523,63 @@
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
 </div>
 
-<!-- Header -->
-<div class="header">
-  <div class="logo-area">
-    <div>
-      <div class="logo-text"><span class="red">BUTLER</span> PERFORMANCE</div>
-      <div class="logo-line"></div>
-      <div class="logo-analytics">ANALYTICS</div>
+<!-- Navigation Shell -->
+<div class="nav-shell">
+  <!-- Tier 1: Top Bar -->
+  <div class="header">
+    <div class="logo-area">
+      <div class="logo-mark">BP</div>
+      <div class="logo-text"><span class="red">Butler</span> Performance</div>
+      <div class="logo-divider"></div>
+      <div class="logo-analytics">Analytics</div>
+    </div>
+    <div class="header-center">
+      <div class="date-range-display">
+        <span class="date-icon">&#9671;</span>
+        <span id="dateRange">No data loaded</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="client-badge" id="clientBadge" onclick="openSettings()">
+        <span id="clientBadgeText">Set Client</span>
+      </div>
+      <div class="nav-sep"></div>
+      <button class="nav-action admin-only" id="alertsBtn" onclick="openAlerts()" title="Performance Alerts">&#9888;</button>
+      <button class="nav-action" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">&#9790;</button>
+      <button class="nav-action admin-only" onclick="openCreateAccount()" title="Add User">&#43;</button>
+      <button class="nav-action" id="auditLogBtn" onclick="openAuditLog()" title="Audit Log" style="display:none;">&#8942;</button>
+      <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
     </div>
   </div>
-  <div class="header-right" style="gap:10px;">
-    <!-- Filters in header -->
-    <select id="filterStore" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;min-width:100px;"><option value="">All Stores</option></select>
-    <input type="date" id="filterFrom" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:130px;">
-    <input type="date" id="filterTo" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:130px;">
-    <button class="btn-configure" onclick="applyFilters()" style="background:var(--primary);color:white;border-color:var(--primary);font-size:11px;padding:6px 12px;">Apply</button>
-    <button class="btn-configure" onclick="openDistrictModal()" style="border-color:var(--blue);color:var(--blue);font-size:11px;padding:5px 10px;">Districts</button>
-    <div id="dataSavedBadge" style="display:none;align-items:center;gap:6px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:6px;padding:4px 10px;font-size:10px;color:var(--green);font-weight:600;cursor:pointer;" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Data persisted. Click to clear and re-upload.">
-      <span style="width:6px;height:6px;background:var(--green);border-radius:50%;"></span> Data Saved
+
+  <!-- Tier 2: Command Bar -->
+  <div class="command-bar">
+    <span class="cmd-label">Store</span>
+    <select id="filterStore" class="cmd-select"><option value="">All Stores</option></select>
+    <span class="cmd-label" style="margin-left:8px;">From</span>
+    <input type="date" id="filterFrom" class="cmd-input">
+    <span class="cmd-label">To</span>
+    <input type="date" id="filterTo" class="cmd-input">
+    <button class="cmd-btn cmd-btn-primary" onclick="applyFilters()">Apply</button>
+    <button class="cmd-btn cmd-btn-accent" onclick="openDistrictModal()">Districts</button>
+    <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Data persisted — click to clear and re-upload">
+      <span class="data-saved-dot"></span> Saved
     </div>
-    <div style="width:1px;height:24px;background:var(--border);"></div>
-    <button class="btn-configure admin-only" id="alertsBtn" onclick="openAlerts()" style="border-color:var(--orange);color:var(--orange);font-size:11px;padding:5px 10px;">Alerts</button>
-    <div class="client-badge" id="clientBadge" onclick="openSettings()">
-      <span id="clientBadgeText">Click to set client</span>
-    </div>
-    <button class="btn-configure admin-only" onclick="openCreateAccount()" style="font-size:10px;padding:4px 10px;">+ User</button>
-    <button class="btn-configure" onclick="toggleTheme()" id="themeToggle" style="font-size:11px;padding:5px 10px;" title="Toggle light/dark mode">Light</button>
-    <button class="btn-configure" id="auditLogBtn" onclick="openAuditLog()" style="font-size:10px;padding:4px 10px;display:none;">Audit</button>
-    <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
+    <div class="cmd-spacer"></div>
+  </div>
+
+  <!-- Tier 3: Tab Rail -->
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="revenue">Revenue</button>
+    <button class="tab" data-tab="inspections">Inspections</button>
+    <button class="tab" data-tab="promos">Promos</button>
+    <button class="tab" data-tab="operations">Operations</button>
+    <button class="tab" data-tab="customers">Customers</button>
+    <button class="tab company-admin-only" data-tab="segments">Segments</button>
+    <button class="tab company-admin-only" data-tab="marketing">Marketing</button>
+    <button class="tab" data-tab="reporting">Reporting</button>
+    <button class="tab" data-tab="stores">Rankings</button>
   </div>
 </div>
 
@@ -2406,19 +2802,7 @@
     </div>
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab active" data-tab="overview">Overview</button>
-    <button class="tab" data-tab="revenue">Revenue & Services</button>
-    <button class="tab" data-tab="inspections">Inspections</button>
-    <button class="tab" data-tab="promos">Promotions</button>
-    <button class="tab" data-tab="operations">Operations</button>
-    <button class="tab" data-tab="customers">Customers</button>
-    <button class="tab company-admin-only" data-tab="segments">Segments</button>
-    <button class="tab company-admin-only" data-tab="marketing">Marketing</button>
-    <button class="tab" data-tab="reporting">Reporting</button>
-    <button class="tab" data-tab="stores">Store Rankings</button>
-  </div>
+  <!-- Tabs moved to nav-shell above -->
 
   <!-- OVERVIEW TAB -->
   <div class="tab-content active" id="tab-overview">
@@ -3499,10 +3883,10 @@ function updateDataSavedIndicator(saved) {
   if (!el) return;
   if (saved) {
     const info = getUserDataInfo();
-    el.style.display = 'flex';
+    el.classList.add('visible');
     el.title = info ? 'Data saved: ' + info.totalRows.toLocaleString() + ' rows (' + info.sizeKB + 'KB) — Last saved: ' + new Date(info.savedAt).toLocaleString() : 'Data saved';
   } else {
-    el.style.display = 'none';
+    el.classList.remove('visible');
   }
 }
 
@@ -9178,7 +9562,8 @@ resetInactivityTimer();
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light-mode');
   localStorage.setItem('bp_theme', isLight ? 'light' : 'dark');
-  document.getElementById('themeToggle').textContent = isLight ? 'Dark' : 'Light';
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.innerHTML = isLight ? '&#9728;' : '&#9790;';
 }
 
 function loadTheme() {
@@ -9186,7 +9571,7 @@ function loadTheme() {
   if (theme === 'light') {
     document.body.classList.add('light-mode');
     const btn = document.getElementById('themeToggle');
-    if (btn) btn.textContent = 'Dark';
+    if (btn) btn.innerHTML = '&#9728;';
   }
 }
 loadTheme();
