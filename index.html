@@ -1113,6 +1113,347 @@
   .campaign-status.sent { background: rgba(68,138,255,0.15); color: var(--blue); }
   .campaign-status.active { background: rgba(227,24,55,0.15); color: var(--primary); }
 
+  /* Tokens System */
+  .tokens-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .tokens-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: rgba(0,0,0,0.15);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tokens-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tokens-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(68,138,255,0.12);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--blue);
+    font-weight: 800;
+  }
+
+  .tokens-description {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tokens-body {
+    padding: 0;
+  }
+
+  .tokens-empty {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .tokens-empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+  }
+
+  .tokens-empty-text {
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .tokens-empty-sub {
+    font-size: 12px;
+  }
+
+  .token-row {
+    display: grid;
+    grid-template-columns: 200px 120px 1fr 100px 60px;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: background 0.1s;
+  }
+
+  .token-row:hover {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .token-row-header {
+    background: rgba(0,0,0,0.15);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    padding: 10px 24px;
+  }
+
+  .token-row-header:hover {
+    background: rgba(0,0,0,0.15);
+  }
+
+  .token-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: white;
+    font-family: 'Consolas', 'Monaco', monospace;
+  }
+
+  .token-type-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .token-type-badge.text { background: rgba(68,138,255,0.15); color: var(--blue); }
+  .token-type-badge.url { background: rgba(0,200,83,0.15); color: var(--green); }
+  .token-type-badge.date { background: rgba(255,145,0,0.15); color: var(--orange); }
+  .token-type-badge.image { background: rgba(227,24,55,0.15); color: var(--primary); }
+  .token-type-badge.number { background: rgba(255,214,0,0.15); color: var(--yellow); }
+
+  .token-value {
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .token-overrides {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .token-overrides .has-overrides {
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  .token-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  .token-action-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+
+  .token-action-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  .token-action-btn.delete:hover {
+    background: rgba(255,23,68,0.15);
+    color: var(--red);
+    border-color: rgba(255,23,68,0.3);
+  }
+
+  /* Token Modal */
+  .token-modal {
+    width: 520px;
+    max-width: 90vw;
+  }
+
+  .token-modal .form-group { margin-bottom: 16px; }
+
+  .token-modal .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .token-preview {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    color: var(--blue);
+  }
+
+  .token-overrides-section {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 8px;
+  }
+
+  .token-overrides-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .token-overrides-title span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .token-override-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 32px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .token-override-row select,
+  .token-override-row input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .token-override-remove {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .token-override-remove:hover {
+    background: rgba(255,23,68,0.15);
+    color: var(--red);
+    border-color: rgba(255,23,68,0.3);
+  }
+
+  .btn-add-override {
+    background: rgba(68,138,255,0.08);
+    border: 1px dashed rgba(68,138,255,0.3);
+    color: var(--blue);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    transition: all 0.15s;
+  }
+
+  .btn-add-override:hover {
+    background: rgba(68,138,255,0.15);
+    border-color: var(--blue);
+  }
+
+  .btn-new-token {
+    background: var(--primary);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+
+  .btn-new-token:hover {
+    background: var(--primary-dark);
+    transform: scale(1.02);
+  }
+
+  .token-search {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px 8px 34px;
+    border-radius: 8px;
+    font-size: 12px;
+    width: 220px;
+    transition: border-color 0.15s;
+  }
+
+  .token-search:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .token-search-wrap {
+    position: relative;
+  }
+
+  .token-search-wrap::before {
+    content: '\26B2';
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 13px;
+    pointer-events: none;
+  }
+
+  .token-copy-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.15s;
+    margin-left: 4px;
+  }
+
+  .token-row:hover .token-copy-hint {
+    opacity: 1;
+  }
+
   /* Alert Banner */
   .alert-banner {
     display: none;
@@ -2120,6 +2461,82 @@
 
     <!-- Hero KPIs -->
     <div class="kpi-grid" id="mktgKPIs"></div>
+
+    <!-- Dynamic Tokens Manager -->
+    <div class="tokens-container">
+      <div class="tokens-header">
+        <div class="tokens-header-left">
+          <div class="tokens-icon">{}</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:white;">Tokens</div>
+            <div style="font-size:11px;color:var(--text-muted);">Dynamic content for campaigns</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="token-search-wrap">
+            <input type="text" class="token-search" id="tokenSearch" placeholder="Search tokens..." oninput="filterTokens()">
+          </div>
+          <button class="btn-new-token" onclick="openTokenModal()">+ New Token</button>
+        </div>
+      </div>
+      <div class="tokens-description">
+        Create and manage dynamic tokens to personalize your campaign content at scale. Use tokens to insert custom text, URLs, or calculated values that update automatically across multiple locations. Override token values for specific locations when needed. Reference tokens in campaigns and emails using <strong style="color:var(--blue);font-family:Consolas,Monaco,monospace;">{{token_name}}</strong> syntax.
+      </div>
+      <div class="tokens-body">
+        <div class="token-row token-row-header">
+          <div>Token Name</div>
+          <div>Type</div>
+          <div>Default Value</div>
+          <div style="text-align:center;">Overrides</div>
+          <div></div>
+        </div>
+        <div id="tokensList"></div>
+      </div>
+    </div>
+
+    <!-- Token Create/Edit Modal -->
+    <div class="modal-overlay" id="tokenModal">
+      <div class="modal token-modal">
+        <h3 id="tokenModalTitle">New Token</h3>
+        <input type="hidden" id="tokenEditIndex" value="-1">
+        <div class="token-modal .form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Token Name</label>
+            <input type="text" id="tokenName" placeholder="e.g. manager_name" oninput="updateTokenPreview()">
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="tokenType">
+              <option value="text">Text</option>
+              <option value="url">URL</option>
+              <option value="image">Image URL</option>
+              <option value="date">Date</option>
+              <option value="number">Number</option>
+            </select>
+          </div>
+        </div>
+        <div class="token-preview" id="tokenPreview">{{token_name}}</div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="tokenDescription" placeholder="What this token is used for">
+        </div>
+        <div class="form-group">
+          <label>Default Value</label>
+          <input type="text" id="tokenDefaultValue" placeholder="Value used for all locations unless overridden">
+        </div>
+        <div class="token-overrides-section">
+          <div class="token-overrides-title">
+            <span>Location Overrides</span>
+            <button class="btn-add-override" onclick="addTokenOverrideRow()" style="width:auto;padding:5px 12px;">+ Add Override</button>
+          </div>
+          <div id="tokenOverrideRows"></div>
+        </div>
+        <div class="modal-buttons" style="margin-top:20px;">
+          <button class="btn-cancel" onclick="closeTokenModal()">Cancel</button>
+          <button class="btn-save" onclick="saveToken()">Save Token</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Campaign Builder + Sidebar -->
     <div style="display:grid;grid-template-columns:7fr 3fr;gap:24px;margin-bottom:24px;">
@@ -5319,6 +5736,7 @@ function renderMarketing() {
   renderCampaignTable();
   initOfferConfigurator();
   renderHandoffChecklist();
+  renderTokens();
 }
 
 function updateBudgetPreview() {
@@ -5703,6 +6121,246 @@ function emailHandoff() {
     window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + '&cc=' + encodeURIComponent('chase@butleranalytics.io'), '_self');
   }
 }
+
+// ============================================================
+// DYNAMIC TOKENS SYSTEM
+// ============================================================
+function getTokens() {
+  try { return JSON.parse(localStorage.getItem('bp_tokens') || '[]'); } catch(e) { return []; }
+}
+function saveTokens(list) { localStorage.setItem('bp_tokens', JSON.stringify(list)); }
+
+function renderTokens() {
+  const tokens = getTokens();
+  const container = document.getElementById('tokensList');
+  if (!container) return;
+
+  if (tokens.length === 0) {
+    container.innerHTML = `
+      <div class="tokens-empty">
+        <div class="tokens-empty-icon">{}</div>
+        <div class="tokens-empty-text">No tokens yet</div>
+        <div class="tokens-empty-sub">Create your first token to personalize campaigns across locations.</div>
+      </div>
+    `;
+    return;
+  }
+
+  const search = (document.getElementById('tokenSearch')?.value || '').toLowerCase();
+  const filtered = search
+    ? tokens.filter(t => t.name.toLowerCase().includes(search) || (t.description||'').toLowerCase().includes(search) || (t.defaultValue||'').toLowerCase().includes(search))
+    : tokens;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="tokens-empty"><div class="tokens-empty-sub">No tokens match your search.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((t, i) => {
+    const realIndex = tokens.indexOf(t);
+    const overrideCount = t.overrides ? Object.keys(t.overrides).length : 0;
+    return `
+      <div class="token-row" data-index="${realIndex}">
+        <div>
+          <span class="token-name" title="Click to copy" onclick="copyTokenSyntax('${t.name}')" style="cursor:pointer;">{{${t.name}}}</span>
+          <span class="token-copy-hint">click to copy</span>
+          ${t.description ? '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">' + escHtml(t.description) + '</div>' : ''}
+        </div>
+        <div><span class="token-type-badge ${t.type}">${t.type}</span></div>
+        <div class="token-value" title="${escHtml(t.defaultValue || '')}">${escHtml(t.defaultValue || '—')}</div>
+        <div class="token-overrides">${overrideCount ? '<span class="has-overrides">' + overrideCount + ' location' + (overrideCount > 1 ? 's' : '') + '</span>' : '<span style="opacity:0.4;">none</span>'}</div>
+        <div class="token-actions">
+          <button class="token-action-btn" onclick="editToken(${realIndex})" title="Edit">&#9998;</button>
+          <button class="token-action-btn delete" onclick="deleteToken(${realIndex})" title="Delete">&#10005;</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterTokens() {
+  renderTokens();
+}
+
+function openTokenModal(editIdx) {
+  const modal = document.getElementById('tokenModal');
+  const isEdit = typeof editIdx === 'number' && editIdx >= 0;
+  document.getElementById('tokenModalTitle').textContent = isEdit ? 'Edit Token' : 'New Token';
+  document.getElementById('tokenEditIndex').value = isEdit ? editIdx : -1;
+
+  if (isEdit) {
+    const tokens = getTokens();
+    const t = tokens[editIdx];
+    document.getElementById('tokenName').value = t.name || '';
+    document.getElementById('tokenType').value = t.type || 'text';
+    document.getElementById('tokenDescription').value = t.description || '';
+    document.getElementById('tokenDefaultValue').value = t.defaultValue || '';
+    // Populate overrides
+    const overridesContainer = document.getElementById('tokenOverrideRows');
+    overridesContainer.innerHTML = '';
+    if (t.overrides) {
+      Object.entries(t.overrides).forEach(([loc, val]) => {
+        addTokenOverrideRow(loc, val);
+      });
+    }
+  } else {
+    document.getElementById('tokenName').value = '';
+    document.getElementById('tokenType').value = 'text';
+    document.getElementById('tokenDescription').value = '';
+    document.getElementById('tokenDefaultValue').value = '';
+    document.getElementById('tokenOverrideRows').innerHTML = '';
+  }
+
+  updateTokenPreview();
+  modal.classList.add('active');
+}
+
+function closeTokenModal() {
+  document.getElementById('tokenModal').classList.remove('active');
+}
+
+function updateTokenPreview() {
+  const name = document.getElementById('tokenName').value.trim().replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase() || 'token_name';
+  document.getElementById('tokenPreview').textContent = '{{' + name + '}}';
+}
+
+function addTokenOverrideRow(location, value) {
+  const container = document.getElementById('tokenOverrideRows');
+  // Get available stores from loaded data
+  let stores = [];
+  try {
+    if (typeof FILTERED !== 'undefined' && FILTERED.customers) {
+      stores = [...new Set(FILTERED.customers.map(r => r.Store_Number))].filter(Boolean).sort((a,b) => +a - +b);
+    }
+  } catch(e) {}
+
+  const row = document.createElement('div');
+  row.className = 'token-override-row';
+  row.innerHTML = `
+    <select class="override-location">
+      <option value="">Select location...</option>
+      ${stores.map(s => `<option value="${s}" ${location == s ? 'selected' : ''}>#${s}</option>`).join('')}
+      ${location && !stores.includes(location) ? `<option value="${location}" selected>#${location}</option>` : ''}
+    </select>
+    <input type="text" class="override-value" placeholder="Override value for this location" value="${escHtml(value || '')}">
+    <button class="token-override-remove" onclick="this.parentElement.remove()" title="Remove">&times;</button>
+  `;
+  container.appendChild(row);
+}
+
+function saveToken() {
+  const name = document.getElementById('tokenName').value.trim().replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+  if (!name) { alert('Token name is required.'); return; }
+
+  const type = document.getElementById('tokenType').value;
+  const description = document.getElementById('tokenDescription').value.trim();
+  const defaultValue = document.getElementById('tokenDefaultValue').value.trim();
+  const editIdx = +document.getElementById('tokenEditIndex').value;
+
+  // Collect overrides
+  const overrides = {};
+  document.querySelectorAll('#tokenOverrideRows .token-override-row').forEach(row => {
+    const loc = row.querySelector('.override-location').value;
+    const val = row.querySelector('.override-value').value.trim();
+    if (loc && val) overrides[loc] = val;
+  });
+
+  const tokens = getTokens();
+
+  // Check for duplicate name (skip self if editing)
+  const dupeIdx = tokens.findIndex(t => t.name === name);
+  if (dupeIdx >= 0 && dupeIdx !== editIdx) {
+    alert('A token with this name already exists.');
+    return;
+  }
+
+  const tokenObj = { name, type, description, defaultValue, overrides, updated: new Date().toISOString() };
+
+  if (editIdx >= 0 && editIdx < tokens.length) {
+    tokens[editIdx] = tokenObj;
+  } else {
+    tokenObj.created = new Date().toISOString();
+    tokens.push(tokenObj);
+  }
+
+  saveTokens(tokens);
+  closeTokenModal();
+  renderTokens();
+}
+
+function editToken(idx) {
+  openTokenModal(idx);
+}
+
+function deleteToken(idx) {
+  if (!confirm('Delete this token? Any campaigns using it will show the raw {{token}} placeholder.')) return;
+  const tokens = getTokens();
+  tokens.splice(idx, 1);
+  saveTokens(tokens);
+  renderTokens();
+}
+
+function copyTokenSyntax(name) {
+  const syntax = '{{' + name + '}}';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(syntax).then(() => {
+      showTokenCopyToast(syntax);
+    });
+  } else {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = syntax;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showTokenCopyToast(syntax);
+  }
+}
+
+function showTokenCopyToast(text) {
+  let toast = document.getElementById('tokenCopyToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'tokenCopyToast';
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--green);color:var(--green);padding:10px 20px;border-radius:8px;font-size:12px;font-weight:600;z-index:10000;opacity:0;transition:opacity 0.2s;pointer-events:none;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = 'Copied: ' + text;
+  toast.style.opacity = '1';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 1800);
+}
+
+// Resolve a token value for a given location (returns default if no override)
+function resolveToken(name, locationId) {
+  const tokens = getTokens();
+  const token = tokens.find(t => t.name === name);
+  if (!token) return '{{' + name + '}}';
+  if (locationId && token.overrides && token.overrides[locationId]) {
+    return token.overrides[locationId];
+  }
+  return token.defaultValue || '';
+}
+
+// Replace all {{token}} placeholders in a string, optionally for a specific location
+function resolveAllTokens(text, locationId) {
+  if (!text) return text;
+  return text.replace(/\{\{([a-zA-Z0-9_-]+)\}\}/g, function(match, name) {
+    return resolveToken(name, locationId);
+  });
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Token modal close handlers
+document.getElementById('tokenModal').addEventListener('click', function(e) {
+  if (e.target === this) closeTokenModal();
+});
 
 // ============================================================
 // REPORTING TAB
