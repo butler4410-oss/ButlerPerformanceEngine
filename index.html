@@ -144,7 +144,7 @@
   .modal h3 {
     font-size: 16px;
     margin-bottom: 20px;
-    color: white;
+    color: var(--text);
   }
 
   .form-group {
@@ -574,7 +574,7 @@
   .kpi-value {
     font-size: 28px;
     font-weight: 700;
-    color: white;
+    color: var(--text);
   }
 
   .kpi-sub {
@@ -667,8 +667,14 @@
   }
 
   thead th.sortable:hover {
-    color: white;
+    color: var(--text);
     background: rgba(255,255,255,0.06);
+  }
+
+  thead th[title] {
+    cursor: help;
+    text-decoration: underline dotted var(--text-muted);
+    text-underline-offset: 3px;
   }
 
   tbody td {
@@ -760,7 +766,7 @@
 
   .cust-modal-header h2 {
     font-size: 18px;
-    color: white;
+    color: var(--text);
   }
 
   .cust-modal-close {
@@ -824,7 +830,7 @@
   }
 
   .cust-field .value {
-    color: white;
+    color: var(--text);
     font-weight: 500;
     text-align: right;
     max-width: 60%;
@@ -851,7 +857,7 @@
   .cust-timeline-step .time {
     font-size: 12px;
     font-weight: 600;
-    color: white;
+    color: var(--text);
   }
 
   .cust-timeline-step .step-label {
@@ -933,7 +939,7 @@
   .bpa-title {
     font-size: 13px;
     font-weight: 600;
-    color: white;
+    color: var(--text);
   }
 
   .bpa-toggle {
@@ -1215,7 +1221,7 @@
   .token-name {
     font-weight: 600;
     font-size: 13px;
-    color: white;
+    color: var(--text);
     font-family: 'Consolas', 'Monaco', monospace;
   }
 
@@ -1558,7 +1564,7 @@
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 14px;
-    color: white;
+    color: var(--text);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1582,6 +1588,7 @@
     top: 0;
   }
   .ops-grid th:first-child { text-align: left; }
+  .ops-grid th[title] { cursor: help; text-decoration: underline dotted var(--text-muted); text-underline-offset: 3px; }
   .ops-grid td {
     padding: 7px 10px;
     text-align: right;
@@ -1647,7 +1654,7 @@
   .today-snapshot-header h3 {
     font-size: 14px;
     font-weight: 700;
-    color: white;
+    color: var(--text);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1674,7 +1681,7 @@
   .today-stat-value {
     font-size: 22px;
     font-weight: 800;
-    color: white;
+    color: var(--text);
   }
   .today-stat-label {
     font-size: 10px;
@@ -1946,6 +1953,7 @@
   }
 
   body.light-mode tbody td { border-bottom-color: #f0f2f5; }
+  body.light-mode thead th.sortable:hover { color: #1a1a2e; background: rgba(0,0,0,0.04); }
   body.light-mode tbody tr:hover { background: rgba(0,0,0,0.02); }
   body.light-mode tbody tr.clickable-row:hover { background: rgba(227,24,55,0.06); }
 
@@ -1971,6 +1979,92 @@
   }
 
   body.light-mode .logo-line { background: rgba(255,255,255,0.3); }
+
+  /* ===== Light Mode: Tokens ===== */
+  body.light-mode .tokens-container { background: white; border-color: #e0e0e0; }
+  body.light-mode .tokens-header { background: #f8f9fa; border-bottom-color: #e0e0e0; }
+  body.light-mode .tokens-header-left .tokens-icon { background: rgba(68,138,255,0.08); }
+  body.light-mode .tokens-description { border-bottom-color: #e0e0e0; color: #6b7280; }
+  body.light-mode .tokens-description strong { color: #448aff; }
+  body.light-mode .token-row { border-bottom-color: #f0f2f5; }
+  body.light-mode .token-row:hover { background: #f8f9fa; }
+  body.light-mode .token-row-header { background: #f0f2f5; color: #6b7280; }
+  body.light-mode .token-row-header:hover { background: #f0f2f5; }
+  body.light-mode .token-name { color: #1a1a2e; }
+  body.light-mode .token-value { color: #1a1a2e; }
+  body.light-mode .token-action-btn { background: #f0f2f5; border-color: #e0e0e0; color: #6b7280; }
+  body.light-mode .token-action-btn:hover { background: #e0e0e0; color: #1a1a2e; }
+  body.light-mode .token-action-btn.delete:hover { background: rgba(255,23,68,0.1); color: #e31837; }
+  body.light-mode .token-modal { background: white; border-color: #e0e0e0; }
+  body.light-mode .token-preview { background: #f8f9fa; border-color: #e0e0e0; color: #448aff; }
+  body.light-mode .token-overrides-section { border-top-color: #e0e0e0; }
+  body.light-mode .token-override-row select,
+  body.light-mode .token-override-row input { background: #f8f9fa; border-color: #e0e0e0; color: #1a1a2e; }
+  body.light-mode .token-override-remove { border-color: #e0e0e0; color: #6b7280; }
+  body.light-mode .token-search { background: white; border-color: #e0e0e0; color: #1a1a2e; }
+  body.light-mode .btn-add-override { background: rgba(68,138,255,0.04); border-color: rgba(68,138,255,0.2); }
+  body.light-mode .tokens-empty-text { color: #1a1a2e; }
+
+  /* ===== Light Mode: District Modal ===== */
+  body.light-mode .district-item { background: #f8f9fa; border-color: #e0e0e0; }
+  body.light-mode .district-item-header input { color: #1a1a2e; }
+  body.light-mode .district-stores-wrap { background: rgba(0,0,0,0.04); }
+  body.light-mode .district-unassigned { background: rgba(0,0,0,0.02); border-color: #e0e0e0; }
+
+  /* ===== Light Mode: Operations Grid ===== */
+  body.light-mode .ops-quick-btn { background: white; border-color: #e0e0e0; color: #6b7280; }
+  body.light-mode .ops-quick-btn:hover { border-color: #e31837; color: #1a1a2e; }
+  body.light-mode .ops-quick-btn.active { background: #e31837; border-color: #e31837; color: white; }
+  body.light-mode .ops-grid-wrap { background: white; border-color: #e0e0e0; }
+  body.light-mode .ops-grid-wrap h3 { color: #1a1a2e; }
+  body.light-mode .ops-grid th { background: #f0f2f5; color: #6b7280; border-bottom-color: #e0e0e0; }
+  body.light-mode .ops-grid td { border-bottom-color: #f0f2f5; color: #1a1a2e; }
+  body.light-mode .ops-grid td:first-child { color: #1a1a2e; }
+  body.light-mode .ops-grid tr:hover td { background: rgba(0,0,0,0.02); }
+  body.light-mode .ops-grid .district-row td { background: rgba(227,24,55,0.04); color: #1a1a2e; border-bottom-color: #e0e0e0; }
+  body.light-mode .ops-grid .district-row:hover td { background: rgba(227,24,55,0.08); }
+  body.light-mode .ops-grid .district-row td:first-child::before { border-left-color: #6b7280; }
+  body.light-mode .ops-grid .totals-row td { background: #f0f2f5; color: #1a1a2e; border-top-color: #e31837; }
+  body.light-mode .cell-green { background: rgba(0,200,83,0.08) !important; color: #00913c; }
+  body.light-mode .cell-yellow { background: rgba(255,214,0,0.10) !important; color: #9e8600; }
+  body.light-mode .cell-red { background: rgba(255,23,68,0.08) !important; color: #c41230; }
+
+  /* ===== Light Mode: Today Snapshot ===== */
+  body.light-mode .today-snapshot { background: linear-gradient(135deg, rgba(227,24,55,0.04) 0%, #f8f9fa 100%); border-color: rgba(227,24,55,0.15); }
+  body.light-mode .today-snapshot-header h3 { color: #1a1a2e; }
+  body.light-mode .today-stat-value { color: #1a1a2e; }
+
+  /* ===== Light Mode: Zero Dollar Section ===== */
+  body.light-mode .zero-dollar-section .kpi-card { background: white; border-color: #e0e0e0; }
+
+  /* ===== Light Mode: General heading and text fixes ===== */
+  body.light-mode .modal h3 { color: #1a1a2e; }
+  body.light-mode .table-wrap h3 { color: #1a1a2e; }
+  body.light-mode .kpi-label { color: #6b7280; }
+  body.light-mode .kpi-sub { color: #6b7280; }
+  body.light-mode .btn-export { background: #f8f9fa; border-color: #e0e0e0; color: #1a1a2e; }
+  body.light-mode .btn-export:hover { background: #e0e0e0; }
+  body.light-mode .btn-configure { border-color: #e0e0e0; color: #6b7280; }
+  body.light-mode .btn-cancel { border-color: #e0e0e0; color: #6b7280; }
+  body.light-mode .checklist-item .ck-text { color: #1a1a2e; }
+  body.light-mode .checklist-section-title { color: #e31837; border-bottom-color: #e0e0e0; }
+  body.light-mode .client-badge { color: #e31837; background: rgba(227,24,55,0.06); border-color: rgba(227,24,55,0.2); }
+  body.light-mode .tab { color: #6b7280; }
+  body.light-mode .tab:hover { color: #1a1a2e; background: rgba(0,0,0,0.03); }
+  body.light-mode .tab.active { color: #e31837; border-bottom-color: #e31837; background: rgba(227,24,55,0.04); }
+  body.light-mode .drop-zone { background: white; border-color: #e0e0e0; color: #1a1a2e; }
+  body.light-mode .drop-zone h2 { color: #1a1a2e; }
+  body.light-mode .drop-zone p { color: #6b7280; }
+  body.light-mode .bpa-insight { color: #1a1a2e; }
+  body.light-mode .bpa-panel h4, body.light-mode .bpa-panel .bpa-title { color: #1a1a2e; }
+  body.light-mode .bpa-action-btn { background: rgba(0,0,0,0.03); border-color: #e0e0e0; color: #1a1a2e; }
+  body.light-mode .campaign-status.draft { color: #6b7280; }
+
+  /* ===== Light Mode: Data saved badge ===== */
+  body.light-mode #dataSavedBadge { background: rgba(0,200,83,0.06); border-color: rgba(0,200,83,0.2); }
+
+  /* ===== Light Mode: Sidebar cards in reporting/marketing ===== */
+  body.light-mode [style*="background:var(--card)"] { background: white !important; }
 
   @media print {
     .header { position: static; }
@@ -2526,17 +2620,17 @@
           <thead>
             <tr>
               <th style="min-width:120px;">Store / District</th>
-              <th>Guest Count</th>
-              <th>CPD</th>
-              <th>Net Sales</th>
-              <th>Ticket Avg</th>
-              <th>Avg Bay</th>
-              <th>Avg Wait</th>
-              <th>MHPV</th>
-              <th>Promos</th>
-              <th>Promo $</th>
-              <th>Inspections</th>
-              <th>Yellow/Red %</th>
+              <th title="Guest Count — Total invoices/vehicles serviced">GC</th>
+              <th title="Cars Per Day — Guest count divided by business days in the selected range">CPD</th>
+              <th title="Net Sales — Total revenue after discounts">Net Sales</th>
+              <th title="Ticket Average — Net sales divided by guest count">TA</th>
+              <th title="Average Bay Time — Time from bay start to bay end (minutes)">Avg Bay</th>
+              <th title="Average Wait Time — Time from customer greet to bay start (minutes)">Avg Wait</th>
+              <th title="Man Hours Per Vehicle — Estimated labor hours per vehicle (bay time / 60)">MHPV</th>
+              <th title="Promotions — Number of promotional codes applied">Promos</th>
+              <th title="Promo Dollars — Total dollar amount of promotional discounts">Promo $</th>
+              <th title="Inspections — Total vehicle inspection items recorded">Insp</th>
+              <th title="Yellow/Red Percentage — Inspection items flagged as needing attention">Y/R %</th>
             </tr>
           </thead>
           <tbody id="opsGridBody"></tbody>
@@ -2580,12 +2674,12 @@
           <thead>
             <tr>
               <th class="sortable" data-col="0">Store #</th>
-              <th class="sortable" data-col="1">Invoices</th>
-              <th class="sortable" data-col="2">Avg Bay Time</th>
-              <th class="sortable" data-col="3">Avg Wait Time</th>
-              <th class="sortable" data-col="4">Avg Total Time</th>
-              <th class="sortable" data-col="5">Revenue</th>
-              <th class="sortable" data-col="6">Avg Ticket</th>
+              <th class="sortable" data-col="1" title="Total invoices/vehicles serviced">Invoices</th>
+              <th class="sortable" data-col="2" title="Average time in the service bay (minutes)">Avg Bay Time</th>
+              <th class="sortable" data-col="3" title="Average wait from greet to bay start (minutes)">Avg Wait Time</th>
+              <th class="sortable" data-col="4" title="Average total time from greet to checkout end (minutes)">Avg Total Time</th>
+              <th class="sortable" data-col="5" title="Total net sales revenue">Revenue</th>
+              <th class="sortable" data-col="6" title="Ticket Average — Revenue divided by invoice count">Avg Ticket</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -2682,7 +2776,7 @@
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;">S</div>
             <div>
-              <div style="font-size:16px;font-weight:700;color:white;">Segment Builder</div>
+              <div style="font-size:16px;font-weight:700;color:var(--text);">Segment Builder</div>
               <div style="font-size:11px;color:var(--text-muted);">Define criteria to segment your customer base</div>
             </div>
           </div>
@@ -2718,7 +2812,7 @@
       <!-- Preview Results -->
       <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
         <div style="padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
-          <div style="font-size:16px;font-weight:700;color:white;">Segment Preview</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text);">Segment Preview</div>
           <div style="font-size:11px;color:var(--text-muted);">Live results from your loaded data</div>
         </div>
         <div style="padding:24px;">
@@ -2764,7 +2858,7 @@
         <div class="tokens-header-left">
           <div class="tokens-icon">{}</div>
           <div>
-            <div style="font-size:16px;font-weight:700;color:white;">Tokens</div>
+            <div style="font-size:16px;font-weight:700;color:var(--text);">Tokens</div>
             <div style="font-size:11px;color:var(--text-muted);">Dynamic content for campaigns</div>
           </div>
         </div>
@@ -2862,7 +2956,7 @@
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="width:40px;height:40px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;">+</div>
             <div>
-              <div style="font-size:16px;font-weight:700;color:white;">New Campaign</div>
+              <div style="font-size:16px;font-weight:700;color:var(--text);">New Campaign</div>
               <div style="font-size:11px;color:var(--text-muted);">Triadex Plastic Postcard Program</div>
             </div>
           </div>
@@ -2920,12 +3014,12 @@
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
             <div style="width:38px;height:38px;background:rgba(227,24,55,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--primary);font-weight:700;">S</div>
             <div>
-              <div style="font-size:14px;font-weight:700;color:white;">Suppression File</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);">Suppression File</div>
               <div style="font-size:11px;color:var(--text-muted);">Exclude existing customers</div>
             </div>
           </div>
           <div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:14px;">Generates a deduplicated CSV from loaded customer data. Attach to Triadex handoff to prevent mailing existing customers.</div>
-          <div id="suppressionCount" style="font-size:22px;font-weight:800;color:white;margin-bottom:14px;">—</div>
+          <div id="suppressionCount" style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:14px;">—</div>
           <button class="btn-save" onclick="generateSuppression()" style="width:100%;justify-content:center;padding:12px;border-radius:10px;">Generate Suppression CSV</button>
         </div>
 
@@ -2934,7 +3028,7 @@
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
             <div style="width:38px;height:38px;background:rgba(68,138,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);font-weight:700;">H</div>
             <div>
-              <div style="font-size:14px;font-weight:700;color:white;">Triadex Handoff</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);">Triadex Handoff</div>
               <div style="font-size:11px;color:var(--text-muted);">Email to Tim, Ryan, Riley</div>
             </div>
           </div>
@@ -2968,7 +3062,7 @@
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="width:40px;height:40px;background:rgba(68,138,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);font-weight:800;">&#9998;</div>
           <div>
-            <div style="font-size:16px;font-weight:700;color:white;">Offer Configurator</div>
+            <div style="font-size:16px;font-weight:700;color:var(--text);">Offer Configurator</div>
             <div style="font-size:11px;color:var(--text-muted);">Select postcard format and define offers for each card slot</div>
           </div>
         </div>
@@ -3046,7 +3140,7 @@
     <!-- Triadex Production Handoff Checklist -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-top:24px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <h3 style="font-size:16px;font-weight:700;color:white;margin:0;">Production Handoff Checklist</h3>
+        <h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0;">Production Handoff Checklist</h3>
         <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Triadex QA Guide</div>
       </div>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Complete all items before emailing Triadex. Progress saves automatically.</div>
@@ -3127,7 +3221,7 @@
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
             <div style="width:38px;height:38px;background:rgba(0,200,83,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--green);font-weight:700;">M</div>
             <div>
-              <div style="font-size:14px;font-weight:700;color:white;">Mailable Customers</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);">Mailable Customers</div>
               <div style="font-size:11px;color:var(--text-muted);">Full address on file</div>
             </div>
           </div>
@@ -3139,7 +3233,7 @@
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
             <div style="width:38px;height:38px;background:rgba(68,138,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--blue);font-weight:700;">Q</div>
             <div>
-              <div style="font-size:14px;font-weight:700;color:white;">Data Quality</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);">Data Quality</div>
               <div style="font-size:11px;color:var(--text-muted);">Contact info coverage</div>
             </div>
           </div>
@@ -3198,14 +3292,14 @@
           <thead>
             <tr>
               <th class="sortable" data-col="0">Store #</th>
-              <th class="sortable" data-col="1">Invoices</th>
-              <th class="sortable" data-col="2">Revenue</th>
-              <th class="sortable" data-col="3">Avg Ticket</th>
-              <th class="sortable" data-col="4">Avg Svc Time</th>
-              <th class="sortable" data-col="5">Promo Usage</th>
-              <th class="sortable" data-col="6">Promo Discounts</th>
-              <th class="sortable" data-col="7">Vehicle Inspections</th>
-              <th class="sortable" data-col="8">Yellow/Red %</th>
+              <th class="sortable" data-col="1" title="Total invoices/vehicles serviced">Invoices</th>
+              <th class="sortable" data-col="2" title="Total net sales revenue">Revenue</th>
+              <th class="sortable" data-col="3" title="Ticket Average — Revenue divided by invoice count">Avg Ticket</th>
+              <th class="sortable" data-col="4" title="Average service time in the bay (minutes)">Avg Svc Time</th>
+              <th class="sortable" data-col="5" title="Number of promotional codes applied">Promo Usage</th>
+              <th class="sortable" data-col="6" title="Total dollar amount of promotional discounts">Promo Discounts</th>
+              <th class="sortable" data-col="7" title="Total vehicle inspection items recorded">Vehicle Inspections</th>
+              <th class="sortable" data-col="8" title="Percentage of inspection items flagged Yellow, Orange, or Red">Yellow/Red %</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -4741,12 +4835,12 @@ function renderOverview() {
   if (qsEl) qsEl.innerHTML = `
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">Quick Snapshot</div>
     <div style="display:flex;flex-direction:column;gap:8px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Active Stores</span><span style="font-weight:700;color:white;">${stores.size}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Active Stores</span><span style="font-weight:700;color:var(--text);">${stores.size}</span></div>
       <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Email Capture</span><span style="font-weight:700;color:${emailPct>=75?'var(--green)':emailPct>=50?'var(--orange)':'var(--red)'};">${pct(emailPct)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Promo Discounts</span><span style="font-weight:700;color:white;">${money(promoTotal)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Promo Uses</span><span style="font-weight:700;color:white;">${num(promo.length)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Promo Discounts</span><span style="font-weight:700;color:var(--text);">${money(promoTotal)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Promo Uses</span><span style="font-weight:700;color:var(--text);">${num(promo.length)}</span></div>
       <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Inspection Conv.</span><span style="font-weight:700;color:${inspConv>=20?'var(--green)':inspConv>=10?'var(--orange)':'var(--red)'};">${pct(inspConv)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Inspections</span><span style="font-weight:700;color:white;">${num(insp.length)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Inspections</span><span style="font-weight:700;color:var(--text);">${num(insp.length)}</span></div>
     </div>
   `;
 }
@@ -5974,15 +6068,15 @@ function previewSegment() {
       </div>
       <div style="flex:1;min-width:100px;text-align:center;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
         <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);">Revenue</div>
-        <div style="font-size:20px;font-weight:700;color:white;">${money(totalRev)}</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);">${money(totalRev)}</div>
       </div>
       <div style="flex:1;min-width:100px;text-align:center;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
         <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);">Avg Ticket</div>
-        <div style="font-size:20px;font-weight:700;color:white;">${money(avgTicket)}</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);">${money(avgTicket)}</div>
       </div>
       <div style="flex:1;min-width:100px;text-align:center;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
         <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);">Has Email</div>
-        <div style="font-size:20px;font-weight:700;color:white;">${pct(count ? withEmail/count*100 : 0)}</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);">${pct(count ? withEmail/count*100 : 0)}</div>
       </div>
     </div>`;
 
