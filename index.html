@@ -1454,6 +1454,247 @@
     opacity: 1;
   }
 
+  /* District Builder Modal */
+  .district-list { max-height: 400px; overflow-y: auto; }
+  .district-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s;
+  }
+  .district-item:hover { border-color: var(--primary); }
+  .district-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .district-item-header input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    width: 200px;
+    outline: none;
+  }
+  .district-item-header input:focus { border-bottom: 1px solid var(--primary); }
+  .district-stores-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 32px;
+    padding: 6px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 6px;
+  }
+  .district-store-chip {
+    background: rgba(227,24,55,0.15);
+    border: 1px solid rgba(227,24,55,0.3);
+    border-radius: 5px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .district-store-chip:hover { background: rgba(227,24,55,0.3); }
+  .district-store-chip .remove-store { font-size: 13px; opacity: 0.6; }
+  .district-store-chip .remove-store:hover { opacity: 1; }
+  .district-unassigned {
+    background: rgba(0,0,0,0.2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 12px;
+  }
+  .district-unassigned-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  /* Operations Grid */
+  .ops-quick-filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .ops-quick-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+  }
+  .ops-quick-btn:hover { border-color: var(--primary); color: var(--text); }
+  .ops-quick-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+  .ops-grid-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+  .ops-grid-wrap h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ops-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .ops-grid th {
+    background: rgba(0,0,0,0.3);
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 10px;
+    text-align: right;
+    white-space: nowrap;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+  .ops-grid th:first-child { text-align: left; }
+  .ops-grid td {
+    padding: 7px 10px;
+    text-align: right;
+    border-bottom: 1px solid rgba(42,42,69,0.5);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .ops-grid td:first-child { text-align: left; font-weight: 600; }
+  .ops-grid tr:hover td { background: rgba(255,255,255,0.03); }
+  .ops-grid .district-row td {
+    background: rgba(227,24,55,0.06);
+    font-weight: 700;
+    font-size: 12px;
+    border-bottom: 2px solid var(--border);
+    cursor: pointer;
+  }
+  .ops-grid .district-row:hover td { background: rgba(227,24,55,0.12); }
+  .ops-grid .district-row td:first-child::before {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid var(--text-muted);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    margin-right: 8px;
+    transition: transform 0.2s;
+  }
+  .ops-grid .district-row.expanded td:first-child::before {
+    transform: rotate(90deg);
+  }
+  .ops-grid .store-child { display: none; }
+  .ops-grid .store-child.visible { display: table-row; }
+  .ops-grid .store-child td:first-child { padding-left: 28px; }
+  .ops-grid .totals-row td {
+    background: rgba(0,0,0,0.2);
+    font-weight: 800;
+    border-top: 2px solid var(--primary);
+    font-size: 12px;
+  }
+
+  /* Cell color coding */
+  .cell-green { background: rgba(0,200,83,0.12) !important; color: var(--green); }
+  .cell-yellow { background: rgba(255,214,0,0.10) !important; color: var(--yellow); }
+  .cell-red { background: rgba(255,23,68,0.10) !important; color: var(--red); }
+
+  /* Today Snapshot */
+  .today-snapshot {
+    background: linear-gradient(135deg, rgba(227,24,55,0.08) 0%, rgba(26,26,46,0.95) 100%);
+    border: 1px solid rgba(227,24,55,0.25);
+    border-radius: 14px;
+    padding: 18px 24px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .today-snapshot.visible { display: block; }
+  .today-snapshot-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .today-snapshot-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .today-snapshot-header .live-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: livePulse 2s infinite;
+  }
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,200,83,0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(0,200,83,0); }
+  }
+  .today-snapshot-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+  .today-stat {
+    text-align: center;
+  }
+  .today-stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: white;
+  }
+  .today-stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* Zero Dollar Report */
+  .zero-dollar-section {
+    margin-top: 24px;
+  }
+  .zero-dollar-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
   /* Alert Banner */
   .alert-banner {
     display: none;
@@ -1836,6 +2077,7 @@
     <input type="date" id="filterFrom" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:130px;">
     <input type="date" id="filterTo" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;width:130px;">
     <button class="btn-configure" onclick="applyFilters()" style="background:var(--primary);color:white;border-color:var(--primary);font-size:11px;padding:6px 12px;">Apply</button>
+    <button class="btn-configure" onclick="openDistrictModal()" style="border-color:var(--blue);color:var(--blue);font-size:11px;padding:5px 10px;">Districts</button>
     <div style="width:1px;height:24px;background:var(--border);"></div>
     <button class="btn-configure admin-only" id="alertsBtn" onclick="openAlerts()" style="border-color:var(--orange);color:var(--orange);font-size:11px;padding:5px 10px;">Alerts</button>
     <div class="client-badge" id="clientBadge" onclick="openSettings()">
@@ -2078,6 +2320,15 @@
 
   <!-- OVERVIEW TAB -->
   <div class="tab-content active" id="tab-overview">
+    <!-- Today's Snapshot -->
+    <div class="today-snapshot" id="todaySnapshot">
+      <div class="today-snapshot-header">
+        <h3><div class="live-dot"></div> Today's Snapshot</h3>
+        <div id="todayDate" style="font-size:11px;color:var(--text-muted);"></div>
+      </div>
+      <div class="today-snapshot-grid" id="todayStats"></div>
+    </div>
+
     <!-- KPI Tiles Row -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Key Metrics</div>
@@ -2247,7 +2498,44 @@
 
   <!-- OPERATIONS TAB -->
   <div class="tab-content" id="tab-operations">
+    <!-- Quick Date Range Filters -->
+    <div class="ops-quick-filters" id="opsQuickFilters">
+      <span style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Quick Range:</span>
+      <button class="ops-quick-btn" onclick="setOpsDateRange('YTD')">YTD</button>
+      <button class="ops-quick-btn" onclick="setOpsDateRange('QTD')">QTD</button>
+      <button class="ops-quick-btn" onclick="setOpsDateRange('MTD')">MTD</button>
+      <button class="ops-quick-btn" onclick="setOpsDateRange('WTD')">WTD</button>
+      <button class="ops-quick-btn" onclick="setOpsDateRange('DTD')">DTD</button>
+    </div>
+
     <div class="kpi-grid" id="opsKPIs"></div>
+
+    <!-- Operations Command Grid -->
+    <div class="ops-grid-wrap">
+      <h3>Operations Command Grid <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Performance by Store</span></h3>
+      <div style="max-height:500px;overflow-y:auto;">
+        <table class="ops-grid" id="opsCommandGrid">
+          <thead>
+            <tr>
+              <th style="min-width:120px;">Store / District</th>
+              <th>Guest Count</th>
+              <th>CPD</th>
+              <th>Net Sales</th>
+              <th>Ticket Avg</th>
+              <th>Avg Bay</th>
+              <th>Avg Wait</th>
+              <th>MHPV</th>
+              <th>Promos</th>
+              <th>Promo $</th>
+              <th>Inspections</th>
+              <th>Yellow/Red %</th>
+            </tr>
+          </thead>
+          <tbody id="opsGridBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
       <div>
         <div class="charts-row" style="margin-bottom:20px;">
@@ -2534,6 +2822,24 @@
         <div class="modal-buttons" style="margin-top:20px;">
           <button class="btn-cancel" onclick="closeTokenModal()">Cancel</button>
           <button class="btn-save" onclick="saveToken()">Save Token</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- District Builder Modal -->
+    <div class="modal-overlay" id="districtModal">
+      <div class="modal" style="width:600px;max-height:85vh;overflow-y:auto;">
+        <h3>District / Group Builder</h3>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Create districts or groups to organize stores. Saved locally and used in the Operations grid.</div>
+        <div class="district-list" id="districtList"></div>
+        <div class="district-unassigned" id="districtUnassigned">
+          <div class="district-unassigned-title">Unassigned Stores</div>
+          <div class="district-stores-wrap" id="unassignedStores"></div>
+        </div>
+        <div class="modal-buttons" style="margin-top:16px;">
+          <button class="btn-cancel" onclick="closeDistrictModal()">Close</button>
+          <button class="btn-save" onclick="addNewDistrict()" style="background:var(--blue);margin-right:auto;">+ Add District</button>
+          <button class="btn-save" onclick="saveDistricts()">Save Districts</button>
         </div>
       </div>
     </div>
@@ -2836,6 +3142,36 @@
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;">Store Mailing Coverage</div>
           <div id="storeMailStats" style="max-height:250px;overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Zero Dollar Invoices Section -->
+    <div class="zero-dollar-section" id="zeroDollarSection">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Zero Dollar Invoice Tracking</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-export" onclick="exportReport('tblZeroDollar','Zero Dollar Invoices')">Export Report</button>
+          <button class="btn-export" onclick="emailReport('tblZeroDollar','Zero Dollar Invoices')">Email</button>
+        </div>
+      </div>
+      <div class="zero-dollar-kpis" id="zeroDollarKPIs"></div>
+      <div class="table-wrap">
+        <h3>Zero & Negative Dollar Invoices</h3>
+        <div class="table-scroll" style="max-height:400px;">
+          <table id="tblZeroDollar">
+            <thead>
+              <tr>
+                <th class="sortable" data-col="0">Store #</th>
+                <th class="sortable" data-col="1">Date</th>
+                <th class="sortable" data-col="2">Invoice #</th>
+                <th class="sortable" data-col="3">Customer</th>
+                <th class="sortable" data-col="4">Net Sales</th>
+                <th class="sortable" data-col="5">Services</th>
+                <th class="sortable" data-col="6">Bay Time</th>
+              </tr>
+            </thead>
+            <tbody id="zeroDollarBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -4102,6 +4438,7 @@ document.getElementById('tilePickerModal').addEventListener('click', (e) => {
 // OVERVIEW TAB
 // ============================================================
 function renderOverview() {
+  renderTodaySnapshot();
   const cust = FILTERED.customers;
   const det = FILTERED.details;
   const promo = FILTERED.promos;
@@ -4604,6 +4941,7 @@ const CHEKCHART_MAKES = {
 function decodeMake(code) { return CHEKCHART_MAKES[code] || code; }
 
 function renderOperations() {
+  renderOpsGrid();
   const cust = FILTERED.customers;
 
   // Compute service times
@@ -6363,6 +6701,424 @@ document.getElementById('tokenModal').addEventListener('click', function(e) {
 });
 
 // ============================================================
+// DISTRICT BUILDER
+// ============================================================
+let bp_districts = JSON.parse(localStorage.getItem('bp_districts') || '[]');
+
+function openDistrictModal() {
+  document.getElementById('districtModal').classList.add('active');
+  renderDistrictModal();
+}
+
+function closeDistrictModal() {
+  document.getElementById('districtModal').classList.remove('active');
+}
+
+document.getElementById('districtModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDistrictModal();
+});
+
+function getAllStoreNumbers() {
+  const stores = new Set();
+  DATA.customers.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
+  return Array.from(stores).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+}
+
+function renderDistrictModal() {
+  const allStores = getAllStoreNumbers();
+  const assigned = new Set();
+  bp_districts.forEach(d => d.stores.forEach(s => assigned.add(s)));
+  const unassigned = allStores.filter(s => !assigned.has(s));
+
+  let html = '';
+  bp_districts.forEach((d, idx) => {
+    html += `<div class="district-item" data-idx="${idx}">
+      <div class="district-item-header">
+        <input type="text" value="${d.name}" onchange="bp_districts[${idx}].name=this.value" placeholder="District Name">
+        <button class="btn-cancel" onclick="removeDistrict(${idx})" style="padding:3px 10px;font-size:11px;">Delete</button>
+      </div>
+      <div class="district-stores-wrap">
+        ${d.stores.map(s => `<div class="district-store-chip" onclick="unassignStore(${idx},'${s}')">#${s} <span class="remove-store">x</span></div>`).join('')}
+      </div>
+    </div>`;
+  });
+  document.getElementById('districtList').innerHTML = html || '<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">No districts created yet. Click "+ Add District" to start.</div>';
+
+  document.getElementById('unassignedStores').innerHTML = unassigned.length
+    ? unassigned.map(s => `<div class="district-store-chip" style="background:rgba(68,138,255,0.12);border-color:rgba(68,138,255,0.3);color:var(--blue);cursor:pointer;" onclick="showAssignMenu(event,'${s}')">#${s}</div>`).join('')
+    : '<div style="color:var(--text-muted);font-size:11px;padding:6px;">All stores assigned to districts.</div>';
+}
+
+function addNewDistrict() {
+  const num = bp_districts.length + 1;
+  bp_districts.push({ name: 'District ' + num, stores: [] });
+  renderDistrictModal();
+}
+
+function removeDistrict(idx) {
+  bp_districts.splice(idx, 1);
+  renderDistrictModal();
+}
+
+function unassignStore(distIdx, store) {
+  bp_districts[distIdx].stores = bp_districts[distIdx].stores.filter(s => s !== store);
+  renderDistrictModal();
+}
+
+function showAssignMenu(event, store) {
+  if (bp_districts.length === 0) { alert('Create a district first.'); return; }
+  if (bp_districts.length === 1) { bp_districts[0].stores.push(store); renderDistrictModal(); return; }
+  // Build a quick dropdown
+  const existing = document.getElementById('assignDropdown');
+  if (existing) existing.remove();
+  const dd = document.createElement('div');
+  dd.id = 'assignDropdown';
+  dd.style.cssText = 'position:fixed;z-index:9999;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 0;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.5);';
+  dd.style.left = event.clientX + 'px';
+  dd.style.top = event.clientY + 'px';
+  bp_districts.forEach((d, idx) => {
+    const item = document.createElement('div');
+    item.style.cssText = 'padding:8px 14px;font-size:12px;cursor:pointer;color:var(--text);';
+    item.textContent = d.name;
+    item.onmouseenter = () => item.style.background = 'var(--card-hover)';
+    item.onmouseleave = () => item.style.background = 'transparent';
+    item.onclick = () => { bp_districts[idx].stores.push(store); dd.remove(); renderDistrictModal(); };
+    dd.appendChild(item);
+  });
+  document.body.appendChild(dd);
+  setTimeout(() => {
+    const handler = (e) => { if (!dd.contains(e.target)) { dd.remove(); document.removeEventListener('click', handler); } };
+    document.addEventListener('click', handler);
+  }, 50);
+}
+
+function saveDistricts() {
+  localStorage.setItem('bp_districts', JSON.stringify(bp_districts));
+  closeDistrictModal();
+  if (typeof renderDashboard === 'function') renderDashboard();
+}
+
+// ============================================================
+// QUICK DATE RANGE FILTERS (Operations Tab)
+// ============================================================
+function setOpsDateRange(range) {
+  const today = new Date();
+  let from = new Date(today);
+
+  switch (range) {
+    case 'YTD': from = new Date(today.getFullYear(), 0, 1); break;
+    case 'QTD': {
+      const q = Math.floor(today.getMonth() / 3);
+      from = new Date(today.getFullYear(), q * 3, 1);
+      break;
+    }
+    case 'MTD': from = new Date(today.getFullYear(), today.getMonth(), 1); break;
+    case 'WTD': {
+      const day = today.getDay();
+      from = new Date(today);
+      from.setDate(today.getDate() - day);
+      break;
+    }
+    case 'DTD': from = new Date(today); break;
+  }
+
+  document.getElementById('filterFrom').value = fmtDateISO(from);
+  document.getElementById('filterTo').value = fmtDateISO(today);
+
+  // Highlight active button
+  document.querySelectorAll('.ops-quick-btn').forEach(b => b.classList.remove('active'));
+  const btns = document.querySelectorAll('.ops-quick-btn');
+  btns.forEach(b => { if (b.textContent.trim() === range) b.classList.add('active'); });
+
+  applyFilters();
+}
+
+// ============================================================
+// OPERATIONS COMMAND GRID
+// ============================================================
+function getBusinessDays(startDate, endDate) {
+  let count = 0;
+  const cur = new Date(startDate);
+  while (cur <= endDate) {
+    const day = cur.getDay();
+    if (day !== 0 && day !== 6) count++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return Math.max(count, 1);
+}
+
+function cellColor(value, greenThresh, yellowThresh, higherIsBetter) {
+  if (value === null || value === undefined) return '';
+  if (higherIsBetter) {
+    if (value >= greenThresh) return 'cell-green';
+    if (value >= yellowThresh) return 'cell-yellow';
+    return 'cell-red';
+  } else {
+    if (value <= greenThresh) return 'cell-green';
+    if (value <= yellowThresh) return 'cell-yellow';
+    return 'cell-red';
+  }
+}
+
+function renderOpsGrid() {
+  const cust = FILTERED.customers;
+  const promo = FILTERED.promos;
+  const insp = FILTERED.inspections;
+  const det = FILTERED.details;
+
+  // Determine date range for CPD
+  let minDate = null, maxDate = null;
+  cust.forEach(r => {
+    const d = parseDate(r.Invoice_Date);
+    if (d) {
+      if (!minDate || d < minDate) minDate = d;
+      if (!maxDate || d > maxDate) maxDate = d;
+    }
+  });
+  const bizDays = minDate && maxDate ? getBusinessDays(minDate, maxDate) : 1;
+
+  // Build store data
+  const storeData = {};
+  cust.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeData[s]) storeData[s] = { gc: 0, sales: 0, bayTimes: [], waitTimes: [], promos: 0, promoDollars: 0, inspTotal: 0, inspBad: 0 };
+    storeData[s].gc++;
+    storeData[s].sales += (+r.Net_Sales || 0);
+    const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (bay !== null && bay > 0 && bay < 180) storeData[s].bayTimes.push(bay);
+    const wait = diffMinutes(r.Greet_Time, r.Bay_Start_Time);
+    if (wait !== null && wait >= 0 && wait < 120) storeData[s].waitTimes.push(wait);
+  });
+
+  promo.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeData[s]) storeData[s] = { gc: 0, sales: 0, bayTimes: [], waitTimes: [], promos: 0, promoDollars: 0, inspTotal: 0, inspBad: 0 };
+    storeData[s].promos++;
+    storeData[s].promoDollars += (+r.Promo_Amount || 0);
+  });
+
+  insp.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeData[s]) storeData[s] = { gc: 0, sales: 0, bayTimes: [], waitTimes: [], promos: 0, promoDollars: 0, inspTotal: 0, inspBad: 0 };
+    if (r.Inspection_Status && r.Inspection_Status !== 'NotCheck' && r.Inspection_Status !== 'NotEquip') {
+      storeData[s].inspTotal++;
+      if (r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red') {
+        storeData[s].inspBad++;
+      }
+    }
+  });
+
+  function storeRow(store, d, isChild) {
+    const avgBay = d.bayTimes.length ? d.bayTimes.reduce((a,b) => a+b, 0) / d.bayTimes.length : null;
+    const avgWait = d.waitTimes.length ? d.waitTimes.reduce((a,b) => a+b, 0) / d.waitTimes.length : null;
+    const ta = d.gc ? d.sales / d.gc : 0;
+    const cpd = (d.gc / bizDays);
+    const mhpv = avgBay !== null ? (avgBay / 60).toFixed(2) : '--';
+    const yrPct = d.inspTotal ? (d.inspBad / d.inspTotal * 100) : 0;
+
+    const cls = isChild ? 'store-child' : '';
+    return `<tr class="${cls}" data-district="${isChild || ''}">
+      <td>${isChild ? '' : ''}<strong>#${store}</strong></td>
+      <td>${num(d.gc)}</td>
+      <td class="${cellColor(cpd, 15, 8, true)}">${cpd.toFixed(1)}</td>
+      <td>${money(d.sales)}</td>
+      <td class="${cellColor(ta, 80, 50, true)}">${money(ta)}</td>
+      <td class="${cellColor(avgBay, 20, 35, false)}">${avgBay !== null ? avgBay.toFixed(1) + ' min' : '--'}</td>
+      <td class="${cellColor(avgWait, 3, 8, false)}">${avgWait !== null ? avgWait.toFixed(1) + ' min' : '--'}</td>
+      <td>${mhpv}</td>
+      <td>${num(d.promos)}</td>
+      <td>${money(d.promoDollars)}</td>
+      <td>${num(d.inspTotal)}</td>
+      <td class="${cellColor(yrPct, 40, 60, true)}">${d.inspTotal ? pct(yrPct) : '--'}</td>
+    </tr>`;
+  }
+
+  function aggregateStores(stores) {
+    const agg = { gc: 0, sales: 0, bayTimes: [], waitTimes: [], promos: 0, promoDollars: 0, inspTotal: 0, inspBad: 0 };
+    stores.forEach(s => {
+      const d = storeData[s];
+      if (!d) return;
+      agg.gc += d.gc;
+      agg.sales += d.sales;
+      agg.bayTimes = agg.bayTimes.concat(d.bayTimes);
+      agg.waitTimes = agg.waitTimes.concat(d.waitTimes);
+      agg.promos += d.promos;
+      agg.promoDollars += d.promoDollars;
+      agg.inspTotal += d.inspTotal;
+      agg.inspBad += d.inspBad;
+    });
+    return agg;
+  }
+
+  let html = '';
+  const allStores = Object.keys(storeData).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  const renderedStores = new Set();
+
+  if (bp_districts.length > 0) {
+    bp_districts.forEach((dist, dIdx) => {
+      const dStores = dist.stores.filter(s => storeData[s]);
+      if (dStores.length === 0) return;
+      const agg = aggregateStores(dStores);
+      const avgBay = agg.bayTimes.length ? agg.bayTimes.reduce((a,b) => a+b, 0) / agg.bayTimes.length : null;
+      const avgWait = agg.waitTimes.length ? agg.waitTimes.reduce((a,b) => a+b, 0) / agg.waitTimes.length : null;
+      const ta = agg.gc ? agg.sales / agg.gc : 0;
+      const cpd = (agg.gc / bizDays);
+      const mhpv = avgBay !== null ? (avgBay / 60).toFixed(2) : '--';
+      const yrPct = agg.inspTotal ? (agg.inspBad / agg.inspTotal * 100) : 0;
+
+      html += `<tr class="district-row" onclick="toggleDistrictRows(this, 'dist-${dIdx}')">
+        <td>${dist.name} (${dStores.length})</td>
+        <td>${num(agg.gc)}</td>
+        <td class="${cellColor(cpd, 15, 8, true)}">${cpd.toFixed(1)}</td>
+        <td>${money(agg.sales)}</td>
+        <td class="${cellColor(ta, 80, 50, true)}">${money(ta)}</td>
+        <td class="${cellColor(avgBay, 20, 35, false)}">${avgBay !== null ? avgBay.toFixed(1) + ' min' : '--'}</td>
+        <td class="${cellColor(avgWait, 3, 8, false)}">${avgWait !== null ? avgWait.toFixed(1) + ' min' : '--'}</td>
+        <td>${mhpv}</td>
+        <td>${num(agg.promos)}</td>
+        <td>${money(agg.promoDollars)}</td>
+        <td>${num(agg.inspTotal)}</td>
+        <td class="${cellColor(yrPct, 40, 60, true)}">${agg.inspTotal ? pct(yrPct) : '--'}</td>
+      </tr>`;
+      dStores.forEach(s => {
+        html += storeRow(s, storeData[s], 'dist-' + dIdx);
+        renderedStores.add(s);
+      });
+    });
+  }
+
+  // Remaining stores (not in any district)
+  allStores.forEach(s => {
+    if (!renderedStores.has(s)) {
+      html += storeRow(s, storeData[s], false);
+    }
+  });
+
+  // Totals row
+  const total = aggregateStores(allStores);
+  const tAvgBay = total.bayTimes.length ? total.bayTimes.reduce((a,b) => a+b, 0) / total.bayTimes.length : null;
+  const tAvgWait = total.waitTimes.length ? total.waitTimes.reduce((a,b) => a+b, 0) / total.waitTimes.length : null;
+  const tTa = total.gc ? total.sales / total.gc : 0;
+  const tCpd = (total.gc / bizDays);
+  const tMhpv = tAvgBay !== null ? (tAvgBay / 60).toFixed(2) : '--';
+  const tYrPct = total.inspTotal ? (total.inspBad / total.inspTotal * 100) : 0;
+
+  html += `<tr class="totals-row">
+    <td>TOTAL</td>
+    <td>${num(total.gc)}</td>
+    <td>${tCpd.toFixed(1)}</td>
+    <td>${money(total.sales)}</td>
+    <td>${money(tTa)}</td>
+    <td>${tAvgBay !== null ? tAvgBay.toFixed(1) + ' min' : '--'}</td>
+    <td>${tAvgWait !== null ? tAvgWait.toFixed(1) + ' min' : '--'}</td>
+    <td>${tMhpv}</td>
+    <td>${num(total.promos)}</td>
+    <td>${money(total.promoDollars)}</td>
+    <td>${num(total.inspTotal)}</td>
+    <td>${total.inspTotal ? pct(tYrPct) : '--'}</td>
+  </tr>`;
+
+  document.getElementById('opsGridBody').innerHTML = html;
+}
+
+function toggleDistrictRows(headerRow, distId) {
+  headerRow.classList.toggle('expanded');
+  const rows = document.querySelectorAll(`.ops-grid .store-child[data-district="${distId}"]`);
+  rows.forEach(r => r.classList.toggle('visible'));
+}
+
+// ============================================================
+// TODAY'S SNAPSHOT (Overview)
+// ============================================================
+function renderTodaySnapshot() {
+  const today = new Date();
+  const todayStr = fmtDateISO(today);
+
+  const todayCust = DATA.customers.filter(r => {
+    const d = parseDate(r.Invoice_Date);
+    return d && fmtDateISO(d) === todayStr;
+  });
+
+  const snap = document.getElementById('todaySnapshot');
+  if (todayCust.length === 0) {
+    snap.classList.remove('visible');
+    return;
+  }
+  snap.classList.add('visible');
+
+  const totalSales = todayCust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+  const avgTicket = todayCust.length ? totalSales / todayCust.length : 0;
+
+  const bayTimes = [];
+  todayCust.forEach(r => {
+    const m = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (m !== null && m > 0 && m < 180) bayTimes.push(m);
+  });
+  const avgBay = bayTimes.length ? bayTimes.reduce((a, b) => a + b, 0) / bayTimes.length : 0;
+
+  // Best store today
+  const storeRevToday = {};
+  todayCust.forEach(r => {
+    storeRevToday[r.Store_Number] = (storeRevToday[r.Store_Number] || 0) + (+r.Net_Sales || 0);
+  });
+  const bestStore = Object.entries(storeRevToday).sort((a, b) => b[1] - a[1])[0];
+
+  document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+  document.getElementById('todayStats').innerHTML = `
+    <div class="today-stat"><div class="today-stat-value">${num(todayCust.length)}</div><div class="today-stat-label">Cars Today</div></div>
+    <div class="today-stat"><div class="today-stat-value">${money(totalSales)}</div><div class="today-stat-label">Net Sales</div></div>
+    <div class="today-stat"><div class="today-stat-value">${money(avgTicket)}</div><div class="today-stat-label">Avg Ticket</div></div>
+    <div class="today-stat"><div class="today-stat-value">${avgBay > 0 ? avgBay.toFixed(1) + 'm' : '--'}</div><div class="today-stat-label">Avg Bay Time</div></div>
+    <div class="today-stat"><div class="today-stat-value">${bestStore ? '#' + bestStore[0] : '--'}</div><div class="today-stat-label">Top Store Today</div></div>
+  `;
+}
+
+// ============================================================
+// ZERO DOLLAR INVOICE REPORT
+// ============================================================
+function renderZeroDollarReport() {
+  const cust = FILTERED.customers;
+  const det = FILTERED.details;
+
+  const zeroDollar = cust.filter(r => (+r.Net_Sales || 0) <= 0);
+  const totalInvoices = cust.length;
+  const zdPct = totalInvoices ? (zeroDollar.length / totalInvoices * 100) : 0;
+  const zdNegative = zeroDollar.filter(r => (+r.Net_Sales || 0) < 0);
+  const negTotal = zdNegative.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+
+  // Store breakdown
+  const zdByStore = {};
+  zeroDollar.forEach(r => {
+    zdByStore[r.Store_Number] = (zdByStore[r.Store_Number] || 0) + 1;
+  });
+  const worstStore = Object.entries(zdByStore).sort((a, b) => b[1] - a[1])[0];
+
+  document.getElementById('zeroDollarKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Zero/Negative Invoices</div><div class="kpi-value" style="color:${zdPct > 5 ? 'var(--red)' : zdPct > 2 ? 'var(--orange)' : 'var(--green)'};">${num(zeroDollar.length)}</div><div class="kpi-sub">${pct(zdPct)} of all invoices</div></div>
+    <div class="kpi-card"><div class="kpi-label">Negative Sales Total</div><div class="kpi-value" style="color:var(--red);">${money(negTotal)}</div><div class="kpi-sub">${num(zdNegative.length)} negative invoices</div></div>
+    <div class="kpi-card"><div class="kpi-label">Worst Store</div><div class="kpi-value">${worstStore ? '#' + worstStore[0] : '--'}</div><div class="kpi-sub">${worstStore ? worstStore[1] + ' zero-dollar invoices' : 'none'}</div></div>
+  `;
+
+  const rows = zeroDollar.slice(0, 200).map(r => {
+    const name = ((r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '')).trim() || 'Unknown';
+    const services = det.filter(d => d.Invoice_Number === r.Invoice_Number && d.Invoice_Detail_Type === 'SERVICE').map(d => d.Invoice_Detail_Description).join(', ') || '--';
+    const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    const dateStr = r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '';
+    return `<tr>
+      <td>#${r.Store_Number}</td>
+      <td>${dateStr}</td>
+      <td>${r.Invoice_Number}</td>
+      <td>${name}</td>
+      <td style="color:${(+r.Net_Sales||0) < 0 ? 'var(--red)' : 'var(--text-muted)'};">${money(+r.Net_Sales || 0)}</td>
+      <td style="font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${services}</td>
+      <td>${bay !== null && bay > 0 ? bay.toFixed(0) + ' min' : '--'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('zeroDollarBody').innerHTML = rows || '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:20px;">No zero-dollar invoices found.</td></tr>';
+}
+
+// ============================================================
 // REPORTING TAB
 // ============================================================
 function renderReporting() {
@@ -6479,6 +7235,9 @@ function renderReporting() {
     repInsights.push({ type: 'suggestion', msg: `Top warranty/maintenance service: <strong>${topWarranty[0]}</strong> at ${money(topWarranty[1].rev)}.`, detail: warrantyEntries.length > 1 ? 'Also: ' + warrantyEntries.slice(1, 3).map(e => e[0] + ' (' + money(e[1].rev) + ')').join(', ') : '' });
   }
   bpaHTML('bpaReporting', 'Reporting Insights', repInsights);
+
+  // Zero Dollar Invoice Report
+  renderZeroDollarReport();
 }
 
 // ============================================================
