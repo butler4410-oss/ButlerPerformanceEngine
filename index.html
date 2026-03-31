@@ -2854,7 +2854,7 @@
     <form onsubmit="event.preventDefault();doCreateAccount();" autocomplete="off">
     <div class="form-group"><label for="regName">Full Name</label><input type="text" id="regName" name="name" placeholder="Full name"></div>
     <div class="form-group"><label for="regEmail">Email</label><input type="email" id="regEmail" name="email" placeholder="you@company.com"></div>
-    <div class="form-group" id="regCompanyGroup"><label for="regCompany">Company</label><input type="text" id="regCompany" name="company" placeholder="South Bay Lube Inc."></div>
+    <div class="form-group" id="regCompanyGroup"><label for="regCompany">Company</label><input type="text" id="regCompany" name="company" placeholder="Your Company Name"></div>
     <div class="form-group"><label for="regPassword">Password</label><input type="password" id="regPassword" name="password" autocomplete="new-password" placeholder="Min 6 chars, 1 uppercase, 1 number"></div>
     <div class="form-group" id="regRoleGroup"><label for="regRole">Role</label>
       <select id="regRole" name="role"></select>
@@ -2953,15 +2953,15 @@
     <h3>Dashboard Settings</h3>
     <div class="form-group">
       <label for="settingCompany">Company / Client Name</label>
-      <input type="text" id="settingCompany" name="company" placeholder="e.g. Jiffy Lube">
+      <input type="text" id="settingCompany" name="company" placeholder="Company name">
     </div>
     <div class="form-group">
       <label for="settingUser">User / Contact Name</label>
-      <input type="text" id="settingUser" name="user" placeholder="e.g. Erin Ham">
+      <input type="text" id="settingUser" name="user" placeholder="Contact name">
     </div>
     <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Gmail Integration (EmailJS)</div>
-    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect chase@butleranalytics.io via <a href="https://www.emailjs.com" target="_blank" style="color:var(--primary);">emailjs.com</a> (free 200/mo). Create a template with: <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{to_email}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{from_name}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{subject}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{message}}</code></p>
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect your email via <a href="https://www.emailjs.com" target="_blank" style="color:var(--primary);">emailjs.com</a> (free 200/mo). Create a template with: <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{to_email}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{from_name}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{subject}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{message}}</code></p>
     <div class="form-group">
       <label for="settingEjsKey">EmailJS Public Key</label>
       <input type="text" id="settingEjsKey" name="ejsKey" placeholder="e.g. abc123XYZ">
@@ -3024,7 +3024,7 @@
         </div>
         <div class="form-group">
           <label for="schedName">Recipient Name</label>
-          <input type="text" id="schedName" name="schedName" placeholder="Erin Ham">
+          <input type="text" id="schedName" name="schedName" placeholder="Recipient name">
         </div>
         <div class="form-group">
           <label for="schedReport">Report</label>
@@ -4936,7 +4936,7 @@ function runBPAInsights() {
   });
   const topMissed = Object.entries(upsellMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if (topMissed.length && topMissed[0][1] > 20) {
-    inspInsights.push({ type: 'suggestion', msg: `Top 3 missed upsells: <strong>${topMissed[0][0]}</strong> (${num(topMissed[0][1])}x), ${topMissed[1]?topMissed[1][0]+' ('+num(topMissed[1][1])+'x)':''}, ${topMissed[2]?topMissed[2][0]+' ('+num(topMissed[2][1])+'x)':''}`, detail: 'Create targeted training or Triadex campaigns around these items. Combined opportunity: ~' + money(topMissed.slice(0,3).reduce((s,m)=>s+m[1],0) * avgUpsellValue * 0.15), actions: [
+    inspInsights.push({ type: 'suggestion', msg: `Top 3 missed upsells: <strong>${topMissed[0][0]}</strong> (${num(topMissed[0][1])}x), ${topMissed[1]?topMissed[1][0]+' ('+num(topMissed[1][1])+'x)':''}, ${topMissed[2]?topMissed[2][0]+' ('+num(topMissed[2][1])+'x)':''}`, detail: 'Create targeted training or direct mail campaigns around these items. Combined opportunity: ~' + money(topMissed.slice(0,3).reduce((s,m)=>s+m[1],0) * avgUpsellValue * 0.15), actions: [
       { label: 'Launch Campaign', onclick: "bpaSwitchTab('marketing')", color: 'blue' },
       { label: 'Build Segment', onclick: "bpaSwitchTab('segments')", color: 'blue' }
     ]});
@@ -5132,7 +5132,7 @@ function runBPAInsights() {
   // Mailing address with marketing impact
   if (addrPct < 90) {
     const missingAddr = totalInv - withAddr;
-    custInsights.push({ type: 'warning', msg: `<strong>${num(missingAddr)}</strong> customers lack a mailable address (${pct(100-addrPct)} gap).`, detail: 'Direct mail is the highest-ROAS channel for auto services. Missing addresses = wasted Triadex budget.', actions: [
+    custInsights.push({ type: 'warning', msg: `<strong>${num(missingAddr)}</strong> customers lack a mailable address (${pct(100-addrPct)} gap).`, detail: 'Direct mail is the highest-ROAS channel for auto services. Missing addresses = lost direct mail opportunity.', actions: [
       { label: 'View Reporting', onclick: "bpaSwitchTab('reporting')", color: 'blue' }
     ]});
   }
@@ -7726,7 +7726,7 @@ function deleteSegment(idx) {
 }
 
 // ============================================================
-// MARKETING TAB (Triadex Integration)
+// MARKETING TAB (Legacy)
 // ============================================================
 const HANDOFF_CHECKLIST = []; // Legacy — removed
 
@@ -8821,18 +8821,18 @@ function emailHandoff() {
   }
   body += 'Checklist Status: ' + checkedItems + '/' + totalItems + ' complete\n\n';
   body += 'Please confirm:\n- Production timeline\n- Any questions\n- Proof delivery date\n\n';
-  body += 'Best,\nChase Butler\nDirector of Business Development\nchase@butleranalytics.io\n(706) 676-5110\n';
+  body += 'Best,\n' + (localStorage.getItem('bp_user') || 'BPA Admin') + '\n';
 
-  const to = 'tim@triadex.com, ryan@triadex.com, riley@triadex.com';
+  const to = ''; // Configure via settings
 
   if (isEmailConfigured()) {
     sendViaEmailJS(to, subject, body).then(() => {
-      alert('Handoff email sent to Triadex!');
+      alert('Handoff email sent!');
     }).catch(err => {
       alert('Failed: ' + (err?.text || err?.message || 'Check Settings.'));
     });
   } else {
-    window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + '&cc=' + encodeURIComponent('chase@butleranalytics.io'), '_self');
+    window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
   }
 }
 
@@ -10482,7 +10482,7 @@ function buildEmailReportBody(tableId, title, userMessage) {
 
   report += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
   report += 'Butler Performance Analytics\n';
-  report += 'chase@butleranalytics.io | (706) 676-5110\n';
+  report += (localStorage.getItem('bp_user') || '') + '\n';
 
   return report;
 }
@@ -11047,9 +11047,9 @@ function sendViaEmailJS(to, subject, message) {
     email_to: to,
     email: to,
     to_name: to.split('@')[0],
-    from_email: 'chase@butleranalytics.io',
-    from_name: 'Chase Butler — Butler Performance Analytics',
-    reply_to: 'chase@butleranalytics.io',
+    from_email: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+    from_name: (localStorage.getItem('bp_user') || 'Butler Performance Analytics'),
+    reply_to: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
     subject: subject,
     message: message
   });
@@ -11112,15 +11112,15 @@ function testEmailSetup() {
   if (typeof emailjs !== 'undefined') {
     emailjs.init(key);
     emailjs.send(service, template, {
-      to_email: 'chase@butleranalytics.io',
-      email_to: 'chase@butleranalytics.io',
-      email: 'chase@butleranalytics.io',
-      to_name: 'Chase Butler',
-      from_email: 'chase@butleranalytics.io',
-      from_name: 'Chase Butler — Butler Performance Analytics',
-      reply_to: 'chase@butleranalytics.io',
+      to_email: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+      email_to: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+      email: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+      to_name: localStorage.getItem('bp_user') || 'Admin',
+      from_email: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+      from_name: (localStorage.getItem('bp_user') || 'Butler Performance Analytics'),
+      reply_to: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
       subject: 'Butler Performance Analytics - Test Connection',
-      message: 'This is a test email from Butler Performance Analytics. If you received this, your Gmail integration is working correctly.\n\n— Chase Butler\nchase@butleranalytics.io'
+      message: 'This is a test email from Butler Performance Analytics. If you received this, your email integration is working correctly.'
     }).then(() => {
       resultEl.innerHTML = '<span style="color:var(--green);">Connection successful! Gmail is ready to send.</span>';
     }).catch(err => {
@@ -11245,9 +11245,9 @@ function emailAuditLog() {
   if (log.length > 50) body += '\n... and ' + (log.length - 50) + ' more entries (export CSV for full log)\n';
   const subject = 'BPA Audit Log — ' + (meta.company || 'Butler Performance');
   if (isEmailConfigured()) {
-    sendViaEmailJS('chase@butleranalytics.io', subject, body).then(() => alert('Audit log emailed.')).catch(e => alert('Failed: '+(e?.text||e?.message||'Error')));
+    sendViaEmailJS(localStorage.getItem('bp_ejs_from') || '', subject, body).then(() => alert('Audit log emailed.')).catch(e => alert('Failed: '+(e?.text||e?.message||'Error')));
   } else {
-    window.open('mailto:chase@butleranalytics.io?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_self');
+    window.open('mailto:' + encodeURIComponent(localStorage.getItem('bp_ejs_from') || '') + '?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_self');
   }
 }
 
@@ -11275,10 +11275,7 @@ function setSession(user) {
 const ROLE_LABELS = { company_admin: 'Company Admin', client_admin: 'Client Admin', client_viewer: 'Client Viewer' };
 
 const DEFAULT_ACCOUNTS = [
-  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', _pw: 'bpa2026', role: 'company_admin', stores: [] },
-  { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'client_admin', stores: [] },
-  { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'client_admin', stores: [] },
-  { name: 'Demo User', email: 'demo@butleranalytics.io', company: 'Demo Account', _pw: 'demo2026', role: 'client_viewer', stores: [] },
+  { name: 'Admin', email: 'admin@butlerperformance.com', company: 'Butler Performance Analytics', _pw: 'BPA!2026admin', role: 'company_admin', stores: [] },
 ];
 
 function isCompanyAdmin() { const u = getCurrentUser(); return u && u.role === 'company_admin'; }
@@ -11485,7 +11482,7 @@ function openForgotPassword() {
         .then(() => alert('Reset instructions sent to ' + email))
         .catch(() => alert('Could not send email. Contact your administrator.'));
     } else {
-      alert('Password reset requested. Contact your administrator at chase@butleranalytics.io');
+      alert('Password reset requested. Contact your administrator.');
     }
   } else {
     alert('If an account exists for ' + email + ', reset instructions will be sent.');
