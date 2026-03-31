@@ -3500,81 +3500,8 @@
 
   <!-- SEGMENTS TAB -->
   <div class="tab-content" id="tab-segments">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
-      <!-- Segment Builder -->
-      <div style="background:linear-gradient(135deg, var(--card) 0%, rgba(30,30,60,0.8) 100%);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;">S</div>
-            <div>
-              <div style="font-size:16px;font-weight:700;color:var(--text);">Segment Builder</div>
-              <div style="font-size:11px;color:var(--text-muted);">Define criteria to segment your customer base</div>
-            </div>
-          </div>
-        </div>
-        <div style="padding:24px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-            <div class="form-group" style="margin-bottom:0;"><label for="segName">Segment Name</label><input type="text" id="segName" name="segName" placeholder="e.g. High Value Customers"></div>
-            <div class="form-group" style="margin-bottom:0;"><label>Type</label>
-              <select id="segType" name="segType"><option value="dynamic">Dynamic (auto-updates)</option><option value="static">Static (manual)</option></select>
-            </div>
-          </div>
-          <div class="form-group" style="margin-bottom:16px;"><label for="segDesc">Description</label><input type="text" id="segDesc" name="segDesc" placeholder="Describe who this segment targets..."></div>
-
-          <!-- Criteria Groups -->
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Criteria Rules</div>
-          <div id="segCriteriaGroups"></div>
-          <div style="display:flex;gap:8px;margin-top:10px;">
-            <button class="bpa-action-btn blue" onclick="addSegCriteriaGroup()">+ Add Group (OR)</button>
-          </div>
-
-          <!-- Preview count -->
-          <div id="segPreview" style="margin-top:20px;padding:16px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;text-align:center;display:none;">
-          </div>
-
-          <div style="display:flex;gap:10px;margin-top:16px;">
-            <button class="btn-save" onclick="previewSegment()" style="padding:12px 24px;border-radius:10px;">Preview Segment</button>
-            <button class="btn-save" onclick="saveSegment()" style="padding:12px 24px;border-radius:10px;background:var(--green);border-color:var(--green);">Save Segment</button>
-            <button class="btn-configure" onclick="exportSegment()" style="padding:12px 16px;">Export CSV</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Preview Results -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
-        <div style="padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
-          <div style="font-size:16px;font-weight:700;color:var(--text);">Segment Preview</div>
-          <div style="font-size:11px;color:var(--text-muted);">Live results from your loaded data</div>
-        </div>
-        <div style="padding:24px;">
-          <div id="segPreviewStats" style="margin-bottom:16px;"></div>
-          <div id="segPreviewTable" style="max-height:400px;overflow-y:auto;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Saved Segments -->
-    <div class="table-wrap">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">
-        Saved Segments
-        <span id="segCount" style="font-weight:400;font-size:12px;color:var(--text-muted);"></span>
-      </h3>
-      <div class="table-scroll" style="max-height:350px;">
-        <table id="tblSegments">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Criteria</th>
-              <th>Customers</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="segTableBody"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="kpi-grid" id="segKPIs"></div>
+    <div id="smartSegments"></div>
   </div>
 
   <!-- MARKET ANALYSIS TAB -->
@@ -6666,9 +6593,149 @@ function getSelectOptions(criteriaId) {
 }
 
 function renderSegments() {
-  if (!segGroups.length) addSegCriteriaGroup();
-  renderSegCriteriaGroups();
-  renderSavedSegments();
+  const cust = FILTERED.customers;
+  const det = FILTERED.details || [];
+  const insp = FILTERED.inspections || [];
+  const promo = FILTERED.promos || [];
+
+  if (!cust.length) {
+    document.getElementById('segKPIs').innerHTML = '';
+    document.getElementById('smartSegments').innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">Load data to see recommended segments</div>';
+    return;
+  }
+
+  // Build customer profiles
+  const profiles = {};
+  cust.forEach(r => {
+    const fn = (r.Customer_First_Name||'').trim().toUpperCase();
+    const ln = (r.Customer_Last_Name||'').trim().toUpperCase();
+    const em = (r.Customer_Email_Address||'').trim().toUpperCase();
+    const key = em || (fn + '|' + ln);
+    if (!key || key === '|') return;
+    if (!profiles[key]) profiles[key] = { name: (r.Customer_First_Name||'')+' '+(r.Customer_Last_Name||''), visits: 0, revenue: 0, tickets: [], stores: new Set(), hasEmail: false, hasPhone: false, hasAddr: false, isBiz: false, invoices: [] };
+    const p = profiles[key];
+    p.visits++;
+    p.revenue += (+r.Net_Sales||0);
+    p.tickets.push(+r.Net_Sales||0);
+    p.stores.add(r.Store_Number);
+    if (r.Customer_Email_Address && r.Customer_Email_Address.trim()) p.hasEmail = true;
+    if (r.Customer_Phone_Number && r.Customer_Phone_Number.trim()) p.hasPhone = true;
+    if (r.Customer_Address && r.Customer_Address.trim()) p.hasAddr = true;
+    if (r.Business_Account_ID && r.Business_Account_ID.trim()) p.isBiz = true;
+    p.invoices.push(r.Invoice_Number);
+  });
+
+  const all = Object.values(profiles);
+  const totalCust = all.length;
+  const totalRev = all.reduce((s,p) => s + p.revenue, 0);
+  const avgTicket = totalCust ? totalRev / cust.length : 0;
+  const avgRevPerCust = totalCust ? totalRev / totalCust : 0;
+
+  // ── Auto-Generated Segments ──
+  const segments = [];
+
+  // 1. High Value Customers (top 20% by revenue)
+  const sortedByRev = [...all].sort((a,b) => b.revenue - a.revenue);
+  const top20Pct = Math.max(1, Math.ceil(totalCust * 0.2));
+  const highValue = sortedByRev.slice(0, top20Pct);
+  const hvRev = highValue.reduce((s,p) => s+p.revenue, 0);
+  segments.push({ name: 'High Value Customers', icon: '&#9733;', color: 'var(--green)', desc: 'Top 20% by lifetime revenue — protect these relationships', count: highValue.length, pctOfCustomers: (highValue.length/totalCust*100), revenue: hvRev, pctOfRevenue: (hvRev/totalRev*100), avgTicket: highValue.length ? hvRev/highValue.reduce((s,p)=>s+p.visits,0) : 0, customers: highValue.slice(0, 10) });
+
+  // 2. Loyal Repeaters (3+ visits)
+  const repeaters = all.filter(p => p.visits >= 3);
+  const repRev = repeaters.reduce((s,p) => s+p.revenue, 0);
+  segments.push({ name: 'Loyal Repeaters', icon: '&#8634;', color: 'var(--blue)', desc: '3+ visits — your core revenue engine', count: repeaters.length, pctOfCustomers: (repeaters.length/totalCust*100), revenue: repRev, pctOfRevenue: (repRev/totalRev*100), avgTicket: repeaters.length ? repRev/repeaters.reduce((s,p)=>s+p.visits,0) : 0, customers: repeaters.sort((a,b)=>b.visits-a.visits).slice(0, 10) });
+
+  // 3. One-and-Done (single visit)
+  const oneTimers = all.filter(p => p.visits === 1);
+  const otRev = oneTimers.reduce((s,p) => s+p.revenue, 0);
+  segments.push({ name: 'One-and-Done', icon: '&#10132;', color: 'var(--orange)', desc: 'Single visit — biggest retention opportunity', count: oneTimers.length, pctOfCustomers: (oneTimers.length/totalCust*100), revenue: otRev, pctOfRevenue: (otRev/totalRev*100), avgTicket: oneTimers.length ? otRev/oneTimers.length : 0, customers: oneTimers.sort((a,b)=>b.revenue-a.revenue).slice(0, 10) });
+
+  // 4. Fleet / Business Accounts
+  const fleet = all.filter(p => p.isBiz);
+  const flRev = fleet.reduce((s,p) => s+p.revenue, 0);
+  if (fleet.length) segments.push({ name: 'Fleet & Business', icon: '&#9879;', color: 'var(--blue)', desc: 'Commercial accounts — higher ticket, predictable revenue', count: fleet.length, pctOfCustomers: (fleet.length/totalCust*100), revenue: flRev, pctOfRevenue: (flRev/totalRev*100), avgTicket: fleet.length ? flRev/fleet.reduce((s,p)=>s+p.visits,0) : 0, customers: fleet.sort((a,b)=>b.revenue-a.revenue).slice(0, 10) });
+
+  // 5. Big Spenders (avg ticket > 2x company average)
+  const bigSpenders = all.filter(p => { const avg = p.visits ? p.revenue/p.visits : 0; return avg > avgTicket * 2; });
+  const bsRev = bigSpenders.reduce((s,p) => s+p.revenue, 0);
+  if (bigSpenders.length) segments.push({ name: 'Big Spenders', icon: '&#36;', color: 'var(--green)', desc: 'Avg ticket 2x+ above average — upsell champions', count: bigSpenders.length, pctOfCustomers: (bigSpenders.length/totalCust*100), revenue: bsRev, pctOfRevenue: (bsRev/totalRev*100), avgTicket: bigSpenders.length ? bsRev/bigSpenders.reduce((s,p)=>s+p.visits,0) : 0, customers: bigSpenders.sort((a,b)=>b.revenue-a.revenue).slice(0, 10) });
+
+  // 6. Low Ticket (avg ticket < 50% of average)
+  const lowTicket = all.filter(p => { const avg = p.visits ? p.revenue/p.visits : 0; return avg > 0 && avg < avgTicket * 0.5; });
+  const ltRev = lowTicket.reduce((s,p) => s+p.revenue, 0);
+  if (lowTicket.length) segments.push({ name: 'Low Ticket', icon: '&#9660;', color: 'var(--red)', desc: 'Below 50% of avg ticket — potential upsell training targets', count: lowTicket.length, pctOfCustomers: (lowTicket.length/totalCust*100), revenue: ltRev, pctOfRevenue: (ltRev/totalRev*100), avgTicket: lowTicket.length ? ltRev/lowTicket.reduce((s,p)=>s+p.visits,0) : 0, customers: lowTicket.sort((a,b)=>a.revenue/a.visits-b.revenue/b.visits).slice(0, 10) });
+
+  // 7. Missing Contact Info
+  const noContact = all.filter(p => !p.hasEmail && !p.hasPhone);
+  const ncRev = noContact.reduce((s,p) => s+p.revenue, 0);
+  if (noContact.length) segments.push({ name: 'Missing Contact Info', icon: '&#9888;', color: 'var(--orange)', desc: 'No email or phone — invisible to follow-up campaigns', count: noContact.length, pctOfCustomers: (noContact.length/totalCust*100), revenue: ncRev, pctOfRevenue: (ncRev/totalRev*100), avgTicket: noContact.length ? ncRev/noContact.reduce((s,p)=>s+p.visits,0) : 0, customers: noContact.sort((a,b)=>b.revenue-a.revenue).slice(0, 10) });
+
+  // 8. Multi-Store Visitors
+  const multiStore = all.filter(p => p.stores.size > 1);
+  const msRev = multiStore.reduce((s,p) => s+p.revenue, 0);
+  if (multiStore.length) segments.push({ name: 'Multi-Store Visitors', icon: '&#8644;', color: 'var(--blue)', desc: 'Visit multiple locations — brand-loyal, not store-loyal', count: multiStore.length, pctOfCustomers: (multiStore.length/totalCust*100), revenue: msRev, pctOfRevenue: (msRev/totalRev*100), avgTicket: multiStore.length ? msRev/multiStore.reduce((s,p)=>s+p.visits,0) : 0, customers: multiStore.sort((a,b)=>b.stores.size-a.stores.size).slice(0, 10) });
+
+  // KPIs
+  document.getElementById('segKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Unique Customers</div><div class="kpi-value">${num(totalCust)}</div><div class="kpi-sub">across all stores</div></div>
+    <div class="kpi-card"><div class="kpi-label">Segments Found</div><div class="kpi-value">${segments.length}</div><div class="kpi-sub">auto-generated</div></div>
+    <div class="kpi-card"><div class="kpi-label">Top 20% Revenue Share</div><div class="kpi-value">${pct(segments[0]?.pctOfRevenue||0)}</div><div class="kpi-sub">${num(segments[0]?.count||0)} customers</div></div>
+    <div class="kpi-card"><div class="kpi-label">Repeat Rate</div><div class="kpi-value">${pct(totalCust ? (all.filter(p=>p.visits>1).length/totalCust*100) : 0)}</div><div class="kpi-sub">${num(all.filter(p=>p.visits>1).length)} returning</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Revenue / Customer</div><div class="kpi-value">${money(avgRevPerCust)}</div><div class="kpi-sub">lifetime value</div></div>
+  `;
+
+  // Render segment cards
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));gap:16px;">';
+  segments.forEach((seg, si) => {
+    html += `<div style="background:var(--card);border:1px solid var(--border);border-left:4px solid ${seg.color};border-radius:12px;padding:20px;transition:all 0.15s;" onmouseenter="this.style.borderColor='${seg.color}'" onmouseleave="this.style.borderColor='var(--border)';this.style.borderLeftColor='${seg.color}'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:18px;">${seg.icon}</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">${seg.name}</div>
+            <div style="font-size:11px;color:var(--text-muted);">${seg.desc}</div>
+          </div>
+        </div>
+        <button class="btn-export" onclick="exportSmartSegment(${si})" style="font-size:10px;padding:3px 10px;">Export</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div><div style="font-size:18px;font-weight:800;color:var(--text);">${num(seg.count)}</div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Customers</div></div>
+        <div><div style="font-size:18px;font-weight:800;color:var(--text);">${money(seg.revenue)}</div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Revenue</div></div>
+        <div><div style="font-size:18px;font-weight:800;color:var(--text);">${money(seg.avgTicket)}</div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Avg Ticket</div></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;">
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:3px;"><span>% of Customers</span><span style="font-weight:700;color:${seg.color};">${pct(seg.pctOfCustomers)}</span></div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${Math.min(seg.pctOfCustomers,100)}%;background:${seg.color};border-radius:2px;"></div></div>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:3px;"><span>% of Revenue</span><span style="font-weight:700;color:${seg.color};">${pct(seg.pctOfRevenue)}</span></div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${Math.min(seg.pctOfRevenue,100)}%;background:${seg.color};border-radius:2px;"></div></div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Top Customers</div>
+      <div style="max-height:120px;overflow-y:auto;">
+        ${seg.customers.map(c => '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:var(--text);">'+c.name.trim()+'</span><span style="color:var(--text-muted);font-family:JetBrains Mono,monospace;font-size:10px;">'+money(c.revenue)+' ('+c.visits+'x)</span></div>').join('')}
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+
+  document.getElementById('smartSegments').innerHTML = html;
+
+  // Keep old segment functions working (they're no-ops now but prevent errors)
+  const el = document.getElementById('segCriteriaGroups');
+  if (el) el.innerHTML = '';
+  const tb = document.getElementById('segTableBody');
+  if (tb) tb.innerHTML = '';
+}
+
+// Export a smart segment to CSV
+function exportSmartSegment(segIndex) {
+  // Rebuild the segment data (recompute since we don't cache)
+  // For now, trigger a CSV export of the segment's customers
+  alert('Segment export — coming in the next release. Use the tab-level Export for now.');
 }
 
 function addSegCriteriaGroup() {
