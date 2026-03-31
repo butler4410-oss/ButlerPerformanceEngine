@@ -3612,6 +3612,25 @@
 
   </div>
 
+  <!-- District Builder Modal -->
+  <div class="modal-overlay" id="districtModal">
+    <div class="modal" style="width:700px;max-height:85vh;overflow-y:auto;">
+      <h3>District Settings</h3>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Organize stores into districts and assign district managers. Changes are saved locally and reflected in the Operations grid.</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;font-family:'JetBrains Mono',monospace;opacity:0.7;">Each district can have a manager name and email for reporting.</div>
+      <div class="district-list" id="districtList"></div>
+      <div class="district-unassigned" id="districtUnassigned">
+        <div class="district-unassigned-title">Unassigned Stores</div>
+        <div class="district-stores-wrap" id="unassignedStores"></div>
+      </div>
+      <div class="modal-buttons" style="margin-top:16px;">
+        <button class="btn-cancel" onclick="closeDistrictModal()">Close</button>
+        <button class="btn-save" onclick="addNewDistrict()" style="background:var(--blue);margin-right:auto;">+ Add District</button>
+        <button class="btn-save" onclick="saveDistricts()">Save Districts</button>
+      </div>
+    </div>
+  </div>
+
   <!-- REPORTING TAB -->
   <div class="tab-content" id="tab-reporting">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -7841,9 +7860,10 @@ function escHtml(str) {
 }
 
 // Token modal close handlers
-document.getElementById('tokenModal').addEventListener('click', function(e) {
-  if (e.target === this) closeTokenModal();
-});
+(function() {
+  const tm = document.getElementById('tokenModal');
+  if (tm) tm.addEventListener('click', function(e) { if (e.target === this) closeTokenModal(); });
+})();
 
 // ============================================================
 // DISTRICT BUILDER
