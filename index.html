@@ -3068,7 +3068,7 @@
     <div class="upload-file-types">
       <div class="upload-type-group">
         <div class="upload-type-label">POS Reports</div>
-        <div class="upload-type-items">Sales Summary · KPI Actuals · Time Analysis · System Impact · KPI Retail Comp</div>
+        <div class="upload-type-items">Sales Summary · KPI Actuals · Time Analysis · System Impact · KPI Retail Comp · Any CSV</div>
       </div>
       <div class="upload-type-group">
         <div class="upload-type-label">Transaction Data</div>
@@ -3777,6 +3777,7 @@
         Upload your POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact) to view reports.
       </div>
     </div>
+    <div id="customReportsContent"></div>
   </div>
 
   <!-- STORE RANKINGS TAB -->
@@ -3829,6 +3830,8 @@ let GROW = {
   system_impact: [],
   kpi_retail_comp: []
 };
+
+let CUSTOM_REPORTS = []; // Stores unrecognized CSVs: [{name, headers, rows}]
 
 let FILTERED = {};
 let allCharts = {};
@@ -3950,6 +3953,7 @@ function saveUserData() {
     const payload = {
       data: trimmedData,
       grow: GROW,
+      customReports: CUSTOM_REPORTS,
       loadedFiles: loadedFiles,
       savedAt: new Date().toISOString(),
       version: 3
@@ -4007,6 +4011,9 @@ function loadUserData() {
           GROW[type] = payload.grow[type];
         }
       });
+    }
+    if (payload.customReports) {
+      CUSTOM_REPORTS = payload.customReports;
     }
     Object.assign(loadedFiles, payload.loadedFiles);
     return true;
@@ -4069,7 +4076,23 @@ function processFile(file) {
       const headers = parseCSVLine(firstLine);
       const type = detectFileType(headers);
       if (type === 'unknown') {
-        resolve({ name: file.name, type: 'unknown', rows: 0 });
+        // Store as custom report — any CSV can be viewed
+        const rows = parseCSV(text);
+        if (rows.length > 0) {
+          // Clean the store number prefix if present (e.g. "Store Id: 319" -> "319")
+          rows.forEach(r => {
+            if (r.Store_Number) r.Store_Number = r.Store_Number.replace(/^Store\s*Id:\s*/i, '').trim();
+            if (r.Employee_Name1) r.Employee_Name1 = r.Employee_Name1.replace(/^Employee\s*:\s*/i, '').trim();
+            if (r.User_name) r.User_name = r.User_name.replace(/^User\s*Name\s*:\s*/i, '').trim();
+          });
+          // Remove existing report with same name to prevent dupes
+          CUSTOM_REPORTS = CUSTOM_REPORTS.filter(r => r.name !== file.name);
+          CUSTOM_REPORTS.push({ name: file.name, headers: headers.filter(h => h.trim()), rows: rows });
+          loadedFiles['custom_' + file.name] = true;
+          resolve({ name: file.name, type: 'custom', rows: rows.length });
+        } else {
+          resolve({ name: file.name, type: 'unknown', rows: 0 });
+        }
         return;
       }
       const rows = parseCSV(text);
@@ -4159,14 +4182,14 @@ async function handleFiles(files) {
 
   fileListEl.innerHTML = results.map(r => `
     <div class="file-item">
-      <span class="check">${r.type !== 'unknown' ? '✓' : '?'}</span>
+      <span class="check">${r.type === 'unknown' ? '?' : '✓'}</span>
       <span class="name">${r.name}</span>
-      <span class="rows">${r.type !== 'unknown' ? fileLabels[r.type] + ' — ' + r.rows.toLocaleString() + ' rows' : 'Unknown format'}</span>
+      <span class="rows">${r.type === 'unknown' ? 'Unknown format' : (r.type === 'custom' ? 'Custom Report — ' + r.rows.toLocaleString() + ' rows' : (fileLabels[r.type] || r.type) + ' — ' + r.rows.toLocaleString() + ' rows')}</span>
     </div>
   `).join('');
 
   const loadedCount = Object.keys(loadedFiles).length;
-  const hasGrow = Object.keys(loadedFiles).some(k => k.startsWith('grow_'));
+  const hasGrow = Object.keys(loadedFiles).some(k => k.startsWith('grow_') || k.startsWith('custom_'));
   if (loadedCount >= 2 || hasGrow) {
     setTimeout(() => {
       launchDashboard();
@@ -10691,6 +10714,87 @@ function renderGrow() {
       `;
     }
   }
+  // ── Custom Reports ──
+  renderCustomReports();
+}
+
+function renderCustomReports() {
+  const container = document.getElementById('customReportsContent');
+  if (!container) return;
+  if (!CUSTOM_REPORTS.length) { container.innerHTML = ''; return; }
+
+  let html = '';
+  CUSTOM_REPORTS.forEach((report, ri) => {
+    const cleanName = report.name.replace(/\.csv$/i, '').replace(/[_-]/g, ' ');
+    const maxRows = 500; // Limit for performance
+    const displayRows = report.rows.slice(0, maxRows);
+
+    // Figure out meaningful column names — replace Textbox## with something useful
+    const smartHeaders = report.headers.map(h => {
+      // Clean up GROW's Textbox naming
+      return h.replace(/^Textbox\d+$/, function(m) { return m; }); // Keep as-is for now, tooltip will help
+    });
+
+    html += '<div class="ops-grid-wrap" style="margin-top:24px;">';
+    html += '<h3 style="display:flex;align-items:center;justify-content:space-between;">';
+    html += '<span>' + cleanName + ' <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">' + report.rows.length.toLocaleString() + ' rows</span></span>';
+    html += '<div style="display:flex;gap:6px;">';
+    html += '<button class="btn-export" onclick="exportCustomReport(' + ri + ')" style="font-size:11px;padding:4px 12px;">Export</button>';
+    html += '<button class="btn-export" onclick="removeCustomReport(' + ri + ')" style="font-size:11px;padding:4px 12px;color:var(--red);border-color:var(--red);">Remove</button>';
+    html += '</div></h3>';
+    html += '<div class="ops-grid-scroll" style="max-height:500px;">';
+    html += '<table class="ops-grid">';
+    html += '<thead><tr>';
+    smartHeaders.forEach(h => {
+      html += '<th title="' + h + '">' + (h.length > 18 ? h.slice(0, 16) + '..' : h) + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    displayRows.forEach(row => {
+      html += '<tr>';
+      report.headers.forEach(h => {
+        let val = row[h] || '';
+        // Clean up common GROW prefixes in values
+        val = val.replace(/^Store\s*Id:\s*/i, '#').replace(/^Employee\s*:\s*/i, '').replace(/^User\s*Name\s*:\s*/i, '');
+        // Color-code inspection statuses
+        if (val.includes('Green')) val = '<span style="color:var(--green);font-weight:600;">Green</span>';
+        else if (val.includes('Red')) val = '<span style="color:var(--red);font-weight:600;">Red</span>';
+        else if (val.includes('Yellow')) val = '<span style="color:var(--yellow);font-weight:600;">Yellow</span>';
+        // Truncate long values
+        const display = val.length > 30 ? val.slice(0, 28) + '..' : val;
+        html += '<td style="font-size:11px;white-space:nowrap;" title="' + (row[h]||'').replace(/"/g, '&quot;') + '">' + display + '</td>';
+      });
+      html += '</tr>';
+    });
+    if (report.rows.length > maxRows) {
+      html += '<tr><td colspan="' + report.headers.length + '" style="text-align:center;color:var(--text-muted);padding:12px;font-size:11px;">Showing ' + maxRows.toLocaleString() + ' of ' + report.rows.length.toLocaleString() + ' rows</td></tr>';
+    }
+    html += '</tbody></table></div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function exportCustomReport(idx) {
+  if (!CUSTOM_REPORTS[idx]) return;
+  const report = CUSTOM_REPORTS[idx];
+  let csv = report.headers.join(',') + '\n';
+  report.rows.forEach(row => {
+    csv += report.headers.map(h => {
+      const v = row[h] || '';
+      return v.includes(',') || v.includes('"') ? '"' + v.replace(/"/g, '""') + '"' : v;
+    }).join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = report.name;
+  a.click();
+}
+
+function removeCustomReport(idx) {
+  if (!confirm('Remove this report from the viewer?')) return;
+  CUSTOM_REPORTS.splice(idx, 1);
+  renderCustomReports();
 }
 
 // Init auth — seed in background, don't block page
