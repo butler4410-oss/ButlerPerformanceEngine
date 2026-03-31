@@ -313,13 +313,14 @@
     height: 28px;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
-    color: var(--text);
+    color: #e8e8f0;
     padding: 0 10px;
     border-radius: 6px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
-    width: 120px;
+    width: 130px;
     transition: all 0.15s;
+    color-scheme: dark;
   }
 
   .cmd-input:hover {
@@ -4255,7 +4256,7 @@ function launchDashboard() {
     sel.innerHTML += `<option value="${s}">${s}</option>`;
   });
 
-  // Date range
+  // Date range — from transaction data or GROW reports
   let minD = null, maxD = null;
   DATA.customers.forEach(r => {
     const d = parseDate(r.Invoice_Date);
@@ -4265,15 +4266,20 @@ function launchDashboard() {
     }
   });
   if (minD && maxD) {
-    document.getElementById('dateRange').textContent = fmtDate(minD) + ' — ' + fmtDate(maxD);
     document.getElementById('filterFrom').value = fmtDateISO(minD);
     document.getElementById('filterTo').value = fmtDateISO(maxD);
-  } else if (GROW.sales_summary.length > 0 && GROW.sales_summary[0].From_Date) {
-    // Use GROW date range as fallback
-    const fromStr = GROW.sales_summary[0].From_Date || '';
-    const toStr = GROW.sales_summary[0].To_Date || '';
-    if (fromStr && toStr) {
-      document.getElementById('dateRange').textContent = fromStr.replace(/["']/g,'') + ' — ' + toStr.replace(/["']/g,'');
+  } else {
+    // Try GROW data for date range
+    const growSources = [GROW.sales_summary, GROW.kpi_retail_comp, GROW.time_analysis].find(arr => arr.length > 0 && arr[0].From_Date);
+    if (growSources) {
+      const fromStr = (growSources[0].From_Date || '').replace(/["']/g, '').trim();
+      const toStr = (growSources[0].To_Date || '').replace(/["']/g, '').trim();
+      // Parse MM/DD/YYYY to Date
+      const parseGrowDate = (s) => { const m = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? new Date(+m[3], +m[1]-1, +m[2]) : null; };
+      const gFrom = parseGrowDate(fromStr);
+      const gTo = parseGrowDate(toStr);
+      if (gFrom) document.getElementById('filterFrom').value = fmtDateISO(gFrom);
+      if (gTo) document.getElementById('filterTo').value = fmtDateISO(gTo);
     }
   }
 
