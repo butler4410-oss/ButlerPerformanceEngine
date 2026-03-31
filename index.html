@@ -2707,15 +2707,17 @@
     <div class="login-box">
       <h2>Sign In</h2>
       <div class="login-sub">Enter your credentials to access the platform</div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="loginEmail" placeholder="you@company.com" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="loginPassword" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <button class="btn-login" onclick="doLogin()">Sign In</button>
+      <form onsubmit="event.preventDefault();doLogin();" autocomplete="on">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" autocomplete="email" placeholder="you@company.com">
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder="Enter password">
+        </div>
+        <button type="submit" class="btn-login">Sign In</button>
+      </form>
       <div class="login-error" id="loginError"></div>
     </div>
     <div class="login-footer">
@@ -2729,17 +2731,19 @@
   <div class="modal" style="width:460px;">
     <h3 id="regTitle">Create Account</h3>
     <div id="regRoleNote" style="font-size:12px;color:var(--text-muted);margin-bottom:16px;"></div>
-    <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Full name"></div>
-    <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="you@company.com"></div>
-    <div class="form-group" id="regCompanyGroup"><label>Company</label><input type="text" id="regCompany" placeholder="South Bay Lube Inc."></div>
-    <div class="form-group"><label>Password</label><input type="password" id="regPassword" placeholder="Min 6 chars, 1 uppercase, 1 number"></div>
-    <div class="form-group" id="regRoleGroup"><label>Role</label>
-      <select id="regRole"></select>
+    <form onsubmit="event.preventDefault();doCreateAccount();" autocomplete="off">
+    <div class="form-group"><label for="regName">Full Name</label><input type="text" id="regName" name="name" placeholder="Full name"></div>
+    <div class="form-group"><label for="regEmail">Email</label><input type="email" id="regEmail" name="email" placeholder="you@company.com"></div>
+    <div class="form-group" id="regCompanyGroup"><label for="regCompany">Company</label><input type="text" id="regCompany" name="company" placeholder="South Bay Lube Inc."></div>
+    <div class="form-group"><label for="regPassword">Password</label><input type="password" id="regPassword" name="password" autocomplete="new-password" placeholder="Min 6 chars, 1 uppercase, 1 number"></div>
+    <div class="form-group" id="regRoleGroup"><label for="regRole">Role</label>
+      <select id="regRole" name="role"></select>
     </div>
     <div class="form-group" id="regStoresGroup" style="display:none;">
-      <label>Assigned Stores (hold Ctrl to multi-select, leave empty for all)</label>
-      <select id="regStores" multiple style="height:80px;"></select>
+      <label for="regStores">Assigned Stores (hold Ctrl to multi-select, leave empty for all)</label>
+      <select id="regStores" name="stores" multiple style="height:80px;"></select>
     </div>
+    </form>
     <div class="modal-buttons">
       <button class="btn-cancel" onclick="document.getElementById('createAccountModal').classList.remove('active')">Cancel</button>
       <button class="btn-save" onclick="doCreateAccount()">Create Account</button>
@@ -2807,12 +2811,12 @@
 
   <!-- Tier 2: Command Bar -->
   <div class="command-bar">
-    <span class="cmd-label" style="font-weight:600;color:var(--text);font-size:11px;">Viewing:</span>
-    <select id="filterStore" class="cmd-select"><option value="">All Stores</option></select>
-    <span class="cmd-label" style="margin-left:8px;">From</span>
-    <input type="date" id="filterFrom" class="cmd-input">
-    <span class="cmd-label">To</span>
-    <input type="date" id="filterTo" class="cmd-input">
+    <label for="filterStore" class="cmd-label" style="font-weight:600;color:var(--text);font-size:11px;">Viewing:</label>
+    <select id="filterStore" name="store" class="cmd-select"><option value="">All Stores</option></select>
+    <label for="filterFrom" class="cmd-label" style="margin-left:8px;">From</label>
+    <input type="date" id="filterFrom" name="dateFrom" class="cmd-input">
+    <label for="filterTo" class="cmd-label">To</label>
+    <input type="date" id="filterTo" name="dateTo" class="cmd-input">
     <button class="cmd-btn cmd-btn-primary" onclick="applyFilters()" style="font-weight:700;padding:5px 16px;">Apply</button>
     <button class="cmd-btn" onclick="resetFilters()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:11px;padding:4px 10px;">Reset</button>
     <span id="filterSummary" class="filter-summary"></span>
@@ -2844,28 +2848,28 @@
   <div class="modal" style="width:480px;">
     <h3>Dashboard Settings</h3>
     <div class="form-group">
-      <label>Company / Client Name</label>
-      <input type="text" id="settingCompany" placeholder="e.g. Jiffy Lube">
+      <label for="settingCompany">Company / Client Name</label>
+      <input type="text" id="settingCompany" name="company" placeholder="e.g. Jiffy Lube">
     </div>
     <div class="form-group">
-      <label>User / Contact Name</label>
-      <input type="text" id="settingUser" placeholder="e.g. Erin Ham">
+      <label for="settingUser">User / Contact Name</label>
+      <input type="text" id="settingUser" name="user" placeholder="e.g. Erin Ham">
     </div>
     <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Gmail Integration (EmailJS)</div>
     <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect chase@butleranalytics.io via <a href="https://www.emailjs.com" target="_blank" style="color:var(--primary);">emailjs.com</a> (free 200/mo). Create a template with: <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{to_email}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{from_name}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{subject}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{message}}</code></p>
     <div class="form-group">
-      <label>EmailJS Public Key</label>
-      <input type="text" id="settingEjsKey" placeholder="e.g. abc123XYZ">
+      <label for="settingEjsKey">EmailJS Public Key</label>
+      <input type="text" id="settingEjsKey" name="ejsKey" placeholder="e.g. abc123XYZ">
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div class="form-group">
-        <label>Service ID</label>
-        <input type="text" id="settingEjsService" placeholder="e.g. service_gmail">
+        <label for="settingEjsService">Service ID</label>
+        <input type="text" id="settingEjsService" name="ejsService" placeholder="e.g. service_gmail">
       </div>
       <div class="form-group">
-        <label>Template ID</label>
-        <input type="text" id="settingEjsTemplate" placeholder="e.g. template_report">
+        <label for="settingEjsTemplate">Template ID</label>
+        <input type="text" id="settingEjsTemplate" name="ejsTemplate" placeholder="e.g. template_report">
       </div>
     </div>
     <div id="emailTestResult" style="font-size:12px;margin-top:4px;"></div>
@@ -2911,16 +2915,16 @@
       <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:12px;">Add New Schedule</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="form-group">
-          <label>Recipient Email</label>
-          <input type="email" id="schedEmail" placeholder="name@company.com">
+          <label for="schedEmail">Recipient Email</label>
+          <input type="email" id="schedEmail" name="schedEmail" placeholder="name@company.com">
         </div>
         <div class="form-group">
-          <label>Recipient Name</label>
-          <input type="text" id="schedName" placeholder="Erin Ham">
+          <label for="schedName">Recipient Name</label>
+          <input type="text" id="schedName" name="schedName" placeholder="Erin Ham">
         </div>
         <div class="form-group">
-          <label>Report</label>
-          <select id="schedReport" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;">
+          <label for="schedReport">Report</label>
+          <select id="schedReport" name="schedReport" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;">
             <option value="overview">Overview Summary</option>
             <option value="tblServices">Service & Product Breakdown</option>
             <option value="tblInsp">Vehicle Inspection Summary</option>
@@ -2931,8 +2935,8 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Frequency</label>
-          <select id="schedFreq" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;">
+          <label for="schedFreq">Frequency</label>
+          <select id="schedFreq" name="schedFreq" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;">
             <option value="daily">Daily</option>
             <option value="weekly" selected>Weekly</option>
             <option value="biweekly">Bi-Weekly</option>
@@ -2955,16 +2959,16 @@
   <div class="modal" style="width:520px;">
     <h3 id="emailModalTitle">Email Report</h3>
     <div class="form-group">
-      <label>To (email addresses, comma-separated)</label>
-      <input type="text" id="emailTo" placeholder="name@company.com, name2@company.com">
+      <label for="emailTo">To (email addresses, comma-separated)</label>
+      <input type="text" id="emailTo" name="to" placeholder="name@company.com, name2@company.com">
     </div>
     <div class="form-group">
-      <label>Subject</label>
-      <input type="text" id="emailSubject">
+      <label for="emailSubject">Subject</label>
+      <input type="text" id="emailSubject" name="subject">
     </div>
     <div class="form-group">
-      <label>Message (optional)</label>
-      <textarea id="emailBody" rows="3" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;resize:vertical;font-family:inherit;"></textarea>
+      <label for="emailBody">Message (optional)</label>
+      <textarea id="emailBody" name="body" rows="3" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:14px;resize:vertical;font-family:inherit;"></textarea>
     </div>
     <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">The styled report will be attached as an HTML file. Recipient can view in any browser or print to PDF.</div>
     <div class="modal-buttons">
@@ -3392,7 +3396,7 @@
       <button class="btn-export" onclick="emailReport('tblCustomers','Customer Details')">Email</button>
       <div class="filter-group" style="flex-direction:row;align-items:center;gap:8px;">
         <label style="margin:0;">Search:</label>
-        <input type="text" id="custSearch" placeholder="Name, email, phone, VIN..." style="min-width:260px;" oninput="filterCustomerTable()">
+        <input type="text" id="custSearch" name="custSearch" aria-label="Search customers" placeholder="Name, email, phone, VIN..." style="min-width:260px;" oninput="filterCustomerTable()">
       </div>
     </div>
     <div class="table-wrap">
@@ -3454,12 +3458,12 @@
         </div>
         <div style="padding:24px;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-            <div class="form-group" style="margin-bottom:0;"><label>Segment Name</label><input type="text" id="segName" placeholder="e.g. High Value Customers"></div>
+            <div class="form-group" style="margin-bottom:0;"><label for="segName">Segment Name</label><input type="text" id="segName" name="segName" placeholder="e.g. High Value Customers"></div>
             <div class="form-group" style="margin-bottom:0;"><label>Type</label>
-              <select id="segType"><option value="dynamic">Dynamic (auto-updates)</option><option value="static">Static (manual)</option></select>
+              <select id="segType" name="segType"><option value="dynamic">Dynamic (auto-updates)</option><option value="static">Static (manual)</option></select>
             </div>
           </div>
-          <div class="form-group" style="margin-bottom:16px;"><label>Description</label><input type="text" id="segDesc" placeholder="Describe who this segment targets..."></div>
+          <div class="form-group" style="margin-bottom:16px;"><label for="segDesc">Description</label><input type="text" id="segDesc" name="segDesc" placeholder="Describe who this segment targets..."></div>
 
           <!-- Criteria Groups -->
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Criteria Rules</div>
@@ -4070,11 +4074,26 @@ function processFile(file) {
       }
       const rows = parseCSV(text);
       // Route GROW files to GROW object, others to DATA
+      // Append to existing data (allows loading multiple files to expand date range)
+      // Dedup by creating a row fingerprint to avoid duplicates from same file loaded twice
+      function dedupMerge(existing, newRows) {
+        if (!existing.length) return newRows;
+        const seen = new Set();
+        existing.forEach(r => {
+          const fp = (r.Store_Number||'') + '|' + (r.Invoice_Number||r.Measure||r.Store_Number||'') + '|' + (r.Invoice_Date||r.From_Date||'');
+          seen.add(fp);
+        });
+        const unique = newRows.filter(r => {
+          const fp = (r.Store_Number||'') + '|' + (r.Invoice_Number||r.Measure||r.Store_Number||'') + '|' + (r.Invoice_Date||r.From_Date||'');
+          return !seen.has(fp);
+        });
+        return existing.concat(unique);
+      }
       if (type.startsWith('grow_')) {
         const growKey = type.replace('grow_', '');
-        GROW[growKey] = rows;
+        GROW[growKey] = dedupMerge(GROW[growKey], rows);
       } else {
-        DATA[type] = rows;
+        DATA[type] = dedupMerge(DATA[type], rows);
       }
       loadedFiles[type] = true;
       resolve({ name: file.name, type, rows: rows.length });
