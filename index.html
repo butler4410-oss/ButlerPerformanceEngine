@@ -5814,15 +5814,18 @@ function renderRevenue() {
   const promos = FILTERED.promos;
   const promoDiscMap = {};
   promos.forEach(r => {
-    const code = r.Promo_Code || 'Unknown';
-    promoDiscMap[code] = (promoDiscMap[code] || 0) + Math.abs(+r.Promo_Amount || 0);
+    const code = r.Promo_Code || r.Promo_Description || 'Unknown';
+    // Parse amount — handle "$2,548.00", "(15.00)", plain numbers
+    let amt = r.Promo_Amount || r.Promo_Amount_Sum || r.New_Vehicle_Promo_Amount_Sum || '0';
+    if (typeof amt === 'string') amt = amt.replace(/[$,]/g, '').replace(/[()]/g, '');
+    promoDiscMap[code] = (promoDiscMap[code] || 0) + Math.abs(parseFloat(amt) || 0);
   });
   const topPromoDisc = Object.entries(promoDiscMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
   if (topPromoDisc.length) {
     makeChart('chartDiscountImpact', {
       type: 'bar',
       data: {
-        labels: topPromoDisc.map(p => p[0]),
+        labels: topPromoDisc.map(p => p[0].length > 25 ? p[0].slice(0,23) + '..' : p[0]),
         datasets: [{ label: 'Total Discount', data: topPromoDisc.map(p => p[1]), backgroundColor: PALETTE.redLight, borderRadius: 4 }]
       },
       options: { indexAxis: 'y', scales: { x: { ticks: { callback: tickMoney } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: tooltipMoney } } } }
@@ -7345,10 +7348,14 @@ function renderPeople() {
       <div class="kpi-card"><div class="kpi-label">Total Green</div><div class="kpi-value">${num(totalGreen)}</div><div class="kpi-sub">items passed</div></div>
     `;
 
-    csaBody.innerHTML = advisorList.map(a => {
+    // Store advisor data globally for detail modal
+    window._csaAdvisors = advisorList;
+    window._csaSrReport = srReport;
+
+    csaBody.innerHTML = advisorList.map((a, idx) => {
       const opps = a.yellow + a.red;
       const conv = opps ? (a.sold / opps * 100) : 0;
-      return '<tr><td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>' + a.name + '</strong></td><td>#' + a.store + '</td><td>' + num(a.vehicles) + '</td><td style="color:var(--green);">' + num(a.green) + '</td><td style="color:var(--yellow);">' + num(a.yellow) + '</td><td style="color:var(--red);">' + num(a.red) + '</td><td>' + num(a.sold) + '</td><td class="' + (conv > 50 ? 'cell-green' : conv > 25 ? 'cell-yellow' : 'cell-red') + '">' + pct(conv) + '</td></tr>';
+      return '<tr style="cursor:pointer;" onclick="openAdvisorDetail(' + idx + ')"><td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>' + a.name + '</strong></td><td>#' + a.store + '</td><td>' + num(a.vehicles) + '</td><td style="color:var(--green);">' + num(a.green) + '</td><td style="color:var(--yellow);">' + num(a.yellow) + '</td><td style="color:var(--red);">' + num(a.red) + '</td><td>' + num(a.sold) + '</td><td class="' + (conv > 50 ? 'cell-green' : conv > 25 ? 'cell-yellow' : 'cell-red') + '">' + pct(conv) + '</td></tr>';
     }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">No advisor data found</td></tr>';
   } else {
     if (csaBody) csaBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Upload SR_Productivity CSV via "+ Add Files" to see advisor performance</td></tr>';
@@ -7496,9 +7503,80 @@ function renderPeople() {
 
 // Export a smart segment to CSV
 function exportSmartSegment(segIndex) {
-  // Rebuild the segment data (recompute since we don't cache)
-  // For now, trigger a CSV export of the segment's customers
   alert('Segment export — coming in the next release. Use the tab-level Export for now.');
+}
+
+function openAdvisorDetail(idx) {
+  const advisors = window._csaAdvisors;
+  const srReport = window._csaSrReport;
+  if (!advisors || !advisors[idx] || !srReport) return;
+  const a = advisors[idx];
+
+  // Get all rows for this advisor from the SR report
+  const rows = srReport.rows.filter(r => {
+    const empName = (r.Employee_Name1 || '').replace(/^Employee\s*:\s*/i, '').trim();
+    const store = (r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').trim();
+    return empName === a.name && store === a.store;
+  });
+
+  // Group by inspection item
+  const items = {};
+  rows.forEach(r => {
+    const item = r.Group_Map || r.Textbox34 || 'Unknown';
+    const status = (r.Textbox31 || r.Group_Map || '').toLowerCase();
+    const count = parseInt((r.Textbox38 || r.Textbox42 || '0').replace(/[^0-9]/g, '')) || 0;
+    if (!items[item]) items[item] = { green: 0, yellow: 0, red: 0 };
+    if (status.includes('green')) items[item].green += count;
+    else if (status.includes('yellow')) items[item].yellow += count;
+    else if (status.includes('red')) items[item].red += count;
+  });
+
+  const itemList = Object.entries(items).filter(([,d]) => d.green + d.yellow + d.red > 0).sort((a,b) => (b[1].yellow + b[1].red) - (a[1].yellow + a[1].red));
+  const opps = a.yellow + a.red;
+  const conv = opps ? (a.sold / opps * 100) : 0;
+
+  openReportModal(a.name + ' — Store #' + a.store, function(body) {
+    let html = '<div class="kpi-grid" style="margin-bottom:20px;">';
+    html += '<div class="kpi-card"><div class="kpi-label">Vehicles</div><div class="kpi-value">' + num(a.vehicles) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Green Items</div><div class="kpi-value" style="color:var(--green);">' + num(a.green) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Yellow Items</div><div class="kpi-value" style="color:var(--yellow);">' + num(a.yellow) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Red Items</div><div class="kpi-value" style="color:var(--red);">' + num(a.red) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Conversion</div><div class="kpi-value" style="color:' + (conv > 50 ? 'var(--green)' : conv > 25 ? 'var(--yellow)' : 'var(--red)') + ';">' + pct(conv) + '</div></div>';
+    html += '</div>';
+
+    // Chart: inspection items breakdown
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">';
+    html += '<div class="chart-card"><h3>Inspection Items by Status</h3><div class="chart-wrap" style="height:350px;"><canvas id="modalAdvisorChart"></canvas></div></div>';
+
+    // Item detail table
+    html += '<div class="table-wrap" style="margin:0;"><h3>Inspection Item Detail</h3><div class="table-scroll" style="max-height:380px;"><table><thead><tr><th style="text-align:left;">Item</th><th style="color:var(--green);">Green</th><th style="color:var(--yellow);">Yellow</th><th style="color:var(--red);">Red</th><th>Total</th></tr></thead><tbody>';
+    itemList.forEach(([name, d]) => {
+      const total = d.green + d.yellow + d.red;
+      html += '<tr><td>' + name + '</td><td style="color:var(--green);">' + num(d.green) + '</td><td style="color:var(--yellow);">' + num(d.yellow) + '</td><td style="color:var(--red);">' + num(d.red) + '</td><td>' + num(total) + '</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+    html += '</div>';
+
+    body.innerHTML = html;
+
+    // Render chart
+    const topItems = itemList.slice(0, 12);
+    if (topItems.length) {
+      reportModalCharts.push('modalAdvisorChart');
+      makeChart('modalAdvisorChart', {
+        type: 'bar',
+        data: {
+          labels: topItems.map(([n]) => n.length > 20 ? n.slice(0,18) + '..' : n),
+          datasets: [
+            { label: 'Green', data: topItems.map(([,d]) => d.green), backgroundColor: PALETTE.green, borderRadius: 3 },
+            { label: 'Yellow', data: topItems.map(([,d]) => d.yellow), backgroundColor: PALETTE.yellow, borderRadius: 3 },
+            { label: 'Red', data: topItems.map(([,d]) => d.red), backgroundColor: PALETTE.red, borderRadius: 3 }
+          ]
+        },
+        options: { scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true } }, plugins: { legend: { position: 'top' } } }
+      });
+    }
+  });
 }
 
 function addSegCriteriaGroup() {
