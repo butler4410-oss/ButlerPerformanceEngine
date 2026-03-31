@@ -2871,6 +2871,7 @@
       <span class="data-saved-dot"></span> Saved
     </div>
     <div class="cmd-spacer"></div>
+    <button class="cmd-btn cmd-btn-ghost" onclick="openAddFiles()" title="Add more CSV files">+ Add Files</button>
   </div>
 
   <!-- Tier 3: Tab Rail -->
@@ -2884,7 +2885,6 @@
     <button class="tab company-admin-only" data-tab="segments">Segments</button>
     <button class="tab company-admin-only" data-tab="marketing">Market Analysis</button>
     <button class="tab" data-tab="reporting">Reporting</button>
-    <button class="tab" data-tab="grow">POS Reports</button>
     <button class="tab" data-tab="stores">Rankings</button>
   </div>
 </div>
@@ -3338,6 +3338,9 @@
         <button class="sub-tab active" data-sub="grid" onclick="switchSubTab('opsSubTabs','grid')">Command Grid</button>
         <button class="sub-tab" data-sub="charts" onclick="switchSubTab('opsSubTabs','charts')">Charts</button>
         <button class="sub-tab" data-sub="times" onclick="switchSubTab('opsSubTabs','times')">Service Times</button>
+        <button class="sub-tab" data-sub="pos" onclick="switchSubTab('opsSubTabs','pos')">POS Summary</button>
+        <button class="sub-tab" data-sub="custom" onclick="switchSubTab('opsSubTabs','custom')">Additional Reports</button>
+        <button class="sub-tab" data-sub="csa" onclick="switchSubTab('opsSubTabs','csa')">Service Advisors</button>
       </div>
 
       <div class="sub-panel active" data-sub="grid">
@@ -3412,6 +3415,38 @@
                 </tr>
               </thead>
               <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-panel" data-sub="pos">
+        <div id="opsGrowContent"></div>
+      </div>
+
+      <div class="sub-panel" data-sub="custom">
+        <div id="opsCustomContent"></div>
+      </div>
+
+      <div class="sub-panel" data-sub="csa">
+        <div class="kpi-grid" id="csaKPIs"></div>
+        <div class="ops-grid-wrap">
+          <h3>Service Advisor Performance</h3>
+          <div class="ops-grid-scroll" style="max-height:500px;">
+            <table class="ops-grid" id="csaGrid">
+              <thead>
+                <tr>
+                  <th style="min-width:160px;position:sticky;left:0;z-index:3;background:var(--card);">Advisor</th>
+                  <th title="Store location">Store</th>
+                  <th title="Total vehicles serviced">Vehicles</th>
+                  <th title="Total green inspection items">Green</th>
+                  <th title="Total yellow inspection items">Yellow</th>
+                  <th title="Total red inspection items">Red</th>
+                  <th title="Items sold from inspections">Sold</th>
+                  <th title="Conversion rate: sold / (yellow+red)">Conv %</th>
+                </tr>
+              </thead>
+              <tbody id="csaGridBody"></tbody>
             </table>
           </div>
         </div>
@@ -3744,13 +3779,9 @@
   </div>
 
   <!-- GROW REPORTS TAB -->
-  <div class="tab-content" id="tab-grow">
-    <div id="growContent">
-      <div class="grow-no-data">
-        <strong>No POS Report Data</strong><br>
-        Upload your POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact) to view reports.
-      </div>
-    </div>
+  <!-- POS data renders into Operations sub-tabs -->
+  <div style="display:none;" id="tab-grow">
+    <div id="growContent"></div>
     <div id="customReportsContent"></div>
   </div>
 
@@ -4117,6 +4148,12 @@ function processFile(file) {
 // ============================================================
 // FILE UPLOAD HANDLING
 // ============================================================
+// Add Files from dashboard (without leaving)
+function openAddFiles() {
+  const input = document.getElementById('addFilesInput');
+  if (input) input.click();
+}
+
 const uploadZone = document.getElementById('uploadZone');
 const fileInput = document.getElementById('fileInput');
 const fileListEl = document.getElementById('fileList');
@@ -4138,6 +4175,33 @@ uploadZone.addEventListener('drop', async (e) => {
 
 fileInput.addEventListener('change', async () => {
   await handleFiles(fileInput.files);
+});
+
+// Additional file input for adding files from dashboard
+const addFilesEl = document.createElement('input');
+addFilesEl.type = 'file';
+addFilesEl.id = 'addFilesInput';
+addFilesEl.multiple = true;
+addFilesEl.accept = '.csv,.CSV';
+addFilesEl.style.display = 'none';
+document.body.appendChild(addFilesEl);
+addFilesEl.addEventListener('change', async () => {
+  if (addFilesEl.files.length) {
+    const results = [];
+    for (const file of addFilesEl.files) {
+      const r = await processFile(file);
+      results.push(r);
+    }
+    addFilesEl.value = '';
+    // Show a toast with what was loaded
+    const loaded = results.filter(r => r.type !== 'unknown');
+    if (loaded.length) {
+      const msg = loaded.map(r => r.name + ' (' + r.rows.toLocaleString() + ' rows)').join(', ');
+      showTokenCopyToast('Loaded: ' + msg);
+      applyFilters();
+      saveUserData();
+    }
+  }
 });
 
 document.getElementById('uploadDropInner').addEventListener('click', function(e) {
@@ -4349,10 +4413,10 @@ function launchDashboard() {
   if (!hasStandardData && hasAnyGrowData()) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    const growTab = document.querySelector('.tab[data-tab="grow"]');
-    const growContent = document.getElementById('tab-grow');
-    if (growTab) growTab.classList.add('active');
-    if (growContent) growContent.classList.add('active');
+    const opsTab = document.querySelector('.tab[data-tab="operations"]');
+    const opsContent = document.getElementById('tab-operations');
+    if (opsTab) opsTab.classList.add('active');
+    if (opsContent) opsContent.classList.add('active');
   } else {
     // Ensure first tab is active
     ensureActiveTab();
@@ -6011,6 +6075,75 @@ function renderOperations() {
       <td>${money(avgTicket)}</td>
     </tr>`;
   }).join('');
+  renderCSA();
+}
+
+function renderCSA() {
+  const body = document.getElementById('csaGridBody');
+  const kpis = document.getElementById('csaKPIs');
+  if (!body) return;
+
+  // Try to build CSA data from custom reports (SR_Productivity)
+  const srReport = CUSTOM_REPORTS.find(r => r.name.toLowerCase().includes('productivity') || r.name.toLowerCase().includes('sr_'));
+
+  if (!srReport) {
+    if (kpis) kpis.innerHTML = '<div class="kpi-card" style="grid-column:1/-1;text-align:center;"><div class="kpi-label">Service Advisors</div><div class="kpi-value" style="font-size:14px;color:var(--text-muted);">Upload an SR_Productivity report to see advisor performance</div></div>';
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">No SR Productivity data loaded. Add the file via "+ Add Files" in the command bar.</td></tr>';
+    return;
+  }
+
+  // Parse SR_Productivity: group by employee + store
+  const advisors = {};
+  srReport.rows.forEach(r => {
+    const store = (r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').trim();
+    const empName = (r.Employee_Name1 || '').replace(/^Employee\s*:\s*/i, '').trim();
+    if (!empName || !store) return;
+    const key = store + '|' + empName;
+    if (!advisors[key]) advisors[key] = { name: empName, store: store, vehicles: 0, green: 0, yellow: 0, red: 0, sold: 0 };
+    const a = advisors[key];
+    // Textbox31 or Group_Map has the color status
+    const status = (r.Textbox31 || r.Group_Map || '').toLowerCase();
+    const count = parseInt((r.Textbox38 || r.Textbox42 || '0').replace(/[^0-9]/g, '')) || 0;
+    const soldCount = parseInt((r.Textbox42 || r.Textbox43 || '0').replace(/[^0-9]/g, '')) || 0;
+    // Parse total vehicles from Textbox50 or Textbox51
+    const veh = parseInt((r.Textbox50 || r.Textbox51 || '0').replace(/[^0-9]/g, '')) || 0;
+    if (veh > a.vehicles) a.vehicles = veh; // Take max since it repeats per row
+
+    if (status.includes('green')) a.green += count;
+    else if (status.includes('yellow')) a.yellow += count;
+    else if (status.includes('red')) a.red += count;
+  });
+
+  const advisorList = Object.values(advisors).filter(a => a.vehicles > 0 || a.green > 0 || a.yellow > 0 || a.red > 0);
+  advisorList.sort((a, b) => b.vehicles - a.vehicles);
+
+  // KPIs
+  const totalAdvisors = advisorList.length;
+  const totalVehicles = Math.max(...advisorList.map(a => a.vehicles), 0);
+  const totalYellowRed = advisorList.reduce((s, a) => s + a.yellow + a.red, 0);
+  const totalGreen = advisorList.reduce((s, a) => s + a.green, 0);
+  const avgGreenRate = (totalGreen + totalYellowRed) ? (totalGreen / (totalGreen + totalYellowRed) * 100) : 0;
+
+  if (kpis) kpis.innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Service Advisors</div><div class="kpi-value">${num(totalAdvisors)}</div><div class="kpi-sub">across all stores</div></div>
+    <div class="kpi-card"><div class="kpi-label">Green Rate</div><div class="kpi-value" style="color:var(--green);">${pct(avgGreenRate)}</div><div class="kpi-sub">of all inspections</div></div>
+    <div class="kpi-card"><div class="kpi-label">Yellow + Red Items</div><div class="kpi-value" style="color:var(--orange);">${num(totalYellowRed)}</div><div class="kpi-sub">opportunity items</div></div>
+  `;
+
+  body.innerHTML = advisorList.length ? advisorList.map(a => {
+    const opportunities = a.yellow + a.red;
+    const convRate = opportunities ? (a.sold / opportunities * 100) : 0;
+    return `<tr>
+      <td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>${a.name}</strong></td>
+      <td>#${a.store}</td>
+      <td>${num(a.vehicles)}</td>
+      <td style="color:var(--green);">${num(a.green)}</td>
+      <td style="color:var(--yellow);">${num(a.yellow)}</td>
+      <td style="color:var(--red);">${num(a.red)}</td>
+      <td>${num(a.sold)}</td>
+      <td class="${convRate > 50 ? 'cell-green' : convRate > 25 ? 'cell-yellow' : 'cell-red'}">${pct(convRate)}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">No advisor data found in the uploaded report.</td></tr>';
 }
 
 // ============================================================
@@ -8077,6 +8210,10 @@ bp_districts.forEach(d => { if (!d.manager) d.manager = ''; if (!d.managerEmail)
 function openDistrictModal() {
   document.getElementById('districtModal').classList.add('active');
   renderDistrictModal();
+  // Auto-suggest districts from GROW data if none exist
+  if (bp_districts.length === 0) {
+    autoDetectDistricts();
+  }
 }
 
 function closeDistrictModal() {
@@ -8169,6 +8306,32 @@ function saveDistricts() {
   localStorage.setItem('bp_districts', JSON.stringify(bp_districts));
   closeDistrictModal();
   if (typeof renderDashboard === 'function') renderDashboard();
+}
+
+function autoDetectDistricts() {
+  // Check GROW data for District/Region columns
+  const sources = [GROW.sales_summary, GROW.kpi_actuals, GROW.time_analysis, GROW.kpi_retail_comp];
+  const districtMap = {};
+  sources.forEach(arr => {
+    arr.forEach(r => {
+      const dm = (r.District || r.Region || '').trim();
+      const store = (r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').trim();
+      if (dm && store) {
+        if (!districtMap[dm]) districtMap[dm] = { stores: new Set(), area: (r.Area || '').trim(), division: (r.Division || '').trim() };
+        districtMap[dm].stores.add(store);
+      }
+    });
+  });
+
+  if (Object.keys(districtMap).length > 0) {
+    bp_districts = Object.entries(districtMap).map(([name, data]) => ({
+      name: name,
+      manager: name.replace(/\s*DM$/i, '').trim(),
+      managerEmail: '',
+      stores: [...data.stores].sort((a,b) => +a - +b)
+    }));
+    renderDistrictModal();
+  }
 }
 
 // ============================================================
@@ -10442,7 +10605,7 @@ function exportGrowReport() {
 }
 
 function renderGrow() {
-  const container = document.getElementById('growContent');
+  const container = document.getElementById('opsGrowContent') || document.getElementById('growContent');
   if (!container) return;
 
   if (!hasAnyGrowData()) {
@@ -10880,7 +11043,7 @@ function renderGrow() {
 }
 
 function renderCustomReports() {
-  const container = document.getElementById('customReportsContent');
+  const container = document.getElementById('opsCustomContent') || document.getElementById('customReportsContent');
   if (!container) return;
   if (!CUSTOM_REPORTS.length) { container.innerHTML = ''; return; }
 
