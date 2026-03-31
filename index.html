@@ -1378,6 +1378,188 @@
     background: rgba(227,24,55,0.2);
   }
 
+  /* ═══════════════════════════════
+     REPORT CARD & MODAL SYSTEM
+     ═══════════════════════════════ */
+  .report-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .report-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .report-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+
+  .report-card-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .report-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .report-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .report-card-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .report-card-metric {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .report-card-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .report-card-badge.ready { background: rgba(0,200,83,0.1); color: var(--green); }
+  .report-card-badge.empty { background: rgba(120,120,160,0.08); color: var(--text-muted); }
+
+  /* Report Detail Modal */
+  .report-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .report-modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .report-modal {
+    position: fixed;
+    inset: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 501;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.98);
+    transition: all 0.2s;
+  }
+
+  .report-modal-overlay.active .report-modal {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
+  }
+
+  .report-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .report-modal-header h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .report-modal-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .report-modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .report-modal-close:hover {
+    background: rgba(255,23,68,0.1);
+    color: var(--red);
+    border-color: rgba(255,23,68,0.3);
+  }
+
+  .report-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  /* Light mode */
+  body.light-mode .report-card { background: white; border-color: #e0e0e0; }
+  body.light-mode .report-card:hover { border-color: var(--primary); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  body.light-mode .report-card-title { color: #1a1a2e; }
+  body.light-mode .report-card-metric { color: #1a1a2e; }
+  body.light-mode .report-modal { background: #f3f4f6; border-color: #e0e0e0; }
+  body.light-mode .report-modal-header { background: white; border-color: #e0e0e0; }
+  body.light-mode .report-modal-header h2 { color: #1a1a2e; }
+  body.light-mode .report-modal-close { border-color: #e0e0e0; color: #6b7280; }
+
+  @media (max-width: 768px) {
+    .report-cards { grid-template-columns: 1fr; }
+    .report-modal { inset: 0; border-radius: 0; }
+  }
+
   /* BPA Insights Panel */
   .bpa-panel {
     background: var(--card);
@@ -3081,6 +3263,20 @@
   </div>
 </div>
 
+<!-- Report Detail Modal -->
+<div class="report-modal-overlay" id="reportModal">
+  <div class="report-modal">
+    <div class="report-modal-header">
+      <h2 id="reportModalTitle">Report</h2>
+      <div class="report-modal-actions">
+        <button class="btn-export" id="reportModalExport" style="display:none;">Export</button>
+        <button class="report-modal-close" onclick="closeReportModal()">&times;</button>
+      </div>
+    </div>
+    <div class="report-modal-body" id="reportModalBody"></div>
+  </div>
+</div>
+
 <!-- Upload Zone (shown when no data) -->
 <div id="uploadZone" class="upload-screen">
   <div class="upload-card">
@@ -4435,6 +4631,102 @@ function switchSubTab(container, tabName) {
   parent.querySelectorAll('.sub-tab').forEach(t => t.classList.toggle('active', t.dataset.sub === tabName));
   parent.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.dataset.sub === tabName));
 }
+
+// ============================================================
+// REPORT CARD & MODAL SYSTEM
+// ============================================================
+let reportModalCharts = [];
+
+function openReportModal(title, contentFn, exportFn) {
+  const titleEl = document.getElementById('reportModalTitle');
+  const body = document.getElementById('reportModalBody');
+  const exportBtn = document.getElementById('reportModalExport');
+
+  titleEl.textContent = title;
+  body.innerHTML = '';
+
+  // Destroy previous modal charts
+  reportModalCharts.forEach(id => { if (allCharts[id]) { allCharts[id].destroy(); delete allCharts[id]; } });
+  reportModalCharts = [];
+
+  document.getElementById('reportModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  // Render content after modal visible (so charts size correctly)
+  setTimeout(() => { contentFn(body); }, 60);
+
+  if (exportFn) {
+    exportBtn.style.display = '';
+    exportBtn.onclick = exportFn;
+  } else {
+    exportBtn.style.display = 'none';
+  }
+}
+
+function closeReportModal() {
+  document.getElementById('reportModal').classList.remove('active');
+  document.body.style.overflow = '';
+  reportModalCharts.forEach(id => { if (allCharts[id]) { allCharts[id].destroy(); delete allCharts[id]; } });
+  reportModalCharts = [];
+  document.getElementById('reportModalBody').innerHTML = '';
+}
+
+function modalChart(container, chartId, config) {
+  const fullId = 'modal_' + chartId + '_' + Date.now();
+  const card = document.createElement('div');
+  card.className = 'chart-card';
+  if (config._title) { const h = document.createElement('h3'); h.textContent = config._title; card.appendChild(h); delete config._title; }
+  const wrap = document.createElement('div');
+  wrap.className = 'chart-wrap';
+  const canvas = document.createElement('canvas');
+  canvas.id = fullId;
+  wrap.appendChild(canvas);
+  card.appendChild(wrap);
+  container.appendChild(card);
+  reportModalCharts.push(fullId);
+  makeChart(fullId, config);
+}
+
+function modalTable(container, sourceTableId, title) {
+  const src = document.getElementById(sourceTableId);
+  if (!src) { container.innerHTML += '<div style="color:var(--text-muted);text-align:center;padding:40px;">No data available</div>'; return; }
+  const wrap = document.createElement('div');
+  wrap.className = 'table-wrap';
+  wrap.style.margin = '0';
+  if (title) wrap.innerHTML = '<h3>' + title + '</h3>';
+  const scroll = document.createElement('div');
+  scroll.className = 'table-scroll';
+  scroll.style.maxHeight = 'calc(100vh - 160px)';
+  const clone = src.cloneNode(true);
+  clone.id = ''; // avoid duplicate IDs
+  scroll.appendChild(clone);
+  wrap.appendChild(scroll);
+  container.appendChild(wrap);
+}
+
+function buildReportCard(id, title, desc, metric, iconBg, iconColor, icon, hasData) {
+  return '<div class="report-card" data-report="' + id + '">' +
+    (hasData ? '<div class="report-card-badge ready">Ready</div>' : '<div class="report-card-badge empty">No Data</div>') +
+    '<div class="report-card-top">' +
+      '<div class="report-card-icon" style="background:' + iconBg + ';color:' + iconColor + ';">' + icon + '</div>' +
+      '<div><div class="report-card-title">' + title + '</div><div class="report-card-desc">' + desc + '</div></div>' +
+    '</div>' +
+    '<div class="report-card-metric">' + metric + '</div>' +
+  '</div>';
+}
+
+// Close report modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('reportModal').classList.contains('active')) {
+    closeReportModal();
+    e.stopImmediatePropagation(); // prevent other Escape handlers
+  }
+}, true); // capture phase so it fires first
+
+// Close on overlay click
+document.getElementById('reportModal').addEventListener('click', function(e) {
+  if (e.target === this) closeReportModal();
+});
 
 function renderDashboard() {
   const renders = [
