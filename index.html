@@ -4073,10 +4073,25 @@ function loadUserData() {
 function clearUserData() {
   const key = getDataStorageKey();
   if (key) localStorage.removeItem(key);
-  // Reset DATA
+  // Reset ALL data — transaction, POS reports, and custom
   DATA = { invoices: [], promos: [], odi: [], details: [], customers: [], inspections: [] };
+  GROW = { sales_summary: [], kpi_actuals: [], time_analysis: [], system_impact: [], kpi_retail_comp: [] };
+  CUSTOM_REPORTS = [];
   loadedFiles = {};
   FILTERED = {};
+  // Reset store filter dropdown
+  const sel = document.getElementById('filterStore');
+  if (sel) sel.innerHTML = '<option value="">All Stores</option>';
+  // Reset date inputs
+  const fromEl = document.getElementById('filterFrom');
+  const toEl = document.getElementById('filterTo');
+  if (fromEl) fromEl.value = '';
+  if (toEl) toEl.value = '';
+  // Reset date range display and filter summary
+  const dr = document.getElementById('dateRange');
+  if (dr) dr.textContent = 'No data loaded';
+  const fs = document.getElementById('filterSummary');
+  if (fs) fs.textContent = '';
   // Show upload zone, hide dashboard
   document.getElementById('uploadZone').style.display = '';
   document.getElementById('dashboard').classList.remove('active');
