@@ -3474,7 +3474,31 @@
 
   <!-- SEGMENTS TAB -->
   <div class="view-content" id="view-people">
-    <div class="kpi-grid" id="segKPIs"></div>
+    <!-- People KPIs -->
+    <div class="kpi-grid" id="peopleKPIs"></div>
+
+    <!-- Service Advisor Performance (always visible) -->
+    <div class="ops-grid-wrap" style="margin-bottom:20px;">
+      <h3>Service Advisor Performance <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">From SR_Productivity Data</span></h3>
+      <div class="ops-grid-scroll" style="max-height:450px;">
+        <table class="ops-grid" id="peopleCSAGrid">
+          <thead><tr>
+            <th style="min-width:160px;position:sticky;left:0;z-index:3;background:var(--card);">Advisor</th>
+            <th>Store</th>
+            <th>Vehicles</th>
+            <th title="Green inspection items" style="color:var(--green);">Green</th>
+            <th title="Yellow inspection items" style="color:var(--yellow);">Yellow</th>
+            <th title="Red inspection items" style="color:var(--red);">Red</th>
+            <th>Sold</th>
+            <th title="Conversion: sold / (yellow+red)">Conv %</th>
+          </tr></thead>
+          <tbody id="peopleCSABody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Customer Segments (auto-generated) -->
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">Customer Segments</div>
     <div id="smartSegments"></div>
   </div>
 
@@ -3546,7 +3570,13 @@
 
   <!-- Reports View -->
   <div class="view-content" id="view-reports">
-    <div class="kpi-grid" id="reportsKPIs"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);">Reports</div>
+        <div style="font-size:12px;color:var(--text-muted);">All uploaded data files. Click any report to view in detail.</div>
+      </div>
+      <button class="nav-util-btn" onclick="openAddFiles()">+ Add Files</button>
+    </div>
     <div class="report-cards" id="reportsCards"></div>
   </div>
 
@@ -4297,11 +4327,134 @@ document.getElementById('reportModal').addEventListener('click', function(e) {
   if (e.target === this) closeReportModal();
 });
 
+function renderReports() {
+  const cards = document.getElementById('reportsCards');
+  if (!cards) return;
+
+  let html = '';
+
+  // Standard data types
+  const dataTypes = [
+    { key: 'customers', label: 'Customers & Vehicles', icon: '&#9775;', color: 'var(--blue)' },
+    { key: 'details', label: 'Invoice Details', icon: '&#9783;', color: 'var(--green)' },
+    { key: 'promos', label: 'Promotions', icon: '&#9733;', color: 'var(--yellow)' },
+    { key: 'inspections', label: 'Inspections', icon: '&#9888;', color: 'var(--orange)' },
+    { key: 'invoices', label: 'Invoices', icon: '&#9776;', color: 'var(--text-muted)' },
+    { key: 'odi', label: 'ODI Values', icon: '&#9672;', color: 'var(--text-muted)' }
+  ];
+  dataTypes.forEach(t => {
+    if (DATA[t.key] && DATA[t.key].length) {
+      html += buildReportCard('data-' + t.key, t.label, DATA[t.key].length.toLocaleString() + ' rows', num(DATA[t.key].length) + ' records', 'rgba(' + (t.color === 'var(--blue)' ? '68,138,255' : t.color === 'var(--green)' ? '0,200,83' : t.color === 'var(--yellow)' ? '255,214,0' : t.color === 'var(--orange)' ? '255,145,0' : '120,120,160') + ',0.12)', t.color, t.icon, true);
+    }
+  });
+
+  // GROW POS report types
+  const growTypes = [
+    { key: 'sales_summary', label: 'Sales Summary', icon: '&#9733;' },
+    { key: 'kpi_actuals', label: 'KPI Actuals', icon: '&#9638;' },
+    { key: 'time_analysis', label: 'Time Analysis', icon: '&#9201;' },
+    { key: 'system_impact', label: 'System Impact', icon: '&#9672;' },
+    { key: 'kpi_retail_comp', label: 'KPI Retail Comp', icon: '&#9684;' }
+  ];
+  growTypes.forEach(t => {
+    if (GROW[t.key] && GROW[t.key].length) {
+      html += buildReportCard('grow-' + t.key, t.label, GROW[t.key].length + ' stores', num(GROW[t.key].length) + ' records', 'rgba(227,24,55,0.12)', 'var(--primary)', t.icon, true);
+    }
+  });
+
+  // Custom reports
+  if (typeof CUSTOM_REPORTS !== 'undefined') {
+    CUSTOM_REPORTS.forEach((r, i) => {
+      const cleanName = r.name.replace(/\.csv$/i, '').replace(/[_-]/g, ' ');
+      html += buildReportCard('custom-' + i, cleanName, r.rows.length.toLocaleString() + ' rows', num(r.rows.length) + ' records', 'rgba(179,136,255,0.12)', '#b388ff', '&#9776;', true);
+    });
+  }
+
+  if (!html) {
+    html = '<div style="text-align:center;color:var(--text-muted);padding:40px;">No data loaded yet. Upload CSV files to see reports here.</div>';
+  }
+
+  cards.innerHTML = html;
+
+  // Wire click handlers — open report modal with table
+  cards.querySelectorAll('.report-card').forEach(card => {
+    card.addEventListener('click', () => openReportDetail(card.dataset.report));
+  });
+}
+
+function openReportDetail(reportId) {
+  if (reportId.startsWith('data-')) {
+    const key = reportId.replace('data-', '');
+    const rows = DATA[key];
+    if (!rows || !rows.length) return;
+    const headers = Object.keys(rows[0]);
+    openReportModal(key.charAt(0).toUpperCase() + key.slice(1) + ' Data', function(body) {
+      let html = '<div class="table-wrap" style="margin:0;"><div class="table-scroll" style="max-height:calc(100vh - 160px);"><table><thead><tr>';
+      headers.slice(0, 15).forEach(h => { html += '<th>' + h + '</th>'; });
+      html += '</tr></thead><tbody>';
+      rows.slice(0, 500).forEach(r => {
+        html += '<tr>';
+        headers.slice(0, 15).forEach(h => { html += '<td style="font-size:11px;white-space:nowrap;">' + (r[h] || '') + '</td>'; });
+        html += '</tr>';
+      });
+      if (rows.length > 500) html += '<tr><td colspan="' + Math.min(headers.length, 15) + '" style="text-align:center;color:var(--text-muted);padding:12px;">Showing 500 of ' + rows.length.toLocaleString() + ' rows</td></tr>';
+      html += '</tbody></table></div></div>';
+      body.innerHTML = html;
+    });
+  } else if (reportId.startsWith('grow-')) {
+    const key = reportId.replace('grow-', '');
+    const rows = GROW[key];
+    if (!rows || !rows.length) return;
+    const headers = Object.keys(rows[0]);
+    openReportModal(key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), function(body) {
+      let html = '<div class="table-wrap" style="margin:0;"><div class="table-scroll" style="max-height:calc(100vh - 160px);"><table><thead><tr>';
+      headers.slice(0, 20).forEach(h => { html += '<th style="font-size:10px;white-space:nowrap;" title="' + h + '">' + (h.length > 20 ? h.slice(0, 18) + '..' : h) + '</th>'; });
+      html += '</tr></thead><tbody>';
+      rows.forEach(r => {
+        html += '<tr>';
+        headers.slice(0, 20).forEach(h => {
+          let v = r[h] || '';
+          v = v.replace(/^Store\s*Id:\s*/i, '#');
+          html += '<td style="font-size:11px;white-space:nowrap;">' + v + '</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div></div>';
+      body.innerHTML = html;
+    });
+  } else if (reportId.startsWith('custom-')) {
+    const idx = parseInt(reportId.replace('custom-', ''));
+    const report = CUSTOM_REPORTS[idx];
+    if (!report) return;
+    const cleanName = report.name.replace(/\.csv$/i, '').replace(/[_-]/g, ' ');
+    openReportModal(cleanName, function(body) {
+      let html = '<div class="table-wrap" style="margin:0;"><div class="table-scroll" style="max-height:calc(100vh - 160px);"><table><thead><tr>';
+      report.headers.forEach(h => { html += '<th style="font-size:10px;white-space:nowrap;" title="' + h + '">' + (h.length > 18 ? h.slice(0, 16) + '..' : h) + '</th>'; });
+      html += '</tr></thead><tbody>';
+      report.rows.slice(0, 500).forEach(r => {
+        html += '<tr>';
+        report.headers.forEach(h => {
+          let v = r[h] || '';
+          v = v.replace(/^Store\s*Id:\s*/i, '#').replace(/^Employee\s*:\s*/i, '').replace(/^User\s*Name\s*:\s*/i, '');
+          if (v.includes('Green')) v = '<span style="color:var(--green);">Green</span>';
+          else if (v.includes('Red')) v = '<span style="color:var(--red);">Red</span>';
+          else if (v.includes('Yellow')) v = '<span style="color:var(--yellow);">Yellow</span>';
+          html += '<td style="font-size:11px;white-space:nowrap;">' + v + '</td>';
+        });
+        html += '</tr>';
+      });
+      if (report.rows.length > 500) html += '<tr><td colspan="' + report.headers.length + '" style="text-align:center;color:var(--text-muted);padding:12px;">Showing 500 of ' + report.rows.length.toLocaleString() + ' rows</td></tr>';
+      html += '</tbody></table></div></div>';
+      body.innerHTML = html;
+    });
+  }
+}
+
 function renderDashboard() {
   const renders = [
     renderOverview, renderRevenue, renderInspections, renderPromos,
-    renderOperations, renderCustomers, renderSegments, renderMarketing,
-    renderReporting, renderStores, renderGrow, runAlertCheck, runBPAInsights
+    renderOperations, renderCustomers, renderPeople, renderMarketing,
+    renderReporting, renderStores, renderGrow, renderReports, runAlertCheck, runBPAInsights
   ];
   renders.forEach(fn => {
     try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
@@ -7055,14 +7208,64 @@ function getSelectOptions(criteriaId) {
   return [...vals].sort();
 }
 
-function renderSegments() {
+function renderPeople() {
+  // ── Service Advisor Performance ──
+  const csaBody = document.getElementById('peopleCSABody');
+  const peopleKPIs = document.getElementById('peopleKPIs');
+
+  // Find SR_Productivity data in custom reports
+  const srReport = typeof CUSTOM_REPORTS !== 'undefined' ? CUSTOM_REPORTS.find(r => r.name.toLowerCase().includes('productivity') || r.name.toLowerCase().includes('sr_')) : null;
+
+  if (srReport && csaBody) {
+    const advisors = {};
+    srReport.rows.forEach(r => {
+      const store = (r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').trim();
+      const empName = (r.Employee_Name1 || '').replace(/^Employee\s*:\s*/i, '').trim();
+      if (!empName || !store) return;
+      const key = store + '|' + empName;
+      if (!advisors[key]) advisors[key] = { name: empName, store: store, vehicles: 0, green: 0, yellow: 0, red: 0, sold: 0 };
+      const a = advisors[key];
+      const status = (r.Textbox31 || r.Group_Map || '').toLowerCase();
+      const count = parseInt((r.Textbox38 || r.Textbox42 || '0').replace(/[^0-9]/g, '')) || 0;
+      const veh = parseInt((r.Textbox50 || r.Textbox51 || '0').replace(/[^0-9]/g, '')) || 0;
+      if (veh > a.vehicles) a.vehicles = veh;
+      if (status.includes('green')) a.green += count;
+      else if (status.includes('yellow')) a.yellow += count;
+      else if (status.includes('red')) a.red += count;
+    });
+    const advisorList = Object.values(advisors).filter(a => a.vehicles > 0 || a.green > 0 || a.yellow > 0 || a.red > 0);
+    advisorList.sort((a, b) => b.vehicles - a.vehicles);
+
+    const totalAdvisors = advisorList.length;
+    const totalGreen = advisorList.reduce((s, a) => s + a.green, 0);
+    const totalYR = advisorList.reduce((s, a) => s + a.yellow + a.red, 0);
+    const avgGreenRate = (totalGreen + totalYR) ? (totalGreen / (totalGreen + totalYR) * 100) : 0;
+
+    if (peopleKPIs) peopleKPIs.innerHTML = `
+      <div class="kpi-card"><div class="kpi-label">Service Advisors</div><div class="kpi-value">${num(totalAdvisors)}</div><div class="kpi-sub">across all stores</div></div>
+      <div class="kpi-card"><div class="kpi-label">Green Rate</div><div class="kpi-value" style="color:var(--green);">${pct(avgGreenRate)}</div><div class="kpi-sub">of inspections</div></div>
+      <div class="kpi-card"><div class="kpi-label">Opportunity Items</div><div class="kpi-value" style="color:var(--orange);">${num(totalYR)}</div><div class="kpi-sub">yellow + red</div></div>
+      <div class="kpi-card"><div class="kpi-label">Total Green</div><div class="kpi-value">${num(totalGreen)}</div><div class="kpi-sub">items passed</div></div>
+    `;
+
+    csaBody.innerHTML = advisorList.map(a => {
+      const opps = a.yellow + a.red;
+      const conv = opps ? (a.sold / opps * 100) : 0;
+      return '<tr><td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>' + a.name + '</strong></td><td>#' + a.store + '</td><td>' + num(a.vehicles) + '</td><td style="color:var(--green);">' + num(a.green) + '</td><td style="color:var(--yellow);">' + num(a.yellow) + '</td><td style="color:var(--red);">' + num(a.red) + '</td><td>' + num(a.sold) + '</td><td class="' + (conv > 50 ? 'cell-green' : conv > 25 ? 'cell-yellow' : 'cell-red') + '">' + pct(conv) + '</td></tr>';
+    }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">No advisor data found</td></tr>';
+  } else {
+    if (csaBody) csaBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Upload SR_Productivity CSV via "+ Add Files" to see advisor performance</td></tr>';
+    if (peopleKPIs) peopleKPIs.innerHTML = '';
+  }
+
+  // ── Smart Segments (existing logic follows) ──
   const cust = FILTERED.customers;
   const det = FILTERED.details || [];
   const insp = FILTERED.inspections || [];
   const promo = FILTERED.promos || [];
 
   if (!cust.length) {
-    document.getElementById('segKPIs').innerHTML = '';
+    const segKPIsEl = document.getElementById('segKPIs'); if (segKPIsEl) segKPIsEl.innerHTML = '';
     document.getElementById('smartSegments').innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">Load data to see recommended segments</div>';
     return;
   }
@@ -7140,7 +7343,7 @@ function renderSegments() {
   if (multiStore.length) segments.push({ name: 'Multi-Store Visitors', icon: '&#8644;', color: 'var(--blue)', desc: 'Visit multiple locations — brand-loyal, not store-loyal', count: multiStore.length, pctOfCustomers: (multiStore.length/totalCust*100), revenue: msRev, pctOfRevenue: (msRev/totalRev*100), avgTicket: multiStore.length ? msRev/multiStore.reduce((s,p)=>s+p.visits,0) : 0, customers: multiStore.sort((a,b)=>b.stores.size-a.stores.size).slice(0, 10) });
 
   // KPIs
-  document.getElementById('segKPIs').innerHTML = `
+  const segKPIsEl2 = document.getElementById('segKPIs'); if (segKPIsEl2) segKPIsEl2.innerHTML = `
     <div class="kpi-card"><div class="kpi-label">Unique Customers</div><div class="kpi-value">${num(totalCust)}</div><div class="kpi-sub">across all stores</div></div>
     <div class="kpi-card"><div class="kpi-label">Segments Found</div><div class="kpi-value">${segments.length}</div><div class="kpi-sub">auto-generated</div></div>
     <div class="kpi-card"><div class="kpi-label">Top 20% Revenue Share</div><div class="kpi-value">${pct(segments[0]?.pctOfRevenue||0)}</div><div class="kpi-sub">${num(segments[0]?.count||0)} customers</div></div>
