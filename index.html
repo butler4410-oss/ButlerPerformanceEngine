@@ -3336,6 +3336,61 @@
         </table>
       </div>
     </div>
+
+    <!-- Market Intelligence -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;margin-bottom:16px;">
+      <div class="chart-card">
+        <h3>Revenue Forecast (90-Day Projection)</h3>
+        <div class="chart-wrap"><canvas id="chartRevForecast"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Seasonal Revenue Pattern</h3>
+        <div class="chart-wrap"><canvas id="chartSeasonal"></canvas></div>
+      </div>
+    </div>
+    <div class="bpa-panel" id="bpaMarket"></div>
+
+    <!-- Trade Area + Service Mix -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">ZIP Code Analysis</div>
+        <div id="zipAnalysis" style="max-height:350px;overflow-y:auto;"></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Service Mix Opportunity</div>
+        <div id="serviceMixAnalysis" style="max-height:350px;overflow-y:auto;"></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Customer Retention</div>
+        <div id="retentionAnalysis" style="max-height:350px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- Store Scorecard + Fleet -->
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:16px;">
+      <div class="ops-grid-wrap" style="margin:0;">
+        <h3>Store Opportunity Scorecard</h3>
+        <div class="ops-grid-scroll" style="max-height:350px;">
+          <table class="ops-grid" id="tblOpportunity">
+            <thead><tr>
+              <th style="text-align:left;">Store</th>
+              <th>Rev/Vehicle</th>
+              <th>Ancillary %</th>
+              <th>Data Quality</th>
+              <th>Efficiency</th>
+              <th>Upsell Rate</th>
+              <th>Score</th>
+            </tr></thead>
+            <tbody id="opportunityBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Fleet vs Retail</div>
+        <div id="fleetAnalysis"></div>
+        <div class="chart-wrap" style="height:200px;margin-top:12px;"><canvas id="chartFleetMix"></canvas></div>
+      </div>
+    </div>
   </div>
 
   <!-- INSPECTIONS TAB -->
@@ -3367,7 +3422,7 @@
     <div style="display:none;">
       <canvas id="chartPromoUsage"></canvas>
       <canvas id="chartPromoDisc"></canvas>
-      <table id="tblPromos"><thead><tr>
+      <table id="tblPromos_hidden"><thead><tr>
         <th class="sortable" data-col="0">Promo Code</th>
         <th class="sortable" data-col="1">Uses</th>
         <th class="sortable" data-col="2">Total Discount</th>
@@ -3506,16 +3561,7 @@
   <div class="tab-content" id="tab-marketing" style="display:none !important">
     <div class="kpi-grid" id="marketKPIs"></div>
     <div class="report-cards" id="marketCards"></div>
-    <div class="bpa-panel" id="bpaMarket"></div>
-    <div style="display:none;">
-      <canvas id="chartRevForecast"></canvas><canvas id="chartSeasonal"></canvas>
-      <canvas id="chartFleetMix"></canvas><canvas id="chartTicketDist"></canvas><canvas id="chartDiscountImpact"></canvas>
-      <div id="zipAnalysis"></div><div id="serviceMixAnalysis"></div><div id="retentionAnalysis"></div>
-      <table class="ops-grid" id="tblOpportunity"><thead><tr>
-        <th>Store</th><th>Rev/Vehicle</th><th>Ancillary %</th><th>Data Quality</th><th>Efficiency</th><th>Upsell Rate</th><th>Score</th>
-      </tr></thead><tbody id="opportunityBody"></tbody></table>
-      <div id="fleetAnalysis"></div>
-    </div>
+    <!-- Elements moved to view-financials -->
   </div>
 
   <!-- District Builder Modal -->
@@ -3539,25 +3585,12 @@
 
   <!-- REPORTING TAB -->
   <div class="tab-content" id="tab-reporting" style="display:none !important">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Reporting</div>
-      <button class="btn-configure" onclick="openScheduler()" style="border-color:var(--primary);color:var(--primary);">Scheduled Reports</button>
-    </div>
-    <div class="kpi-grid" id="reportingKPIs"></div>
     <div class="report-cards" id="reportCards"></div>
-    <div class="bpa-panel" id="bpaReporting"></div>
+    <!-- Elements moved to view-reports -->
     <div style="display:none;">
-      <table id="tblWarranty"><thead><tr>
-        <th class="sortable" data-col="0">Service</th><th class="sortable" data-col="1">Category</th><th class="sortable" data-col="2">Qty Sold</th><th class="sortable" data-col="3">Revenue</th><th class="sortable" data-col="4">Invoices</th><th class="sortable" data-col="5">Stores</th><th class="sortable" data-col="6">Avg Price</th>
-      </tr></thead><tbody id="warrantyTableBody"></tbody></table>
       <table id="tblQuickSales"><thead><tr>
         <th class="sortable" data-col="0">Customer</th><th class="sortable" data-col="1">Store</th><th class="sortable" data-col="2">Date</th><th class="sortable" data-col="3">Services</th><th class="sortable" data-col="4">Net Sales</th><th class="sortable" data-col="5">Bay Time</th>
       </tr></thead><tbody id="quickSalesTableBody"></tbody></table>
-      <table id="tblZeroDollar"><thead><tr>
-        <th class="sortable" data-col="0">Store #</th><th class="sortable" data-col="1">Date</th><th class="sortable" data-col="2">Invoice #</th><th class="sortable" data-col="3">Customer</th><th class="sortable" data-col="4">Net Sales</th><th class="sortable" data-col="5">Services</th><th class="sortable" data-col="6">Bay Time</th>
-      </tr></thead><tbody id="zeroDollarBody"></tbody></table>
-      <div id="mailableStats"></div><div id="dataQualityStats"></div><div id="storeMailStats"></div>
-      <div id="zeroDollarKPIs"></div>
     </div>
   </div>
 
@@ -3577,6 +3610,47 @@
       </div>
       <button class="nav-util-btn" onclick="openAddFiles()">+ Add Files</button>
     </div>
+
+    <!-- Reporting Analytics -->
+    <div class="kpi-grid" id="reportingKPIs"></div>
+    <div class="bpa-panel" id="bpaReporting"></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;">
+      <div>
+        <div class="table-wrap" style="margin-bottom:16px;">
+          <h3>Warranty Services</h3>
+          <div class="table-scroll" style="max-height:300px;">
+            <table id="tblWarranty"><thead><tr>
+              <th class="sortable" data-col="0">Service</th><th class="sortable" data-col="1">Category</th><th class="sortable" data-col="2">Qty Sold</th><th class="sortable" data-col="3">Revenue</th><th class="sortable" data-col="4">Invoices</th><th class="sortable" data-col="5">Stores</th><th class="sortable" data-col="6">Avg Price</th>
+            </tr></thead><tbody id="warrantyTableBody"></tbody></table>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <h3>Zero Dollar Invoices</h3>
+          <div class="table-scroll" style="max-height:300px;">
+            <table id="tblZeroDollar"><thead><tr>
+              <th class="sortable" data-col="0">Store #</th><th class="sortable" data-col="1">Date</th><th class="sortable" data-col="2">Invoice #</th><th class="sortable" data-col="3">Customer</th><th class="sortable" data-col="4">Net Sales</th><th class="sortable" data-col="5">Services</th><th class="sortable" data-col="6">Bay Time</th>
+            </tr></thead><tbody id="zeroDollarBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Mailable Customers</div>
+          <div id="mailableStats"></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Data Quality</div>
+          <div id="dataQualityStats"></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Store Mailing Coverage</div>
+          <div id="storeMailStats" style="max-height:200px;overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-grid" id="zeroDollarKPIs" style="margin-bottom:16px;"></div>
+
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;">Uploaded Data Files</div>
     <div class="report-cards" id="reportsCards"></div>
   </div>
 
@@ -9460,6 +9534,23 @@ function openStoreDetail(storeNum) {
   }
 
   document.getElementById('storeDetailTables').innerHTML = tablesHTML;
+
+  // Promo usage at this store
+  if (promo.length) {
+    let promoHTML = '<div class="table-wrap" style="margin-top:16px;"><h3>Promotions — Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:250px;"><table><thead><tr><th>Promo Code</th><th>Uses</th><th>Total Discount</th><th>Avg Discount</th></tr></thead><tbody>';
+    const promoMap = {};
+    promo.forEach(r => {
+      const code = r.Promo_Code || 'Unknown';
+      if (!promoMap[code]) promoMap[code] = { uses: 0, total: 0 };
+      promoMap[code].uses++;
+      promoMap[code].total += Math.abs(+r.Promo_Amount || 0);
+    });
+    Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total).slice(0, 15).forEach(([code, d]) => {
+      promoHTML += '<tr><td>' + code + '</td><td>' + num(d.uses) + '</td><td>' + money(d.total) + '</td><td>' + money(d.uses ? d.total / d.uses : 0) + '</td></tr>';
+    });
+    promoHTML += '</tbody></table></div></div>';
+    document.getElementById('storeDetailTables').innerHTML += promoHTML;
+  }
 }
 
 function exitStoreDetail() {
