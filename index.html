@@ -3389,129 +3389,59 @@
   <!-- REVENUE TAB -->
   <div class="tab-content" id="tab-revenue">
     <div class="kpi-grid" id="revenueKPIs"></div>
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
-      <div>
-        <div class="charts-row" style="margin-bottom:0;">
-          <div class="chart-card">
-            <h3>Revenue by Category</h3>
-            <div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div>
-          </div>
-          <div class="chart-card">
-            <h3>Revenue by Type</h3>
-            <div class="chart-wrap"><canvas id="chartRevByType"></canvas></div>
-          </div>
-        </div>
-      </div>
-      <div><div class="bpa-panel" id="bpaRevenue" style="margin-bottom:0;"></div></div>
-    </div>
-    <div class="export-bar">
-      <button class="btn-export" onclick="exportReport('tblServices','Service & Product Breakdown')">Export Report</button>
-      <button class="btn-export" onclick="emailReport('tblServices','Service & Product Breakdown')">Email</button>
-    </div>
-    <div class="table-wrap">
-      <h3>Service & Product Breakdown</h3>
-      <div class="table-scroll">
-        <table id="tblServices">
-          <thead>
-            <tr>
-              <th class="sortable" data-col="0">Category</th>
-              <th class="sortable" data-col="1">Description</th>
-              <th class="sortable" data-col="2">Type</th>
-              <th class="sortable" data-col="3">Qty Sold</th>
-              <th class="sortable" data-col="4">Revenue</th>
-              <th class="sortable" data-col="5">Avg Price</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <div class="report-cards" id="revenueCards"></div>
+    <div class="bpa-panel" id="bpaRevenue"></div>
+    <div style="display:none;">
+      <canvas id="chartRevByCat"></canvas>
+      <canvas id="chartRevByType"></canvas>
+      <table id="tblServices"><thead><tr>
+        <th class="sortable" data-col="0">Category</th>
+        <th class="sortable" data-col="1">Description</th>
+        <th class="sortable" data-col="2">Type</th>
+        <th class="sortable" data-col="3">Qty Sold</th>
+        <th class="sortable" data-col="4">Revenue</th>
+        <th class="sortable" data-col="5">Avg Price</th>
+      </tr></thead><tbody></tbody></table>
     </div>
   </div>
 
   <!-- INSPECTIONS TAB -->
   <div class="tab-content" id="tab-inspections">
     <div class="kpi-grid" id="inspKPIs"></div>
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
-      <div>
-        <div class="charts-row" style="margin-bottom:20px;">
-          <div class="chart-card">
-            <h3>Status Distribution</h3>
-            <div class="chart-wrap"><canvas id="chartInspStatus"></canvas></div>
-          </div>
-          <div class="chart-card">
-            <h3>Conversion Rate</h3>
-            <div class="chart-wrap"><canvas id="chartConversion"></canvas></div>
-          </div>
-        </div>
-        <div class="chart-card">
-          <h3>Top Upsell Opportunities</h3>
-          <div class="chart-wrap" style="height:300px;"><canvas id="chartUpsell"></canvas></div>
-        </div>
-      </div>
-      <div><div class="bpa-panel" id="bpaInspections" style="margin-bottom:0;"></div></div>
-    </div>
-    <div class="export-bar">
-      <button class="btn-export" onclick="exportReport('tblInsp','Vehicle Inspection Summary')">Export Report</button>
-      <button class="btn-export" onclick="emailReport('tblInsp','Vehicle Inspection Summary')">Email</button>
-    </div>
-    <div class="table-wrap">
-      <h3>Vehicle Inspection Summary</h3>
-      <div class="table-scroll">
-        <table id="tblInsp">
-          <thead>
-            <tr>
-              <th class="sortable" data-col="0">Service Item</th>
-              <th class="sortable" data-col="1">Green</th>
-              <th class="sortable" data-col="2">Yellow</th>
-              <th class="sortable" data-col="3">Orange</th>
-              <th class="sortable" data-col="4">Red</th>
-              <th class="sortable" data-col="5">Purchased</th>
-              <th class="sortable" data-col="6">Conversion %</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <div class="report-cards" id="inspCards"></div>
+    <div class="bpa-panel" id="bpaInspections"></div>
+    <div style="display:none;">
+      <canvas id="chartInspStatus"></canvas>
+      <canvas id="chartConversion"></canvas>
+      <canvas id="chartUpsell"></canvas>
+      <table id="tblInsp"><thead><tr>
+        <th class="sortable" data-col="0">Service Item</th>
+        <th class="sortable" data-col="1">Green</th>
+        <th class="sortable" data-col="2">Yellow</th>
+        <th class="sortable" data-col="3">Orange</th>
+        <th class="sortable" data-col="4">Red</th>
+        <th class="sortable" data-col="5">Purchased</th>
+        <th class="sortable" data-col="6">Conversion %</th>
+      </tr></thead><tbody></tbody></table>
     </div>
   </div>
 
   <!-- PROMOS TAB -->
   <div class="tab-content" id="tab-promos">
     <div class="kpi-grid" id="promoKPIs"></div>
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
-      <div class="charts-row" style="margin-bottom:0;">
-        <div class="chart-card">
-          <h3>Top Promos by Usage</h3>
-          <div class="chart-wrap"><canvas id="chartPromoUsage"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3>Top Promos by Discount</h3>
-          <div class="chart-wrap"><canvas id="chartPromoAmt"></canvas></div>
-        </div>
-      </div>
-      <div><div class="bpa-panel" id="bpaPromos" style="margin-bottom:0;"></div></div>
-    </div>
-    <div class="export-bar">
-      <button class="btn-export" onclick="exportReport('tblPromos','Promotion Details')">Export Report</button>
-      <button class="btn-export" onclick="emailReport('tblPromos','Promotion Details')">Email</button>
-    </div>
-    <div class="table-wrap">
-      <h3>Promotion Details</h3>
-      <div class="table-scroll">
-        <table id="tblPromos">
-          <thead>
-            <tr>
-              <th class="sortable" data-col="0">Promo Code</th>
-              <th class="sortable" data-col="1">Description</th>
-              <th class="sortable" data-col="2">Times Used</th>
-              <th class="sortable" data-col="3">Total Discount</th>
-              <th class="sortable" data-col="4">Avg Discount</th>
-              <th class="sortable" data-col="5">Stores Using</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <div class="report-cards" id="promoCards"></div>
+    <div class="bpa-panel" id="bpaPromos"></div>
+    <div style="display:none;">
+      <canvas id="chartPromoUsage"></canvas>
+      <canvas id="chartPromoDisc"></canvas>
+      <table id="tblPromos"><thead><tr>
+        <th class="sortable" data-col="0">Promo Code</th>
+        <th class="sortable" data-col="1">Uses</th>
+        <th class="sortable" data-col="2">Total Discount</th>
+        <th class="sortable" data-col="3">Avg Discount</th>
+        <th class="sortable" data-col="4">Stores</th>
+        <th class="sortable" data-col="5">Avg Invoice w/ Promo</th>
+      </tr></thead><tbody></tbody></table>
     </div>
   </div>
 
@@ -5936,6 +5866,45 @@ function renderRevenue() {
   document.querySelector('#tblServices tbody').innerHTML = svcRows.map(r => `
     <tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(r.desc||'').replace(/'/g,"\\'")}','${(r.type||'').replace(/'/g,"\\'")}')"><td>${r.cat}</td><td>${r.desc}</td><td>${r.type}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${money(r.count ? r.rev / r.count : 0)}</td></tr>
   `).join('');
+
+  // Build report cards
+  const detCount = det.length;
+  document.getElementById('revenueCards').innerHTML =
+    buildReportCard('rev-category', 'Revenue by Category', 'Breakdown by JLI category code', money(totalRev), 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9776;', detCount > 0) +
+    buildReportCard('rev-type', 'Revenue by Type', 'Service vs Product vs Credit split', typeEntries.length + ' types', 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9684;', detCount > 0) +
+    buildReportCard('rev-table', 'Service & Product Breakdown', 'Full detail table with category, description, qty, revenue', num(svcRows.length) + ' line items', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9783;', svcRows.length > 0);
+  document.querySelectorAll('#revenueCards .report-card').forEach(c => {
+    c.addEventListener('click', () => openRevenueReport(c.dataset.report));
+  });
+}
+
+function openRevenueReport(id) {
+  const det = FILTERED.details;
+  switch(id) {
+    case 'rev-category': {
+      openReportModal('Revenue by Category', function(body) {
+        const catRev = {};
+        det.forEach(r => { const c = r.JLI_Category_Code || 'Other'; catRev[c] = (catRev[c]||0) + (+r.Extended_Price||0); });
+        const cats = Object.entries(catRev).sort((a,b)=>b[1]-a[1]).slice(0,15);
+        modalChart(body, 'revCat', { _title: 'Revenue by Category', type:'bar', data:{ labels:cats.map(c=>c[0]), datasets:[{label:'Revenue',data:cats.map(c=>c[1]),backgroundColor:PALETTE.multi.slice(0,cats.length),borderRadius:6}] }, options:{ indexAxis:'y', scales:{x:{ticks:{callback:tickMoney}}}, plugins:{tooltip:{callbacks:{label:tooltipMoney}},legend:{display:false}} } });
+      });
+      break;
+    }
+    case 'rev-type': {
+      openReportModal('Revenue by Type', function(body) {
+        const typeRev = {};
+        det.forEach(r => { const t = r.Invoice_Detail_Type || 'Other'; typeRev[t] = (typeRev[t]||0) + (+r.Extended_Price||0); });
+        const types = Object.entries(typeRev).sort((a,b)=>b[1]-a[1]);
+        modalChart(body, 'revType', { _title: 'Revenue by Type', type:'doughnut', data:{ labels:types.map(t=>t[0]), datasets:[{data:types.map(t=>t[1]),backgroundColor:PALETTE.multi.slice(0,types.length)}] }, options:{ plugins:{tooltip:{callbacks:{label:tooltipMoneyPie}}} } });
+      });
+      break;
+    }
+    case 'rev-table':
+      openReportModal('Service & Product Breakdown', function(body) {
+        modalTable(body, 'tblServices', 'Service & Product Breakdown');
+      }, function() { exportReport('tblServices','Service & Product Breakdown'); });
+      break;
+  }
 }
 
 // ============================================================
@@ -6068,6 +6037,67 @@ function renderInspections() {
     const conv = needs ? (r.purchased / needs * 100) : 0;
     return `<tr class="clickable-row" onclick="openInspDetail('${name.replace(/'/g,"\\'")}')"><td>${name}</td><td>${num(r.green)}</td><td>${num(r.yellow)}</td><td>${num(r.orange)}</td><td>${num(r.red)}</td><td>${num(r.purchased)}</td><td>${pct(conv)}</td></tr>`;
   }).join('');
+
+  // Build report cards
+  document.getElementById('inspCards').innerHTML =
+    buildReportCard('insp-status', 'Status Distribution', 'Green / Yellow / Orange / Red breakdown', num(total) + ' inspections', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9684;', total > 0) +
+    buildReportCard('insp-conversion', 'Conversion Rate', 'Items needing attention that were purchased', pct(convRate), 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9733;', needsAttention > 0) +
+    buildReportCard('insp-upsell', 'Top Upsell Opportunities', 'Most common missed sales from inspections', num(upsellTop.length) + ' items', 'rgba(255,145,0,0.12)', 'var(--orange)', '&#9650;', upsellTop.length > 0) +
+    buildReportCard('insp-table', 'Inspection Summary Table', 'Full detail by service item with status counts', num(inspRows.length) + ' service items', 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9783;', inspRows.length > 0);
+  document.querySelectorAll('#inspCards .report-card').forEach(c => {
+    c.addEventListener('click', () => openInspReport(c.dataset.report));
+  });
+}
+
+function openInspReport(id) {
+  const insp = FILTERED.inspections;
+  switch(id) {
+    case 'insp-status': {
+      openReportModal('Status Distribution', function(body) {
+        const green = insp.filter(r => r.Inspection_Status === 'Green').length;
+        const yellow = insp.filter(r => r.Inspection_Status === 'Yellow').length;
+        const orange = insp.filter(r => r.Inspection_Status === 'Orange').length;
+        const red = insp.filter(r => r.Inspection_Status === 'Red').length;
+        modalChart(body, 'inspStatus', { _title: 'Inspection Status Distribution', type:'doughnut', data:{ labels:['Green','Yellow','Orange','Red'], datasets:[{data:[green,yellow,orange,red],backgroundColor:['#00c853','#ffd600','#ff9100','#ff1744'],hoverOffset:8}] }, options:{ plugins:{legend:{position:'right'},tooltip:{callbacks:{label:function(ctx){ const t=green+yellow+orange+red; const p=t?(ctx.parsed/t*100).toFixed(1):0; return ctx.label+': '+ctx.parsed.toLocaleString()+' ('+p+'%)'; }}}} } });
+      });
+      break;
+    }
+    case 'insp-conversion': {
+      openReportModal('Conversion Rate by Service', function(body) {
+        const convMap = {};
+        insp.forEach(r => {
+          if (r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red') {
+            const key = r.Service_Title || r.Product_Code;
+            if (!convMap[key]) convMap[key] = { total: 0, purchased: 0 };
+            convMap[key].total++;
+            if (r.Purchased_This_Visit === 'True') convMap[key].purchased++;
+          }
+        });
+        const convEntries = Object.entries(convMap).filter(e => e[1].total >= 5).sort((a,b) => (b[1].purchased/b[1].total) - (a[1].purchased/a[1].total)).slice(0, 15);
+        modalChart(body, 'inspConv', { _title: 'Conversion Rate by Service', type:'bar', data:{ labels:convEntries.map(e=>truncLabel(e[0],24)), datasets:[{label:'Conversion %',data:convEntries.map(e=>(e[1].purchased/e[1].total*100)),backgroundColor:PALETTE.greenLight,hoverBackgroundColor:PALETTE.green,borderRadius:6}] }, options:{ indexAxis:'y', scales:{x:{beginAtZero:true,max:100,ticks:{callback:function(v){return v+'%'}}}}, plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){ const entry=convEntries[ctx.dataIndex]; return 'Conversion: '+Number(ctx.parsed.x).toFixed(1)+'% ('+entry[1].purchased+'/'+entry[1].total+')'; }}}} } });
+      });
+      break;
+    }
+    case 'insp-upsell': {
+      openReportModal('Top Upsell Opportunities', function(body) {
+        const upsellMap = {};
+        insp.forEach(r => {
+          if ((r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red') && r.Purchased_This_Visit !== 'True') {
+            const key = r.Service_Title || r.Product_Code;
+            upsellMap[key] = (upsellMap[key] || 0) + 1;
+          }
+        });
+        const upsellTop = Object.entries(upsellMap).sort((a,b) => b[1] - a[1]).slice(0, 15);
+        modalChart(body, 'inspUpsell', { _title: 'Top Upsell Opportunities', type:'bar', data:{ labels:upsellTop.map(u=>truncLabel(u[0],22)), datasets:[{label:'Missed Opportunities',data:upsellTop.map(u=>u[1]),backgroundColor:PALETTE.orangeLight,hoverBackgroundColor:PALETTE.orange,borderRadius:6,maxBarThickness:50}] }, options:{ scales:{x:{ticks:{maxRotation:45,font:{size:10}}},y:{beginAtZero:true,ticks:{callback:tickCount}}}, plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipCount}}} } });
+      });
+      break;
+    }
+    case 'insp-table':
+      openReportModal('Vehicle Inspection Summary', function(body) {
+        modalTable(body, 'tblInsp', 'Vehicle Inspection Summary');
+      }, function() { exportReport('tblInsp','Vehicle Inspection Summary'); });
+      break;
+  }
 }
 
 // ============================================================
@@ -6092,9 +6122,10 @@ function renderPromos() {
   const promoMap = {};
   promo.forEach(r => {
     const code = r.Promo_Code;
-    if (!promoMap[code]) promoMap[code] = { desc: r.Promo_Description, uses: 0, total: 0, stores: new Set() };
+    if (!promoMap[code]) promoMap[code] = { desc: r.Promo_Description, uses: 0, total: 0, stores: new Set(), invTotal: 0 };
     promoMap[code].uses++;
     promoMap[code].total += (+r.Promo_Amount || 0);
+    promoMap[code].invTotal += (+r.Invoice_Total || 0);
     promoMap[code].stores.add(r.Store_Number);
   });
 
@@ -6125,7 +6156,7 @@ function renderPromos() {
 
   // Top by amount
   const byAmt = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total).slice(0, 10);
-  makeChart('chartPromoAmt', {
+  makeChart('chartPromoDisc', {
     type: 'bar',
     data: {
       labels: byAmt.map(p => truncLabel(p[0], 16)),
@@ -6146,8 +6177,51 @@ function renderPromos() {
   // Table
   const promoRows = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total);
   document.querySelector('#tblPromos tbody').innerHTML = promoRows.map(([code, r]) => `
-    <tr class="clickable-row" onclick="openPromoDetail('${code.replace(/'/g,"\\'")}')"><td>${code}</td><td>${r.desc}</td><td>${num(r.uses)}</td><td>${money(r.total)}</td><td>${money(r.uses ? r.total / r.uses : 0)}</td><td>${r.stores.size}</td></tr>
+    <tr class="clickable-row" onclick="openPromoDetail('${code.replace(/'/g,"\\'")}')"><td>${code}</td><td>${num(r.uses)}</td><td>${money(r.total)}</td><td>${money(r.uses ? r.total / r.uses : 0)}</td><td>${r.stores.size}</td><td>${money(r.uses ? r.invTotal / r.uses : 0)}</td></tr>
   `).join('');
+
+  // Build report cards
+  document.getElementById('promoCards').innerHTML =
+    buildReportCard('promo-usage', 'Top Promos by Usage', 'Most frequently used promotion codes', num(totalUses) + ' total uses', 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9776;', totalUses > 0) +
+    buildReportCard('promo-discount', 'Top Promos by Discount', 'Promotions with highest total discount value', money(totalDisc), 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9684;', totalUses > 0) +
+    buildReportCard('promo-table', 'Promotion Details Table', 'Full promo breakdown with usage, discount, and store counts', num(promoRows.length) + ' promos', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9783;', promoRows.length > 0);
+  document.querySelectorAll('#promoCards .report-card').forEach(c => {
+    c.addEventListener('click', () => openPromoReport(c.dataset.report));
+  });
+}
+
+function openPromoReport(id) {
+  const promo = FILTERED.promos;
+  const promoMap = {};
+  promo.forEach(r => {
+    const code = r.Promo_Code;
+    if (!promoMap[code]) promoMap[code] = { desc: r.Promo_Description, uses: 0, total: 0, stores: new Set(), invTotal: 0 };
+    promoMap[code].uses++;
+    promoMap[code].total += (+r.Promo_Amount || 0);
+    promoMap[code].invTotal += (+r.Invoice_Total || 0);
+    promoMap[code].stores.add(r.Store_Number);
+  });
+  switch(id) {
+    case 'promo-usage': {
+      openReportModal('Top Promos by Usage', function(body) {
+        const byUsage = Object.entries(promoMap).sort((a,b) => b[1].uses - a[1].uses).slice(0, 15);
+        modalChart(body, 'promoUsage', { _title: 'Top Promos by Usage', type:'bar', data:{ labels:byUsage.map(p=>truncLabel(p[0],16)), datasets:[{label:'Uses',data:byUsage.map(p=>p[1].uses),backgroundColor:PALETTE.blueLight,hoverBackgroundColor:PALETTE.blue,borderRadius:6,maxBarThickness:50}] }, options:{ scales:{x:{ticks:{maxRotation:45,font:{size:10}}},y:{beginAtZero:true,ticks:{callback:tickCount}}}, plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){ const entry=byUsage[ctx.dataIndex]; return entry[0]+': '+entry[1].uses.toLocaleString()+' uses'; }}}} } });
+      });
+      break;
+    }
+    case 'promo-discount': {
+      openReportModal('Top Promos by Discount', function(body) {
+        const byAmt = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total).slice(0, 15);
+        modalChart(body, 'promoDisc', { _title: 'Top Promos by Discount', type:'bar', data:{ labels:byAmt.map(p=>truncLabel(p[0],16)), datasets:[{label:'Total Discount',data:byAmt.map(p=>p[1].total),backgroundColor:PALETTE.redLight,hoverBackgroundColor:PALETTE.red,borderRadius:6,maxBarThickness:50}] }, options:{ scales:{x:{ticks:{maxRotation:45,font:{size:10}}},y:{beginAtZero:true,ticks:{callback:tickMoney}}}, plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipMoney}}} } });
+      });
+      break;
+    }
+    case 'promo-table':
+      openReportModal('Promotion Details', function(body) {
+        modalTable(body, 'tblPromos', 'Promotion Details');
+      }, function() { exportReport('tblPromos','Promotion Details'); });
+      break;
+  }
 }
 
 // ============================================================
