@@ -4291,19 +4291,14 @@ function launchDashboard() {
 // RENDER DASHBOARD
 // ============================================================
 function renderDashboard() {
-  renderOverview();
-  renderRevenue();
-  renderInspections();
-  renderPromos();
-  renderOperations();
-  renderCustomers();
-  renderSegments();
-  renderMarketing();
-  renderReporting();
-  renderStores();
-  renderGrow();
-  runAlertCheck();
-  runBPAInsights();
+  const renders = [
+    renderOverview, renderRevenue, renderInspections, renderPromos,
+    renderOperations, renderCustomers, renderSegments, renderMarketing,
+    renderReporting, renderStores, renderGrow, runAlertCheck, runBPAInsights
+  ];
+  renders.forEach(fn => {
+    try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
+  });
 }
 
 // ============================================================
@@ -6838,7 +6833,7 @@ function renderMarketing() {
   // Upsell conversion: inspections leading to purchases
   let upsellRate = 0;
   if (inspections.length) {
-    const inspWithSale = inspections.filter(i => i.Sold === 'Y' || i.Sold === 'Yes' || i.Sold === '1' || +i.Sold > 0).length;
+    const inspWithSale = inspections.filter(i => i.Purchased_This_Visit === 'True' || i.Purchased_This_Visit === 'Yes' || i.Purchased_This_Visit === '1').length;
     upsellRate = (inspWithSale / inspections.length * 100);
   }
 
@@ -6937,15 +6932,15 @@ function renderMarketing() {
 
   // ── (d) BPA Market Insights ──
   const insights = [];
-  if (ticketTrendPct < -5) insights.push({ type: 'alert', msg: 'Avg ticket is <strong>declining</strong> — down ' + pct(Math.abs(ticketTrendPct)) + ' from early to late period.', detail: 'Review pricing strategy and upsell execution.' });
-  else if (ticketTrendPct > 5) insights.push({ type: 'success', msg: 'Avg ticket is <strong>trending up</strong> — +' + pct(ticketTrendPct) + ' growth.', detail: 'Current upsell and pricing strategy is working.' });
+  if (ticketTrendPct < -5) insights.push({ type: 'warning', msg: 'Avg ticket is <strong>declining</strong> — down ' + pct(Math.abs(ticketTrendPct)) + ' from early to late period.', detail: 'Review pricing strategy and upsell execution.' });
+  else if (ticketTrendPct > 5) insights.push({ type: 'positive', msg: 'Avg ticket is <strong>trending up</strong> — +' + pct(ticketTrendPct) + ' growth.', detail: 'Current upsell and pricing strategy is working.' });
 
-  if (repeatPct < 20) insights.push({ type: 'alert', msg: 'Low repeat rate: only <strong>' + pct(repeatPct) + '</strong> of customers return.', detail: 'Consider loyalty programs or follow-up campaigns to drive retention.' });
+  if (repeatPct < 20) insights.push({ type: 'critical', msg: 'Low repeat rate: only <strong>' + pct(repeatPct) + '</strong> of customers return.', detail: 'Consider loyalty programs or follow-up campaigns to drive retention.' });
 
-  if (fleetPct > 25) insights.push({ type: 'info', msg: 'Fleet business is <strong>' + pct(fleetPct) + '</strong> of invoices — significant B2B exposure.', detail: 'Ensure fleet pricing and contracts are optimized.' });
-  else if (fleetPct < 5 && fleetPct > 0) insights.push({ type: 'info', msg: 'Fleet business is only <strong>' + pct(fleetPct) + '</strong> — potential growth area.', detail: 'Target local fleets and commercial accounts.' });
+  if (fleetPct > 25) insights.push({ type: 'suggestion', msg: 'Fleet business is <strong>' + pct(fleetPct) + '</strong> of invoices — significant B2B exposure.', detail: 'Ensure fleet pricing and contracts are optimized.' });
+  else if (fleetPct < 5 && fleetPct > 0) insights.push({ type: 'suggestion', msg: 'Fleet business is only <strong>' + pct(fleetPct) + '</strong> — potential growth area.', detail: 'Target local fleets and commercial accounts.' });
 
-  if (upsellRate > 0 && upsellRate < 30) insights.push({ type: 'alert', msg: 'Upsell conversion at <strong>' + pct(upsellRate) + '</strong> — below 30% threshold.', detail: 'Train technicians on inspection-to-sale communication.' });
+  if (upsellRate > 0 && upsellRate < 30) insights.push({ type: 'warning', msg: 'Upsell conversion at <strong>' + pct(upsellRate) + '</strong> — below 30% threshold.', detail: 'Train technicians on inspection-to-sale communication.' });
 
   // Find underperforming stores
   const storeRevMap = {};
@@ -6953,14 +6948,14 @@ function renderMarketing() {
   const storeRevArr = Object.values(storeRevMap);
   const avgStoreRev = storeRevArr.length ? storeRevArr.reduce((a, b) => a + b, 0) / storeRevArr.length : 0;
   const underperformers = Object.entries(storeRevMap).filter(([, v]) => v < avgStoreRev * 0.6).map(([s]) => '#' + s);
-  if (underperformers.length) insights.push({ type: 'alert', msg: '<strong>' + underperformers.length + ' store(s)</strong> significantly below average revenue: ' + underperformers.slice(0, 5).join(', '), detail: 'These stores are at <60% of the ' + money(avgStoreRev) + ' store average.' });
+  if (underperformers.length) insights.push({ type: 'critical', msg: '<strong>' + underperformers.length + ' store(s)</strong> significantly below average revenue: ' + underperformers.slice(0, 5).join(', '), detail: 'These stores are at <60% of the ' + money(avgStoreRev) + ' store average.' });
 
   // Low-penetration ZIPs
   const topZIPs = Object.entries(zipMap).sort((a, b) => b[1].count - a[1].count);
   if (topZIPs.length > 10) {
     const topZipRev = topZIPs.slice(0, 5).reduce((s, z) => s + z[1].revenue, 0);
     const topZipPct = totalRevenue ? topZipRev / totalRevenue * 100 : 0;
-    if (topZipPct > 50) insights.push({ type: 'info', msg: 'Top 5 ZIPs drive <strong>' + pct(topZipPct) + '</strong> of revenue — high geographic concentration.', detail: 'Diversify marketing reach to adjacent ZIP codes.' });
+    if (topZipPct > 50) insights.push({ type: 'suggestion', msg: 'Top 5 ZIPs drive <strong>' + pct(topZipPct) + '</strong> of revenue — high geographic concentration.', detail: 'Diversify marketing reach to adjacent ZIP codes.' });
   }
 
   bpaHTML('bpaMarket', 'Market Intelligence', insights);
@@ -10636,16 +10631,20 @@ function renderGrow() {
 
 // Init auth — seed in background, don't block page
 (async function initAuth() {
-  await seedDefaultUser();
-  const currentUser = getCurrentUser();
-  if (currentUser) {
-    document.getElementById('loginScreen').classList.add('hidden');
-    updateUserAvatar(currentUser);
-    // Auto-restore saved data if available
-    if (loadUserData()) {
-      launchDashboard();
-      updateDataSavedIndicator(true);
+  try {
+    await seedDefaultUser();
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      updateUserAvatar(currentUser);
+      // Auto-restore saved data if available
+      if (loadUserData()) {
+        launchDashboard();
+        updateDataSavedIndicator(true);
+      }
     }
+  } catch(e) {
+    console.error('Init auth error:', e);
   }
   document.getElementById('loadingScreen').classList.add('hidden');
 })();
