@@ -2832,7 +2832,7 @@
     <button class="tab" data-tab="operations">Operations</button>
     <button class="tab" data-tab="customers">Customers</button>
     <button class="tab company-admin-only" data-tab="segments">Segments</button>
-    <button class="tab company-admin-only" data-tab="marketing">Marketing</button>
+    <button class="tab company-admin-only" data-tab="marketing">Market Analysis</button>
     <button class="tab" data-tab="reporting">Reporting</button>
     <button class="tab" data-tab="grow">POS Reports</button>
     <button class="tab" data-tab="stores">Rankings</button>
@@ -3517,307 +3517,99 @@
     </div>
   </div>
 
-  <!-- MARKETING TAB -->
+  <!-- MARKET ANALYSIS TAB -->
   <div class="tab-content" id="tab-marketing">
 
-    <!-- Hero KPIs -->
-    <div class="kpi-grid" id="mktgKPIs"></div>
+    <!-- Market Analysis KPIs -->
+    <div class="kpi-grid" id="marketKPIs"></div>
 
-    <!-- Dynamic Tokens Manager -->
-    <div class="tokens-container">
-      <div class="tokens-header">
-        <div class="tokens-header-left">
-          <div class="tokens-icon">{}</div>
-          <div>
-            <div style="font-size:16px;font-weight:700;color:var(--text);">Tokens</div>
-            <div style="font-size:11px;color:var(--text-muted);">Dynamic content for campaigns</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div class="token-search-wrap">
-            <input type="text" class="token-search" id="tokenSearch" placeholder="Search tokens..." oninput="filterTokens()">
-          </div>
-          <button class="btn-new-token" onclick="openTokenModal()">+ New Token</button>
-        </div>
+    <!-- Two-column layout -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+
+      <!-- Revenue Forecast -->
+      <div class="chart-card">
+        <h3>Revenue Forecast (90-Day Projection)</h3>
+        <div class="chart-wrap"><canvas id="chartRevForecast"></canvas></div>
       </div>
-      <div class="tokens-description">
-        Create and manage dynamic tokens to personalize your campaign content at scale. Use tokens to insert custom text, URLs, or calculated values that update automatically across multiple locations. Override token values for specific locations when needed. Reference tokens in campaigns and emails using <strong style="color:var(--blue);font-family:Consolas,Monaco,monospace;">{{token_name}}</strong> syntax.
-      </div>
-      <div class="tokens-body">
-        <div class="token-row token-row-header">
-          <div>Token Name</div>
-          <div>Type</div>
-          <div>Default Value</div>
-          <div style="text-align:center;">Overrides</div>
-          <div></div>
-        </div>
-        <div id="tokensList"></div>
+
+      <!-- Seasonal Pattern -->
+      <div class="chart-card">
+        <h3>Seasonal Revenue Pattern</h3>
+        <div class="chart-wrap"><canvas id="chartSeasonal"></canvas></div>
       </div>
     </div>
 
-    <!-- Token Create/Edit Modal -->
-    <div class="modal-overlay" id="tokenModal">
-      <div class="modal token-modal">
-        <h3 id="tokenModalTitle">New Token</h3>
-        <input type="hidden" id="tokenEditIndex" value="-1">
-        <div class="token-modal .form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div class="form-group">
-            <label>Token Name</label>
-            <input type="text" id="tokenName" placeholder="e.g. manager_name" oninput="updateTokenPreview()">
-          </div>
-          <div class="form-group">
-            <label>Type</label>
-            <select id="tokenType">
-              <option value="text">Text</option>
-              <option value="url">URL</option>
-              <option value="image">Image URL</option>
-              <option value="date">Date</option>
-              <option value="number">Number</option>
-            </select>
-          </div>
-        </div>
-        <div class="token-preview" id="tokenPreview">{{token_name}}</div>
-        <div class="form-group">
-          <label>Description</label>
-          <input type="text" id="tokenDescription" placeholder="What this token is used for">
-        </div>
-        <div class="form-group">
-          <label>Default Value</label>
-          <input type="text" id="tokenDefaultValue" placeholder="Value used for all locations unless overridden">
-        </div>
-        <div class="token-overrides-section">
-          <div class="token-overrides-title">
-            <span>Location Overrides</span>
-            <button class="btn-add-override" onclick="addTokenOverrideRow()" style="width:auto;padding:5px 12px;">+ Add Override</button>
-          </div>
-          <div id="tokenOverrideRows"></div>
-        </div>
-        <div class="modal-buttons" style="margin-top:20px;">
-          <button class="btn-cancel" onclick="closeTokenModal()">Cancel</button>
-          <button class="btn-save" onclick="saveToken()">Save Token</button>
-        </div>
+    <!-- BPA Insights for Market Analysis -->
+    <div class="bpa-panel" id="bpaMarket"></div>
+
+    <!-- Three-column layout -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:24px;">
+
+      <!-- Trade Area Map / ZIP Analysis -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Trade Area — ZIP Code Analysis</div>
+        <div id="zipAnalysis" style="max-height:400px;overflow-y:auto;"></div>
+      </div>
+
+      <!-- Service Mix Opportunity -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Service Mix Opportunity</div>
+        <div id="serviceMixAnalysis"></div>
+      </div>
+
+      <!-- Customer Retention -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Customer Retention Signals</div>
+        <div id="retentionAnalysis"></div>
       </div>
     </div>
 
-    <!-- District Builder Modal -->
-    <div class="modal-overlay" id="districtModal">
-      <div class="modal" style="width:700px;max-height:85vh;overflow-y:auto;">
-        <h3>District Settings</h3>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Organize stores into districts and assign district managers. Changes are saved locally and reflected in the Operations grid.</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;font-family:'JetBrains Mono',monospace;opacity:0.7;">Each district can have a manager name and email for reporting.</div>
-        <div class="district-list" id="districtList"></div>
-        <div class="district-unassigned" id="districtUnassigned">
-          <div class="district-unassigned-title">Unassigned Stores</div>
-          <div class="district-stores-wrap" id="unassignedStores"></div>
+    <!-- Two-column: Store Opportunity + Fleet Analysis -->
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:20px;margin-bottom:24px;">
+
+      <!-- Store Opportunity Scorecard -->
+      <div class="ops-grid-wrap">
+        <h3>Store Opportunity Scorecard</h3>
+        <div class="ops-grid-scroll" style="max-height:450px;">
+          <table class="ops-grid" id="tblOpportunity">
+            <thead>
+              <tr>
+                <th style="min-width:80px;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
+                <th title="Revenue per vehicle — higher is better">Rev/Vehicle</th>
+                <th title="Service mix diversity — % of revenue from non-oil services">Ancillary %</th>
+                <th title="Customer data completeness — email + phone + address">Data Quality</th>
+                <th title="Average service time — lower is more efficient">Efficiency</th>
+                <th title="Inspection-to-sale conversion rate">Upsell Rate</th>
+                <th title="Composite opportunity score 0-100">Score</th>
+              </tr>
+            </thead>
+            <tbody id="opportunityBody"></tbody>
+          </table>
         </div>
-        <div class="modal-buttons" style="margin-top:16px;">
-          <button class="btn-cancel" onclick="closeDistrictModal()">Close</button>
-          <button class="btn-save" onclick="addNewDistrict()" style="background:var(--blue);margin-right:auto;">+ Add District</button>
-          <button class="btn-save" onclick="saveDistricts()">Save Districts</button>
+      </div>
+
+      <!-- Fleet vs Retail Analysis -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Fleet vs Retail Intelligence</div>
+        <div id="fleetAnalysis"></div>
+        <div style="margin-top:16px;">
+          <div class="chart-wrap" style="height:220px;"><canvas id="chartFleetMix"></canvas></div>
         </div>
       </div>
     </div>
 
-    <!-- Campaign Builder + Sidebar -->
-    <div style="display:grid;grid-template-columns:7fr 3fr;gap:24px;margin-bottom:24px;">
-
-      <!-- Campaign Builder Card -->
-      <div style="background:linear-gradient(135deg, var(--card) 0%, rgba(30,30,60,0.8) 100%);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
-        <!-- Header Bar -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:40px;height:40px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;">+</div>
-            <div>
-              <div style="font-size:16px;font-weight:700;color:var(--text);">New Campaign</div>
-              <div style="font-size:11px;color:var(--text-muted);">Triadex Plastic Postcard Program</div>
-            </div>
-          </div>
-          <div style="background:rgba(227,24,55,0.12);border:1px solid rgba(227,24,55,0.25);border-radius:8px;padding:8px 16px;font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;">Triadex</div>
-        </div>
-        <!-- Form Body -->
-        <div style="padding:24px;">
-          <!-- Row 1: Name + Client -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px;">
-            <div class="form-group"><label>Campaign Name</label><input type="text" id="mktgCampName" placeholder="Spring SSOC Push — Q2 2026"></div>
-            <div class="form-group"><label>Client</label><input type="text" id="mktgClient" placeholder="South Bay Lube Inc."></div>
-          </div>
-          <!-- Section: Volume & Pricing -->
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:12px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);">Volume & Pricing</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:4px;">
-            <div class="form-group"><label>Cards / Drop</label><input type="number" id="mktgCardsPerDrop" placeholder="5,000"></div>
-            <div class="form-group"><label>Drops</label><input type="number" id="mktgDrops" placeholder="6" value="6"></div>
-            <div class="form-group"><label>Frequency</label>
-              <select id="mktgFreq">
-                <option value="monthly">Monthly</option>
-                <option value="biweekly">Bi-Weekly</option>
-                <option value="weekly">Weekly</option>
-                <option value="quarterly">Quarterly</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Price / Card (all-in)</label><input type="number" step="0.01" id="mktgPricePerCard" placeholder="0.42"></div>
-          </div>
-          <!-- Live Budget Preview -->
-          <div id="mktgBudgetPreview" style="margin:8px 0 16px;padding:16px 20px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;display:none;"></div>
-          <!-- Section: Schedule -->
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:12px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);">Schedule</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px;">
-            <div class="form-group"><label>Drop 1 Target Date</label><input type="date" id="mktgDrop1"></div>
-            <div class="form-group"><label>Offer Expiration</label><input type="date" id="mktgExpDate"></div>
-          </div>
-          <!-- Section: Stores -->
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:12px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);">Store Selection</div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label>Select Stores <span style="font-weight:400;text-transform:none;letter-spacing:0;">(hold Ctrl/Cmd to multi-select)</span></label>
-            <select id="mktgStoreSelect" multiple style="height:90px;"></select>
-          </div>
-          <!-- Action -->
-          <div style="margin-top:20px;display:flex;align-items:center;gap:16px;">
-            <button class="btn-save" onclick="createCampaign()" style="padding:14px 36px;font-size:14px;font-weight:700;border-radius:10px;">Create Campaign</button>
-            <span style="font-size:12px;color:var(--text-muted);">Campaign will be saved as Draft</span>
-          </div>
-        </div>
+    <!-- Pricing Intelligence -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+      <div class="chart-card">
+        <h3>Ticket Distribution — Where's the Revenue?</h3>
+        <div class="chart-wrap"><canvas id="chartTicketDist"></canvas></div>
       </div>
-
-      <!-- Right Sidebar -->
-      <div style="display:flex;flex-direction:column;gap:16px;">
-
-        <!-- Suppression Tool -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <div style="width:38px;height:38px;background:rgba(227,24,55,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--primary);font-weight:700;">S</div>
-            <div>
-              <div style="font-size:14px;font-weight:700;color:var(--text);">Suppression File</div>
-              <div style="font-size:11px;color:var(--text-muted);">Exclude existing customers</div>
-            </div>
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:14px;">Generates a deduplicated CSV from loaded customer data. Attach to Triadex handoff to prevent mailing existing customers.</div>
-          <div id="suppressionCount" style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:14px;">—</div>
-          <button class="btn-save" onclick="generateSuppression()" style="width:100%;justify-content:center;padding:12px;border-radius:10px;">Generate Suppression CSV</button>
-        </div>
-
-        <!-- Triadex Handoff -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <div style="width:38px;height:38px;background:rgba(68,138,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);font-weight:700;">H</div>
-            <div>
-              <div style="font-size:14px;font-weight:700;color:var(--text);">Triadex Handoff</div>
-              <div style="font-size:11px;color:var(--text-muted);">Email to Tim, Ryan, Riley</div>
-            </div>
-          </div>
-          <div id="checklistProgress" style="margin-bottom:14px;"></div>
-          <div style="display:flex;gap:8px;">
-            <button class="btn-save" onclick="emailHandoff()" style="flex:1;justify-content:center;padding:12px;border-radius:10px;font-size:13px;">Send Handoff</button>
-            <button class="btn-configure" onclick="resetChecklist()" style="padding:12px;border-radius:10px;">Reset</button>
-          </div>
-        </div>
-
-        <!-- Common Mistakes -->
-        <div style="background:rgba(255,145,0,0.06);border:1px solid rgba(255,145,0,0.2);border-radius:16px;padding:18px;">
-          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:10px;">Common Mistakes</div>
-          <div style="font-size:12px;color:var(--text-muted);line-height:1.8;">
-            <span style="color:var(--red);">&#10007;</span> Missing phone numbers on stores<br>
-            <span style="color:var(--red);">&#10007;</span> Abbreviated addresses (spell out)<br>
-            <span style="color:var(--red);">&#10007;</span> Mismatched card counts vs deal sheet<br>
-            <span style="color:var(--red);">&#10007;</span> Expiration &lt;60 days from drop<br>
-            <span style="color:var(--red);">&#10007;</span> Creative is a draft/WIP<br>
-            <span style="color:var(--red);">&#10007;</span> No NCOA PAF (USPS required)<br>
-            <span style="color:var(--red);">&#10007;</span> No suppression file<br>
-            <span style="color:var(--red);">&#10007;</span> Saying "ROI" — always <strong style="color:white;">ROAS</strong>
-          </div>
-        </div>
+      <div class="chart-card">
+        <h3>Discount Impact Analysis</h3>
+        <div class="chart-wrap"><canvas id="chartDiscountImpact"></canvas></div>
       </div>
     </div>
 
-    <!-- Offer Configurator -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:40px;height:40px;background:rgba(68,138,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);font-weight:800;">&#9998;</div>
-          <div>
-            <div style="font-size:16px;font-weight:700;color:var(--text);">Offer Configurator</div>
-            <div style="font-size:11px;color:var(--text-muted);">Select postcard format and define offers for each card slot</div>
-          </div>
-        </div>
-      </div>
-      <div style="padding:24px;">
-        <!-- Step 1: Postcard Size + Layout -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-          <div class="form-group">
-            <label>Postcard Size</label>
-            <select id="offerSize" onchange="updateLayoutOptions()">
-              <option value="standard">Standard (6" x 4.25")</option>
-              <option value="medium">Medium (8.5" x 5.5")</option>
-              <option value="jumbo">Jumbo (11" x 6")</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Card Layout</label>
-            <select id="offerLayout" onchange="renderOfferSlots()">
-            </select>
-          </div>
-        </div>
-
-        <!-- Visual Preview + Offer Inputs -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-          <!-- Left: Visual Preview -->
-          <div>
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;">Front Preview</div>
-            <div id="postcardPreview" style="background:#f5f5f0;border-radius:12px;border:2px solid var(--border);position:relative;overflow:hidden;aspect-ratio:6/4.25;">
-            </div>
-            <div style="font-size:10px;color:var(--text-muted);margin-top:8px;text-align:center;">Dashed = card die-cut area &middot; Cards are plastic pop-out</div>
-          </div>
-          <!-- Right: Offer Slot Forms -->
-          <div>
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;">Offer Details</div>
-            <div id="offerSlotsForm"></div>
-          </div>
-        </div>
-
-        <!-- Save -->
-        <div style="margin-top:20px;display:flex;gap:10px;align-items:center;">
-          <button class="btn-save" onclick="saveOfferConfig()" style="padding:12px 28px;border-radius:10px;">Save Offer Configuration</button>
-          <span id="offerSaveStatus" style="font-size:12px;color:var(--text-muted);"></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Active Campaigns -->
-    <div class="table-wrap">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">
-        Campaigns
-        <span id="campaignCount" style="font-weight:400;font-size:12px;color:var(--text-muted);"></span>
-      </h3>
-      <div class="table-scroll" style="max-height:350px;">
-        <table id="tblCampaigns">
-          <thead>
-            <tr>
-              <th class="sortable" data-col="0">Campaign</th>
-              <th class="sortable" data-col="1">Client</th>
-              <th class="sortable" data-col="2">Stores</th>
-              <th class="sortable" data-col="3">Cards/Drop</th>
-              <th class="sortable" data-col="4">Drops</th>
-              <th class="sortable" data-col="5">Annual Cards</th>
-              <th class="sortable" data-col="6">Budget/Drop</th>
-              <th class="sortable" data-col="7">Annual Budget</th>
-              <th class="sortable" data-col="8">Drop 1</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="campaignTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Triadex Production Handoff Checklist -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-top:24px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0;">Production Handoff Checklist</h3>
-        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Triadex QA Guide</div>
-      </div>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Complete all items before emailing Triadex. Progress saves automatically.</div>
-      <div id="handoffChecklist"></div>
-    </div>
   </div>
 
   <!-- REPORTING TAB -->
@@ -6961,66 +6753,7 @@ function deleteSegment(idx) {
 // ============================================================
 // MARKETING TAB (Triadex Integration)
 // ============================================================
-const HANDOFF_CHECKLIST = [
-  { section: 'Required Attachments', items: [
-    'Approved Creative (PDF/AI) — final, not draft/WIP',
-    'Bought Mailing List (CSV/XLSX) — new prospect HH per store radius',
-    'NCOA PAF (PDF) — required for USPS compliance',
-    'Suppression File (CSV/XLSX) — existing customers to suppress'
-  ]},
-  { section: 'Conditional Attachments', items: [
-    'Store List Spreadsheet (if >5 stores) — address, phone, hours',
-    'Coupon Code Matrix — store to code to drop mapping',
-    'Radius Map Composite — PNG/PDF of store maps',
-    'Creative Revision Markup — annotated PDF or text notes',
-    'Deal Sheet (new programs) — PDF for program context'
-  ]},
-  { section: 'Store Details', items: [
-    'Every store has FULL street address (no abbreviations, no PO boxes)',
-    'Every store has phone number with area code',
-    'Store count in email matches actual store list',
-    'Cards/drop x drops = annual cards (math checks per store)',
-    'Total cards/drop = sum of all store cards/drop',
-    'Total annual cards = sum of all store annual cards'
-  ]},
-  { section: 'Creative Verification', items: [
-    'Creative filename matches actual attached file',
-    'Revision notes are specific — exact section, exact text',
-    '"Keep unchanged" list included',
-    'Per-store variable fields explicitly listed',
-    'Expiration date is specified',
-    'Card back treatment stated (individual vs. all-stores)',
-    'Version count matches store count'
-  ]},
-  { section: 'Mailing List', items: [
-    'List filename matches actual attached file',
-    'Total record count is stated',
-    'Targeting criteria described (radius, demographics, income)',
-    'Suppression details included (what was suppressed, record count)',
-    'Dedupe scope stated (across all stores in program)',
-    'NCOA processing confirmed and PAF attached'
-  ]},
-  { section: 'Pricing Confirmation', items: [
-    'Per-card price matches approved deal',
-    'Budget per drop = cards/drop x per-card price (list fee in budget)',
-    'Annual budget = budget/drop x drops',
-    '"All-in" noted (print + postage + tracking)'
-  ]},
-  { section: 'Drop Schedule', items: [
-    'Drop 1 target date is realistic (min 2 weeks for production)',
-    'Drop frequency stated',
-    'Future drop dates listed or noted as TBD'
-  ]},
-  { section: 'General / Final Check', items: [
-    'Subject: {Client} — Production Handoff — {N} Stores — Drop 1 Target: {Date}',
-    'All three Triadex contacts included: Tim, Ryan, Riley',
-    'CC includes sending AM + Chase Butler + Hollie Higgs',
-    'No {PLACEHOLDER} markers remain (or each noted as TBD with owner)',
-    'Closing asks for: production timeline, questions, proof delivery date',
-    'AM signature block is complete',
-    'Say "ROAS" not "ROI"'
-  ]}
-];
+const HANDOFF_CHECKLIST = []; // Legacy — removed
 
 function getCampaigns() {
   try { return JSON.parse(localStorage.getItem('bp_campaigns') || '[]'); } catch(e) { return []; }
@@ -7034,52 +6767,464 @@ function saveChecklistState(state) { localStorage.setItem('bp_checklist', JSON.s
 
 function renderMarketing() {
   const cust = FILTERED.customers;
-  const campaigns = getCampaigns();
+  const details = FILTERED.details || [];
+  const promos = FILTERED.promos || [];
+  const inspections = FILTERED.inspections || [];
 
-  // KPIs
-  const totalCampaigns = campaigns.length;
-  const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'sent').length;
-  const totalAnnualCards = campaigns.reduce((s, c) => s + ((+c.cardsPerDrop || 0) * (+c.drops || 0)), 0);
-  const totalAnnualBudget = campaigns.reduce((s, c) => s + ((+c.cardsPerDrop || 0) * (+c.drops || 0) * (+c.pricePerCard || 0)), 0);
-  const suppressionPool = cust.length;
-  // Deduplicated addresses for suppression
-  const addrSet = new Set();
-  cust.forEach(r => { if (r.Customer_Address) addrSet.add((r.Customer_Address||'').trim().toUpperCase() + '|' + (r.ZIP_Code||'')); });
+  // Empty-state guard
+  if (!cust.length) {
+    const kpiEl = document.getElementById('marketKPIs');
+    if (kpiEl) kpiEl.innerHTML = '<div class="kpi-card" style="grid-column:1/-1;text-align:center;"><div class="kpi-label">Market Analysis</div><div class="kpi-value" style="font-size:16px;color:var(--text-muted);">Load transaction data to see analysis</div></div>';
+    ['zipAnalysis','serviceMixAnalysis','retentionAnalysis','fleetAnalysis','opportunityBody'].forEach(id => { const e = document.getElementById(id); if (e) e.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:20px;text-align:center;">No data loaded</div>'; });
+    return;
+  }
 
-  document.getElementById('mktgKPIs').innerHTML = `
-    <div class="kpi-card"><div class="kpi-label">Campaigns</div><div class="kpi-value">${totalCampaigns}</div><div class="kpi-sub">${activeCampaigns} active</div></div>
-    <div class="kpi-card"><div class="kpi-label">Total Annual Cards</div><div class="kpi-value">${num(totalAnnualCards)}</div><div class="kpi-sub">across all campaigns</div></div>
-    <div class="kpi-card"><div class="kpi-label">Annual Budget</div><div class="kpi-value">${money(totalAnnualBudget)}</div><div class="kpi-sub">print + postage + tracking</div></div>
-    <div class="kpi-card"><div class="kpi-label">Suppression Pool</div><div class="kpi-value">${num(addrSet.size)}</div><div class="kpi-sub">unique addresses</div></div>
-    <div class="kpi-card"><div class="kpi-label">Avg Cost/Card</div><div class="kpi-value">${totalAnnualCards ? money(totalAnnualBudget / totalAnnualCards) : '$—'}</div><div class="kpi-sub">all-in</div></div>
+  // ── Shared calculations ──
+  const stores = [...new Set(cust.map(r => r.Store_Number))].sort((a, b) => +a - +b);
+  const totalRevenue = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+  const storeCount = stores.length;
+
+  // Parse all dates
+  const custWithDates = cust.map(r => ({ ...r, _date: parseDate(r.Invoice_Date) })).filter(r => r._date);
+  custWithDates.sort((a, b) => a._date - b._date);
+
+  // Unique customers by name key
+  function custKey(r) {
+    const fn = (r.Customer_First_Name || '').trim().toUpperCase();
+    const ln = (r.Customer_Last_Name || '').trim().toUpperCase();
+    const em = (r.Customer_Email_Address || '').trim().toUpperCase();
+    return em ? em : (fn + '|' + ln);
+  }
+  const custVisits = {};
+  cust.forEach(r => {
+    const k = custKey(r);
+    if (!k || k === '|') return;
+    if (!custVisits[k]) custVisits[k] = { count: 0, revenue: 0, name: (r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '') };
+    custVisits[k].count++;
+    custVisits[k].revenue += (+r.Net_Sales || 0);
+  });
+  const uniqueCustomers = Object.keys(custVisits).length;
+  const repeatCustomers = Object.values(custVisits).filter(v => v.count > 1).length;
+  const oneTimeCustomers = uniqueCustomers - repeatCustomers;
+  const repeatPct = uniqueCustomers ? (repeatCustomers / uniqueCustomers * 100) : 0;
+
+  // ZIP analysis
+  const zipMap = {};
+  cust.forEach(r => {
+    const z = (r.ZIP_Code || '').trim();
+    if (!z) return;
+    if (!zipMap[z]) zipMap[z] = { count: 0, revenue: 0 };
+    zipMap[z].count++;
+    zipMap[z].revenue += (+r.Net_Sales || 0);
+  });
+  const uniqueZIPs = Object.keys(zipMap).length;
+  const zipsWithCustomers = Object.values(zipMap).filter(z => z.count > 0).length;
+
+  // Fleet analysis
+  const fleetInvoices = cust.filter(r => r.Business_Account_ID && String(r.Business_Account_ID).trim() !== '' && String(r.Business_Account_ID).trim() !== '0');
+  const retailInvoices = cust.filter(r => !r.Business_Account_ID || String(r.Business_Account_ID).trim() === '' || String(r.Business_Account_ID).trim() === '0');
+  const fleetPct = cust.length ? (fleetInvoices.length / cust.length * 100) : 0;
+  const fleetRevenue = fleetInvoices.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+  const retailRevenue = retailInvoices.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+
+  // Avg ticket trend: first half vs second half of date range
+  const midIdx = Math.floor(custWithDates.length / 2);
+  const firstHalf = custWithDates.slice(0, midIdx);
+  const secondHalf = custWithDates.slice(midIdx);
+  const avgFirst = firstHalf.length ? firstHalf.reduce((s, r) => s + (+r.Net_Sales || 0), 0) / firstHalf.length : 0;
+  const avgSecond = secondHalf.length ? secondHalf.reduce((s, r) => s + (+r.Net_Sales || 0), 0) / secondHalf.length : 0;
+  const ticketTrendPct = avgFirst ? ((avgSecond - avgFirst) / avgFirst * 100) : 0;
+
+  // Upsell conversion: inspections leading to purchases
+  let upsellRate = 0;
+  if (inspections.length) {
+    const inspWithSale = inspections.filter(i => i.Sold === 'Y' || i.Sold === 'Yes' || i.Sold === '1' || +i.Sold > 0).length;
+    upsellRate = (inspWithSale / inspections.length * 100);
+  }
+
+  // ── (a) KPI Cards ──
+  const avgRevPerStore = storeCount ? totalRevenue / storeCount : 0;
+  const kpiEl = document.getElementById('marketKPIs');
+  if (kpiEl) kpiEl.innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Avg Revenue / Store</div><div class="kpi-value">${money(avgRevPerStore)}</div><div class="kpi-sub">${storeCount} stores</div></div>
+    <div class="kpi-card"><div class="kpi-label">Customer Penetration</div><div class="kpi-value">${num(zipsWithCustomers)} / ${num(uniqueZIPs)}</div><div class="kpi-sub">ZIPs with customers</div></div>
+    <div class="kpi-card"><div class="kpi-label">Repeat Customer %</div><div class="kpi-value">${pct(repeatPct)}</div><div class="kpi-sub">${num(repeatCustomers)} of ${num(uniqueCustomers)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Ticket Trend</div><div class="kpi-value" style="color:${ticketTrendPct >= 0 ? 'var(--green)' : 'var(--red)'};">${ticketTrendPct >= 0 ? '+' : ''}${pct(ticketTrendPct)}</div><div class="kpi-sub">${money(avgFirst)} → ${money(avgSecond)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Fleet Mix %</div><div class="kpi-value">${pct(fleetPct)}</div><div class="kpi-sub">${num(fleetInvoices.length)} fleet invoices</div></div>
+    <div class="kpi-card"><div class="kpi-label">Upsell Conversion</div><div class="kpi-value">${inspections.length ? pct(upsellRate) : '—'}</div><div class="kpi-sub">${inspections.length ? num(inspections.length) + ' inspections' : 'No inspection data'}</div></div>
   `;
 
-  // Populate store selector
-  const sel = document.getElementById('mktgStoreSelect');
-  const stores = [...new Set(cust.map(r => r.Store_Number))].sort((a,b) => +a - +b);
-  sel.innerHTML = stores.map(s => `<option value="${s}">#${s}</option>`).join('');
+  // ── (b) Revenue Forecast Chart ──
+  if (custWithDates.length) {
+    const weekMap = {};
+    custWithDates.forEach(r => {
+      const d = r._date;
+      const weekStart = new Date(d);
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      const wk = weekStart.getFullYear() + '-' + String(weekStart.getMonth()+1).padStart(2,'0') + '-' + String(weekStart.getDate()).padStart(2,'0');
+      weekMap[wk] = (weekMap[wk] || 0) + (+r.Net_Sales || 0);
+    });
+    const weekKeys = Object.keys(weekMap).sort();
+    const weekVals = weekKeys.map(k => weekMap[k]);
+    const n = weekVals.length;
 
-  // Suppression count
-  const suppEl = document.getElementById('suppressionCount');
-  if (suppEl) suppEl.textContent = num(addrSet.size) + ' unique addresses';
+    // Linear regression
+    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+    weekVals.forEach((y, x) => { sumX += x; sumY += y; sumXY += x * y; sumXX += x * x; });
+    const slope = n > 1 ? (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX) : 0;
+    const intercept = n ? (sumY - slope * sumX) / n : 0;
 
-  // Campaign count
-  const countEl = document.getElementById('campaignCount');
-  if (countEl) countEl.textContent = totalCampaigns + ' total · ' + activeCampaigns + ' active';
+    // Project 13 more weeks (90 days)
+    const projWeeks = 13;
+    const allLabels = [...weekKeys];
+    const historicalData = [...weekVals];
+    const trendData = weekVals.map((_, x) => Math.max(0, intercept + slope * x));
+    const projData = new Array(n).fill(null);
+    const projTrend = new Array(n).fill(null);
 
-  // Budget preview listener
-  ['mktgCardsPerDrop','mktgDrops','mktgPricePerCard'].forEach(id => {
-    document.getElementById(id).onkeyup = updateBudgetPreview;
-    document.getElementById(id).onchange = updateBudgetPreview;
+    for (let i = 0; i < projWeeks; i++) {
+      const lastDate = new Date(weekKeys[weekKeys.length - 1]);
+      lastDate.setDate(lastDate.getDate() + 7 * (i + 1));
+      allLabels.push(lastDate.getFullYear() + '-' + String(lastDate.getMonth()+1).padStart(2,'0') + '-' + String(lastDate.getDate()).padStart(2,'0'));
+      historicalData.push(null);
+      trendData.push(null);
+      projData.push(Math.max(0, intercept + slope * (n + i)));
+      projTrend.push(Math.max(0, intercept + slope * (n + i)));
+    }
+
+    makeChart('chartRevForecast', {
+      type: 'line',
+      data: {
+        labels: allLabels.map(l => { const p = l.split('-'); return +p[1] + '/' + +p[2]; }),
+        datasets: [
+          { label: 'Actual Revenue', data: historicalData, borderColor: PALETTE.blue, backgroundColor: PALETTE.blueFill, fill: true, tension: 0.3, pointRadius: 2 },
+          { label: 'Trend', data: trendData, borderColor: PALETTE.yellow, borderDash: [4, 4], pointRadius: 0, fill: false, tension: 0 },
+          { label: 'Projection', data: projData, borderColor: PALETTE.green, backgroundColor: PALETTE.greenFill, borderDash: [6, 3], fill: true, tension: 0.3, pointRadius: 1 }
+        ]
+      },
+      options: {
+        scales: { y: { ticks: { callback: tickMoney } } },
+        plugins: { tooltip: { callbacks: { label: tooltipMoney } } }
+      }
+    });
+  }
+
+  // ── (c) Seasonal Pattern Chart ──
+  if (custWithDates.length) {
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const monthRevenue = new Array(12).fill(0);
+    const monthCounts = new Array(12).fill(0);
+    custWithDates.forEach(r => {
+      const m = r._date.getMonth();
+      monthRevenue[m] += (+r.Net_Sales || 0);
+      monthCounts[m]++;
+    });
+    // Only show months that have data
+    const activeMonths = monthNames.map((name, i) => ({ name, revenue: monthRevenue[i], count: monthCounts[i] })).filter(m => m.count > 0);
+
+    makeChart('chartSeasonal', {
+      type: 'bar',
+      data: {
+        labels: activeMonths.map(m => m.name),
+        datasets: [{ label: 'Revenue', data: activeMonths.map(m => m.revenue), backgroundColor: PALETTE.multi.slice(0, activeMonths.length), borderRadius: 6 }]
+      },
+      options: {
+        scales: { y: { ticks: { callback: tickMoney } } },
+        plugins: { tooltip: { callbacks: { label: tooltipMoney } }, legend: { display: false } }
+      }
+    });
+  }
+
+  // ── (d) BPA Market Insights ──
+  const insights = [];
+  if (ticketTrendPct < -5) insights.push({ type: 'alert', msg: 'Avg ticket is <strong>declining</strong> — down ' + pct(Math.abs(ticketTrendPct)) + ' from early to late period.', detail: 'Review pricing strategy and upsell execution.' });
+  else if (ticketTrendPct > 5) insights.push({ type: 'success', msg: 'Avg ticket is <strong>trending up</strong> — +' + pct(ticketTrendPct) + ' growth.', detail: 'Current upsell and pricing strategy is working.' });
+
+  if (repeatPct < 20) insights.push({ type: 'alert', msg: 'Low repeat rate: only <strong>' + pct(repeatPct) + '</strong> of customers return.', detail: 'Consider loyalty programs or follow-up campaigns to drive retention.' });
+
+  if (fleetPct > 25) insights.push({ type: 'info', msg: 'Fleet business is <strong>' + pct(fleetPct) + '</strong> of invoices — significant B2B exposure.', detail: 'Ensure fleet pricing and contracts are optimized.' });
+  else if (fleetPct < 5 && fleetPct > 0) insights.push({ type: 'info', msg: 'Fleet business is only <strong>' + pct(fleetPct) + '</strong> — potential growth area.', detail: 'Target local fleets and commercial accounts.' });
+
+  if (upsellRate > 0 && upsellRate < 30) insights.push({ type: 'alert', msg: 'Upsell conversion at <strong>' + pct(upsellRate) + '</strong> — below 30% threshold.', detail: 'Train technicians on inspection-to-sale communication.' });
+
+  // Find underperforming stores
+  const storeRevMap = {};
+  cust.forEach(r => { const s = r.Store_Number; storeRevMap[s] = (storeRevMap[s] || 0) + (+r.Net_Sales || 0); });
+  const storeRevArr = Object.values(storeRevMap);
+  const avgStoreRev = storeRevArr.length ? storeRevArr.reduce((a, b) => a + b, 0) / storeRevArr.length : 0;
+  const underperformers = Object.entries(storeRevMap).filter(([, v]) => v < avgStoreRev * 0.6).map(([s]) => '#' + s);
+  if (underperformers.length) insights.push({ type: 'alert', msg: '<strong>' + underperformers.length + ' store(s)</strong> significantly below average revenue: ' + underperformers.slice(0, 5).join(', '), detail: 'These stores are at <60% of the ' + money(avgStoreRev) + ' store average.' });
+
+  // Low-penetration ZIPs
+  const topZIPs = Object.entries(zipMap).sort((a, b) => b[1].count - a[1].count);
+  if (topZIPs.length > 10) {
+    const topZipRev = topZIPs.slice(0, 5).reduce((s, z) => s + z[1].revenue, 0);
+    const topZipPct = totalRevenue ? topZipRev / totalRevenue * 100 : 0;
+    if (topZipPct > 50) insights.push({ type: 'info', msg: 'Top 5 ZIPs drive <strong>' + pct(topZipPct) + '</strong> of revenue — high geographic concentration.', detail: 'Diversify marketing reach to adjacent ZIP codes.' });
+  }
+
+  bpaHTML('bpaMarket', 'Market Intelligence', insights);
+
+  // ── (e) ZIP Code Analysis ──
+  const zipEl = document.getElementById('zipAnalysis');
+  if (zipEl) {
+    const sorted = Object.entries(zipMap).sort((a, b) => b[1].count - a[1].count).slice(0, 20);
+    const maxCount = sorted.length ? sorted[0][1].count : 1;
+    const totalCust = cust.length;
+    zipEl.innerHTML = sorted.length ? sorted.map(([zip, d]) => {
+      const avgTicket = d.count ? d.revenue / d.count : 0;
+      const pctOfTotal = totalCust ? (d.count / totalCust * 100) : 0;
+      const barW = Math.round(d.count / maxCount * 100);
+      return `<div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--text);">${zip}</span>
+          <span style="font-size:11px;color:var(--text-muted);">${num(d.count)} customers · ${money(d.revenue)} · Avg ${money(avgTicket)} · ${pct(pctOfTotal)}</span>
+        </div>
+        <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${barW}%;background:${PALETTE.blue};border-radius:3px;"></div>
+        </div>
+      </div>`;
+    }).join('') : '<div style="color:var(--text-muted);font-size:12px;">No ZIP data available</div>';
+  }
+
+  // ── (f) Service Mix Opportunity ──
+  const svcEl = document.getElementById('serviceMixAnalysis');
+  if (svcEl && details.length) {
+    const catMap = {};
+    details.forEach(r => {
+      const cat = r.JLI_Category_Code || 'Unknown';
+      if (!catMap[cat]) catMap[cat] = { revenue: 0, qty: 0, stores: new Set() };
+      catMap[cat].revenue += (+r.Extended_Price || 0);
+      catMap[cat].qty += (+r.Quantity_Sold || 0);
+      if (r.Store_Number) catMap[cat].stores.add(r.Store_Number);
+    });
+    const catArr = Object.entries(catMap).sort((a, b) => b[1].revenue - a[1].revenue);
+    const maxRev = catArr.length ? catArr[0][1].revenue : 1;
+
+    svcEl.innerHTML = `<div style="max-height:370px;overflow-y:auto;">` + catArr.slice(0, 15).map(([cat, d]) => {
+      const avgPrice = d.qty ? d.revenue / d.qty : 0;
+      const penetration = storeCount ? (d.stores.size / storeCount * 100) : 0;
+      const barW = Math.round(d.revenue / maxRev * 100);
+      const penColor = penetration < 50 ? 'var(--orange)' : 'var(--green)';
+      return `<div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;">
+          <span style="font-size:12px;font-weight:600;color:var(--text);">${cat}</span>
+          <span style="font-size:10px;color:${penColor};font-weight:700;">${d.stores.size}/${storeCount} stores</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">${money(d.revenue)} · ${num(d.qty)} sold · Avg ${money(avgPrice)}</div>
+        <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${barW}%;background:${PALETTE.blue};border-radius:3px;"></div>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+  } else if (svcEl) {
+    svcEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:20px;text-align:center;">Load detail data for service mix analysis</div>';
+  }
+
+  // ── (g) Customer Retention Signals ──
+  const retEl = document.getElementById('retentionAnalysis');
+  if (retEl) {
+    const repeatRevenue = Object.values(custVisits).filter(v => v.count > 1).reduce((s, v) => s + v.revenue, 0);
+    const oneTimeRevenue = Object.values(custVisits).filter(v => v.count === 1).reduce((s, v) => s + v.revenue, 0);
+    const avgRepeatTicket = repeatCustomers ? repeatRevenue / Object.values(custVisits).filter(v => v.count > 1).reduce((s, v) => s + v.count, 0) : 0;
+    const avgOneTimeTicket = oneTimeCustomers ? oneTimeRevenue / oneTimeCustomers : 0;
+    const top5 = Object.values(custVisits).sort((a, b) => b.count - a.count).slice(0, 5);
+
+    retEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:var(--text);">${num(uniqueCustomers)}</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Unique Customers</div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:${repeatPct > 30 ? 'var(--green)' : 'var(--orange)'};">${pct(repeatPct)}</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Repeat Rate</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;">
+          <span style="color:var(--text-muted);">One-time visitors</span>
+          <span style="color:var(--text);font-weight:600;">${num(oneTimeCustomers)} · Avg ${money(avgOneTimeTicket)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;">
+          <span style="color:var(--text-muted);">Repeat visitors</span>
+          <span style="color:var(--green);font-weight:600;">${num(repeatCustomers)} · Avg ${money(avgRepeatTicket)}</span>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px;">Top 5 Most Frequent</div>
+      ${top5.map((c, i) => `<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;${i < 4 ? 'border-bottom:1px solid var(--border);' : ''}">
+        <span style="color:var(--text);">${c.name.trim() || 'Unknown'}</span>
+        <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;">${c.count}x · ${money(c.revenue)}</span>
+      </div>`).join('')}
+    `;
+  }
+
+  // ── (h) Store Opportunity Scorecard ──
+  const oppBody = document.getElementById('opportunityBody');
+  if (oppBody) {
+    const storeMetrics = stores.map(s => {
+      const sc = cust.filter(r => r.Store_Number === s);
+      const rev = sc.reduce((sum, r) => sum + (+r.Net_Sales || 0), 0);
+      const guestCount = sc.length;
+      const revPerVehicle = guestCount ? rev / guestCount : 0;
+
+      // Ancillary % from details
+      const sd = details.filter(r => r.Store_Number === s);
+      const detailRev = sd.reduce((sum, r) => sum + (+r.Extended_Price || 0), 0);
+      const oilCats = ['SSOC', 'OIL', 'CONV', 'SIGNATURE', 'FULL SYNTHETIC', 'HIGH MILEAGE'];
+      const oilRev = sd.filter(r => oilCats.some(c => (r.JLI_Category_Code || '').toUpperCase().includes(c))).reduce((sum, r) => sum + (+r.Extended_Price || 0), 0);
+      const ancillaryPct = detailRev ? ((detailRev - oilRev) / detailRev * 100) : 0;
+
+      // Data quality: % of invoices with email + phone + address
+      const withEmail = sc.filter(r => r.Customer_Email_Address && r.Customer_Email_Address.trim()).length;
+      const withPhone = sc.filter(r => r.Customer_Phone_Number && r.Customer_Phone_Number.trim()).length;
+      const withAddr = sc.filter(r => r.Customer_Address && r.Customer_Address.trim()).length;
+      const dataQuality = guestCount ? ((withEmail + withPhone + withAddr) / (guestCount * 3) * 100) : 0;
+
+      // Efficiency: avg bay time
+      const bayTimes = sc.map(r => {
+        if (!r.Bay_Start_Time || !r.Bay_End_Time) return null;
+        return diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+      }).filter(t => t !== null && t > 0 && t < 120);
+      const avgBayTime = bayTimes.length ? bayTimes.reduce((a, b) => a + b, 0) / bayTimes.length : 0;
+
+      // Upsell rate from inspections
+      const si = inspections.filter(r => r.Store_Number === s);
+      const siSold = si.filter(i => i.Sold === 'Y' || i.Sold === 'Yes' || i.Sold === '1' || +i.Sold > 0).length;
+      const storeUpsell = si.length ? (siSold / si.length * 100) : 0;
+
+      return { store: s, rev, guestCount, revPerVehicle, ancillaryPct, dataQuality, avgBayTime, storeUpsell, inspCount: si.length };
+    });
+
+    // Normalize for scoring (0-100 each dimension)
+    const maxRPV = Math.max(...storeMetrics.map(s => s.revPerVehicle), 1);
+    const maxAnc = Math.max(...storeMetrics.map(s => s.ancillaryPct), 1);
+    const maxDQ = 100;
+    const maxBay = Math.max(...storeMetrics.map(s => s.avgBayTime), 1);
+    const maxUps = Math.max(...storeMetrics.map(s => s.storeUpsell), 1);
+    const maxVol = Math.max(...storeMetrics.map(s => s.guestCount), 1);
+
+    storeMetrics.forEach(s => {
+      const rpvScore = (s.revPerVehicle / maxRPV) * 100;
+      const ancScore = (s.ancillaryPct / maxAnc) * 100;
+      const dqScore = s.dataQuality;
+      const effScore = s.avgBayTime ? (1 - s.avgBayTime / maxBay) * 100 : 50; // Lower is better
+      const upsScore = maxUps ? (s.storeUpsell / maxUps) * 100 : 50;
+      const volScore = (s.guestCount / maxVol) * 100;
+      s.score = Math.round(rpvScore * 0.20 + ancScore * 0.20 + dqScore * 0.15 + effScore * 0.15 + upsScore * 0.15 + volScore * 0.15);
+    });
+
+    storeMetrics.sort((a, b) => b.score - a.score);
+
+    oppBody.innerHTML = storeMetrics.map(s => {
+      const scoreColor = s.score > 70 ? 'var(--green)' : s.score >= 40 ? 'var(--yellow)' : 'var(--red)';
+      return `<tr>
+        <td style="position:sticky;left:0;z-index:2;background:var(--card);font-weight:700;">#${s.store}</td>
+        <td>${money(s.revPerVehicle)}</td>
+        <td>${pct(s.ancillaryPct)}</td>
+        <td>${pct(s.dataQuality)}</td>
+        <td>${s.avgBayTime ? s.avgBayTime.toFixed(1) + ' min' : '—'}</td>
+        <td>${s.inspCount ? pct(s.storeUpsell) : '—'}</td>
+        <td style="font-weight:800;color:${scoreColor};font-family:'JetBrains Mono',monospace;font-size:15px;">${s.score}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── (i) Fleet Analysis ──
+  const fleetEl = document.getElementById('fleetAnalysis');
+  if (fleetEl) {
+    const fleetAvgTicket = fleetInvoices.length ? fleetRevenue / fleetInvoices.length : 0;
+    const retailAvgTicket = retailInvoices.length ? retailRevenue / retailInvoices.length : 0;
+    fleetEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div style="background:var(--bg);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Fleet</div>
+          <div style="font-size:16px;font-weight:800;color:var(--blue);">${num(fleetInvoices.length)}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${money(fleetRevenue)}</div>
+          <div style="font-size:11px;color:var(--text-muted);">Avg ${money(fleetAvgTicket)}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Retail</div>
+          <div style="font-size:16px;font-weight:800;color:var(--green);">${num(retailInvoices.length)}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${money(retailRevenue)}</div>
+          <div style="font-size:11px;color:var(--text-muted);">Avg ${money(retailAvgTicket)}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">
+        ${fleetAvgTicket > retailAvgTicket ? '<span style="color:var(--green);">Fleet tickets average <strong>' + money(fleetAvgTicket - retailAvgTicket) + ' more</strong> than retail.</span>' : fleetAvgTicket < retailAvgTicket ? '<span style="color:var(--orange);">Retail tickets average <strong>' + money(retailAvgTicket - fleetAvgTicket) + ' more</strong> than fleet.</span>' : 'Fleet and retail tickets are comparable.'}
+      </div>
+    `;
+
+    // Doughnut chart
+    makeChart('chartFleetMix', {
+      type: 'doughnut',
+      data: {
+        labels: ['Fleet', 'Retail'],
+        datasets: [{ data: [fleetRevenue, retailRevenue], backgroundColor: [PALETTE.blue, PALETTE.green], borderWidth: 0 }]
+      },
+      options: {
+        cutout: '65%',
+        plugins: { tooltip: { callbacks: { label: tooltipMoneyPie } } }
+      }
+    });
+  }
+
+  // ── (j) Ticket Distribution Chart ──
+  const buckets = [
+    { label: '$0-25', min: 0, max: 25 },
+    { label: '$25-50', min: 25, max: 50 },
+    { label: '$50-100', min: 50, max: 100 },
+    { label: '$100-150', min: 100, max: 150 },
+    { label: '$150-200', min: 150, max: 200 },
+    { label: '$200-300', min: 200, max: 300 },
+    { label: '$300-500', min: 300, max: 500 },
+    { label: '$500+', min: 500, max: Infinity }
+  ];
+  const bucketCounts = buckets.map(b => cust.filter(r => { const v = +r.Net_Sales || 0; return v >= b.min && v < b.max; }).length);
+  const bucketRevenue = buckets.map(b => cust.filter(r => { const v = +r.Net_Sales || 0; return v >= b.min && v < b.max; }).reduce((s, r) => s + (+r.Net_Sales || 0), 0));
+
+  makeChart('chartTicketDist', {
+    type: 'bar',
+    data: {
+      labels: buckets.map(b => b.label),
+      datasets: [
+        { label: 'Invoices', data: bucketCounts, backgroundColor: PALETTE.blue, borderRadius: 6, yAxisID: 'y' },
+        { label: 'Revenue', data: bucketRevenue, backgroundColor: PALETTE.greenFill, borderColor: PALETTE.green, borderWidth: 2, type: 'line', tension: 0.3, pointRadius: 3, yAxisID: 'y1' }
+      ]
+    },
+    options: {
+      scales: {
+        y: { position: 'left', ticks: { callback: tickCount } },
+        y1: { position: 'right', ticks: { callback: tickMoney }, grid: { drawOnChartArea: false } }
+      },
+      plugins: { tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label === 'Revenue' ? tooltipMoney(ctx) : tooltipCount(ctx); } } } }
+    }
   });
 
-  // Checklist progress in sidebar
-  updateChecklistSidebar();
+  // ── (k) Discount Impact Chart ──
+  if (promos.length) {
+    const promoMap = {};
+    promos.forEach(r => {
+      const name = r.Promo_Description || r.Promotion_Description || r.Description || 'Unknown Promo';
+      const disc = Math.abs(+r.Discount_Amount || +r.Extended_Price || 0);
+      if (!promoMap[name]) promoMap[name] = 0;
+      promoMap[name] += disc;
+    });
+    const promoArr = Object.entries(promoMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
-  renderCampaignTable();
-  initOfferConfigurator();
-  renderHandoffChecklist();
-  renderTokens();
+    makeChart('chartDiscountImpact', {
+      type: 'bar',
+      data: {
+        labels: promoArr.map(p => truncLabel(p[0], 30)),
+        datasets: [{ label: 'Discount $', data: promoArr.map(p => p[1]), backgroundColor: PALETTE.red, borderRadius: 6 }]
+      },
+      options: {
+        indexAxis: 'y',
+        scales: { x: { ticks: { callback: tickMoney } } },
+        plugins: { tooltip: { callbacks: { label: tooltipMoney } }, legend: { display: false } }
+      }
+    });
+  }
 }
 
 function updateBudgetPreview() {
