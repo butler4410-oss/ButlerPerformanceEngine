@@ -840,6 +840,52 @@
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
+  /* Sub-Tab Navigation */
+  .sub-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    width: fit-content;
+  }
+
+  .sub-tab {
+    padding: 8px 18px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .sub-tab:last-child { border-right: none; }
+
+  .sub-tab:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .sub-tab.active {
+    color: white;
+    background: var(--primary);
+    font-weight: 600;
+  }
+
+  .sub-panel { display: none; }
+  .sub-panel.active { display: block; }
+
+  body.light-mode .sub-tabs { border-color: #e0e0e0; }
+  body.light-mode .sub-tab { color: #6b7280; }
+  body.light-mode .sub-tab:hover { color: #1a1a2e; background: rgba(0,0,0,0.02); }
+  body.light-mode .sub-tab.active { color: white; background: var(--primary); }
+
   /* KPI Cards */
   .kpi-grid {
     display: grid;
@@ -3275,7 +3321,7 @@
 
   <!-- OPERATIONS TAB -->
   <div class="tab-content" id="tab-operations">
-    <!-- Quick Date Range Filters -->
+    <!-- Quick Filters stay at top -->
     <div class="ops-quick-filters" id="opsQuickFilters">
       <span style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Quick Range:</span>
       <button class="ops-quick-btn" onclick="setOpsDateRange('YTD')">YTD</button>
@@ -3284,38 +3330,46 @@
       <button class="ops-quick-btn" onclick="setOpsDateRange('WTD')">WTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('DTD')">DTD</button>
     </div>
-
     <div class="kpi-grid" id="opsKPIs"></div>
 
-    <!-- Operations Command Grid -->
-    <div class="ops-grid-wrap">
-      <h3>Operations Command Grid <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Performance by Store</span></h3>
-      <div class="ops-grid-scroll">
-        <table class="ops-grid" id="opsCommandGrid">
-          <thead>
-            <tr>
-              <th style="min-width:140px;position:sticky;left:0;z-index:3;background:var(--card);">Store / District</th>
-              <th title="Guest Count — Total invoices/vehicles serviced">GC</th>
-              <th title="Cars Per Day — Guest count divided by business days in the selected range">CPD</th>
-              <th title="Net Sales — Total revenue after discounts">Net Sales</th>
-              <th title="Ticket Average — Net sales divided by guest count">TA</th>
-              <th title="Average Bay Time — Time from bay start to bay end (minutes)">Avg Bay</th>
-              <th title="Average Wait Time — Time from customer greet to bay start (minutes)">Avg Wait</th>
-              <th title="Man Hours Per Vehicle — Estimated labor hours per vehicle (bay time / 60)">MHPV</th>
-              <th title="Promotions — Number of promotional codes applied">Promos</th>
-              <th title="Promo Dollars — Total dollar amount of promotional discounts">Promo $</th>
-              <th title="Inspections — Total vehicle inspection items recorded">Insp</th>
-              <th title="Yellow/Red Percentage — Inspection items flagged as needing attention">Y/R %</th>
-            </tr>
-          </thead>
-          <tbody id="opsGridBody"></tbody>
-        </table>
+    <!-- Sub-tabs -->
+    <div id="opsSubTabs">
+      <div class="sub-tabs">
+        <button class="sub-tab active" data-sub="grid" onclick="switchSubTab('opsSubTabs','grid')">Command Grid</button>
+        <button class="sub-tab" data-sub="charts" onclick="switchSubTab('opsSubTabs','charts')">Charts</button>
+        <button class="sub-tab" data-sub="times" onclick="switchSubTab('opsSubTabs','times')">Service Times</button>
       </div>
-    </div>
 
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
-      <div>
-        <div class="charts-row" style="margin-bottom:20px;">
+      <div class="sub-panel active" data-sub="grid">
+        <div class="bpa-panel" id="bpaOps" style="margin-bottom:16px;"></div>
+        <div class="ops-grid-wrap">
+          <h3>Operations Command Grid <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Performance by Store</span></h3>
+          <div class="ops-grid-scroll">
+            <table class="ops-grid" id="opsCommandGrid">
+              <thead>
+                <tr>
+                  <th style="min-width:140px;position:sticky;left:0;z-index:3;background:var(--card);">Store / District</th>
+                  <th title="Guest Count — Total invoices/vehicles serviced">GC</th>
+                  <th title="Cars Per Day — Guest count divided by business days in the selected range">CPD</th>
+                  <th title="Net Sales — Total revenue after discounts">Net Sales</th>
+                  <th title="Ticket Average — Net sales divided by guest count">TA</th>
+                  <th title="Average Bay Time — Time from bay start to bay end (minutes)">Avg Bay</th>
+                  <th title="Average Wait Time — Time from customer greet to bay start (minutes)">Avg Wait</th>
+                  <th title="Man Hours Per Vehicle — Estimated labor hours per vehicle (bay time / 60)">MHPV</th>
+                  <th title="Promotions — Number of promotional codes applied">Promos</th>
+                  <th title="Promo Dollars — Total dollar amount of promotional discounts">Promo $</th>
+                  <th title="Inspections — Total vehicle inspection items recorded">Insp</th>
+                  <th title="Yellow/Red Percentage — Inspection items flagged as needing attention">Y/R %</th>
+                </tr>
+              </thead>
+              <tbody id="opsGridBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-panel" data-sub="charts">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
           <div class="chart-card">
             <h3>Service Time by Store</h3>
             <div class="chart-wrap"><canvas id="chartSvcTime"></canvas></div>
@@ -3325,7 +3379,7 @@
             <div class="chart-wrap"><canvas id="chartTimeHist"></canvas></div>
           </div>
         </div>
-        <div class="charts-row" style="margin-bottom:0;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
           <div class="chart-card">
             <h3>Top Vehicle Makes</h3>
             <div class="chart-wrap"><canvas id="chartMakes"></canvas></div>
@@ -3336,29 +3390,31 @@
           </div>
         </div>
       </div>
-      <div><div class="bpa-panel" id="bpaOps" style="margin-bottom:0;"></div></div>
-    </div>
-    <div class="export-bar">
-      <button class="btn-export" onclick="exportReport('tblStoreOps','Store Service Times')">Export Report</button>
-      <button class="btn-export" onclick="emailReport('tblStoreOps','Store Service Times')">Email</button>
-    </div>
-    <div class="table-wrap">
-      <h3>Store Service Times</h3>
-      <div class="table-scroll">
-        <table id="tblStoreOps">
-          <thead>
-            <tr>
-              <th class="sortable" data-col="0">Store #</th>
-              <th class="sortable" data-col="1" title="Total invoices/vehicles serviced">Invoices</th>
-              <th class="sortable" data-col="2" title="Average time in the service bay (minutes)">Avg Bay Time</th>
-              <th class="sortable" data-col="3" title="Average wait from greet to bay start (minutes)">Avg Wait Time</th>
-              <th class="sortable" data-col="4" title="Average total time from greet to checkout end (minutes)">Avg Total Time</th>
-              <th class="sortable" data-col="5" title="Total net sales revenue">Revenue</th>
-              <th class="sortable" data-col="6" title="Ticket Average — Revenue divided by invoice count">Avg Ticket</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+
+      <div class="sub-panel" data-sub="times">
+        <div class="export-bar">
+          <button class="btn-export" onclick="exportReport('tblStoreOps','Store Service Times')">Export Report</button>
+          <button class="btn-export" onclick="emailReport('tblStoreOps','Store Service Times')">Email</button>
+        </div>
+        <div class="table-wrap">
+          <h3>Store Service Times</h3>
+          <div class="table-scroll">
+            <table id="tblStoreOps">
+              <thead>
+                <tr>
+                  <th class="sortable" data-col="0">Store #</th>
+                  <th class="sortable" data-col="1" title="Total invoices/vehicles serviced">Invoices</th>
+                  <th class="sortable" data-col="2" title="Average time in the service bay (minutes)">Avg Bay Time</th>
+                  <th class="sortable" data-col="3" title="Average wait from greet to bay start (minutes)">Avg Wait Time</th>
+                  <th class="sortable" data-col="4" title="Average total time from greet to checkout end (minutes)">Avg Total Time</th>
+                  <th class="sortable" data-col="5" title="Total net sales revenue">Revenue</th>
+                  <th class="sortable" data-col="6" title="Ticket Average — Revenue divided by invoice count">Avg Ticket</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -3523,97 +3579,91 @@
 
   <!-- MARKET ANALYSIS TAB -->
   <div class="tab-content" id="tab-marketing">
-
-    <!-- Market Analysis KPIs -->
     <div class="kpi-grid" id="marketKPIs"></div>
 
-    <!-- Two-column layout -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-
-      <!-- Revenue Forecast -->
-      <div class="chart-card">
-        <h3>Revenue Forecast (90-Day Projection)</h3>
-        <div class="chart-wrap"><canvas id="chartRevForecast"></canvas></div>
+    <div id="marketSubTabs">
+      <div class="sub-tabs">
+        <button class="sub-tab active" data-sub="overview" onclick="switchSubTab('marketSubTabs','overview')">Overview</button>
+        <button class="sub-tab" data-sub="area" onclick="switchSubTab('marketSubTabs','area')">Trade Area</button>
+        <button class="sub-tab" data-sub="scorecard" onclick="switchSubTab('marketSubTabs','scorecard')">Store Scorecard</button>
+        <button class="sub-tab" data-sub="pricing" onclick="switchSubTab('marketSubTabs','pricing')">Pricing</button>
       </div>
 
-      <!-- Seasonal Pattern -->
-      <div class="chart-card">
-        <h3>Seasonal Revenue Pattern</h3>
-        <div class="chart-wrap"><canvas id="chartSeasonal"></canvas></div>
-      </div>
-    </div>
-
-    <!-- BPA Insights for Market Analysis -->
-    <div class="bpa-panel" id="bpaMarket"></div>
-
-    <!-- Three-column layout -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:24px;">
-
-      <!-- Trade Area Map / ZIP Analysis -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Trade Area — ZIP Code Analysis</div>
-        <div id="zipAnalysis" style="max-height:400px;overflow-y:auto;"></div>
+      <div class="sub-panel active" data-sub="overview">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+          <div class="chart-card">
+            <h3>Revenue Forecast (90-Day Projection)</h3>
+            <div class="chart-wrap"><canvas id="chartRevForecast"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Seasonal Revenue Pattern</h3>
+            <div class="chart-wrap"><canvas id="chartSeasonal"></canvas></div>
+          </div>
+        </div>
+        <div class="bpa-panel" id="bpaMarket"></div>
       </div>
 
-      <!-- Service Mix Opportunity -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Service Mix Opportunity</div>
-        <div id="serviceMixAnalysis"></div>
-      </div>
-
-      <!-- Customer Retention -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Customer Retention Signals</div>
-        <div id="retentionAnalysis"></div>
-      </div>
-    </div>
-
-    <!-- Two-column: Store Opportunity + Fleet Analysis -->
-    <div style="display:grid;grid-template-columns:3fr 2fr;gap:20px;margin-bottom:24px;">
-
-      <!-- Store Opportunity Scorecard -->
-      <div class="ops-grid-wrap">
-        <h3>Store Opportunity Scorecard</h3>
-        <div class="ops-grid-scroll" style="max-height:450px;">
-          <table class="ops-grid" id="tblOpportunity">
-            <thead>
-              <tr>
-                <th style="min-width:80px;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
-                <th title="Revenue per vehicle — higher is better">Rev/Vehicle</th>
-                <th title="Service mix diversity — % of revenue from non-oil services">Ancillary %</th>
-                <th title="Customer data completeness — email + phone + address">Data Quality</th>
-                <th title="Average service time — lower is more efficient">Efficiency</th>
-                <th title="Inspection-to-sale conversion rate">Upsell Rate</th>
-                <th title="Composite opportunity score 0-100">Score</th>
-              </tr>
-            </thead>
-            <tbody id="opportunityBody"></tbody>
-          </table>
+      <div class="sub-panel" data-sub="area">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Trade Area — ZIP Code Analysis</div>
+            <div id="zipAnalysis" style="max-height:400px;overflow-y:auto;"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Service Mix Opportunity</div>
+            <div id="serviceMixAnalysis"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Customer Retention Signals</div>
+            <div id="retentionAnalysis"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Fleet vs Retail Analysis -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Fleet vs Retail Intelligence</div>
-        <div id="fleetAnalysis"></div>
-        <div style="margin-top:16px;">
-          <div class="chart-wrap" style="height:220px;"><canvas id="chartFleetMix"></canvas></div>
+      <div class="sub-panel" data-sub="scorecard">
+        <div style="display:grid;grid-template-columns:3fr 2fr;gap:20px;">
+          <div class="ops-grid-wrap">
+            <h3>Store Opportunity Scorecard</h3>
+            <div class="ops-grid-scroll" style="max-height:450px;">
+              <table class="ops-grid" id="tblOpportunity">
+                <thead>
+                  <tr>
+                    <th style="min-width:80px;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
+                    <th title="Revenue per vehicle — higher is better">Rev/Vehicle</th>
+                    <th title="Service mix diversity — % of revenue from non-oil services">Ancillary %</th>
+                    <th title="Customer data completeness — email + phone + address">Data Quality</th>
+                    <th title="Average service time — lower is more efficient">Efficiency</th>
+                    <th title="Inspection-to-sale conversion rate">Upsell Rate</th>
+                    <th title="Composite opportunity score 0-100">Score</th>
+                  </tr>
+                </thead>
+                <tbody id="opportunityBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Fleet vs Retail Intelligence</div>
+            <div id="fleetAnalysis"></div>
+            <div style="margin-top:16px;">
+              <div class="chart-wrap" style="height:220px;"><canvas id="chartFleetMix"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-panel" data-sub="pricing">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div class="chart-card">
+            <h3>Ticket Distribution — Where's the Revenue?</h3>
+            <div class="chart-wrap"><canvas id="chartTicketDist"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Discount Impact Analysis</h3>
+            <div class="chart-wrap"><canvas id="chartDiscountImpact"></canvas></div>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- Pricing Intelligence -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-      <div class="chart-card">
-        <h3>Ticket Distribution — Where's the Revenue?</h3>
-        <div class="chart-wrap"><canvas id="chartTicketDist"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Discount Impact Analysis</h3>
-        <div class="chart-wrap"><canvas id="chartDiscountImpact"></canvas></div>
-      </div>
-    </div>
-
   </div>
 
   <!-- District Builder Modal -->
@@ -3768,12 +3818,9 @@
 
   <!-- GROW REPORTS TAB -->
   <div class="tab-content" id="tab-grow">
-    <div class="export-bar">
-      <button class="btn-export" onclick="exportGrowReport()">Export POS Report Data</button>
-    </div>
     <div id="growContent">
       <div class="grow-no-data">
-        <strong>No POS Report Data</strong>
+        <strong>No POS Report Data</strong><br>
         Upload your POS export CSVs (Sales Summary, KPI Actuals, Time Analysis, System Impact) to view reports.
       </div>
     </div>
@@ -4376,6 +4423,13 @@ function launchDashboard() {
 // ============================================================
 // RENDER DASHBOARD
 // ============================================================
+function switchSubTab(container, tabName) {
+  const parent = typeof container === 'string' ? document.getElementById(container) : container;
+  if (!parent) return;
+  parent.querySelectorAll('.sub-tab').forEach(t => t.classList.toggle('active', t.dataset.sub === tabName));
+  parent.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.dataset.sub === tabName));
+}
+
 function renderDashboard() {
   const renders = [
     renderOverview, renderRevenue, renderInspections, renderPromos,
@@ -10341,8 +10395,23 @@ function renderGrow() {
     html += '</div>';
   }
 
+  // ── Sub-tabs for Sections B, C, D ──
+  const hasSales = GROW.sales_summary.length > 0;
+  const hasActuals = GROW.kpi_actuals.length > 0;
+  const hasTimes = GROW.time_analysis.length > 0;
+  if (hasSales || hasActuals || hasTimes) {
+    html += '<div id="growSubTabs">';
+    html += '<div class="sub-tabs">';
+    let firstActive = true;
+    if (hasSales) { html += '<button class="sub-tab active" data-sub="sales" onclick="switchSubTab(\'growSubTabs\',\'sales\')">Sales Summary</button>'; firstActive = false; }
+    if (hasActuals) { html += '<button class="sub-tab' + (firstActive ? ' active' : '') + '" data-sub="actuals" onclick="switchSubTab(\'growSubTabs\',\'actuals\')">KPI Actuals</button>'; if (firstActive) firstActive = false; }
+    if (hasTimes) { html += '<button class="sub-tab' + (firstActive ? ' active' : '') + '" data-sub="times" onclick="switchSubTab(\'growSubTabs\',\'times\')">Time Analysis</button>'; }
+    html += '</div>';
+  }
+
   // ── Section B: Store Performance Grid (Sales Summary) ──
   if (GROW.sales_summary.length > 0) {
+    html += '<div class="sub-panel' + (hasSales ? ' active' : '') + '" data-sub="sales">';
     html += '<div class="ops-grid-wrap">';
     html += '<h3>Store Performance — Sales Summary</h3>';
     html += '<div class="ops-grid-scroll" style="max-height:620px;">';
@@ -10544,10 +10613,12 @@ function renderGrow() {
     html += '</tr>';
 
     html += '</tbody></table></div></div>';
+    html += '</div>'; // close sub-panel sales
   }
 
   // ── Section C: KPI Actuals Grid ──
   if (GROW.kpi_actuals.length > 0) {
+    html += '<div class="sub-panel' + (!hasSales && hasActuals ? ' active' : '') + '" data-sub="actuals">';
     html += '<div class="ops-grid-wrap">';
     html += '<h3>KPI Actuals — Current Period</h3>';
     html += '<div class="ops-grid-scroll" style="max-height:520px;">';
@@ -10590,10 +10661,12 @@ function renderGrow() {
     });
 
     html += '</tbody></table></div></div>';
+    html += '</div>'; // close sub-panel actuals
   }
 
   // ── Section D: Time Analysis Grid ──
   if (GROW.time_analysis.length > 0) {
+    html += '<div class="sub-panel' + (!hasSales && !hasActuals && hasTimes ? ' active' : '') + '" data-sub="times">';
     html += '<div class="ops-grid-wrap">';
     html += '<h3>Time Analysis — Service Speed</h3>';
     html += '<div class="ops-grid-scroll" style="max-height:520px;">';
@@ -10688,6 +10761,12 @@ function renderGrow() {
     });
 
     html += '</tbody></table></div></div>';
+    html += '</div>'; // close sub-panel times
+  }
+
+  // Close growSubTabs container
+  if (hasSales || hasActuals || hasTimes) {
+    html += '</div>'; // close growSubTabs
   }
 
   container.innerHTML = html;
