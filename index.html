@@ -3228,7 +3228,7 @@
         <div class="ops-grid-wrap" style="margin-bottom:0;">
           <h3 style="display:flex;align-items:center;justify-content:space-between;">
             Top & Bottom Stores
-            <span style="font-size:10px;font-weight:500;color:var(--text-muted);cursor:pointer;" onclick="document.querySelector('.view-btn[data-view=stores]')?.click()">View All &rarr;</span>
+            <span style="font-size:10px;font-weight:500;color:var(--text-muted);cursor:pointer;" onclick="navigateTo('stores')">View All &rarr;</span>
           </h3>
           <div style="max-height:280px;overflow-y:auto;">
             <table class="ops-grid" id="dashStoreTable">
@@ -3389,7 +3389,7 @@
       <button class="ops-quick-btn" onclick="setOpsDateRange('WTD')">WTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('DTD')">DTD</button>
       <div style="flex:1;"></div>
-      <button class="nav-util-btn" id="storeBackBtn" style="display:none;" onclick="exitStoreDetail()">&#8592; All Stores</button>
+      <button class="nav-util-btn" id="storeBackBtn" style="display:none;" onclick="navigateTo('stores')">&#8592; All Stores</button>
     </div>
 
     <!-- KPI Tiles -->
@@ -4203,18 +4203,12 @@ function launchDashboard() {
     }
   }
 
-  // If only GROW data loaded (no standard DATA), switch to GROW tab
+  // If only GROW data loaded, go to Stores view; otherwise Dashboard
   const hasStandardData = DATA.customers.length > 0 || DATA.details.length > 0 || DATA.promos.length > 0 || DATA.inspections.length > 0 || DATA.invoices.length > 0 || DATA.odi.length > 0;
   if (!hasStandardData && hasAnyGrowData()) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    const opsTab = document.querySelector('.tab[data-tab="operations"]');
-    const opsContent = document.getElementById('tab-operations');
-    if (opsTab) opsTab.classList.add('active');
-    if (opsContent) opsContent.classList.add('active');
+    navigateTo('stores', true);
   } else {
-    // Ensure first tab is active
-    ensureActiveTab();
+    navigateTo(location.hash ? location.hash.replace('#','').split('/')[0] || 'dashboard' : 'dashboard', true);
   }
 
   applyFilters();
@@ -4462,37 +4456,60 @@ function renderDashboard() {
 }
 
 // ============================================================
-// GLOBAL VIEW SWITCHING
+// ROUTER — hash-based navigation with browser back/forward
 // ============================================================
+function navigateTo(path, replace) {
+  if (replace) {
+    history.replaceState(null, '', '#' + path);
+  } else {
+    history.pushState(null, '', '#' + path);
+  }
+  applyRoute();
+}
+
+function applyRoute() {
+  const hash = (location.hash || '#/dashboard').replace('#', '');
+  const parts = hash.split('/').filter(Boolean);
+  const view = parts[0] || 'dashboard';
+  const param = parts[1] || null;
+
+  // Activate the correct view
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+
+  const viewBtn = document.querySelector('.view-btn[data-view="' + view + '"]');
+  const viewContent = document.getElementById('view-' + view);
+  if (viewBtn) viewBtn.classList.add('active');
+  if (viewContent) viewContent.classList.add('active');
+
+  // Handle sub-routes
+  if (view === 'stores' && param) {
+    // Drill into a specific store
+    openStoreDetail(param);
+  } else if (view === 'stores') {
+    // Back to all stores
+    exitStoreDetail();
+  }
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// Listen for browser back/forward
+window.addEventListener('popstate', applyRoute);
+
+// View button clicks → push to history
 document.addEventListener('click', function(e) {
   const viewBtn = e.target.closest('.view-btn');
   if (viewBtn && viewBtn.dataset.view) {
-    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-    viewBtn.classList.add('active');
-    const content = document.getElementById('view-' + viewBtn.dataset.view);
-    if (content) content.classList.add('active');
+    e.preventDefault();
+    navigateTo(viewBtn.dataset.view);
     return;
-  }
-  // Legacy tab support (for any remaining .tab buttons)
-  const tab = e.target.closest('.tab');
-  if (tab && tab.dataset.tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const content = document.getElementById('tab-' + tab.dataset.tab);
-    if (content) content.classList.add('active');
   }
 });
 
 function ensureActiveTab() {
-  const hasActive = document.querySelector('.view-content.active');
-  if (!hasActive) {
-    const first = document.querySelector('.view-content');
-    if (first) first.classList.add('active');
-    const firstBtn = document.querySelector('.view-btn');
-    if (firstBtn) firstBtn.classList.add('active');
-  }
+  applyRoute();
 }
 
 // ============================================================
@@ -4604,12 +4621,7 @@ function bpaCreateAlert(metric, operator, threshold) {
 }
 
 function bpaSwitchTab(viewOrTab) {
-  // Try view first
-  const viewBtn = document.querySelector('.view-btn[data-view="' + viewOrTab + '"]');
-  if (viewBtn) { viewBtn.click(); return; }
-  // Legacy tab support
-  const tab = document.querySelector('.tab[data-tab="' + viewOrTab + '"]');
-  if (tab) { tab.click(); }
+  navigateTo(viewOrTab);
 }
 
 function runBPAInsights() {
@@ -5589,7 +5601,7 @@ function renderOverview() {
     const bottom5 = storeArr.length > 5 ? storeArr.slice(-5).reverse() : [];
     const dashBody = document.getElementById('dashStoreBody');
     if (dashBody) {
-      const makeRow = (s) => `<tr style="cursor:pointer;" onclick="document.getElementById('filterStore').value='${s.sn}';document.querySelector('.view-btn[data-view=stores]')?.click();applyFilters();">
+      const makeRow = (s) => `<tr style="cursor:pointer;" onclick="navigateTo('stores/${s.sn}')">
         <td style="text-align:left;font-weight:600;">#${s.sn}</td>
         <td>${money(s.rev)}</td>
         <td>${money(s.avgTk)}</td>
@@ -9237,7 +9249,7 @@ function renderOpsGrid() {
     const yrPct = d.inspTotal ? (d.inspBad / d.inspTotal * 100) : 0;
 
     const cls = isChild ? 'store-child' : '';
-    return `<tr class="${cls}" data-district="${isChild || ''}" style="cursor:pointer;" onclick="openStoreDetail('${store}')">
+    return `<tr class="${cls}" data-district="${isChild || ''}" style="cursor:pointer;" onclick="navigateTo('stores/${store}')">
       <td>${isChild ? '' : ''}<strong>#${store}</strong></td>
       <td>${num(d.gc)}</td>
       <td class="${cellColor(cpd, 15, 8, true)}">${cpd.toFixed(1)}</td>
