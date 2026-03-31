@@ -3931,25 +3931,50 @@ function saveUserData() {
   const key = getDataStorageKey();
   if (!key) return;
   try {
+    // Trim large datasets — only persist summary/aggregated data, skip massive transaction logs
+    const MAX_ROWS_PER_TYPE = 15000;
+    const trimmedData = {};
+    Object.keys(DATA).forEach(type => {
+      if (DATA[type].length > MAX_ROWS_PER_TYPE) {
+        console.info('Trimming ' + type + ' from ' + DATA[type].length + ' to ' + MAX_ROWS_PER_TYPE + ' rows for storage');
+        trimmedData[type] = DATA[type].slice(0, MAX_ROWS_PER_TYPE);
+      } else {
+        trimmedData[type] = DATA[type];
+      }
+    });
+    // GROW summary reports are small (35 rows each) — always save fully
     const payload = {
-      data: DATA,
+      data: trimmedData,
       grow: GROW,
       loadedFiles: loadedFiles,
       savedAt: new Date().toISOString(),
       version: 3
     };
     const json = JSON.stringify(payload);
-    // Check size — localStorage typically allows ~5-10MB
     if (json.length > 8 * 1024 * 1024) {
-      console.warn('Data too large for localStorage (' + (json.length / 1024 / 1024).toFixed(1) + 'MB). Skipping save.');
-      return false;
+      // Still too big — save only GROW data (summary reports)
+      console.warn('Data still large (' + (json.length / 1024 / 1024).toFixed(1) + 'MB). Saving POS reports only.');
+      const litePayload = {
+        data: { invoices: [], promos: [], odi: [], details: [], customers: [], inspections: [] },
+        grow: GROW,
+        loadedFiles: Object.fromEntries(Object.entries(loadedFiles).filter(([k]) => k.startsWith('grow_'))),
+        savedAt: new Date().toISOString(),
+        version: 3
+      };
+      const liteJson = JSON.stringify(litePayload);
+      if (liteJson.length > 8 * 1024 * 1024) {
+        console.warn('Even POS reports too large. Skipping save.');
+        return false;
+      }
+      localStorage.setItem(key, liteJson);
+      updateDataSavedIndicator(true);
+      return true;
     }
     localStorage.setItem(key, json);
     updateDataSavedIndicator(true);
     return true;
   } catch(e) {
     console.warn('Failed to save user data:', e.message);
-    // Try to free space by removing old data keys
     if (e.name === 'QuotaExceededError') {
       console.warn('Storage quota exceeded. Data will not persist between sessions.');
     }
