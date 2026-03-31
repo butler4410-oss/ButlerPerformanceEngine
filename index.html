@@ -3216,6 +3216,10 @@
   <!-- OVERVIEW TAB -->
   <div class="view-content active" id="view-dashboard">
     <!-- Company KPI Strip -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;">Key Metrics</div>
+      <button class="nav-util-btn" onclick="openTilePicker()" style="font-size:10px;padding:2px 8px;">Configure</button>
+    </div>
     <div class="kpi-grid" id="dashKPIs"></div>
 
     <!-- Two-column body -->
@@ -3454,7 +3458,7 @@
     <!-- All Stores Mode: Command Grid (always visible when no store selected) -->
     <div id="allStoresView">
       <div class="ops-grid-wrap">
-        <h3>Store Performance <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Click a store to drill in</span></h3>
+        <h3 style="display:flex;align-items:center;justify-content:space-between;">Store Performance <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Click a store to drill in</span> <button class="btn-export" onclick="exportReport('opsCommandGrid','Store Performance')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
         <div class="ops-grid-scroll">
           <table class="ops-grid" id="opsCommandGrid">
             <thead>
@@ -3604,54 +3608,52 @@
 
   <!-- Reports View -->
   <div class="view-content" id="view-reports">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);">Reports</div>
-        <div style="font-size:12px;color:var(--text-muted);">All uploaded data files. Click any report to view in detail.</div>
+    <!-- KPIs + Data Quality side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Mailable Customers</div>
+        <div id="mailableStats"></div>
       </div>
-      <button class="nav-util-btn" onclick="openAddFiles()">+ Add Files</button>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Data Quality</div>
+        <div id="dataQualityStats"></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Store Mailing Coverage</div>
+        <div id="storeMailStats" style="max-height:150px;overflow-y:auto;"></div>
+      </div>
     </div>
 
-    <!-- Reporting Analytics -->
     <div class="kpi-grid" id="reportingKPIs"></div>
     <div class="bpa-panel" id="bpaReporting"></div>
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;">
-      <div>
-        <div class="table-wrap" style="margin-bottom:16px;">
-          <h3>Warranty Services</h3>
-          <div class="table-scroll" style="max-height:300px;">
-            <table id="tblWarranty"><thead><tr>
-              <th class="sortable" data-col="0">Service</th><th class="sortable" data-col="1">Category</th><th class="sortable" data-col="2">Qty Sold</th><th class="sortable" data-col="3">Revenue</th><th class="sortable" data-col="4">Invoices</th><th class="sortable" data-col="5">Stores</th><th class="sortable" data-col="6">Avg Price</th>
-            </tr></thead><tbody id="warrantyTableBody"></tbody></table>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <h3>Zero Dollar Invoices</h3>
-          <div class="table-scroll" style="max-height:300px;">
-            <table id="tblZeroDollar"><thead><tr>
-              <th class="sortable" data-col="0">Store #</th><th class="sortable" data-col="1">Date</th><th class="sortable" data-col="2">Invoice #</th><th class="sortable" data-col="3">Customer</th><th class="sortable" data-col="4">Net Sales</th><th class="sortable" data-col="5">Services</th><th class="sortable" data-col="6">Bay Time</th>
-            </tr></thead><tbody id="zeroDollarBody"></tbody></table>
-          </div>
+
+    <!-- Two tables side by side with export buttons -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div class="table-wrap" style="margin:0;">
+        <h3 style="display:flex;align-items:center;justify-content:space-between;">Warranty Services <button class="btn-export" onclick="exportReport('tblWarranty','Warranty Services')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
+        <div class="table-scroll" style="max-height:280px;">
+          <table id="tblWarranty"><thead><tr>
+            <th class="sortable" data-col="0">Service</th><th class="sortable" data-col="1">Category</th><th class="sortable" data-col="2">Qty Sold</th><th class="sortable" data-col="3">Revenue</th><th class="sortable" data-col="4">Invoices</th><th class="sortable" data-col="5">Stores</th><th class="sortable" data-col="6">Avg Price</th>
+          </tr></thead><tbody id="warrantyTableBody"></tbody></table>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:16px;">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Mailable Customers</div>
-          <div id="mailableStats"></div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Data Quality</div>
-          <div id="dataQualityStats"></div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Store Mailing Coverage</div>
-          <div id="storeMailStats" style="max-height:200px;overflow-y:auto;"></div>
+      <div class="table-wrap" style="margin:0;">
+        <h3 style="display:flex;align-items:center;justify-content:space-between;">Zero Dollar Invoices <button class="btn-export" onclick="exportReport('tblZeroDollar','Zero Dollar Invoices')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
+        <div class="table-scroll" style="max-height:280px;">
+          <table id="tblZeroDollar"><thead><tr>
+            <th class="sortable" data-col="0">Store #</th><th class="sortable" data-col="1">Date</th><th class="sortable" data-col="2">Invoice #</th><th class="sortable" data-col="3">Customer</th><th class="sortable" data-col="4">Net Sales</th><th class="sortable" data-col="5">Services</th><th class="sortable" data-col="6">Bay Time</th>
+          </tr></thead><tbody id="zeroDollarBody"></tbody></table>
         </div>
       </div>
     </div>
+
     <div class="kpi-grid" id="zeroDollarKPIs" style="margin-bottom:16px;"></div>
 
-    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;">Uploaded Data Files</div>
+    <!-- Uploaded Data Files -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);">Uploaded Data Files</div>
+      <button class="nav-util-btn" onclick="openAddFiles()">+ Add Files</button>
+    </div>
     <div class="report-cards" id="reportsCards"></div>
   </div>
 
@@ -5507,9 +5509,12 @@ function renderOverview() {
     return r ? parseGrowNum(r.Prior_Comp) : null;
   };
 
-  // ── KPI Strip (6 tiles) ──
+  // ── KPI Strip — use configurable tiles if available, otherwise fixed ──
   const kpiEl = document.getElementById('dashKPIs');
-  if (kpiEl) {
+  const savedTiles = typeof getSelectedTiles === 'function' ? getSelectedTiles() : null;
+  if (kpiEl && savedTiles && savedTiles.length > 0 && typeof renderCustomTiles === 'function' && hasTransactions) {
+    renderCustomTiles();
+  } else if (kpiEl) {
     let totalRev = 0, totalInv = 0, avgTicket = 0, storeSet = new Set(), carsPerDay = 0, yoyChange = null, repeatPct = null;
     if (hasTransactions) {
       totalRev = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
@@ -11047,9 +11052,9 @@ function sendViaEmailJS(to, subject, message) {
     email_to: to,
     email: to,
     to_name: to.split('@')[0],
-    from_email: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+    from_email: localStorage.getItem('bp_ejs_from') || 'chase@butleranalytics.io',
     from_name: (localStorage.getItem('bp_user') || 'Butler Performance Analytics'),
-    reply_to: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+    reply_to: localStorage.getItem('bp_ejs_from') || 'chase@butleranalytics.io',
     subject: subject,
     message: message
   });
@@ -11112,13 +11117,13 @@ function testEmailSetup() {
   if (typeof emailjs !== 'undefined') {
     emailjs.init(key);
     emailjs.send(service, template, {
-      to_email: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
-      email_to: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
-      email: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+      to_email: localStorage.getItem('bp_ejs_from') || 'chase@butleranalytics.io',
+      email_to: localStorage.getItem('bp_ejs_from') || 'chase@butleranalytics.io',
+      email: localStorage.getItem('bp_ejs_from') || 'chase@butleranalytics.io',
       to_name: localStorage.getItem('bp_user') || 'Admin',
-      from_email: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+      from_email: localStorage.getItem('bp_ejs_from') || 'chase@butleranalytics.io',
       from_name: (localStorage.getItem('bp_user') || 'Butler Performance Analytics'),
-      reply_to: localStorage.getItem('bp_ejs_from') || 'noreply@butlerperformance.com',
+      reply_to: localStorage.getItem('bp_ejs_from') || 'chase@butleranalytics.io',
       subject: 'Butler Performance Analytics - Test Connection',
       message: 'This is a test email from Butler Performance Analytics. If you received this, your email integration is working correctly.'
     }).then(() => {
@@ -11275,7 +11280,9 @@ function setSession(user) {
 const ROLE_LABELS = { company_admin: 'Company Admin', client_admin: 'Client Admin', client_viewer: 'Client Viewer' };
 
 const DEFAULT_ACCOUNTS = [
-  { name: 'Admin', email: 'admin@butlerperformance.com', company: 'Butler Performance Analytics', _pw: 'BPA!2026admin', role: 'company_admin', stores: [] },
+  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', _pw: 'bpa2026', role: 'company_admin', stores: [] },
+  { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'client_admin', stores: [] },
+  { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'client_admin', stores: [] },
 ];
 
 function isCompanyAdmin() { const u = getCurrentUser(); return u && u.role === 'company_admin'; }
@@ -11482,7 +11489,7 @@ function openForgotPassword() {
         .then(() => alert('Reset instructions sent to ' + email))
         .catch(() => alert('Could not send email. Contact your administrator.'));
     } else {
-      alert('Password reset requested. Contact your administrator.');
+      alert('Password reset requested. Contact your administrator at chase@butleranalytics.io');
     }
   } else {
     alert('If an account exists for ' + email + ', reset instructions will be sent.');
