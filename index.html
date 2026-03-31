@@ -42,34 +42,72 @@
   }
 
   /* ═══════════════════════════════════════════
-     NAVIGATION SYSTEM — 3-tier command center
+     NAVIGATION — 2-tier command center
      ═══════════════════════════════════════════ */
-
   .nav-shell {
     position: sticky;
     top: 0;
     z-index: 200;
     background: var(--accent);
     border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
   }
 
-  /* ── Tier 1: Top Bar ── */
-  .header {
+  /* Tier 1 */
+  .nav-tier1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
-    height: 48px;
-    background: transparent;
+    height: 44px;
+    padding: 0 20px;
     border-bottom: 1px solid rgba(255,255,255,0.04);
   }
 
-  .logo-area {
+  .nav-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .nav-brand-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .nav-brand-text .red { color: var(--primary); }
+
+  .nav-views {
+    display: flex;
+    gap: 2px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 3px;
+  }
+
+  .view-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .view-btn:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.04); }
+  .view-btn.active { color: white; background: var(--primary); font-weight: 600; }
+
+  .nav-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
   }
 
   .logo-mark {
@@ -101,13 +139,6 @@
 
   .logo-text .red { color: var(--primary); }
 
-  .logo-divider {
-    width: 1px;
-    height: 16px;
-    background: rgba(255,255,255,0.1);
-    margin: 0 4px;
-  }
-
   .logo-analytics {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -123,112 +154,6 @@
     height: 2px;
     background: rgba(255,255,255,0.2);
     margin: 5px 0 4px;
-  }
-
-  .header-center {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .date-range-display {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-muted);
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 6px;
-    padding: 4px 12px;
-    cursor: default;
-  }
-
-  .date-range-display .date-icon {
-    font-size: 11px;
-    opacity: 0.5;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .header-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    display: none;
-  }
-
-  .nav-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
-  }
-
-  .nav-action:hover {
-    background: rgba(255,255,255,0.06);
-    color: var(--text);
-  }
-
-  .nav-action.has-badge::after {
-    content: '';
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 6px;
-    height: 6px;
-    background: var(--orange);
-    border-radius: 50%;
-    border: 1.5px solid var(--accent);
-  }
-
-  .nav-action-text {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    height: 32px;
-    padding: 0 10px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-
-  .nav-action-text:hover {
-    background: rgba(255,255,255,0.06);
-    color: var(--text);
-  }
-
-  .nav-sep {
-    width: 1px;
-    height: 20px;
-    background: rgba(255,255,255,0.06);
-    margin: 0 4px;
   }
 
   .client-badge {
@@ -274,30 +199,82 @@
     box-shadow: 0 0 0 3px rgba(227,24,55,0.2);
   }
 
-  /* ── Tier 2: Command Bar ── */
-  .command-bar {
+  /* Tier 2 */
+  .nav-tier2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 38px;
+    padding: 0 20px;
+    background: rgba(0,0,0,0.15);
+    gap: 12px;
+  }
+
+  .nav-filters {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .nav-filter-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 600;
+  }
+
+  .nav-apply-btn {
+    height: 26px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 5px;
+    background: var(--primary);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .nav-apply-btn:hover { background: var(--primary-dark); }
+
+  .nav-context {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 0 24px;
-    height: 42px;
-    background: rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    overflow-x: auto;
-    scrollbar-width: none;
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
   }
 
-  .command-bar::-webkit-scrollbar { display: none; }
+  .nav-context-sep { color: rgba(255,255,255,0.15); }
+  .nav-context-info { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .cmd-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    opacity: 0.6;
+  .nav-utils {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .nav-util-btn {
+    height: 26px;
+    padding: 0 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 5px;
+    background: transparent;
+    color: rgba(255,255,255,0.45);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
     white-space: nowrap;
-    margin-right: 2px;
   }
+
+  .nav-util-btn:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); }
 
   .cmd-select {
     height: 28px;
@@ -371,36 +348,6 @@
     gap: 4px;
   }
 
-  .cmd-btn-primary {
-    background: var(--primary);
-    color: white;
-  }
-
-  .cmd-btn-primary:hover { background: var(--primary-dark); }
-
-  .cmd-btn-ghost {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: var(--text-muted);
-  }
-
-  .cmd-btn-ghost:hover {
-    background: rgba(255,255,255,0.08);
-    color: var(--text);
-    border-color: rgba(255,255,255,0.15);
-  }
-
-  .cmd-btn-accent {
-    background: rgba(68,138,255,0.1);
-    border: 1px solid rgba(68,138,255,0.2);
-    color: var(--blue);
-  }
-
-  .cmd-btn-accent:hover {
-    background: rgba(68,138,255,0.2);
-    border-color: var(--blue);
-  }
-
   .data-saved-pill {
     display: none;
     align-items: center;
@@ -428,53 +375,11 @@
     border-radius: 50%;
   }
 
-  .cmd-spacer { flex: 1; min-width: 8px; }
+  /* View content (replaces .tab-content) */
+  .view-content { display: none; }
+  .view-content.active { display: block; }
 
-  /* ── Tier 3: Tab Rail ── */
-  .tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 0;
-    padding: 0 24px;
-    height: 38px;
-    align-items: stretch;
-    border-bottom: none;
-    overflow-x: auto;
-    scrollbar-width: none;
-    background: rgba(0,0,0,0.15);
-  }
-
-  .tabs::-webkit-scrollbar { display: none; }
-
-  .tab {
-    padding: 0 16px;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--text-muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12.5px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    position: relative;
-  }
-
-  .tab:hover {
-    color: var(--text);
-    background: rgba(255,255,255,0.03);
-  }
-
-  .tab.active {
-    color: white;
-    border-bottom-color: var(--primary);
-    background: rgba(227,24,55,0.06);
-    font-weight: 600;
-  }
-
+  /* Keep .tab-content working for backward compat during transition */
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
@@ -3008,66 +2913,50 @@
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
 </div>
 
-<!-- Navigation Shell -->
+<!-- Navigation -->
 <div class="nav-shell">
-  <!-- Tier 1: Top Bar -->
-  <div class="header">
-    <div class="logo-area">
+  <!-- Tier 1: Header + Views -->
+  <div class="nav-tier1">
+    <div class="nav-brand">
       <div class="logo-mark">BP</div>
-      <div class="logo-text"><span class="red">Butler</span> Performance</div>
-      <div class="logo-divider"></div>
-      <div class="logo-analytics">Analytics</div>
+      <span class="nav-brand-text"><span class="red">Butler</span> Performance</span>
     </div>
-    <div class="header-center">
-      <div class="date-range-display">
-        <span class="date-icon">&#9671;</span>
-        <span id="dateRange">No data loaded</span>
-      </div>
+    <div class="nav-views">
+      <button class="view-btn active" data-view="dashboard">Dashboard</button>
+      <button class="view-btn" data-view="stores">Stores</button>
+      <button class="view-btn" data-view="financials">Financials</button>
+      <button class="view-btn" data-view="people">People</button>
+      <button class="view-btn" data-view="reports">Reports</button>
     </div>
-    <div class="header-right">
-      <div class="client-badge" id="clientBadge" onclick="openSettings()">
-        <span id="clientBadgeText">Set Client</span>
-      </div>
-      <div class="nav-sep"></div>
-      <button class="nav-action admin-only" id="alertsBtn" onclick="openAlerts()" title="Performance Alerts">&#9888;</button>
-      <button class="nav-action" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">&#9790;</button>
-      <button class="nav-action admin-only" onclick="openCreateAccount()" title="Add User">&#43;</button>
-      <button class="nav-action" id="auditLogBtn" onclick="openAuditLog()" title="Audit Log" style="display:none;">&#8942;</button>
+    <div class="nav-user">
       <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
     </div>
   </div>
-
-  <!-- Tier 2: Command Bar -->
-  <div class="command-bar">
-    <label for="filterStore" class="cmd-label" style="font-weight:600;color:var(--text);font-size:11px;">Viewing:</label>
-    <select id="filterStore" name="store" class="cmd-select"><option value="">All Stores</option></select>
-    <label for="filterFrom" class="cmd-label" style="margin-left:8px;">From</label>
-    <input type="date" id="filterFrom" name="dateFrom" class="cmd-input">
-    <label for="filterTo" class="cmd-label">To</label>
-    <input type="date" id="filterTo" name="dateTo" class="cmd-input">
-    <button class="cmd-btn cmd-btn-primary" onclick="applyFilters()" style="font-weight:700;padding:5px 16px;">Apply</button>
-    <button class="cmd-btn" onclick="resetFilters()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:11px;padding:4px 10px;">Reset</button>
-    <span id="filterSummary" class="filter-summary"></span>
-    <button class="cmd-btn cmd-btn-accent" onclick="openDistrictModal()">Districts</button>
-    <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Data persisted — click to clear and re-upload">
-      <span class="data-saved-dot"></span> Saved
+  <!-- Tier 2: Filters + Context -->
+  <div class="nav-tier2">
+    <div class="nav-filters">
+      <label for="filterStore" class="nav-filter-label">Store:</label>
+      <select id="filterStore" name="store" class="cmd-select"><option value="">All Stores</option></select>
+      <label for="filterFrom" class="nav-filter-label">From:</label>
+      <input type="date" id="filterFrom" name="dateFrom" class="cmd-input">
+      <label for="filterTo" class="nav-filter-label">To:</label>
+      <input type="date" id="filterTo" name="dateTo" class="cmd-input">
+      <button class="nav-apply-btn" onclick="applyFilters()">Apply</button>
     </div>
-    <div class="cmd-spacer"></div>
-    <button class="cmd-btn cmd-btn-ghost" onclick="openAddFiles()" title="Add more CSV files">+ Add Files</button>
-  </div>
-
-  <!-- Tier 3: Tab Rail -->
-  <div class="tabs">
-    <button class="tab active" data-tab="overview">Overview</button>
-    <button class="tab" data-tab="revenue">Revenue</button>
-    <button class="tab" data-tab="inspections">Inspections</button>
-    <button class="tab" data-tab="promos">Promos</button>
-    <button class="tab" data-tab="operations">Operations</button>
-    <button class="tab" data-tab="customers">Customers</button>
-    <button class="tab company-admin-only" data-tab="segments">Segments</button>
-    <button class="tab company-admin-only" data-tab="marketing">Market Analysis</button>
-    <button class="tab" data-tab="reporting">Reporting</button>
-    <button class="tab" data-tab="stores">Rankings</button>
+    <div class="nav-context">
+      <span class="client-badge" id="clientBadge" onclick="openSettings()"><span id="clientBadgeText">Set Client</span></span>
+      <span class="nav-context-sep">&middot;</span>
+      <span id="filterSummary" class="nav-context-info"></span>
+    </div>
+    <div class="nav-utils">
+      <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Click to clear and re-upload">
+        <span class="data-saved-dot"></span> Saved
+      </div>
+      <button class="nav-util-btn" onclick="openAddFiles()" title="Add more CSV files">+ Add Files</button>
+      <button class="nav-util-btn" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">&#9790;</button>
+      <button class="nav-util-btn" onclick="openSettings()" title="Settings">&#9881;</button>
+      <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" title="Alerts">&#9888;</button>
+    </div>
   </div>
 </div>
 
@@ -3338,56 +3227,58 @@
   <!-- Tabs moved to nav-shell above -->
 
   <!-- OVERVIEW TAB -->
-  <div class="tab-content active" id="tab-overview">
-    <!-- Today's Snapshot -->
-    <div class="today-snapshot" id="todaySnapshot">
-      <div class="today-snapshot-header">
-        <h3><div class="live-dot"></div> Today's Snapshot</h3>
-        <div id="todayDate" style="font-size:11px;color:var(--text-muted);"></div>
-      </div>
-      <div class="today-snapshot-grid" id="todayStats"></div>
-    </div>
+  <div class="view-content active" id="view-dashboard">
+    <!-- Company KPI Strip -->
+    <div class="kpi-grid" id="dashKPIs"></div>
 
-    <!-- KPI Tiles Row -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Key Metrics</div>
-      <button class="btn-configure" onclick="openTilePicker()">Configure Tiles</button>
-    </div>
-    <div class="kpi-grid" id="overviewKPIs"></div>
-
-    <!-- Main Content: 2/3 charts + 1/3 BPA Insights -->
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
-      <!-- Left: Revenue Chart (full width of left column) -->
+    <!-- Two-column body -->
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:20px;">
+      <!-- Left: Charts + Store Rankings -->
       <div>
-        <div class="chart-card" style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <h3 style="margin-bottom:0;">Revenue Trend</h3>
-            <div id="ovRevSummary" style="font-size:12px;color:var(--text-muted);"></div>
-          </div>
-          <div class="chart-wrap" style="height:320px;"><canvas id="chartRevByDate"></canvas></div>
+        <div class="chart-card" style="margin-bottom:16px;">
+          <h3>Revenue Trend</h3>
+          <div class="chart-wrap" style="height:280px;"><canvas id="chartDashRevenue"></canvas></div>
         </div>
-        <!-- Two smaller charts side by side -->
-        <div class="chart-card">
-          <h3>Top Services by Revenue</h3>
-          <div class="chart-wrap" style="height:340px;"><canvas id="chartTopServices"></canvas></div>
+        <div class="ops-grid-wrap" style="margin-bottom:0;">
+          <h3 style="display:flex;align-items:center;justify-content:space-between;">
+            Top & Bottom Stores
+            <span style="font-size:10px;font-weight:500;color:var(--text-muted);cursor:pointer;" onclick="document.querySelector('.view-btn[data-view=stores]')?.click()">View All &rarr;</span>
+          </h3>
+          <div style="max-height:280px;overflow-y:auto;">
+            <table class="ops-grid" id="dashStoreTable">
+              <thead><tr>
+                <th style="text-align:left;">Store</th>
+                <th>Revenue</th>
+                <th>Avg Ticket</th>
+                <th>Cars/Day</th>
+                <th>YoY %</th>
+              </tr></thead>
+              <tbody id="dashStoreBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- Right: BPA Insights + Invoice Volume -->
-      <div style="display:flex;flex-direction:column;gap:20px;">
-        <div class="bpa-panel" id="bpaOverview" style="margin-bottom:0;"></div>
-        <div class="chart-card">
-          <h3>Daily Volume</h3>
-          <div class="chart-wrap" style="height:260px;"><canvas id="chartInvByDate"></canvas></div>
+      <!-- Right: BPA + Today + Quick Stats -->
+      <div>
+        <div class="today-snapshot" id="todaySnapshot">
+          <div class="today-snapshot-header">
+            <h3><div class="live-dot"></div> Today's Snapshot</h3>
+            <div id="todayDate" style="font-size:11px;color:var(--text-muted);"></div>
+          </div>
+          <div class="today-snapshot-grid" id="todayStats"></div>
         </div>
-        <!-- Quick Stats -->
-        <div id="ovQuickStats" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;"></div>
+        <div class="bpa-panel" id="bpaOverview"></div>
+        <div class="chart-card" style="margin-top:16px;">
+          <h3>Daily Volume</h3>
+          <div class="chart-wrap" style="height:200px;"><canvas id="chartDashVolume"></canvas></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- REVENUE TAB -->
-  <div class="tab-content" id="tab-revenue">
+  <div class="view-content" id="view-financials">
     <div class="kpi-grid" id="revenueKPIs"></div>
     <div class="report-cards" id="revenueCards"></div>
     <div class="bpa-panel" id="bpaRevenue"></div>
@@ -3406,7 +3297,7 @@
   </div>
 
   <!-- INSPECTIONS TAB -->
-  <div class="tab-content" id="tab-inspections">
+  <div class="tab-content" id="tab-inspections" style="display:none !important">
     <div class="kpi-grid" id="inspKPIs"></div>
     <div class="report-cards" id="inspCards"></div>
     <div class="bpa-panel" id="bpaInspections"></div>
@@ -3427,7 +3318,7 @@
   </div>
 
   <!-- PROMOS TAB -->
-  <div class="tab-content" id="tab-promos">
+  <div class="tab-content" id="tab-promos" style="display:none !important">
     <div class="kpi-grid" id="promoKPIs"></div>
     <div class="report-cards" id="promoCards"></div>
     <div class="bpa-panel" id="bpaPromos"></div>
@@ -3446,7 +3337,7 @@
   </div>
 
   <!-- OPERATIONS TAB -->
-  <div class="tab-content" id="tab-operations">
+  <div class="view-content" id="view-stores">
     <!-- Quick Filters -->
     <div class="ops-quick-filters" id="opsQuickFilters">
       <span style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Quick Range:</span>
@@ -3475,7 +3366,7 @@
   </div>
 
   <!-- CUSTOMERS TAB -->
-  <div class="tab-content" id="tab-customers">
+  <div class="tab-content" id="tab-customers" style="display:none !important">
     <div class="kpi-grid" id="custKPIs"></div>
     <div class="report-cards" id="custCards"></div>
     <div class="bpa-panel" id="bpaCustomers"></div>
@@ -3494,13 +3385,13 @@
   </div>
 
   <!-- SEGMENTS TAB -->
-  <div class="tab-content" id="tab-segments">
+  <div class="view-content" id="view-people">
     <div class="kpi-grid" id="segKPIs"></div>
     <div id="smartSegments"></div>
   </div>
 
   <!-- MARKET ANALYSIS TAB -->
-  <div class="tab-content" id="tab-marketing">
+  <div class="tab-content" id="tab-marketing" style="display:none !important">
     <div class="kpi-grid" id="marketKPIs"></div>
     <div class="report-cards" id="marketCards"></div>
     <div class="bpa-panel" id="bpaMarket"></div>
@@ -3535,7 +3426,7 @@
   </div>
 
   <!-- REPORTING TAB -->
-  <div class="tab-content" id="tab-reporting">
+  <div class="tab-content" id="tab-reporting" style="display:none !important">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Reporting</div>
       <button class="btn-configure" onclick="openScheduler()" style="border-color:var(--primary);color:var(--primary);">Scheduled Reports</button>
@@ -3565,8 +3456,14 @@
     <div id="customReportsContent"></div>
   </div>
 
-  <!-- STORE RANKINGS TAB -->
-  <div class="tab-content" id="tab-stores">
+  <!-- Reports View -->
+  <div class="view-content" id="view-reports">
+    <div class="kpi-grid" id="reportsKPIs"></div>
+    <div class="report-cards" id="reportsCards"></div>
+  </div>
+
+  <!-- Hidden: Store Rankings (data still renders) -->
+  <div class="tab-content" id="tab-stores" style="display:none !important">
     <div class="export-bar">
       <button class="btn-export" onclick="exportReport('tblStores','Store Performance Rankings')">Export Report</button>
       <button class="btn-export" onclick="emailReport('tblStores','Store Performance Rankings')">Email</button>
@@ -4324,26 +4221,36 @@ function renderDashboard() {
 }
 
 // ============================================================
-// GLOBAL TAB SWITCHING (event delegation — always works)
+// GLOBAL VIEW SWITCHING
 // ============================================================
 document.addEventListener('click', function(e) {
+  const viewBtn = e.target.closest('.view-btn');
+  if (viewBtn && viewBtn.dataset.view) {
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+    viewBtn.classList.add('active');
+    const content = document.getElementById('view-' + viewBtn.dataset.view);
+    if (content) content.classList.add('active');
+    return;
+  }
+  // Legacy tab support (for any remaining .tab buttons)
   const tab = e.target.closest('.tab');
-  if (!tab) return;
-  if (!tab.dataset.tab) return;
-  // Switch all tabs
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  tab.classList.add('active');
-  const content = document.getElementById('tab-' + tab.dataset.tab);
-  if (content) content.classList.add('active');
+  if (tab && tab.dataset.tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const content = document.getElementById('tab-' + tab.dataset.tab);
+    if (content) content.classList.add('active');
+  }
 });
 
 function ensureActiveTab() {
-  const tabs = document.querySelectorAll('.tab');
-  const hasActive = [...tabs].some(t => t.classList.contains('active') && getComputedStyle(t).display !== 'none');
+  const hasActive = document.querySelector('.view-content.active');
   if (!hasActive) {
-    const firstVisible = [...tabs].find(t => getComputedStyle(t).display !== 'none');
-    if (firstVisible) firstVisible.click();
+    const first = document.querySelector('.view-content');
+    if (first) first.classList.add('active');
+    const firstBtn = document.querySelector('.view-btn');
+    if (firstBtn) firstBtn.classList.add('active');
   }
 }
 
@@ -5152,14 +5059,14 @@ function renderCustomTiles() {
     const result = tile.calc();
     return `<div class="kpi-card" draggable="true" data-tile-idx="${idx}" data-tile-id="${id}"><div class="kpi-label">${tile.label}</div><div class="kpi-value">${result.value}</div>${result.sub ? '<div class="kpi-sub">'+result.sub+'</div>' : ''}</div>`;
   }).join('');
-  document.getElementById('overviewKPIs').innerHTML = html;
+  document.getElementById('dashKPIs').innerHTML = html;
   initTileDrag();
 }
 
 let dragTileIdx = null;
 
 function initTileDrag() {
-  const grid = document.getElementById('overviewKPIs');
+  const grid = document.getElementById('dashKPIs');
   const cards = grid.querySelectorAll('.kpi-card');
 
   cards.forEach(card => {
@@ -5254,185 +5161,210 @@ document.getElementById('tilePickerModal').addEventListener('click', (e) => {
 function renderOverview() {
   renderTodaySnapshot();
   const cust = FILTERED.customers;
-  const det = FILTERED.details;
-  const promo = FILTERED.promos;
-  const insp = FILTERED.inspections;
+  const hasTransactions = cust.length > 0;
+  const hasGROW = GROW.system_impact.length > 0;
+  const findGrowMeasure = (name) => {
+    const r = GROW.system_impact.find(x => x.Measure && x.Measure.trim() === name);
+    return r ? parseGrowNum(r.Current_Comp) : null;
+  };
+  const findGrowPrior = (name) => {
+    const r = GROW.system_impact.find(x => x.Measure && x.Measure.trim() === name);
+    return r ? parseGrowNum(r.Prior_Comp) : null;
+  };
 
-  renderCustomTiles();
+  // ── KPI Strip (6 tiles) ──
+  const kpiEl = document.getElementById('dashKPIs');
+  if (kpiEl) {
+    let totalRev = 0, totalInv = 0, avgTicket = 0, storeSet = new Set(), carsPerDay = 0, yoyChange = null, repeatPct = null;
+    if (hasTransactions) {
+      totalRev = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+      totalInv = cust.length;
+      avgTicket = totalInv ? totalRev / totalInv : 0;
+      storeSet = new Set(cust.map(r => r.Store_Number).filter(Boolean));
+      // Calculate days span for cars/day
+      const dates = cust.map(r => parseDate(r.Invoice_Date)).filter(Boolean);
+      if (dates.length > 0) {
+        const minD = new Date(Math.min(...dates));
+        const maxD = new Date(Math.max(...dates));
+        const daySpan = Math.max(1, Math.round((maxD - minD) / 86400000) + 1);
+        carsPerDay = totalInv / daySpan;
+        if (storeSet.size > 1) carsPerDay = carsPerDay / storeSet.size;
+      }
+      // Try repeat customer %
+      const custIds = cust.map(r => (r.Customer_Id || r.Customer_ID || '')).filter(Boolean);
+      if (custIds.length > 0) {
+        const freq = {};
+        custIds.forEach(id => { freq[id] = (freq[id] || 0) + 1; });
+        const unique = Object.keys(freq).length;
+        const repeats = Object.values(freq).filter(c => c > 1).length;
+        repeatPct = unique > 0 ? (repeats / unique * 100) : null;
+      }
+      // YoY from GROW if available
+      if (hasGROW) {
+        const cur = findGrowMeasure('Net Sales Adjusted');
+        const pri = findGrowPrior('Net Sales Adjusted');
+        if (cur != null && pri != null && pri !== 0) yoyChange = ((cur - pri) / Math.abs(pri) * 100);
+      }
+    } else if (hasGROW) {
+      // GROW-only mode
+      const ns = findGrowMeasure('Net Sales Adjusted');
+      const cpd = findGrowMeasure('Cars Per Day');
+      const ta = findGrowMeasure('Ticket Average');
+      const sc = findGrowMeasure('Store Count');
+      totalRev = ns || 0;
+      carsPerDay = cpd || 0;
+      avgTicket = ta || 0;
+      totalInv = 0;
+      storeSet = { size: sc ? Math.round(sc) : 0 };
+      const cur = findGrowMeasure('Net Sales Adjusted');
+      const pri = findGrowPrior('Net Sales Adjusted');
+      if (cur != null && pri != null && pri !== 0) yoyChange = ((cur - pri) / Math.abs(pri) * 100);
+    }
+    // 6th tile: YoY if available, otherwise Repeat %
+    let tile6 = '';
+    if (yoyChange != null) {
+      const color = yoyChange >= 0 ? 'var(--green)' : 'var(--red)';
+      const arrow = yoyChange >= 0 ? '&#9650;' : '&#9660;';
+      tile6 = `<div class="kpi-card"><div class="kpi-label">YoY Change</div><div class="kpi-value" style="color:${color};">${arrow} ${pct(Math.abs(yoyChange))}</div><div class="kpi-sub">vs prior comp</div></div>`;
+    } else if (repeatPct != null) {
+      tile6 = `<div class="kpi-card"><div class="kpi-label">Repeat Customers</div><div class="kpi-value">${pct(repeatPct)}</div><div class="kpi-sub">multi-visit</div></div>`;
+    } else {
+      tile6 = `<div class="kpi-card"><div class="kpi-label">YoY Change</div><div class="kpi-value">--</div><div class="kpi-sub">no data</div></div>`;
+    }
+    kpiEl.innerHTML = `
+      <div class="kpi-card"><div class="kpi-label">Net Sales</div><div class="kpi-value">${money(totalRev)}</div><div class="kpi-sub">${hasTransactions ? 'transaction total' : 'GROW adjusted'}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Cars / Day</div><div class="kpi-value">${carsPerDay ? carsPerDay.toFixed(1) : '--'}</div><div class="kpi-sub">${storeSet.size > 1 ? 'per store avg' : 'daily avg'}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ticket Average</div><div class="kpi-value">${money(avgTicket)}</div><div class="kpi-sub">net sales / car</div></div>
+      <div class="kpi-card"><div class="kpi-label">Vehicles Serviced</div><div class="kpi-value">${totalInv ? num(totalInv) : '--'}</div><div class="kpi-sub">total invoices</div></div>
+      <div class="kpi-card"><div class="kpi-label">Active Stores</div><div class="kpi-value">${storeSet.size || '--'}</div><div class="kpi-sub">reporting</div></div>
+      ${tile6}
+    `;
+  }
 
-  // Revenue by date
-  const revByDate = {};
-  cust.forEach(r => {
-    const d = parseDate(r.Invoice_Date);
-    if (!d) return;
-    const key = fmtDateISO(d);
-    revByDate[key] = (revByDate[key] || 0) + (+r.Net_Sales || 0);
-  });
-  const sortedDates = Object.keys(revByDate).sort();
-  makeChart('chartRevByDate', {
-    type: 'line',
-    data: {
-      labels: sortedDates,
-      datasets: [{
-        label: 'Revenue',
-        data: sortedDates.map(d => revByDate[d]),
-        borderColor: PALETTE.red,
-        backgroundColor: PALETTE.redFill,
-        fill: true,
-        tension: 0.35,
-        pointRadius: sortedDates.length > 60 ? 0 : 3,
-        pointBackgroundColor: PALETTE.red,
-        pointHoverRadius: 6,
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: PALETTE.red,
-        pointHoverBorderWidth: 2
-      }]
-    },
-    options: {
-      scales: {
-        x: { ticks: { maxRotation: 45, maxTicksLimit: 15, font: { size: 10 } } },
-        y: { beginAtZero: true, ticks: { callback: tickMoney } }
+  // ── Revenue Trend Chart ──
+  if (hasTransactions) {
+    const revByDate = {};
+    cust.forEach(r => {
+      const d = parseDate(r.Invoice_Date);
+      if (!d) return;
+      const key = fmtDateISO(d);
+      revByDate[key] = (revByDate[key] || 0) + (+r.Net_Sales || 0);
+    });
+    const sortedDates = Object.keys(revByDate).sort();
+    makeChart('chartDashRevenue', {
+      type: 'line',
+      data: {
+        labels: sortedDates,
+        datasets: [{
+          label: 'Revenue',
+          data: sortedDates.map(d => revByDate[d]),
+          borderColor: PALETTE.red,
+          backgroundColor: PALETTE.redFill,
+          fill: true,
+          tension: 0.35,
+          pointRadius: sortedDates.length > 60 ? 0 : 3,
+          pointBackgroundColor: PALETTE.red,
+          pointHoverRadius: 6,
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: PALETTE.red,
+          pointHoverBorderWidth: 2
+        }]
       },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: tooltipMoney } }
+      options: {
+        scales: {
+          x: { ticks: { maxRotation: 45, maxTicksLimit: 15, font: { size: 10 } } },
+          y: { beginAtZero: true, ticks: { callback: tickMoney } }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: tooltipMoney } }
+        }
       }
-    }
-  });
+    });
 
-  // Invoices by date
-  const invByDate = {};
-  cust.forEach(r => {
-    const d = parseDate(r.Invoice_Date);
-    if (!d) return;
-    const key = fmtDateISO(d);
-    invByDate[key] = (invByDate[key] || 0) + 1;
-  });
-  makeChart('chartInvByDate', {
-    type: 'bar',
-    data: {
-      labels: sortedDates,
-      datasets: [{
-        label: 'Invoices',
-        data: sortedDates.map(d => invByDate[d] || 0),
-        backgroundColor: PALETTE.blueLight,
-        hoverBackgroundColor: PALETTE.blue,
-        borderRadius: 4,
-        maxBarThickness: 40
-      }]
-    },
-    options: {
-      scales: {
-        x: { ticks: { maxRotation: 45, maxTicksLimit: 15, font: { size: 10 } } },
-        y: { beginAtZero: true, ticks: { callback: tickCount } }
+    // ── Daily Volume Chart (last 30 days) ──
+    const invByDate = {};
+    cust.forEach(r => {
+      const d = parseDate(r.Invoice_Date);
+      if (!d) return;
+      const key = fmtDateISO(d);
+      invByDate[key] = (invByDate[key] || 0) + 1;
+    });
+    const volDates = sortedDates.slice(-30);
+    makeChart('chartDashVolume', {
+      type: 'bar',
+      data: {
+        labels: volDates,
+        datasets: [{
+          label: 'Invoices',
+          data: volDates.map(d => invByDate[d] || 0),
+          backgroundColor: PALETTE.blueLight,
+          hoverBackgroundColor: PALETTE.blue,
+          borderRadius: 4,
+          maxBarThickness: 40
+        }]
       },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: tooltipCount } }
+      options: {
+        scales: {
+          x: { ticks: { maxRotation: 45, maxTicksLimit: 12, font: { size: 10 } } },
+          y: { beginAtZero: true, ticks: { callback: tickCount } }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: tooltipCount } }
+        }
       }
-    }
-  });
+    });
 
-  // Top services by revenue
-  const svcRev = {};
-  det.forEach(r => {
-    if (r.Invoice_Detail_Type === 'SERVICE' || r.Invoice_Detail_Type === 'PACKAGE') {
-      const price = +r.Extended_Price || 0;
-      if (price > 0) {
-        const key = r.Invoice_Detail_Description || r.Invoice_Detail_Code;
-        svcRev[key] = (svcRev[key] || 0) + price;
+    // ── Top & Bottom Stores Table ──
+    const storeMap = {};
+    cust.forEach(r => {
+      const sn = r.Store_Number || 'Unknown';
+      if (!storeMap[sn]) storeMap[sn] = { rev: 0, count: 0, dates: new Set() };
+      storeMap[sn].rev += (+r.Net_Sales || 0);
+      storeMap[sn].count += 1;
+      const d = parseDate(r.Invoice_Date);
+      if (d) storeMap[sn].dates.add(fmtDateISO(d));
+    });
+    const storeArr = Object.entries(storeMap).map(([sn, s]) => {
+      const days = Math.max(1, s.dates.size);
+      const cpd = s.count / days;
+      const avgTk = s.count ? s.rev / s.count : 0;
+      let yoy = null;
+      if (GROW.kpi_retail_comp && GROW.kpi_retail_comp.length > 0) {
+        const match = GROW.kpi_retail_comp.find(x => String(x.Store_Number || x.Store || '').trim() === String(sn).trim());
+        if (match) {
+          const cur = parseGrowNum(match.Current_Comp || match.Current);
+          const pri = parseGrowNum(match.Prior_Comp || match.Prior);
+          if (cur != null && pri != null && pri !== 0) yoy = ((cur - pri) / Math.abs(pri) * 100);
+        }
       }
-    }
-  });
-  const topSvc = Object.entries(svcRev).filter(s => s[1] > 0).sort((a,b) => b[1] - a[1]).slice(0, 10);
-  makeChart('chartTopServices', {
-    type: 'bar',
-    data: {
-      labels: topSvc.map(s => truncLabel(s[0], 28)),
-      datasets: [{
-        label: 'Revenue',
-        data: topSvc.map(s => s[1]),
-        backgroundColor: PALETTE.redLight,
-        hoverBackgroundColor: PALETTE.red,
-        borderRadius: 4
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      scales: {
-        x: { beginAtZero: true, ticks: { callback: tickMoney } },
-        y: { ticks: { font: { size: 11 } } }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: tooltipMoney } }
+      return { sn, rev: s.rev, count: s.count, cpd, avgTk, yoy };
+    });
+    storeArr.sort((a, b) => b.rev - a.rev);
+    const top5 = storeArr.slice(0, 5);
+    const bottom5 = storeArr.length > 5 ? storeArr.slice(-5).reverse() : [];
+    const dashBody = document.getElementById('dashStoreBody');
+    if (dashBody) {
+      const makeRow = (s) => `<tr style="cursor:pointer;" onclick="document.getElementById('filterStore').value='${s.sn}';document.querySelector('.view-btn[data-view=stores]')?.click();applyFilters();">
+        <td style="text-align:left;font-weight:600;">#${s.sn}</td>
+        <td>${money(s.rev)}</td>
+        <td>${money(s.avgTk)}</td>
+        <td>${s.cpd.toFixed(1)}</td>
+        <td>${s.yoy != null ? (s.yoy >= 0 ? '+' : '') + s.yoy.toFixed(1) + '%' : '--'}</td>
+      </tr>`;
+      let rows = '';
+      if (top5.length) {
+        rows += `<tr><td colspan="5" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);padding:8px 0 4px;">Top Performers</td></tr>`;
+        top5.forEach(s => { rows += makeRow(s); });
       }
-    }
-  });
-
-  // Inspection overview
-  const statusCounts = {};
-  insp.forEach(r => {
-    const s = r.Inspection_Status;
-    if (s && s !== 'NotCheck' && s !== 'NotEquip') {
-      statusCounts[s] = (statusCounts[s] || 0) + 1;
-    }
-  });
-  const statusColors = { Green: '#00c853', Yellow: '#ffd600', Orange: '#ff9100', Red: '#ff1744' };
-  const statusKeys = ['Green', 'Yellow', 'Orange', 'Red'].filter(k => statusCounts[k]);
-  const inspTotal = statusKeys.reduce((s, k) => s + statusCounts[k], 0);
-  makeChart('chartInspOverview', {
-    type: 'doughnut',
-    data: {
-      labels: statusKeys,
-      datasets: [{
-        data: statusKeys.map(k => statusCounts[k]),
-        backgroundColor: statusKeys.map(k => statusColors[k]),
-        hoverOffset: 8
-      }]
-    },
-    options: {
-      plugins: {
-        legend: { position: 'right' },
-        tooltip: { callbacks: {
-          label: function(ctx) {
-            const val = ctx.parsed;
-            const pctVal = inspTotal ? (val / inspTotal * 100).toFixed(1) : 0;
-            return ctx.label + ': ' + val.toLocaleString() + ' (' + pctVal + '%)';
-          }
-        }}
+      if (bottom5.length) {
+        rows += `<tr><td colspan="5" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--red);padding:12px 0 4px;">Needs Attention</td></tr>`;
+        bottom5.forEach(s => { rows += makeRow(s); });
       }
+      dashBody.innerHTML = rows;
     }
-  });
-
-  // Revenue summary line
-  const totalRev = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
-  const totalInv = cust.length;
-  const avgTicket = totalInv ? totalRev / totalInv : 0;
-  const revEl = document.getElementById('ovRevSummary');
-  if (revEl) revEl.innerHTML = money(totalRev) + ' total &middot; ' + num(totalInv) + ' invoices &middot; ' + money(avgTicket) + ' avg';
-
-  // Quick stats panel
-  const stores = new Set(cust.map(r => r.Store_Number));
-  const withEmail = cust.filter(r => r.Customer_Email_Address && r.Customer_Email_Address.trim()).length;
-  const emailPct = totalInv ? (withEmail / totalInv * 100) : 0;
-  const promoTotal = promo.reduce((s, r) => s + (+r.Promo_Amount || 0), 0);
-  const inspBad = insp.filter(r => r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red');
-  const inspPurch = inspBad.filter(r => r.Purchased_This_Visit === 'True').length;
-  const inspConv = inspBad.length ? (inspPurch / inspBad.length * 100) : 0;
-
-  const qsEl = document.getElementById('ovQuickStats');
-  if (qsEl) qsEl.innerHTML = `
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">Quick Snapshot</div>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Active Stores</span><span style="font-weight:700;color:var(--text);">${stores.size}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Email Capture</span><span style="font-weight:700;color:${emailPct>=75?'var(--green)':emailPct>=50?'var(--orange)':'var(--red)'};">${pct(emailPct)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Promo Discounts</span><span style="font-weight:700;color:var(--text);">${money(promoTotal)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Promo Uses</span><span style="font-weight:700;color:var(--text);">${num(promo.length)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Inspection Conv.</span><span style="font-weight:700;color:${inspConv>=20?'var(--green)':inspConv>=10?'var(--orange)':'var(--red)'};">${pct(inspConv)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text-muted);">Inspections</span><span style="font-weight:700;color:var(--text);">${num(insp.length)}</span></div>
-    </div>
-  `;
+  }
 }
 
 // ============================================================
@@ -11718,7 +11650,7 @@ function renderGrow() {
 
   // Cross-populate: if GROW data loaded but no transaction data, update overview KPIs
   if (GROW.system_impact.length > 0 && DATA.customers.length === 0) {
-    const overviewKPIs = document.getElementById('overviewKPIs');
+    const overviewKPIs = document.getElementById('dashKPIs');
     if (overviewKPIs && !overviewKPIs.innerHTML.trim()) {
       const si = GROW.system_impact;
       const findMeasure = (name) => { const r = si.find(x => x.Measure && x.Measure.trim() === name); return r ? parseGrowNum(r.Current_Comp) : null; };
