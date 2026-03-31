@@ -2529,33 +2529,19 @@
     --surface-glass: rgba(255,255,255,0.92);
   }
 
-  body.light-mode .nav-shell {
-    background: #111827;
-    border-bottom-color: rgba(255,255,255,0.08);
-  }
-
-  body.light-mode .header { border-bottom-color: rgba(255,255,255,0.06); }
-  body.light-mode .command-bar { background: rgba(0,0,0,0.15); border-bottom-color: rgba(255,255,255,0.04); }
-  body.light-mode .tabs { background: rgba(0,0,0,0.1); }
-
-  /* Nav shell always stays dark even in light mode */
-  body.light-mode .logo-text { color: white; }
-  body.light-mode .logo-mark { background: var(--primary); color: white; }
+  body.light-mode .nav-shell { background: #111827; }
+  body.light-mode .nav-tier1 { border-bottom-color: rgba(255,255,255,0.06); }
+  body.light-mode .nav-tier2 { background: rgba(0,0,0,0.1); }
+  body.light-mode .view-btn { color: rgba(255,255,255,0.5); }
+  body.light-mode .view-btn:hover { color: rgba(255,255,255,0.8); }
+  body.light-mode .view-btn.active { color: white; background: var(--primary); }
+  body.light-mode .nav-brand-text { color: white; }
   body.light-mode .cmd-select { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #e8e8f0; }
-  body.light-mode .cmd-select option { background: #111827; color: #e8e8f0; }
   body.light-mode .cmd-input { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #e8e8f0; }
-  body.light-mode .cmd-btn-ghost { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #9ca3af; }
-  body.light-mode .cmd-btn-ghost:hover { background: rgba(255,255,255,0.1); color: #e8e8f0; }
-  body.light-mode .cmd-label { color: #6b7280; }
-  body.light-mode .nav-action { color: #9ca3af; }
-  body.light-mode .nav-action:hover { color: #e8e8f0; background: rgba(255,255,255,0.08); }
-  body.light-mode .nav-action-text { color: #9ca3af; }
-  body.light-mode .nav-action-text:hover { color: #e8e8f0; background: rgba(255,255,255,0.08); }
-  body.light-mode .nav-sep { background: rgba(255,255,255,0.08); }
-  body.light-mode .tab { color: #9ca3af; }
-  body.light-mode .tab:hover { color: #e8e8f0; background: rgba(255,255,255,0.04); }
-  body.light-mode .tab.active { color: white; background: rgba(227,24,55,0.1); border-bottom-color: var(--primary); }
-  body.light-mode .date-range-display { color: #9ca3af; background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+  body.light-mode .nav-filter-label { color: rgba(255,255,255,0.35); }
+  body.light-mode .nav-util-btn { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.08); }
+  body.light-mode .nav-util-btn:hover { color: rgba(255,255,255,0.8); }
+  body.light-mode .nav-context-info { color: rgba(255,255,255,0.4); }
   body.light-mode .client-badge { color: #f87171; background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.2); }
   body.light-mode .data-saved-pill { color: #34d399; background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.15); }
 
@@ -3279,20 +3265,76 @@
 
   <!-- REVENUE TAB -->
   <div class="view-content" id="view-financials">
+    <!-- KPI Tiles -->
     <div class="kpi-grid" id="revenueKPIs"></div>
-    <div class="report-cards" id="revenueCards"></div>
+
+    <!-- Charts Row: Revenue by Category + Revenue by Type -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="chart-card">
+        <h3>Revenue by Category</h3>
+        <div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Revenue by Type</h3>
+        <div class="chart-wrap"><canvas id="chartRevByType"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Charts Row: Ticket Distribution + Discount Impact -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="chart-card">
+        <h3>Ticket Distribution</h3>
+        <div class="chart-wrap"><canvas id="chartTicketDist"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Discount Impact — Top Promos</h3>
+        <div class="chart-wrap"><canvas id="chartDiscountImpact"></canvas></div>
+      </div>
+    </div>
+
+    <!-- BPA Insights -->
     <div class="bpa-panel" id="bpaRevenue"></div>
-    <div style="display:none;">
-      <canvas id="chartRevByCat"></canvas>
-      <canvas id="chartRevByType"></canvas>
-      <table id="tblServices"><thead><tr>
-        <th class="sortable" data-col="0">Category</th>
-        <th class="sortable" data-col="1">Description</th>
-        <th class="sortable" data-col="2">Type</th>
-        <th class="sortable" data-col="3">Qty Sold</th>
-        <th class="sortable" data-col="4">Revenue</th>
-        <th class="sortable" data-col="5">Avg Price</th>
-      </tr></thead><tbody></tbody></table>
+
+    <!-- Service & Product Breakdown Table -->
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportReport('tblServices','Service & Product Breakdown')">Export</button>
+    </div>
+    <div class="table-wrap">
+      <h3>Service & Product Breakdown</h3>
+      <div class="table-scroll">
+        <table id="tblServices">
+          <thead><tr>
+            <th class="sortable" data-col="0">Category</th>
+            <th class="sortable" data-col="1">Description</th>
+            <th class="sortable" data-col="2">Type</th>
+            <th class="sortable" data-col="3">Qty Sold</th>
+            <th class="sortable" data-col="4">Revenue</th>
+            <th class="sortable" data-col="5">Avg Price</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Promo Details Table -->
+    <div class="export-bar" style="margin-top:16px;">
+      <button class="btn-export" onclick="exportReport('tblPromos','Promotion Details')">Export</button>
+    </div>
+    <div class="table-wrap">
+      <h3>Promotion Details</h3>
+      <div class="table-scroll">
+        <table id="tblPromos">
+          <thead><tr>
+            <th class="sortable" data-col="0">Promo Code</th>
+            <th class="sortable" data-col="1">Uses</th>
+            <th class="sortable" data-col="2">Total Discount</th>
+            <th class="sortable" data-col="3">Avg Discount</th>
+            <th class="sortable" data-col="4">Stores</th>
+            <th class="sortable" data-col="5">Avg Invoice w/ Promo</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -3340,20 +3382,66 @@
   <div class="view-content" id="view-stores">
     <!-- Quick Filters -->
     <div class="ops-quick-filters" id="opsQuickFilters">
-      <span style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Quick Range:</span>
+      <span style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Range:</span>
       <button class="ops-quick-btn" onclick="setOpsDateRange('YTD')">YTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('QTD')">QTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('MTD')">MTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('WTD')">WTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('DTD')">DTD</button>
+      <div style="flex:1;"></div>
+      <button class="nav-util-btn" id="storeBackBtn" style="display:none;" onclick="exitStoreDetail()">&#8592; All Stores</button>
     </div>
+
+    <!-- KPI Tiles -->
     <div class="kpi-grid" id="opsKPIs"></div>
-    <div class="report-cards" id="opsCards"></div>
-    <div class="bpa-panel" id="bpaOps"></div>
+
+    <!-- All Stores Mode: Command Grid (always visible when no store selected) -->
+    <div id="allStoresView">
+      <div class="ops-grid-wrap">
+        <h3>Store Performance <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Click a store to drill in</span></h3>
+        <div class="ops-grid-scroll">
+          <table class="ops-grid" id="opsCommandGrid">
+            <thead>
+              <tr>
+                <th style="min-width:140px;position:sticky;left:0;z-index:3;background:var(--card);">Store / District</th>
+                <th title="Guest Count">GC</th>
+                <th title="Cars Per Day">CPD</th>
+                <th title="Net Sales">Net Sales</th>
+                <th title="Ticket Average">TA</th>
+                <th title="Average Bay Time (min)">Avg Bay</th>
+                <th title="Average Wait Time (min)">Avg Wait</th>
+                <th title="Man Hours Per Vehicle">MHPV</th>
+                <th title="Promos Used">Promos</th>
+                <th title="Promo Dollars">Promo $</th>
+                <th title="Inspections">Insp</th>
+                <th title="Yellow/Red %">Y/R %</th>
+              </tr>
+            </thead>
+            <tbody id="opsGridBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="bpa-panel" id="bpaOps" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- Single Store Mode: Store Detail Profile (hidden by default) -->
+    <div id="storeDetailView" style="display:none;">
+      <div class="kpi-grid" id="storeDetailKPIs"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="chart-card">
+          <h3 id="storeDetailChartTitle1">Service Times</h3>
+          <div class="chart-wrap" style="height:260px;"><canvas id="chartStoreDetail1"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3 id="storeDetailChartTitle2">Inspections</h3>
+          <div class="chart-wrap" style="height:260px;"><canvas id="chartStoreDetail2"></canvas></div>
+        </div>
+      </div>
+      <div id="storeDetailTables"></div>
+    </div>
+
+    <!-- Hidden render targets -->
     <div style="display:none;">
-      <table class="ops-grid" id="opsCommandGrid"><thead><tr>
-        <th>Store / District</th><th>GC</th><th>CPD</th><th>Net Sales</th><th>TA</th><th>Avg Bay</th><th>Avg Wait</th><th>MHPV</th><th>Promos</th><th>Promo $</th><th>Insp</th><th>Y/R %</th>
-      </tr></thead><tbody id="opsGridBody"></tbody></table>
       <table id="tblStoreOps"><thead><tr>
         <th class="sortable" data-col="0">Store #</th><th class="sortable" data-col="1">Invoices</th><th class="sortable" data-col="2">Avg Bay Time</th><th class="sortable" data-col="3">Avg Wait Time</th><th class="sortable" data-col="4">Avg Total Time</th><th class="sortable" data-col="5">Revenue</th><th class="sortable" data-col="6">Avg Ticket</th>
       </tr></thead><tbody></tbody></table>
@@ -4362,11 +4450,13 @@ function bpaCreateAlert(metric, operator, threshold) {
   alert('Alert rule created: ' + metric + ' ' + operator + ' ' + threshold);
 }
 
-function bpaSwitchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelector('[data-tab="'+tab+'"]').classList.add('active');
-  document.getElementById('tab-'+tab).classList.add('active');
+function bpaSwitchTab(viewOrTab) {
+  // Try view first
+  const viewBtn = document.querySelector('.view-btn[data-view="' + viewOrTab + '"]');
+  if (viewBtn) { viewBtn.click(); return; }
+  // Legacy tab support
+  const tab = document.querySelector('.tab[data-tab="' + viewOrTab + '"]');
+  if (tab) { tab.click(); }
 }
 
 function runBPAInsights() {
@@ -5453,43 +5543,40 @@ function renderRevenue() {
     <tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(r.desc||'').replace(/'/g,"\\'")}','${(r.type||'').replace(/'/g,"\\'")}')"><td>${r.cat}</td><td>${r.desc}</td><td>${r.type}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${money(r.count ? r.rev / r.count : 0)}</td></tr>
   `).join('');
 
-  // Build report cards
-  const detCount = det.length;
-  document.getElementById('revenueCards').innerHTML =
-    buildReportCard('rev-category', 'Revenue by Category', 'Breakdown by JLI category code', money(totalRev), 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9776;', detCount > 0) +
-    buildReportCard('rev-type', 'Revenue by Type', 'Service vs Product vs Credit split', typeEntries.length + ' types', 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9684;', detCount > 0) +
-    buildReportCard('rev-table', 'Service & Product Breakdown', 'Full detail table with category, description, qty, revenue', num(svcRows.length) + ' line items', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9783;', svcRows.length > 0);
-  document.querySelectorAll('#revenueCards .report-card').forEach(c => {
-    c.addEventListener('click', () => openRevenueReport(c.dataset.report));
+  // Ticket Distribution histogram
+  const ticketBuckets = [0, 25, 50, 100, 150, 200, 300, 500];
+  const ticketHist = Array(ticketBuckets.length).fill(0);
+  FILTERED.customers.forEach(r => {
+    const v = +r.Net_Sales || 0;
+    if (v <= 0) return;
+    for (let i = ticketBuckets.length - 1; i >= 0; i--) { if (v >= ticketBuckets[i]) { ticketHist[i]++; break; } }
   });
-}
+  makeChart('chartTicketDist', {
+    type: 'bar',
+    data: {
+      labels: ticketBuckets.map((b, i) => i < ticketBuckets.length - 1 ? '$' + b + '-$' + ticketBuckets[i + 1] : '$' + b + '+'),
+      datasets: [{ label: 'Invoices', data: ticketHist, backgroundColor: PALETTE.blueLight, borderRadius: 4 }]
+    },
+    options: { plugins: { legend: { display: false }, tooltip: { callbacks: { label: tooltipCount } } } }
+  });
 
-function openRevenueReport(id) {
-  const det = FILTERED.details;
-  switch(id) {
-    case 'rev-category': {
-      openReportModal('Revenue by Category', function(body) {
-        const catRev = {};
-        det.forEach(r => { const c = r.JLI_Category_Code || 'Other'; catRev[c] = (catRev[c]||0) + (+r.Extended_Price||0); });
-        const cats = Object.entries(catRev).sort((a,b)=>b[1]-a[1]).slice(0,15);
-        modalChart(body, 'revCat', { _title: 'Revenue by Category', type:'bar', data:{ labels:cats.map(c=>c[0]), datasets:[{label:'Revenue',data:cats.map(c=>c[1]),backgroundColor:PALETTE.multi.slice(0,cats.length),borderRadius:6}] }, options:{ indexAxis:'y', scales:{x:{ticks:{callback:tickMoney}}}, plugins:{tooltip:{callbacks:{label:tooltipMoney}},legend:{display:false}} } });
-      });
-      break;
-    }
-    case 'rev-type': {
-      openReportModal('Revenue by Type', function(body) {
-        const typeRev = {};
-        det.forEach(r => { const t = r.Invoice_Detail_Type || 'Other'; typeRev[t] = (typeRev[t]||0) + (+r.Extended_Price||0); });
-        const types = Object.entries(typeRev).sort((a,b)=>b[1]-a[1]);
-        modalChart(body, 'revType', { _title: 'Revenue by Type', type:'doughnut', data:{ labels:types.map(t=>t[0]), datasets:[{data:types.map(t=>t[1]),backgroundColor:PALETTE.multi.slice(0,types.length)}] }, options:{ plugins:{tooltip:{callbacks:{label:tooltipMoneyPie}}} } });
-      });
-      break;
-    }
-    case 'rev-table':
-      openReportModal('Service & Product Breakdown', function(body) {
-        modalTable(body, 'tblServices', 'Service & Product Breakdown');
-      }, function() { exportReport('tblServices','Service & Product Breakdown'); });
-      break;
+  // Discount Impact — top promos by dollar amount
+  const promos = FILTERED.promos;
+  const promoDiscMap = {};
+  promos.forEach(r => {
+    const code = r.Promo_Code || 'Unknown';
+    promoDiscMap[code] = (promoDiscMap[code] || 0) + Math.abs(+r.Promo_Amount || 0);
+  });
+  const topPromoDisc = Object.entries(promoDiscMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  if (topPromoDisc.length) {
+    makeChart('chartDiscountImpact', {
+      type: 'bar',
+      data: {
+        labels: topPromoDisc.map(p => p[0]),
+        datasets: [{ label: 'Total Discount', data: topPromoDisc.map(p => p[1]), backgroundColor: PALETTE.redLight, borderRadius: 4 }]
+      },
+      options: { indexAxis: 'y', scales: { x: { ticks: { callback: tickMoney } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: tooltipMoney } } } }
+    });
   }
 }
 
@@ -5697,7 +5784,8 @@ function renderPromos() {
   const avgDisc = totalUses ? totalDisc / totalUses : 0;
   const uniquePromos = new Set(promo.map(r => r.Promo_Code)).size;
 
-  document.getElementById('promoKPIs').innerHTML = `
+  const promoKPIsEl = document.getElementById('promoKPIs');
+  if (promoKPIsEl) promoKPIsEl.innerHTML = `
     <div class="kpi-card"><div class="kpi-label">Total Discounts</div><div class="kpi-value">${money(totalDisc)}</div></div>
     <div class="kpi-card"><div class="kpi-label">Promo Uses</div><div class="kpi-value">${num(totalUses)}</div></div>
     <div class="kpi-card"><div class="kpi-label">Avg Discount</div><div class="kpi-value">${money(avgDisc)}</div></div>
@@ -5762,52 +5850,10 @@ function renderPromos() {
 
   // Table
   const promoRows = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total);
-  document.querySelector('#tblPromos tbody').innerHTML = promoRows.map(([code, r]) => `
+  const promoTbody = document.querySelector('#tblPromos tbody');
+  if (promoTbody) promoTbody.innerHTML = promoRows.map(([code, r]) => `
     <tr class="clickable-row" onclick="openPromoDetail('${code.replace(/'/g,"\\'")}')"><td>${code}</td><td>${num(r.uses)}</td><td>${money(r.total)}</td><td>${money(r.uses ? r.total / r.uses : 0)}</td><td>${r.stores.size}</td><td>${money(r.uses ? r.invTotal / r.uses : 0)}</td></tr>
   `).join('');
-
-  // Build report cards
-  document.getElementById('promoCards').innerHTML =
-    buildReportCard('promo-usage', 'Top Promos by Usage', 'Most frequently used promotion codes', num(totalUses) + ' total uses', 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9776;', totalUses > 0) +
-    buildReportCard('promo-discount', 'Top Promos by Discount', 'Promotions with highest total discount value', money(totalDisc), 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9684;', totalUses > 0) +
-    buildReportCard('promo-table', 'Promotion Details Table', 'Full promo breakdown with usage, discount, and store counts', num(promoRows.length) + ' promos', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9783;', promoRows.length > 0);
-  document.querySelectorAll('#promoCards .report-card').forEach(c => {
-    c.addEventListener('click', () => openPromoReport(c.dataset.report));
-  });
-}
-
-function openPromoReport(id) {
-  const promo = FILTERED.promos;
-  const promoMap = {};
-  promo.forEach(r => {
-    const code = r.Promo_Code;
-    if (!promoMap[code]) promoMap[code] = { desc: r.Promo_Description, uses: 0, total: 0, stores: new Set(), invTotal: 0 };
-    promoMap[code].uses++;
-    promoMap[code].total += (+r.Promo_Amount || 0);
-    promoMap[code].invTotal += (+r.Invoice_Total || 0);
-    promoMap[code].stores.add(r.Store_Number);
-  });
-  switch(id) {
-    case 'promo-usage': {
-      openReportModal('Top Promos by Usage', function(body) {
-        const byUsage = Object.entries(promoMap).sort((a,b) => b[1].uses - a[1].uses).slice(0, 15);
-        modalChart(body, 'promoUsage', { _title: 'Top Promos by Usage', type:'bar', data:{ labels:byUsage.map(p=>truncLabel(p[0],16)), datasets:[{label:'Uses',data:byUsage.map(p=>p[1].uses),backgroundColor:PALETTE.blueLight,hoverBackgroundColor:PALETTE.blue,borderRadius:6,maxBarThickness:50}] }, options:{ scales:{x:{ticks:{maxRotation:45,font:{size:10}}},y:{beginAtZero:true,ticks:{callback:tickCount}}}, plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){ const entry=byUsage[ctx.dataIndex]; return entry[0]+': '+entry[1].uses.toLocaleString()+' uses'; }}}} } });
-      });
-      break;
-    }
-    case 'promo-discount': {
-      openReportModal('Top Promos by Discount', function(body) {
-        const byAmt = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total).slice(0, 15);
-        modalChart(body, 'promoDisc', { _title: 'Top Promos by Discount', type:'bar', data:{ labels:byAmt.map(p=>truncLabel(p[0],16)), datasets:[{label:'Total Discount',data:byAmt.map(p=>p[1].total),backgroundColor:PALETTE.redLight,hoverBackgroundColor:PALETTE.red,borderRadius:6,maxBarThickness:50}] }, options:{ scales:{x:{ticks:{maxRotation:45,font:{size:10}}},y:{beginAtZero:true,ticks:{callback:tickMoney}}}, plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipMoney}}} } });
-      });
-      break;
-    }
-    case 'promo-table':
-      openReportModal('Promotion Details', function(body) {
-        modalTable(body, 'tblPromos', 'Promotion Details');
-      }, function() { exportReport('tblPromos','Promotion Details'); });
-      break;
-  }
 }
 
 // ============================================================
@@ -6028,25 +6074,6 @@ function renderOperations() {
     </tr>`;
   }).join('');
   renderCSA();
-
-  // Build report cards
-  const storeCount = Object.keys(storeOpsMap).length;
-  const hasGrowData = typeof hasAnyGrowData === 'function' && hasAnyGrowData();
-  const hasCustom = typeof CUSTOM_REPORTS !== 'undefined' && CUSTOM_REPORTS.length > 0;
-  const hasSR = typeof CUSTOM_REPORTS !== 'undefined' && CUSTOM_REPORTS.some(r => r.name.toLowerCase().includes('productivity') || r.name.toLowerCase().includes('sr_'));
-
-  document.getElementById('opsCards').innerHTML =
-    buildReportCard('ops-grid', 'Command Grid', 'Store-by-store performance matrix with color-coded metrics', storeCount + ' stores', 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9638;', storeCount > 0) +
-    buildReportCard('ops-charts', 'Service Time Analysis', 'Bay times, time distribution, hourly volume', avgSvcTime.toFixed(1) + ' min avg', 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9201;', svcTimes.length > 0) +
-    buildReportCard('ops-times', 'Store Service Times', 'Detailed bay, wait, and total times per store', storeCount + ' stores', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9202;', storeCount > 0) +
-    buildReportCard('ops-makes', 'Vehicle Makes', 'Most common vehicle makes serviced', Object.keys(makeCounts).length + ' makes', 'rgba(179,136,255,0.12)', '#b388ff', '&#9881;', Object.keys(makeCounts).length > 0) +
-    (hasGrowData ? buildReportCard('ops-pos', 'POS Summary', 'Sales summary, KPI actuals, time analysis', 'POS data loaded', 'rgba(255,214,0,0.12)', 'var(--yellow)', '&#9733;', true) : '') +
-    (hasSR ? buildReportCard('ops-csa', 'Service Advisors', 'CSA inspection productivity and conversion', 'Data loaded', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9775;', true) : '') +
-    (hasCustom ? buildReportCard('ops-custom', 'Additional Reports', 'Custom CSV files loaded', CUSTOM_REPORTS.length + ' report(s)', 'rgba(255,145,0,0.12)', 'var(--orange)', '&#9776;', true) : '');
-
-  document.querySelectorAll('#opsCards .report-card').forEach(c => {
-    c.addEventListener('click', () => openOpsReport(c.dataset.report));
-  });
 }
 
 function openOpsReport(id) {
@@ -9007,7 +9034,7 @@ function renderOpsGrid() {
     const yrPct = d.inspTotal ? (d.inspBad / d.inspTotal * 100) : 0;
 
     const cls = isChild ? 'store-child' : '';
-    return `<tr class="${cls}" data-district="${isChild || ''}">
+    return `<tr class="${cls}" data-district="${isChild || ''}" style="cursor:pointer;" onclick="openStoreDetail('${store}')">
       <td>${isChild ? '' : ''}<strong>#${store}</strong></td>
       <td>${num(d.gc)}</td>
       <td class="${cellColor(cpd, 15, 8, true)}">${cpd.toFixed(1)}</td>
@@ -9115,6 +9142,115 @@ function toggleDistrictRows(headerRow, distId) {
   headerRow.classList.toggle('expanded');
   const rows = document.querySelectorAll(`.ops-grid .store-child[data-district="${distId}"]`);
   rows.forEach(r => r.classList.toggle('visible'));
+}
+
+function openStoreDetail(storeNum) {
+  document.getElementById('allStoresView').style.display = 'none';
+  document.getElementById('storeDetailView').style.display = 'block';
+  document.getElementById('storeBackBtn').style.display = '';
+
+  const cust = FILTERED.customers.filter(r => r.Store_Number === storeNum);
+  const det = FILTERED.details.filter(r => r.Store_Number === storeNum);
+  const insp = FILTERED.inspections.filter(r => r.Store_Number === storeNum);
+  const promo = FILTERED.promos.filter(r => r.Store_Number === storeNum);
+
+  if (!cust.length) {
+    document.getElementById('storeDetailKPIs').innerHTML = '<div class="kpi-card" style="grid-column:1/-1;"><div class="kpi-value">Store #' + storeNum + '</div><div class="kpi-sub">No transaction data for this store</div></div>';
+    document.getElementById('storeDetailTables').innerHTML = '';
+    return;
+  }
+
+  const totalRev = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+  const avgTicket = cust.length ? totalRev / cust.length : 0;
+  const bayTimes = [];
+  const waitTimes = [];
+  cust.forEach(r => {
+    const b = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (b !== null && b > 0 && b < 180) bayTimes.push(b);
+    const w = diffMinutes(r.Greet_Time, r.Bay_Start_Time);
+    if (w !== null && w >= 0 && w < 120) waitTimes.push(w);
+  });
+  const avgBay = bayTimes.length ? bayTimes.reduce((a, b) => a + b, 0) / bayTimes.length : 0;
+  const avgWait = waitTimes.length ? waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length : 0;
+  const withEmail = cust.filter(r => r.Customer_Email_Address && r.Customer_Email_Address.trim()).length;
+  const emailPct = cust.length ? (withEmail / cust.length * 100) : 0;
+
+  const inspChecked = insp.filter(r => r.Inspection_Status && r.Inspection_Status !== 'NotCheck' && r.Inspection_Status !== 'NotEquip');
+  const inspBad = inspChecked.filter(r => r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red');
+  const inspPurchased = inspBad.filter(r => r.Purchased_This_Visit === 'True');
+  const convRate = inspBad.length ? (inspPurchased.length / inspBad.length * 100) : 0;
+
+  document.getElementById('storeDetailKPIs').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Store #${storeNum}</div><div class="kpi-value">${money(totalRev)}</div><div class="kpi-sub">net revenue</div></div>
+    <div class="kpi-card"><div class="kpi-label">Vehicles</div><div class="kpi-value">${num(cust.length)}</div><div class="kpi-sub">${money(avgTicket)} avg ticket</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Bay Time</div><div class="kpi-value">${avgBay.toFixed(1)} min</div><div class="kpi-sub">${avgWait.toFixed(1)} min wait</div></div>
+    <div class="kpi-card"><div class="kpi-label">Email Capture</div><div class="kpi-value">${pct(emailPct)}</div><div class="kpi-sub">${num(withEmail)} of ${num(cust.length)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Inspections</div><div class="kpi-value">${num(inspChecked.length)}</div><div class="kpi-sub">${pct(convRate)} upsell conv.</div></div>
+    <div class="kpi-card"><div class="kpi-label">Promos</div><div class="kpi-value">${num(promo.length)}</div><div class="kpi-sub">${money(promo.reduce((s,r) => s+(+r.Promo_Amount||0), 0))} total</div></div>
+  `;
+
+  document.getElementById('storeDetailChartTitle1').textContent = 'Service Time Distribution \u2014 Store #' + storeNum;
+  const buckets = [0, 10, 15, 20, 25, 30, 40, 50, 60];
+  const histData = Array(buckets.length).fill(0);
+  bayTimes.forEach(t => { for (let i = buckets.length - 1; i >= 0; i--) { if (t >= buckets[i]) { histData[i]++; break; } } });
+  makeChart('chartStoreDetail1', {
+    type: 'bar',
+    data: { labels: buckets.map((b, i) => i < buckets.length - 1 ? b + '-' + buckets[i + 1] + 'm' : b + '+m'), datasets: [{ label: 'Vehicles', data: histData, backgroundColor: PALETTE.blueLight, borderRadius: 4 }] },
+    options: { plugins: { legend: { display: false } } }
+  });
+
+  document.getElementById('storeDetailChartTitle2').textContent = 'Inspection Results \u2014 Store #' + storeNum;
+  const statCounts = { Green: 0, Yellow: 0, Orange: 0, Red: 0 };
+  inspChecked.forEach(r => { if (statCounts.hasOwnProperty(r.Inspection_Status)) statCounts[r.Inspection_Status]++; });
+  makeChart('chartStoreDetail2', {
+    type: 'doughnut',
+    data: { labels: Object.keys(statCounts), datasets: [{ data: Object.values(statCounts), backgroundColor: [PALETTE.green, PALETTE.yellow, PALETTE.orange, PALETTE.red] }] },
+    options: { plugins: { tooltip: { callbacks: { label: function(ctx) { return ctx.label + ': ' + ctx.parsed.toLocaleString(); } } } } }
+  });
+
+  let tablesHTML = '';
+
+  const svcMap = {};
+  det.forEach(r => {
+    if (r.Invoice_Detail_Type === 'SERVICE' && +r.Extended_Price > 0) {
+      const d = r.Invoice_Detail_Description || 'Unknown';
+      if (!svcMap[d]) svcMap[d] = { qty: 0, rev: 0 };
+      svcMap[d].qty += (+r.Quantity_Sold || 0);
+      svcMap[d].rev += (+r.Extended_Price || 0);
+    }
+  });
+  const topSvc = Object.entries(svcMap).sort((a, b) => b[1].rev - a[1].rev).slice(0, 15);
+  if (topSvc.length) {
+    tablesHTML += '<div class="table-wrap" style="margin-bottom:16px;"><h3>Top Services \u2014 Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th>Service</th><th>Qty</th><th>Revenue</th><th>Avg Price</th></tr></thead><tbody>';
+    topSvc.forEach(([name, d]) => {
+      tablesHTML += '<tr><td>' + name + '</td><td>' + num(Math.round(d.qty)) + '</td><td>' + money(d.rev) + '</td><td>' + money(d.qty ? d.rev / d.qty : 0) + '</td></tr>';
+    });
+    tablesHTML += '</tbody></table></div></div>';
+  }
+
+  const recentCust = [...cust].sort((a, b) => {
+    const da = parseDate(a.Invoice_Date);
+    const db = parseDate(b.Invoice_Date);
+    return (db || 0) - (da || 0);
+  }).slice(0, 50);
+  if (recentCust.length) {
+    tablesHTML += '<div class="table-wrap"><h3>Recent Customers \u2014 Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th>Name</th><th>Date</th><th>Net Sales</th><th>Vehicle</th><th>Email</th></tr></thead><tbody>';
+    recentCust.forEach(r => {
+      const name = ((r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '')).trim() || 'Unknown';
+      const date = r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '';
+      const make = r.ChekChart_Make ? decodeMake(r.ChekChart_Make) : '';
+      tablesHTML += '<tr><td>' + name + '</td><td>' + date + '</td><td>' + money(+r.Net_Sales || 0) + '</td><td>' + make + '</td><td style="font-size:11px;color:var(--text-muted);">' + (r.Customer_Email_Address || '\u2014') + '</td></tr>';
+    });
+    tablesHTML += '</tbody></table></div></div>';
+  }
+
+  document.getElementById('storeDetailTables').innerHTML = tablesHTML;
+}
+
+function exitStoreDetail() {
+  document.getElementById('storeDetailView').style.display = 'none';
+  document.getElementById('allStoresView').style.display = '';
+  document.getElementById('storeBackBtn').style.display = 'none';
 }
 
 // ============================================================
