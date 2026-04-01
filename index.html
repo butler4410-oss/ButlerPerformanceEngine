@@ -2977,8 +2977,48 @@
       </div>
     </div>
     <div id="emailTestResult" style="font-size:12px;margin-top:4px;"></div>
+
+    <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Data Source Connection</div>
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect to a POS system via API or DDS for automatic data sync. Currently using CSV file upload.</p>
+    <div class="form-group">
+      <label for="settingDataSource">Connection Type</label>
+      <select id="settingDataSource" name="dataSource" onchange="toggleDataSourceFields()">
+        <option value="csv">CSV File Upload (Current)</option>
+        <option value="api">REST API Endpoint</option>
+        <option value="dds">DDS / File Transfer</option>
+        <option value="grow_api">GROW POS Direct</option>
+      </select>
+    </div>
+    <div id="dataSourceFields" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="form-group">
+          <label for="settingApiUrl">API / DDS Endpoint URL</label>
+          <input type="text" id="settingApiUrl" name="apiUrl" placeholder="https://api.pos-system.com/v1">
+        </div>
+        <div class="form-group">
+          <label for="settingApiKey">API Key / Token</label>
+          <input type="password" id="settingApiKey" name="apiKey" placeholder="Bearer token or API key">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="settingApiSchedule">Sync Schedule</label>
+        <select id="settingApiSchedule" name="apiSchedule">
+          <option value="manual">Manual (on demand)</option>
+          <option value="daily">Daily (midnight)</option>
+          <option value="hourly">Hourly</option>
+          <option value="realtime">Real-time (webhook)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn-cancel" onclick="testDataSource()" style="border-color:var(--blue);color:var(--blue);font-size:12px;">Test Connection</button>
+        <button class="btn-cancel" onclick="syncNow()" style="border-color:var(--green);color:var(--green);font-size:12px;">Sync Now</button>
+      </div>
+      <div id="dataSourceTestResult" style="font-size:12px;margin-top:8px;"></div>
+    </div>
+
     <div class="modal-buttons">
-      <button class="btn-cancel" onclick="testEmailSetup()" style="border-color:var(--green);color:var(--green);">Test Connection</button>
+      <button class="btn-cancel" onclick="testEmailSetup()" style="border-color:var(--green);color:var(--green);">Test Email</button>
       <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
       <button class="btn-save" onclick="saveSettings()">Save</button>
     </div>
@@ -3226,40 +3266,41 @@
     </div>
     <div class="kpi-grid" id="dashKPIs"></div>
 
-    <!-- PRIMARY: Store Rankings Table + BPA Insights -->
-    <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:16px;">
-      <div class="ops-grid-wrap" style="margin:0;">
-        <h3 style="display:flex;align-items:center;justify-content:space-between;">
-          Top & Bottom Stores
+    <!-- PRIMARY: Store Rankings Table (full width, fills viewport) -->
+    <div class="ops-grid-wrap" style="margin:0 0 16px 0;">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+        Top & Bottom Stores
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn-export" onclick="exportReport('dashStoreTable','Top Bottom Stores')" style="font-size:10px;padding:3px 10px;">Export</button>
           <span style="font-size:10px;font-weight:500;color:var(--text-muted);cursor:pointer;" onclick="navigateTo('stores')">View All &rarr;</span>
-        </h3>
-        <div style="max-height:320px;overflow-y:auto;">
-          <table class="ops-grid" id="dashStoreTable">
-            <thead><tr>
-              <th style="text-align:left;">Store</th>
-              <th>Revenue</th>
-              <th>Avg Ticket</th>
-              <th>Cars/Day</th>
-              <th>YoY %</th>
-            </tr></thead>
-            <tbody id="dashStoreBody"></tbody>
-          </table>
         </div>
+      </h3>
+      <div class="ops-grid-scroll" style="max-height:calc(100vh - 340px);min-height:300px;">
+        <table class="ops-grid" id="dashStoreTable">
+          <thead><tr>
+            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
+            <th>Revenue</th>
+            <th>Avg Ticket</th>
+            <th>Cars/Day</th>
+            <th>YoY %</th>
+          </tr></thead>
+          <tbody id="dashStoreBody"></tbody>
+        </table>
       </div>
+    </div>
+
+    <!-- Secondary Row: Today + BPA + Charts -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
       <div>
         <div class="today-snapshot" id="todaySnapshot">
           <div class="today-snapshot-header">
             <h3><div class="live-dot"></div> Today's Snapshot</h3>
             <div id="todayDate" style="font-size:11px;color:var(--text-muted);"></div>
           </div>
-          <div class="today-snapshot-grid" id="todayStats"></div>
+          <div class="today-snapshot-grid" id="todayStats" style="grid-template-columns:1fr 1fr;"></div>
         </div>
-        <div class="bpa-panel" id="bpaOverview"></div>
+        <div class="bpa-panel" id="bpaOverview" style="margin-top:12px;"></div>
       </div>
-    </div>
-
-    <!-- SUPPORTING: Charts -->
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
       <div class="chart-card" style="margin:0;">
         <h3>Revenue Trend</h3>
         <div class="chart-wrap" style="height:220px;"><canvas id="chartDashRevenue"></canvas></div>
@@ -11238,6 +11279,15 @@ function openSettings() {
   document.getElementById('settingEjsService').value = localStorage.getItem('bp_ejs_service') || '';
   document.getElementById('settingEjsTemplate').value = localStorage.getItem('bp_ejs_template') || '';
   document.getElementById('emailTestResult').textContent = '';
+  // Data source settings
+  const dsEl = document.getElementById('settingDataSource');
+  if (dsEl) { dsEl.value = localStorage.getItem('bp_data_source') || 'csv'; toggleDataSourceFields(); }
+  const apiUrlEl = document.getElementById('settingApiUrl');
+  if (apiUrlEl) apiUrlEl.value = localStorage.getItem('bp_api_url') || '';
+  const apiKeyEl = document.getElementById('settingApiKey');
+  if (apiKeyEl) apiKeyEl.value = localStorage.getItem('bp_api_key') || '';
+  const apiSchedEl = document.getElementById('settingApiSchedule');
+  if (apiSchedEl) apiSchedEl.value = localStorage.getItem('bp_api_schedule') || 'manual';
   document.getElementById('settingsModal').classList.add('active');
   document.getElementById('settingCompany').focus();
 }
@@ -11259,9 +11309,99 @@ function saveSettings() {
   if (ejsService) localStorage.setItem('bp_ejs_service', ejsService); else localStorage.removeItem('bp_ejs_service');
   if (ejsTemplate) localStorage.setItem('bp_ejs_template', ejsTemplate); else localStorage.removeItem('bp_ejs_template');
 
+  // Data source settings
+  const dataSource = document.getElementById('settingDataSource')?.value || 'csv';
+  const apiUrl = document.getElementById('settingApiUrl')?.value?.trim() || '';
+  const apiKey = document.getElementById('settingApiKey')?.value?.trim() || '';
+  const apiSchedule = document.getElementById('settingApiSchedule')?.value || 'manual';
+  localStorage.setItem('bp_data_source', dataSource);
+  if (apiUrl) localStorage.setItem('bp_api_url', apiUrl);
+  if (apiKey) localStorage.setItem('bp_api_key', apiKey);
+  localStorage.setItem('bp_api_schedule', apiSchedule);
+
   updateBadge(company, user);
   initEmailJS();
   closeSettings();
+}
+
+// ============================================================
+// DATA SOURCE ADAPTER (API / DDS / GROW Direct)
+// ============================================================
+function toggleDataSourceFields() {
+  const src = document.getElementById('settingDataSource').value;
+  const fields = document.getElementById('dataSourceFields');
+  if (fields) fields.style.display = src === 'csv' ? 'none' : 'block';
+}
+
+function testDataSource() {
+  const url = document.getElementById('settingApiUrl')?.value?.trim();
+  const key = document.getElementById('settingApiKey')?.value?.trim();
+  const resultEl = document.getElementById('dataSourceTestResult');
+  if (!url) { resultEl.innerHTML = '<span style="color:var(--red);">Enter an endpoint URL first.</span>'; return; }
+
+  resultEl.innerHTML = '<span style="color:var(--blue);">Testing connection...</span>';
+  fetch(url, {
+    method: 'GET',
+    headers: key ? { 'Authorization': 'Bearer ' + key, 'Accept': 'application/json' } : { 'Accept': 'application/json' },
+    mode: 'cors'
+  }).then(r => {
+    if (r.ok) resultEl.innerHTML = '<span style="color:var(--green);">Connected! Status: ' + r.status + '</span>';
+    else resultEl.innerHTML = '<span style="color:var(--orange);">Responded with status ' + r.status + '</span>';
+  }).catch(e => {
+    resultEl.innerHTML = '<span style="color:var(--red);">Connection failed: ' + (e.message || 'Network error') + '</span>';
+  });
+}
+
+function syncNow() {
+  const src = document.getElementById('settingDataSource')?.value;
+  const url = document.getElementById('settingApiUrl')?.value?.trim();
+  const key = document.getElementById('settingApiKey')?.value?.trim();
+  const resultEl = document.getElementById('dataSourceTestResult');
+
+  if (!url) { resultEl.innerHTML = '<span style="color:var(--red);">Configure endpoint URL first.</span>'; return; }
+
+  resultEl.innerHTML = '<span style="color:var(--blue);">Syncing data...</span>';
+
+  // API adapter: fetch JSON data and convert to internal format
+  fetch(url, {
+    headers: key ? { 'Authorization': 'Bearer ' + key, 'Accept': 'application/json' } : { 'Accept': 'application/json' },
+    mode: 'cors'
+  }).then(r => r.json()).then(json => {
+    // The API adapter pattern: normalize external JSON to BPA's internal format
+    // Different POS systems return different shapes — the adapter handles the mapping
+    if (Array.isArray(json)) {
+      // Flat array of records — try to detect type and store
+      const headers = json.length ? Object.keys(json[0]) : [];
+      const h = headers.join(',').toLowerCase();
+      let type = 'unknown';
+      if (h.includes('cy_comp_gross_sales')) type = 'grow_sales_summary';
+      else if (h.includes('labor_pct_sales')) type = 'grow_kpi_actuals';
+      else if (h.includes('start_to_finish')) type = 'grow_time_analysis';
+      else if (h.includes('store_number') && h.includes('net_sales')) type = 'customers';
+
+      if (type.startsWith('grow_')) {
+        const growKey = type.replace('grow_', '');
+        GROW[growKey] = json;
+        loadedFiles[type] = true;
+      } else if (type !== 'unknown') {
+        DATA[type] = json;
+        loadedFiles[type] = true;
+      }
+      resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + json.length + ' records (' + type + '). Refreshing...</span>';
+      setTimeout(() => { applyFilters(); saveUserData(); }, 500);
+    } else if (json.data && Array.isArray(json.data)) {
+      // Wrapper format: { data: [...], meta: {...} }
+      resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + json.data.length + ' records. Refreshing...</span>';
+      // Store as custom report
+      CUSTOM_REPORTS.push({ name: 'API Sync ' + new Date().toLocaleDateString(), headers: Object.keys(json.data[0] || {}), rows: json.data });
+      loadedFiles['custom_api_sync'] = true;
+      setTimeout(() => { applyFilters(); saveUserData(); }, 500);
+    } else {
+      resultEl.innerHTML = '<span style="color:var(--orange);">Received data but format not recognized. Expected JSON array.</span>';
+    }
+  }).catch(e => {
+    resultEl.innerHTML = '<span style="color:var(--red);">Sync failed: ' + (e.message || 'Error') + '</span>';
+  });
 }
 
 function testEmailSetup() {
