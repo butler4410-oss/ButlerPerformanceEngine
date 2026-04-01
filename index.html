@@ -3266,6 +3266,12 @@
     </div>
     <div class="kpi-grid" id="dashKPIs"></div>
 
+    <!-- Forecast Tool Access -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;">Store Performance</div>
+      <button class="nav-util-btn" onclick="openForecastTool()" style="background:rgba(68,138,255,0.1);border-color:rgba(68,138,255,0.2);color:var(--blue);">Business Forecast Tool</button>
+    </div>
+
     <!-- PRIMARY: Store Rankings Table (full width, fills viewport) -->
     <div class="ops-grid-wrap" style="margin:0 0 16px 0;">
       <h3 style="display:flex;align-items:center;justify-content:space-between;">
@@ -3451,6 +3457,7 @@
       <button class="ops-quick-btn" onclick="setOpsDateRange('MTD')">MTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('WTD')">WTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('DTD')">DTD</button>
+      <button class="nav-util-btn" onclick="openForecastTool()" style="margin-left:8px;background:rgba(68,138,255,0.1);border-color:rgba(68,138,255,0.2);color:var(--blue);">Forecast</button>
       <div style="flex:1;"></div>
       <button class="nav-util-btn" id="storeBackBtn" style="display:none;" onclick="navigateTo('stores')">&#8592; All Stores</button>
     </div>
@@ -4550,6 +4557,210 @@ function openReportDetail(reportId) {
       body.innerHTML = html;
     });
   }
+}
+
+// ============================================================
+// BUSINESS FORECASTING TOOL
+// ============================================================
+function openForecastTool() {
+  openReportModal('Business Forecast Tool', function(body) {
+    // Get current baseline metrics
+    const cust = FILTERED.customers;
+    const det = FILTERED.details || [];
+    const insp = FILTERED.inspections || [];
+    const promo = FILTERED.promos || [];
+
+    const stores = [...new Set(cust.map(r => r.Store_Number).filter(Boolean))].sort((a,b) => +a - +b);
+    const totalRev = cust.reduce((s, r) => s + (+r.Net_Sales || 0), 0);
+    const totalInv = cust.length;
+    const avgTicket = totalInv ? totalRev / totalInv : 0;
+
+    // Calculate days span
+    const dates = cust.map(r => parseDate(r.Invoice_Date)).filter(Boolean);
+    let minD = dates.length ? dates.reduce((a,b) => a < b ? a : b) : new Date();
+    let maxD = dates.length ? dates.reduce((a,b) => a > b ? a : b) : new Date();
+    const daySpan = Math.max(1, Math.ceil((maxD - minD) / 86400000));
+    const carsPerDay = totalInv / daySpan;
+
+    // Inspection metrics
+    const inspChecked = insp.filter(r => r.Inspection_Status && r.Inspection_Status !== 'NotCheck' && r.Inspection_Status !== 'NotEquip');
+    const inspBad = inspChecked.filter(r => r.Inspection_Status === 'Yellow' || r.Inspection_Status === 'Orange' || r.Inspection_Status === 'Red');
+    const inspSold = inspBad.filter(r => r.Purchased_This_Visit === 'True');
+    const currentConvRate = inspBad.length ? (inspSold.length / inspBad.length * 100) : 0;
+
+    // Promo metrics
+    const promoTotal = promo.reduce((s, r) => s + Math.abs(parseFloat(String(r.Promo_Amount || '0').replace(/[$,]/g, '').replace(/[()]/g, '')) || 0), 0);
+    const promoPerCar = totalInv ? promoTotal / totalInv : 0;
+
+    // Use GROW data if available
+    let growCPD = null, growTA = null;
+    if (GROW.system_impact.length) {
+      const findMeasure = (name) => { const r = GROW.system_impact.find(x => x.Measure && x.Measure.trim() === name); return r ? parseGrowNum(r.Current_Comp) : null; };
+      growCPD = findMeasure('Cars Per Day');
+      growTA = findMeasure('Ticket Average');
+    }
+
+    const baseCPD = growCPD || carsPerDay;
+    const baseTA = growTA || avgTicket;
+    const baseConv = currentConvRate;
+    const baseStores = stores.length || 1;
+
+    let html = '';
+
+    // Current Baseline
+    html += '<div style="margin-bottom:24px;">';
+    html += '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;">Current Baseline (' + baseStores + ' stores, ' + daySpan + ' days)</div>';
+    html += '<div class="kpi-grid">';
+    html += '<div class="kpi-card"><div class="kpi-label">Cars Per Day</div><div class="kpi-value">' + baseCPD.toFixed(1) + '</div><div class="kpi-sub">company avg</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Ticket Average</div><div class="kpi-value">' + money(baseTA) + '</div><div class="kpi-sub">per vehicle</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Daily Revenue</div><div class="kpi-value">' + money(baseCPD * baseTA * baseStores) + '</div><div class="kpi-sub">all stores</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">' + money(baseCPD * baseTA * baseStores * 26) + '</div><div class="kpi-sub">26 business days</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Annual Revenue</div><div class="kpi-value">' + money(baseCPD * baseTA * baseStores * 312) + '</div><div class="kpi-sub">312 business days</div></div>';
+    html += '</div></div>';
+
+    // Target Sliders
+    html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px;">';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;">Set Your Growth Targets</div>';
+
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">';
+
+    // Car Count Target
+    html += '<div>';
+    html += '<label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Car Count Increase</label>';
+    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<input type="range" id="fcCarTarget" min="0" max="50" value="10" style="flex:1;accent-color:var(--primary);" oninput="updateForecast()">';
+    html += '<span id="fcCarLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--green);min-width:40px;text-align:right;">+10%</span>';
+    html += '</div></div>';
+
+    // Ticket Average Target
+    html += '<div>';
+    html += '<label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Ticket Average Increase</label>';
+    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<input type="range" id="fcTicketTarget" min="0" max="50" value="5" style="flex:1;accent-color:var(--primary);" oninput="updateForecast()">';
+    html += '<span id="fcTicketLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--green);min-width:40px;text-align:right;">+5%</span>';
+    html += '</div></div>';
+
+    // Inspection Conversion Target
+    html += '<div>';
+    html += '<label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Upsell Conversion Target</label>';
+    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<input type="range" id="fcConvTarget" min="0" max="100" value="' + Math.round(Math.min(baseConv + 10, 80)) + '" style="flex:1;accent-color:var(--primary);" oninput="updateForecast()">';
+    html += '<span id="fcConvLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--blue);min-width:40px;text-align:right;">' + Math.round(Math.min(baseConv + 10, 80)) + '%</span>';
+    html += '</div></div>';
+
+    html += '</div>';
+
+    // Additional targets row
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:16px;">';
+
+    // New Stores
+    html += '<div>';
+    html += '<label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">New Stores to Add</label>';
+    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<input type="range" id="fcNewStores" min="0" max="20" value="0" style="flex:1;accent-color:var(--primary);" oninput="updateForecast()">';
+    html += '<span id="fcNewStoresLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:40px;text-align:right;">0</span>';
+    html += '</div></div>';
+
+    // Promo Reduction
+    html += '<div>';
+    html += '<label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Promo Discount Reduction</label>';
+    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<input type="range" id="fcPromoReduction" min="0" max="50" value="0" style="flex:1;accent-color:var(--primary);" oninput="updateForecast()">';
+    html += '<span id="fcPromoLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--orange);min-width:40px;text-align:right;">0%</span>';
+    html += '</div></div>';
+
+    // Timeframe
+    html += '<div>';
+    html += '<label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Forecast Period</label>';
+    html += '<select id="fcPeriod" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;" onchange="updateForecast()">';
+    html += '<option value="30">30 Days</option><option value="90" selected>90 Days (Quarter)</option><option value="180">180 Days (Half Year)</option><option value="365">365 Days (Annual)</option>';
+    html += '</select>';
+    html += '</div>';
+
+    html += '</div>';
+    html += '</div>';
+
+    // Projected Results
+    html += '<div id="forecastResults"></div>';
+
+    body.innerHTML = html;
+
+    // Store baseline in global for updateForecast
+    window._fcBaseline = { cpd: baseCPD, ta: baseTA, stores: baseStores, convRate: baseConv, promoPerCar: promoPerCar };
+
+    // Initial calculation
+    setTimeout(updateForecast, 100);
+  });
+}
+
+function updateForecast() {
+  const b = window._fcBaseline;
+  if (!b) return;
+
+  const carPct = +document.getElementById('fcCarTarget').value;
+  const ticketPct = +document.getElementById('fcTicketTarget').value;
+  const convTarget = +document.getElementById('fcConvTarget').value;
+  const newStores = +document.getElementById('fcNewStores').value;
+  const promoReduction = +document.getElementById('fcPromoReduction').value;
+  const period = +document.getElementById('fcPeriod').value;
+
+  // Update labels
+  document.getElementById('fcCarLabel').textContent = '+' + carPct + '%';
+  document.getElementById('fcTicketLabel').textContent = '+' + ticketPct + '%';
+  document.getElementById('fcConvLabel').textContent = convTarget + '%';
+  document.getElementById('fcNewStoresLabel').textContent = newStores;
+  document.getElementById('fcPromoLabel').textContent = '-' + promoReduction + '%';
+
+  // Calculate projections
+  const bizDays = Math.round(period * 26 / 30); // ~26 biz days per 30 calendar
+  const projCPD = b.cpd * (1 + carPct / 100);
+  const projTA = b.ta * (1 + ticketPct / 100);
+  const projStores = b.stores + newStores;
+  const projPromoSavings = b.promoPerCar * (promoReduction / 100) * projCPD * projStores * bizDays;
+
+  // Current projected revenue
+  const currentRev = b.cpd * b.ta * b.stores * bizDays;
+  const projectedRev = projCPD * projTA * projStores * bizDays;
+  const delta = projectedRev - currentRev + projPromoSavings;
+  const deltaPct = currentRev ? (delta / currentRev * 100) : 0;
+
+  // Revenue from new upsell conversion
+  const avgUpsellValue = b.ta * 0.15; // assume 15% of ticket avg
+  const additionalConvPct = Math.max(0, convTarget - b.convRate);
+  const projectedNewUpsells = projCPD * projStores * bizDays * (additionalConvPct / 100) * 0.3; // 30% of cars get inspected
+  const upsellRevenue = projectedNewUpsells * avgUpsellValue;
+
+  const totalProjected = projectedRev + projPromoSavings + upsellRevenue;
+  const totalDelta = totalProjected - currentRev;
+
+  let html = '';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:20px;">';
+  html += '<div class="kpi-card" style="border-left:3px solid var(--green);"><div class="kpi-label">Projected Revenue</div><div class="kpi-value" style="color:var(--green);">' + money(totalProjected) + '</div><div class="kpi-sub">' + period + '-day period</div></div>';
+  html += '<div class="kpi-card" style="border-left:3px solid var(--green);"><div class="kpi-label">Revenue Increase</div><div class="kpi-value" style="color:var(--green);">+' + money(totalDelta) + '</div><div class="kpi-sub">+' + pct(currentRev ? totalDelta / currentRev * 100 : 0) + ' growth</div></div>';
+  html += '<div class="kpi-card"><div class="kpi-label">Projected Cars/Day</div><div class="kpi-value">' + projCPD.toFixed(1) + '</div><div class="kpi-sub">' + projStores + ' stores</div></div>';
+  html += '<div class="kpi-card"><div class="kpi-label">Projected Ticket Avg</div><div class="kpi-value">' + money(projTA) + '</div><div class="kpi-sub">+' + money(projTA - b.ta) + ' per car</div></div>';
+  html += '</div>';
+
+  // Breakdown table
+  html += '<div class="table-wrap" style="margin:0;"><h3>Revenue Impact Breakdown</h3>';
+  html += '<div class="table-scroll"><table><thead><tr><th style="text-align:left;">Growth Driver</th><th>Current</th><th>Projected</th><th>Revenue Impact</th></tr></thead><tbody>';
+  html += '<tr><td style="text-align:left;">Car Count Growth (+' + carPct + '%)</td><td>' + b.cpd.toFixed(1) + ' CPD</td><td>' + projCPD.toFixed(1) + ' CPD</td><td style="color:var(--green);">+' + money((projCPD - b.cpd) * b.ta * b.stores * bizDays) + '</td></tr>';
+  html += '<tr><td style="text-align:left;">Ticket Average Growth (+' + ticketPct + '%)</td><td>' + money(b.ta) + '</td><td>' + money(projTA) + '</td><td style="color:var(--green);">+' + money(b.cpd * (projTA - b.ta) * b.stores * bizDays) + '</td></tr>';
+  if (newStores > 0) html += '<tr><td style="text-align:left;">New Stores (+' + newStores + ')</td><td>' + b.stores + ' stores</td><td>' + projStores + ' stores</td><td style="color:var(--green);">+' + money(projCPD * projTA * newStores * bizDays) + '</td></tr>';
+  if (promoReduction > 0) html += '<tr><td style="text-align:left;">Promo Discount Reduction (-' + promoReduction + '%)</td><td>' + money(b.promoPerCar) + '/car</td><td>' + money(b.promoPerCar * (1 - promoReduction / 100)) + '/car</td><td style="color:var(--green);">+' + money(projPromoSavings) + '</td></tr>';
+  if (additionalConvPct > 0) html += '<tr><td style="text-align:left;">Upsell Conversion (' + pct(b.convRate) + ' → ' + convTarget + '%)</td><td>' + pct(b.convRate) + '</td><td>' + convTarget + '%</td><td style="color:var(--green);">+' + money(upsellRevenue) + '</td></tr>';
+  html += '<tr style="font-weight:800;border-top:2px solid var(--primary);"><td style="text-align:left;">TOTAL IMPACT</td><td>' + money(currentRev) + '</td><td style="color:var(--green);">' + money(totalProjected) + '</td><td style="color:var(--green);font-size:16px;">+' + money(totalDelta) + '</td></tr>';
+  html += '</tbody></table></div></div>';
+
+  // Annualized projection
+  const annualMultiplier = 365 / period;
+  html += '<div style="margin-top:16px;padding:16px 20px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;text-align:center;">';
+  html += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--green);font-weight:700;margin-bottom:4px;">Annualized Impact</div>';
+  html += '<div style="font-size:28px;font-weight:800;color:var(--green);">+' + money(totalDelta * annualMultiplier) + '</div>';
+  html += '<div style="font-size:12px;color:var(--text-muted);">additional revenue per year at these growth rates</div>';
+  html += '</div>';
+
+  document.getElementById('forecastResults').innerHTML = html;
 }
 
 function renderDashboard() {
