@@ -3619,12 +3619,15 @@
 
   <!-- Forecast View -->
   <div class="view-content" id="view-forecast">
-    <!-- Store Selector -->
+    <!-- Store Selector + Export -->
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;">Forecast For:</div>
       <select id="fcStoreSelect" class="cmd-select" style="min-width:180px;" onchange="renderForecastView()">
         <option value="">All Stores (Company-Wide)</option>
       </select>
+      <div style="flex:1;"></div>
+      <button class="btn-export" onclick="exportForecast()" style="font-size:11px;padding:5px 14px;">Export Forecast</button>
+      <button class="btn-export" onclick="printForecast()" style="font-size:11px;padding:5px 14px;">Print / PDF</button>
     </div>
 
     <!-- Baseline KPIs -->
@@ -4775,6 +4778,101 @@ function renderForecastResults() {
   html += '</div>';
 
   document.getElementById('forecastResults').innerHTML = html;
+}
+
+function exportForecast() {
+  const b = window._fcBaseline;
+  if (!b) { alert('No forecast data. Set targets first.'); return; }
+  const carPct = +document.getElementById('fcCarTarget').value;
+  const ticketPct = +document.getElementById('fcTicketTarget').value;
+  const convTarget = +document.getElementById('fcConvTarget').value;
+  const newStores = +document.getElementById('fcNewStores').value;
+  const promoReduction = +document.getElementById('fcPromoReduction').value;
+  const period = +document.getElementById('fcPeriod').value;
+  const bizDays = Math.round(period * 26 / 30);
+  const projCPD = b.cpd * (1 + carPct / 100);
+  const projTA = b.ta * (1 + ticketPct / 100);
+  const projStores = b.stores + newStores;
+  const currentRev = b.cpd * b.ta * b.stores * bizDays;
+  const projectedRev = projCPD * projTA * projStores * bizDays;
+  const projPromoSavings = b.promoPerCar * (promoReduction / 100) * projCPD * projStores * bizDays;
+  const avgUpsellValue = b.ta * 0.15;
+  const additionalConvPct = Math.max(0, convTarget - b.convRate);
+  const upsellRevenue = projCPD * projStores * bizDays * (additionalConvPct / 100) * 0.3 * avgUpsellValue;
+  const totalProjected = projectedRev + projPromoSavings + upsellRevenue;
+  const totalDelta = totalProjected - currentRev;
+
+  const company = localStorage.getItem('bp_company') || 'Butler Performance Analytics';
+  const store = document.getElementById('fcStoreSelect')?.value;
+  const storeLabel = store ? 'Store #' + store : b.storeLabel;
+  const date = new Date().toLocaleDateString();
+
+  let csv = 'Butler Performance Analytics — Business Forecast Report\n';
+  csv += 'Generated,' + date + '\n';
+  csv += 'Client,' + company + '\n';
+  csv += 'Scope,' + storeLabel + '\n';
+  csv += 'Forecast Period,' + period + ' days (' + bizDays + ' business days)\n\n';
+  csv += 'CURRENT BASELINE\n';
+  csv += 'Metric,Value\n';
+  csv += 'Cars Per Day,' + b.cpd.toFixed(1) + '\n';
+  csv += 'Ticket Average,$' + b.ta.toFixed(2) + '\n';
+  csv += 'Stores,' + b.stores + '\n';
+  csv += 'Upsell Conversion,' + b.convRate.toFixed(1) + '%\n';
+  csv += 'Current Period Revenue,$' + currentRev.toFixed(2) + '\n\n';
+  csv += 'GROWTH TARGETS\n';
+  csv += 'Target,Value\n';
+  csv += 'Car Count Increase,+' + carPct + '%\n';
+  csv += 'Ticket Average Increase,+' + ticketPct + '%\n';
+  csv += 'Upsell Conversion Target,' + convTarget + '%\n';
+  csv += 'New Stores,' + newStores + '\n';
+  csv += 'Promo Discount Reduction,-' + promoReduction + '%\n\n';
+  csv += 'REVENUE IMPACT BREAKDOWN\n';
+  csv += 'Growth Driver,Current,Projected,Revenue Impact\n';
+  csv += 'Car Count Growth (+' + carPct + '%),' + b.cpd.toFixed(1) + ' CPD,' + projCPD.toFixed(1) + ' CPD,$' + ((projCPD - b.cpd) * b.ta * b.stores * bizDays).toFixed(2) + '\n';
+  csv += 'Ticket Average Growth (+' + ticketPct + '%),$' + b.ta.toFixed(2) + ',$' + projTA.toFixed(2) + ',$' + (b.cpd * (projTA - b.ta) * b.stores * bizDays).toFixed(2) + '\n';
+  if (newStores > 0) csv += 'New Stores (+' + newStores + '),' + b.stores + ' stores,' + projStores + ' stores,$' + (projCPD * projTA * newStores * bizDays).toFixed(2) + '\n';
+  if (promoReduction > 0) csv += 'Promo Reduction (-' + promoReduction + '%),$' + b.promoPerCar.toFixed(2) + '/car,$' + (b.promoPerCar * (1 - promoReduction / 100)).toFixed(2) + '/car,$' + projPromoSavings.toFixed(2) + '\n';
+  if (additionalConvPct > 0) csv += 'Upsell Conversion (' + b.convRate.toFixed(1) + '% → ' + convTarget + '%),' + b.convRate.toFixed(1) + '%,' + convTarget + '%,$' + upsellRevenue.toFixed(2) + '\n';
+  csv += '\nTOTAL PROJECTED REVENUE,$' + totalProjected.toFixed(2) + '\n';
+  csv += 'TOTAL REVENUE INCREASE,$' + totalDelta.toFixed(2) + '\n';
+  csv += 'ANNUALIZED IMPACT,$' + (totalDelta * 365 / period).toFixed(2) + '\n';
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'BPA_Forecast_' + (store || 'All_Stores') + '_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+}
+
+function printForecast() {
+  const content = document.getElementById('view-forecast');
+  if (!content) return;
+  const w = window.open('', '_blank');
+  w.document.write('<html><head><title>BPA Forecast Report</title><style>');
+  w.document.write('body{font-family:Segoe UI,system-ui,sans-serif;padding:24px;color:#222;background:white;}');
+  w.document.write('.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0;}');
+  w.document.write('.kpi-card{border:1px solid #ddd;border-radius:8px;padding:14px;}');
+  w.document.write('.kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#666;margin-bottom:4px;}');
+  w.document.write('.kpi-value{font-size:22px;font-weight:700;}');
+  w.document.write('.kpi-sub{font-size:11px;color:#888;}');
+  w.document.write('table{width:100%;border-collapse:collapse;font-size:13px;}');
+  w.document.write('th,td{padding:8px 10px;border-bottom:1px solid #eee;text-align:right;}');
+  w.document.write('th{background:#f5f5f5;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#666;}');
+  w.document.write('td:first-child,th:first-child{text-align:left;}');
+  w.document.write('input[type=range],select,.nav-util-btn,.btn-export,.cmd-select{display:none!important;}');
+  w.document.write('h1{font-size:18px;margin-bottom:4px;} .sub{font-size:12px;color:#666;margin-bottom:16px;}');
+  w.document.write('@media print{body{padding:0;}}');
+  w.document.write('</style></head><body>');
+  w.document.write('<h1>Butler Performance Analytics — Business Forecast</h1>');
+  w.document.write('<div class="sub">' + (localStorage.getItem('bp_company') || '') + ' · Generated ' + new Date().toLocaleDateString() + '</div>');
+  // Clone the baseline KPIs and results (skip the sliders)
+  const baseline = document.getElementById('fcBaselineKPIs');
+  if (baseline) w.document.write('<h3 style="margin-top:20px;">Current Baseline</h3>' + baseline.outerHTML);
+  const results = document.getElementById('forecastResults');
+  if (results) w.document.write('<h3 style="margin-top:20px;">Projected Results</h3>' + results.innerHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(() => w.print(), 300);
 }
 
 function renderDashboard() {
