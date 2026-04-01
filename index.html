@@ -3222,35 +3222,26 @@
     </div>
     <div class="kpi-grid" id="dashKPIs"></div>
 
-    <!-- Two-column body -->
-    <div style="display:grid;grid-template-columns:3fr 2fr;gap:20px;">
-      <!-- Left: Charts + Store Rankings -->
-      <div>
-        <div class="chart-card" style="margin-bottom:16px;">
-          <h3>Revenue Trend</h3>
-          <div class="chart-wrap" style="height:280px;"><canvas id="chartDashRevenue"></canvas></div>
-        </div>
-        <div class="ops-grid-wrap" style="margin-bottom:0;">
-          <h3 style="display:flex;align-items:center;justify-content:space-between;">
-            Top & Bottom Stores
-            <span style="font-size:10px;font-weight:500;color:var(--text-muted);cursor:pointer;" onclick="navigateTo('stores')">View All &rarr;</span>
-          </h3>
-          <div style="max-height:280px;overflow-y:auto;">
-            <table class="ops-grid" id="dashStoreTable">
-              <thead><tr>
-                <th style="text-align:left;">Store</th>
-                <th>Revenue</th>
-                <th>Avg Ticket</th>
-                <th>Cars/Day</th>
-                <th>YoY %</th>
-              </tr></thead>
-              <tbody id="dashStoreBody"></tbody>
-            </table>
-          </div>
+    <!-- PRIMARY: Store Rankings Table + BPA Insights -->
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:16px;">
+      <div class="ops-grid-wrap" style="margin:0;">
+        <h3 style="display:flex;align-items:center;justify-content:space-between;">
+          Top & Bottom Stores
+          <span style="font-size:10px;font-weight:500;color:var(--text-muted);cursor:pointer;" onclick="navigateTo('stores')">View All &rarr;</span>
+        </h3>
+        <div style="max-height:320px;overflow-y:auto;">
+          <table class="ops-grid" id="dashStoreTable">
+            <thead><tr>
+              <th style="text-align:left;">Store</th>
+              <th>Revenue</th>
+              <th>Avg Ticket</th>
+              <th>Cars/Day</th>
+              <th>YoY %</th>
+            </tr></thead>
+            <tbody id="dashStoreBody"></tbody>
+          </table>
         </div>
       </div>
-
-      <!-- Right: BPA + Today + Quick Stats -->
       <div>
         <div class="today-snapshot" id="todaySnapshot">
           <div class="today-snapshot-header">
@@ -3260,10 +3251,18 @@
           <div class="today-snapshot-grid" id="todayStats"></div>
         </div>
         <div class="bpa-panel" id="bpaOverview"></div>
-        <div class="chart-card" style="margin-top:16px;">
-          <h3>Daily Volume</h3>
-          <div class="chart-wrap" style="height:200px;"><canvas id="chartDashVolume"></canvas></div>
-        </div>
+      </div>
+    </div>
+
+    <!-- SUPPORTING: Charts -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+      <div class="chart-card" style="margin:0;">
+        <h3>Revenue Trend</h3>
+        <div class="chart-wrap" style="height:220px;"><canvas id="chartDashRevenue"></canvas></div>
+      </div>
+      <div class="chart-card" style="margin:0;">
+        <h3>Daily Volume</h3>
+        <div class="chart-wrap" style="height:220px;"><canvas id="chartDashVolume"></canvas></div>
       </div>
     </div>
   </div>
@@ -3273,128 +3272,87 @@
     <!-- KPI Tiles -->
     <div class="kpi-grid" id="revenueKPIs"></div>
 
-    <!-- Charts Row: Revenue by Category + Revenue by Type -->
+    <!-- PRIMARY: Data Tables (2-column) -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-      <div class="chart-card">
-        <h3>Revenue by Category</h3>
-        <div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Revenue by Type</h3>
-        <div class="chart-wrap"><canvas id="chartRevByType"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Charts Row: Ticket Distribution + Discount Impact -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-      <div class="chart-card">
-        <h3>Ticket Distribution</h3>
-        <div class="chart-wrap"><canvas id="chartTicketDist"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Discount Impact — Top Promos</h3>
-        <div class="chart-wrap"><canvas id="chartDiscountImpact"></canvas></div>
-      </div>
-    </div>
-
-    <!-- BPA Insights -->
-    <div class="bpa-panel" id="bpaRevenue"></div>
-
-    <!-- Service & Product Breakdown Table -->
-    <div class="export-bar">
-      <button class="btn-export" onclick="exportReport('tblServices','Service & Product Breakdown')">Export</button>
-    </div>
-    <div class="table-wrap">
-      <h3>Service & Product Breakdown</h3>
-      <div class="table-scroll">
-        <table id="tblServices">
-          <thead><tr>
+      <div class="table-wrap" style="margin:0;">
+        <h3 style="display:flex;align-items:center;justify-content:space-between;">Service & Product Breakdown <button class="btn-export" onclick="exportReport('tblServices','Service & Product Breakdown')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
+        <div class="table-scroll" style="max-height:340px;">
+          <table id="tblServices"><thead><tr>
             <th class="sortable" data-col="0">Category</th>
             <th class="sortable" data-col="1">Description</th>
             <th class="sortable" data-col="2">Type</th>
             <th class="sortable" data-col="3">Qty Sold</th>
             <th class="sortable" data-col="4">Revenue</th>
             <th class="sortable" data-col="5">Avg Price</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
+          </tr></thead><tbody></tbody></table>
+        </div>
       </div>
-    </div>
-
-    <!-- Promo Details Table -->
-    <div class="export-bar" style="margin-top:16px;">
-      <button class="btn-export" onclick="exportReport('tblPromos','Promotion Details')">Export</button>
-    </div>
-    <div class="table-wrap">
-      <h3>Promotion Details</h3>
-      <div class="table-scroll">
-        <table id="tblPromos">
-          <thead><tr>
+      <div class="table-wrap" style="margin:0;">
+        <h3 style="display:flex;align-items:center;justify-content:space-between;">Promotion Details <button class="btn-export" onclick="exportReport('tblPromos','Promotion Details')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
+        <div class="table-scroll" style="max-height:340px;">
+          <table id="tblPromos"><thead><tr>
             <th class="sortable" data-col="0">Promo Code</th>
             <th class="sortable" data-col="1">Uses</th>
             <th class="sortable" data-col="2">Total Discount</th>
             <th class="sortable" data-col="3">Avg Discount</th>
             <th class="sortable" data-col="4">Stores</th>
-            <th class="sortable" data-col="5">Avg Invoice w/ Promo</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
+            <th class="sortable" data-col="5">Avg Invoice</th>
+          </tr></thead><tbody></tbody></table>
+        </div>
       </div>
     </div>
 
-    <!-- Market Intelligence -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;margin-bottom:16px;">
-      <div class="chart-card">
-        <h3>Revenue Forecast (90-Day Projection)</h3>
-        <div class="chart-wrap"><canvas id="chartRevForecast"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Seasonal Revenue Pattern</h3>
-        <div class="chart-wrap"><canvas id="chartSeasonal"></canvas></div>
-      </div>
-    </div>
-    <div class="bpa-panel" id="bpaMarket"></div>
-
-    <!-- Trade Area + Service Mix -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">ZIP Code Analysis</div>
-        <div id="zipAnalysis" style="max-height:350px;overflow-y:auto;"></div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Service Mix Opportunity</div>
-        <div id="serviceMixAnalysis" style="max-height:350px;overflow-y:auto;"></div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Customer Retention</div>
-        <div id="retentionAnalysis" style="max-height:350px;overflow-y:auto;"></div>
-      </div>
-    </div>
-
-    <!-- Store Scorecard + Fleet -->
+    <!-- Store Scorecard + Fleet (data first) -->
     <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:16px;">
       <div class="ops-grid-wrap" style="margin:0;">
         <h3>Store Opportunity Scorecard</h3>
-        <div class="ops-grid-scroll" style="max-height:350px;">
-          <table class="ops-grid" id="tblOpportunity">
-            <thead><tr>
-              <th style="text-align:left;">Store</th>
-              <th>Rev/Vehicle</th>
-              <th>Ancillary %</th>
-              <th>Data Quality</th>
-              <th>Efficiency</th>
-              <th>Upsell Rate</th>
-              <th>Score</th>
-            </tr></thead>
-            <tbody id="opportunityBody"></tbody>
-          </table>
+        <div class="ops-grid-scroll" style="max-height:300px;">
+          <table class="ops-grid" id="tblOpportunity"><thead><tr>
+            <th style="text-align:left;">Store</th><th>Rev/Vehicle</th><th>Ancillary %</th><th>Data Quality</th><th>Efficiency</th><th>Upsell Rate</th><th>Score</th>
+          </tr></thead><tbody id="opportunityBody"></tbody></table>
         </div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;">Fleet vs Retail</div>
-        <div id="fleetAnalysis"></div>
-        <div class="chart-wrap" style="height:200px;margin-top:12px;"><canvas id="chartFleetMix"></canvas></div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Fleet vs Retail</div>
+          <div id="fleetAnalysis"></div>
+        </div>
+        <div class="chart-card" style="margin:0;"><div class="chart-wrap" style="height:180px;"><canvas id="chartFleetMix"></canvas></div></div>
       </div>
+    </div>
+
+    <!-- BPA Insights -->
+    <div class="bpa-panel" id="bpaRevenue"></div>
+
+    <!-- SUPPORTING: Charts (2x2 grid) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="chart-card"><h3>Revenue by Category</h3><div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div></div>
+      <div class="chart-card"><h3>Discount Impact</h3><div class="chart-wrap"><canvas id="chartDiscountImpact"></canvas></div></div>
+      <div class="chart-card"><h3>Revenue Forecast</h3><div class="chart-wrap"><canvas id="chartRevForecast"></canvas></div></div>
+      <div class="chart-card"><h3>Ticket Distribution</h3><div class="chart-wrap"><canvas id="chartTicketDist"></canvas></div></div>
+    </div>
+
+    <!-- Market Intelligence panels -->
+    <div class="bpa-panel" id="bpaMarket"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">ZIP Code Analysis</div>
+        <div id="zipAnalysis" style="max-height:250px;overflow-y:auto;"></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Service Mix</div>
+        <div id="serviceMixAnalysis" style="max-height:250px;overflow-y:auto;"></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Customer Retention</div>
+        <div id="retentionAnalysis" style="max-height:250px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- Hidden: canvases for render functions that need them -->
+    <div style="display:none;">
+      <canvas id="chartRevByType"></canvas>
+      <canvas id="chartSeasonal"></canvas>
     </div>
   </div>
 
@@ -3487,17 +3445,17 @@
     <!-- Single Store Mode: Store Detail Profile (hidden by default) -->
     <div id="storeDetailView" style="display:none;">
       <div class="kpi-grid" id="storeDetailKPIs"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div id="storeDetailTables"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
         <div class="chart-card">
           <h3 id="storeDetailChartTitle1">Service Times</h3>
-          <div class="chart-wrap" style="height:260px;"><canvas id="chartStoreDetail1"></canvas></div>
+          <div class="chart-wrap" style="height:240px;"><canvas id="chartStoreDetail1"></canvas></div>
         </div>
         <div class="chart-card">
           <h3 id="storeDetailChartTitle2">Inspections</h3>
-          <div class="chart-wrap" style="height:260px;"><canvas id="chartStoreDetail2"></canvas></div>
+          <div class="chart-wrap" style="height:240px;"><canvas id="chartStoreDetail2"></canvas></div>
         </div>
       </div>
-      <div id="storeDetailTables"></div>
     </div>
 
     <!-- Hidden render targets -->
