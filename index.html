@@ -3195,6 +3195,10 @@
     </div>
 
     <div class="file-list" id="fileList"></div>
+    <div id="launchBtnWrap" style="display:none;margin-top:20px;text-align:center;">
+      <button class="file-input-btn" onclick="launchDashboard();saveUserData();" style="width:100%;padding:14px;font-size:15px;border-radius:10px;">Launch Dashboard</button>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">You can always add more files later via "+ Add Files"</div>
+    </div>
   </div>
 </div>
 
@@ -3566,6 +3570,25 @@
 
   <!-- Reports View -->
   <div class="view-content" id="view-reports">
+    <!-- Service Mix Report (PRIMARY) -->
+    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">Service Mix Report <button class="btn-export" onclick="exportReport('tblServiceMix','Service Mix Report')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
+      <div class="ops-grid-scroll" style="max-height:380px;">
+        <table class="ops-grid" id="tblServiceMix">
+          <thead><tr>
+            <th style="min-width:120px;text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Category</th>
+            <th title="Total revenue from this category">Revenue</th>
+            <th title="Total units sold">Qty Sold</th>
+            <th title="Average price per unit">Avg Price</th>
+            <th title="Number of stores selling this category">Stores</th>
+            <th title="% of stores with this service">Penetration</th>
+            <th title="% of total revenue">Rev Share</th>
+          </tr></thead>
+          <tbody id="serviceMixBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- KPIs + Data Quality side by side -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
@@ -4056,14 +4079,17 @@ setTimeout(() => {
   }
 }, 500);
 
+let _allUploadResults = [];
+
 async function handleFiles(files) {
-  const results = [];
   for (const file of files) {
     const r = await processFile(file);
-    results.push(r);
+    // Avoid duplicate entries in the list
+    _allUploadResults = _allUploadResults.filter(x => x.name !== r.name);
+    _allUploadResults.push(r);
   }
 
-  fileListEl.innerHTML = results.map(r => `
+  fileListEl.innerHTML = _allUploadResults.map(r => `
     <div class="file-item">
       <span class="check">${r.type === 'unknown' ? '?' : '✓'}</span>
       <span class="name">${r.name}</span>
@@ -4071,13 +4097,14 @@ async function handleFiles(files) {
     </div>
   `).join('');
 
+  // Show launch button when any files are loaded
   const loadedCount = Object.keys(loadedFiles).length;
-  const hasGrow = Object.keys(loadedFiles).some(k => k.startsWith('grow_') || k.startsWith('custom_'));
-  if (loadedCount >= 2 || hasGrow) {
-    setTimeout(() => {
-      launchDashboard();
-      saveUserData(); // Persist data for this account
-    }, 500);
+  if (loadedCount > 0) {
+    const btn = document.getElementById('launchBtnWrap');
+    if (btn) {
+      btn.style.display = '';
+      btn.querySelector('button').textContent = 'Launch Dashboard (' + loadedCount + ' file' + (loadedCount > 1 ? 's' : '') + ' loaded)';
+    }
   }
 }
 
@@ -9705,6 +9732,49 @@ function renderReporting() {
   const det = FILTERED.details;
   const insp = FILTERED.inspections;
 
+  // ── Service Mix Table ──
+  const mixBody = document.getElementById('serviceMixBody');
+  if (mixBody && det.length) {
+    const catMap = {};
+    const storeSet = new Set();
+    det.forEach(r => {
+      const cat = r.JLI_Category_Code || 'Unknown';
+      if (!catMap[cat]) catMap[cat] = { revenue: 0, qty: 0, stores: new Set(), items: {} };
+      catMap[cat].revenue += (+r.Extended_Price || 0);
+      catMap[cat].qty += (+r.Quantity_Sold || 0);
+      if (r.Store_Number) { catMap[cat].stores.add(r.Store_Number); storeSet.add(r.Store_Number); }
+      // Track individual services for drill-down
+      const desc = r.Invoice_Detail_Description || 'Unknown';
+      if (!catMap[cat].items[desc]) catMap[cat].items[desc] = { revenue: 0, qty: 0, stores: new Set() };
+      catMap[cat].items[desc].revenue += (+r.Extended_Price || 0);
+      catMap[cat].items[desc].qty += (+r.Quantity_Sold || 0);
+      if (r.Store_Number) catMap[cat].items[desc].stores.add(r.Store_Number);
+    });
+    const totalRev = det.reduce((s, r) => s + (+r.Extended_Price || 0), 0);
+    const storeCount = storeSet.size;
+    const catArr = Object.entries(catMap).sort((a, b) => b[1].revenue - a[1].revenue);
+
+    // Store globally for drill-down
+    window._serviceMixData = catMap;
+    window._serviceMixStoreCount = storeCount;
+
+    mixBody.innerHTML = catArr.map(([cat, d]) => {
+      const avgPrice = d.qty ? d.revenue / d.qty : 0;
+      const pen = storeCount ? (d.stores.size / storeCount * 100) : 0;
+      const share = totalRev ? (d.revenue / totalRev * 100) : 0;
+      return '<tr style="cursor:pointer;" onclick="drillServiceCategory(\'' + cat.replace(/'/g, "\\'") + '\')">' +
+        '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">' + cat + '</td>' +
+        '<td>' + money(d.revenue) + '</td>' +
+        '<td>' + num(Math.round(d.qty)) + '</td>' +
+        '<td>' + money(avgPrice) + '</td>' +
+        '<td>' + d.stores.size + ' / ' + storeCount + '</td>' +
+        '<td class="' + (pen >= 80 ? 'cell-green' : pen >= 50 ? 'cell-yellow' : 'cell-red') + '">' + pct(pen) + '</td>' +
+        '<td>' + pct(share) + '</td></tr>';
+    }).join('');
+  } else if (mixBody) {
+    mixBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:20px;">Load invoice detail data to see service mix</td></tr>';
+  }
+
   // KPIs
   const mailable = cust.filter(hasValidAddress).length;
   const mailPct = cust.length ? (mailable / cust.length * 100) : 0;
@@ -9895,6 +9965,64 @@ function openReportingReport(id) {
       break;
     }
   }
+}
+
+// ============================================================
+// SERVICE MIX DRILL-DOWN
+// ============================================================
+function drillServiceCategory(cat) {
+  const data = window._serviceMixData;
+  const storeCount = window._serviceMixStoreCount || 1;
+  if (!data || !data[cat]) return;
+
+  const d = data[cat];
+  const items = Object.entries(d.items).sort((a, b) => b[1].revenue - a[1].revenue);
+
+  openReportModal('Service Category: ' + cat, function(body) {
+    // Category KPIs
+    const avgPrice = d.qty ? d.revenue / d.qty : 0;
+    const pen = storeCount ? (d.stores.size / storeCount * 100) : 0;
+
+    let html = '<div class="kpi-grid" style="margin-bottom:20px;">';
+    html += '<div class="kpi-card"><div class="kpi-label">Total Revenue</div><div class="kpi-value">' + money(d.revenue) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Qty Sold</div><div class="kpi-value">' + num(Math.round(d.qty)) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Avg Price</div><div class="kpi-value">' + money(avgPrice) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Store Penetration</div><div class="kpi-value" style="color:' + (pen >= 80 ? 'var(--green)' : pen >= 50 ? 'var(--yellow)' : 'var(--red)') + ';">' + pct(pen) + '</div><div class="kpi-sub">' + d.stores.size + ' of ' + storeCount + ' stores</div></div>';
+    html += '</div>';
+
+    // Individual services table
+    html += '<div class="table-wrap" style="margin:0;"><h3>Services in ' + cat + '</h3>';
+    html += '<div class="table-scroll" style="max-height:calc(100vh - 240px);"><table>';
+    html += '<thead><tr><th style="text-align:left;">Service Description</th><th>Revenue</th><th>Qty Sold</th><th>Avg Price</th><th>Stores</th></tr></thead><tbody>';
+    items.forEach(([name, s]) => {
+      const sAvg = s.qty ? s.revenue / s.qty : 0;
+      html += '<tr><td style="text-align:left;">' + name + '</td><td>' + money(s.revenue) + '</td><td>' + num(Math.round(s.qty)) + '</td><td>' + money(sAvg) + '</td><td>' + s.stores.size + '</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+
+    // Per-store breakdown
+    const storeBreakdown = {};
+    FILTERED.details.filter(r => r.JLI_Category_Code === cat).forEach(r => {
+      const s = r.Store_Number;
+      if (!storeBreakdown[s]) storeBreakdown[s] = { revenue: 0, qty: 0 };
+      storeBreakdown[s].revenue += (+r.Extended_Price || 0);
+      storeBreakdown[s].qty += (+r.Quantity_Sold || 0);
+    });
+    const storeArr = Object.entries(storeBreakdown).sort((a, b) => b[1].revenue - a[1].revenue);
+
+    if (storeArr.length) {
+      html += '<div class="table-wrap" style="margin-top:16px;"><h3>By Store</h3>';
+      html += '<div class="table-scroll" style="max-height:300px;"><table>';
+      html += '<thead><tr><th style="text-align:left;">Store</th><th>Revenue</th><th>Qty Sold</th><th>Avg Price</th></tr></thead><tbody>';
+      storeArr.forEach(([store, s]) => {
+        const sAvg = s.qty ? s.revenue / s.qty : 0;
+        html += '<tr style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + store + '\')"><td style="text-align:left;font-weight:600;">#' + store + '</td><td>' + money(s.revenue) + '</td><td>' + num(Math.round(s.qty)) + '</td><td>' + money(sAvg) + '</td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+    }
+
+    body.innerHTML = html;
+  }, function() { exportReport('tblServiceMix', 'Service Mix - ' + cat); });
 }
 
 // ============================================================
