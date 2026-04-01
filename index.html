@@ -3633,6 +3633,33 @@
     <!-- Baseline KPIs -->
     <div class="kpi-grid" id="fcBaselineKPIs"></div>
 
+    <!-- Month Actuals Table (auto-populated) -->
+    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+        Store Performance — Current Period
+        <button class="btn-export" onclick="exportReport('fcActualsTable','Store Actuals')" style="font-size:10px;padding:3px 10px;">Export</button>
+      </h3>
+      <div class="ops-grid-scroll" style="max-height:280px;">
+        <table class="ops-grid" id="fcActualsTable">
+          <thead><tr>
+            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
+            <th title="Net Sales">Net Sales</th>
+            <th title="Total Vehicles">Vehicles</th>
+            <th title="Ticket Average">Ticket Avg</th>
+            <th title="Labor % of Net Sales">Labor %</th>
+            <th title="Cars Per Day">CPD</th>
+            <th title="Labor Hours Per Vehicle">MHPV</th>
+            <th title="Air Filter % of Vehicles">AF %</th>
+            <th title="Cabin Air Filter %">CAF %</th>
+            <th title="Wiper Blades %">WB %</th>
+            <th title="Tire Rotation %">Tire Rot %</th>
+            <th title="Brake Service Count">Brakes</th>
+          </tr></thead>
+          <tbody id="fcActualsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Target Sliders -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;">
       <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;">Growth Targets</div>
@@ -3683,6 +3710,28 @@
             <option value="365">365 Days (Annual)</option>
           </select>
         </div>
+      </div>
+    </div>
+
+    <!-- Per-Store Targets Table (editable) -->
+    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+        Store Targets — Forecast Period
+        <button class="btn-export" onclick="exportForecastTargets()" style="font-size:10px;padding:3px 10px;">Export Targets</button>
+      </h3>
+      <div class="ops-grid-scroll" style="max-height:280px;">
+        <table class="ops-grid" id="fcTargetsTable">
+          <thead><tr>
+            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
+            <th>Target Net Sales</th>
+            <th>Target Cars</th>
+            <th>Target TA</th>
+            <th>Target Labor %</th>
+            <th>Daily Revenue</th>
+            <th>Weekly Cars</th>
+          </tr></thead>
+          <tbody id="fcTargetsBody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -4703,6 +4752,76 @@ function renderForecastView(storeOverride) {
     `;
   }
 
+  // ── Actuals Table ──
+  const actualsBody = document.getElementById('fcActualsBody');
+  if (actualsBody) {
+    // Get per-store data from transaction data or GROW
+    const storeData = {};
+    const allCust = selectedStore ? cust : FILTERED.customers;
+    allCust.forEach(r => {
+      const s = r.Store_Number;
+      if (!storeData[s]) storeData[s] = { rev: 0, inv: 0, bayTimes: [] };
+      storeData[s].rev += (+r.Net_Sales || 0);
+      storeData[s].inv++;
+      const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+      if (bay !== null && bay > 0 && bay < 180) storeData[s].bayTimes.push(bay);
+    });
+
+    // Service category penetration from details
+    const allDet = selectedStore ? FILTERED.details.filter(r => r.Store_Number === selectedStore) : FILTERED.details;
+    const storeSvc = {};
+    allDet.forEach(r => {
+      const s = r.Store_Number;
+      if (!storeSvc[s]) storeSvc[s] = {};
+      const cat = (r.JLI_Category_Code || '').toUpperCase();
+      if (!storeSvc[s][cat]) storeSvc[s][cat] = 0;
+      storeSvc[s][cat] += (+r.Quantity_Sold || 0);
+    });
+
+    // Also try GROW KPI Actuals
+    const growActuals = {};
+    GROW.kpi_actuals.forEach(r => {
+      const s = (r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').trim();
+      if (s) growActuals[s] = r;
+    });
+
+    const allStoreNums = [...new Set([...Object.keys(storeData), ...Object.keys(growActuals)])].sort((a,b) => +a - +b);
+
+    let actualsHTML = '';
+    allStoreNums.forEach(s => {
+      const d = storeData[s] || { rev: 0, inv: 0, bayTimes: [] };
+      const g = growActuals[s];
+      const rev = g ? parseGrowNum(g.Net_Sales) || d.rev : d.rev;
+      const veh = g ? parseGrowNum(g.Vehicle_Count) || d.inv : d.inv;
+      const ta = veh ? rev / veh : 0;
+      const labor = g ? (parseGrowNum(g.Labor_PCT_Sales) || 0) : 0;
+      const mhpv = g ? (parseGrowNum(g.Labor_Hours_Per_Vehicle) || 0) : 0;
+      const cpd = daySpan ? veh / daySpan : 0;
+      const svc = storeSvc[s] || {};
+      const afPct = veh ? ((svc['AF'] || 0) / veh * 100) : 0;
+      const cafPct = veh ? ((svc['CAF'] || 0) / veh * 100) : 0;
+      const wbPct = veh ? ((svc['WB'] || 0) / veh * 100) : 0;
+      const trPct = veh ? ((svc['TRA'] || svc['TR'] || 0) / veh * 100) : 0;
+      const brakes = svc['BRK'] || svc['BRAKE'] || 0;
+
+      actualsHTML += '<tr style="cursor:pointer;" onclick="document.getElementById(\'fcStoreSelect\').value=\'' + s + '\';renderForecastView()">';
+      actualsHTML += '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">#' + s + '</td>';
+      actualsHTML += '<td>' + money(rev) + '</td>';
+      actualsHTML += '<td>' + num(veh) + '</td>';
+      actualsHTML += '<td>' + money(ta) + '</td>';
+      actualsHTML += '<td>' + (labor ? pct(typeof labor === 'number' && labor < 1 ? labor * 100 : labor) : '--') + '</td>';
+      actualsHTML += '<td>' + cpd.toFixed(1) + '</td>';
+      actualsHTML += '<td>' + (mhpv ? mhpv.toFixed(2) : '--') + '</td>';
+      actualsHTML += '<td>' + (afPct ? pct(afPct) : '--') + '</td>';
+      actualsHTML += '<td>' + (cafPct ? pct(cafPct) : '--') + '</td>';
+      actualsHTML += '<td>' + (wbPct ? pct(wbPct) : '--') + '</td>';
+      actualsHTML += '<td>' + (trPct ? pct(trPct) : '--') + '</td>';
+      actualsHTML += '<td>' + (brakes ? num(Math.round(brakes)) : '--') + '</td>';
+      actualsHTML += '</tr>';
+    });
+    actualsBody.innerHTML = actualsHTML || '<tr><td colspan="12" style="text-align:center;color:var(--text-muted);padding:20px;">No store data available</td></tr>';
+  }
+
   // Store baseline for results calculation
   window._fcBaseline = { cpd: baseCPD, ta: baseTA, stores: baseStores, convRate: baseConv, promoPerCar: promoPerCar, storeLabel: storeLabel };
 
@@ -4777,6 +4896,34 @@ function renderForecastResults() {
   html += '<div style="font-size:12px;color:var(--text-muted);">additional revenue per year at these growth rates</div>';
   html += '</div>';
 
+  // ── Per-Store Targets Table ──
+  const targetsBody = document.getElementById('fcTargetsBody');
+  if (targetsBody && b.stores > 0) {
+    const storeNums = [];
+    FILTERED.customers.forEach(r => { if (r.Store_Number && !storeNums.includes(r.Store_Number)) storeNums.push(r.Store_Number); });
+    [GROW.kpi_actuals, GROW.sales_summary].forEach(arr => arr.forEach(r => { const s = (r.Store_Number||'').replace(/^Store\s*Id:\s*/i,'').trim(); if (s && !storeNums.includes(s)) storeNums.push(s); }));
+    storeNums.sort((a,b) => +a - +b);
+
+    const perStoreRev = projectedRev / projStores;
+    const perStoreCars = projCPD * bizDays;
+    const dailyPerStore = perStoreRev / bizDays;
+    const weeklyPerStoreCars = projCPD * (bizDays / (period / 7));
+
+    let tHTML = '';
+    storeNums.forEach(s => {
+      tHTML += '<tr>';
+      tHTML += '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">#' + s + '</td>';
+      tHTML += '<td style="color:var(--green);">' + money(perStoreRev) + '</td>';
+      tHTML += '<td>' + num(Math.round(perStoreCars)) + '</td>';
+      tHTML += '<td>' + money(projTA) + '</td>';
+      tHTML += '<td>22.5%</td>';
+      tHTML += '<td>' + money(dailyPerStore) + '</td>';
+      tHTML += '<td>' + projCPD.toFixed(1) + '</td>';
+      tHTML += '</tr>';
+    });
+    targetsBody.innerHTML = tHTML;
+  }
+
   document.getElementById('forecastResults').innerHTML = html;
 }
 
@@ -4841,6 +4988,51 @@ function exportForecast() {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'BPA_Forecast_' + (store || 'All_Stores') + '_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+}
+
+function exportForecastTargets() {
+  const b = window._fcBaseline;
+  if (!b) { alert('Set targets first.'); return; }
+  const carPct = +document.getElementById('fcCarTarget').value;
+  const ticketPct = +document.getElementById('fcTicketTarget').value;
+  const period = +document.getElementById('fcPeriod').value;
+  const bizDays = Math.round(period * 26 / 30);
+  const projCPD = b.cpd * (1 + carPct / 100);
+  const projTA = b.ta * (1 + ticketPct / 100);
+  const projStores = b.stores + (+document.getElementById('fcNewStores').value);
+  const perStoreRev = projCPD * projTA * bizDays;
+  const dailyPerStore = perStoreRev / bizDays;
+
+  const company = localStorage.getItem('bp_company') || 'BPA';
+  const storeNums = [];
+  FILTERED.customers.forEach(r => { if (r.Store_Number && !storeNums.includes(r.Store_Number)) storeNums.push(r.Store_Number); });
+  [GROW.kpi_actuals, GROW.sales_summary].forEach(arr => arr.forEach(r => { const s = (r.Store_Number||'').replace(/^Store\s*Id:\s*/i,'').trim(); if (s && !storeNums.includes(s)) storeNums.push(s); }));
+  storeNums.sort((a,b) => +a - +b);
+
+  // Day-of-week weights (Mon-Sat, typical auto service distribution)
+  const dayWeights = { Monday: 0.155, Tuesday: 0.145, Wednesday: 0.16, Thursday: 0.165, Friday: 0.19, Saturday: 0.185 };
+
+  let csv = company + ' — Monthly Forecast Report\n';
+  csv += 'Generated,' + new Date().toLocaleDateString() + '\n';
+  csv += 'Forecast Period,' + period + ' days\n\n';
+  csv += 'STORE TARGETS\n';
+  csv += 'Store,Target Net Sales,Target Cars,Target Ticket Avg,Target Labor %,Daily Revenue,Weekly Cars,Target CPD\n';
+  storeNums.forEach(s => {
+    csv += s + ',' + perStoreRev.toFixed(2) + ',' + Math.round(projCPD * bizDays) + ',' + projTA.toFixed(2) + ',22.5%,' + dailyPerStore.toFixed(2) + ',' + projCPD.toFixed(1) + ',' + projCPD.toFixed(1) + '\n';
+  });
+  csv += '\nDAILY NET SALES GOALS\n';
+  csv += 'Store,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday\n';
+  storeNums.forEach(s => {
+    csv += s;
+    Object.values(dayWeights).forEach(w => { csv += ',' + (dailyPerStore * w / 0.16667).toFixed(2); });
+    csv += '\n';
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'BPA_Monthly_Targets_' + new Date().toISOString().split('T')[0] + '.csv';
   a.click();
 }
 
