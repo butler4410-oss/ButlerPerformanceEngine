@@ -3324,6 +3324,50 @@
     <!-- KPI Tiles -->
     <div class="kpi-grid" id="revenueKPIs"></div>
 
+    <!-- Product Analysis -->
+    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+        Product & Service Analysis
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="productCatFilter" class="cmd-select" style="min-width:140px;" onchange="renderProductAnalysis()">
+            <option value="">All Categories</option>
+          </select>
+          <button class="btn-export" onclick="exportReport('tblProductAnalysis','Product Analysis')" style="font-size:10px;padding:3px 10px;">Export</button>
+        </div>
+      </h3>
+      <div class="ops-grid-scroll" style="max-height:450px;">
+        <table class="ops-grid" id="tblProductAnalysis">
+          <thead><tr>
+            <th style="text-align:left;min-width:50px;position:sticky;left:0;z-index:3;background:var(--card);">Category</th>
+            <th style="text-align:left;min-width:180px;">Product / Service</th>
+            <th title="Total units sold">Qty Sold</th>
+            <th title="Total revenue">Revenue</th>
+            <th title="Average price per unit">Avg Price</th>
+            <th title="Number of transactions with this product">Transactions</th>
+            <th title="Number of stores selling this">Stores</th>
+            <th title="% of all transactions that include this product">Attach Rate</th>
+          </tr></thead>
+          <tbody id="productAnalysisBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recommendations (suggested but not sold) -->
+    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+      <h3>Recommendations <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Suggested but not purchased</span></h3>
+      <div class="ops-grid-scroll" style="max-height:250px;">
+        <table class="ops-grid" id="tblRecommendations">
+          <thead><tr>
+            <th style="text-align:left;min-width:200px;">Recommendation</th>
+            <th>Times Suggested</th>
+            <th>Stores</th>
+            <th title="% of all transactions where this was recommended">Suggest Rate</th>
+          </tr></thead>
+          <tbody id="recommendationsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- PRIMARY: Data Tables (2-column) -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
       <div class="table-wrap" style="margin:0;">
@@ -6475,6 +6519,142 @@ function renderRevenue() {
       options: { indexAxis: 'y', scales: { x: { ticks: { callback: tickMoney } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: tooltipMoney } } } }
     });
   }
+
+  renderProductAnalysis();
+}
+
+function renderProductAnalysis() {
+  const det = FILTERED.details;
+  const cust = FILTERED.customers;
+  const body = document.getElementById('productAnalysisBody');
+  const catFilter = document.getElementById('productCatFilter');
+  if (!body) return;
+
+  if (!det.length) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Load transaction detail data to see product analysis</td></tr>';
+    return;
+  }
+
+  const totalTransactions = cust.length;
+  const selectedCat = catFilter ? catFilter.value : '';
+
+  // Build product map
+  const products = {};
+  const categories = new Set();
+  det.forEach(r => {
+    const cat = r.JLI_Category_Code || 'OTHER';
+    const desc = r.Invoice_Detail_Description || r.Invoice_Detail_Code || 'Unknown';
+    const code = r.Invoice_Detail_Code || '';
+    categories.add(cat);
+    if (selectedCat && cat !== selectedCat) return;
+    // Skip recommendations (they're suggestions, not sales)
+    if (r.Invoice_Detail_Type === 'RECOMMENDATION') return;
+    const key = cat + '||' + desc;
+    if (!products[key]) products[key] = { cat: cat, desc: desc, code: code, qty: 0, revenue: 0, transactions: new Set(), stores: new Set() };
+    products[key].qty += parseFloat(r.Quantity_Sold) || 0;
+    products[key].revenue += parseFloat(r.Extended_Price) || 0;
+    if (r.Invoice_Number) products[key].transactions.add(r.Invoice_Number);
+    if (r.Store_Number) products[key].stores.add(r.Store_Number);
+  });
+
+  // Populate category filter if empty
+  if (catFilter && catFilter.options.length <= 1) {
+    [...categories].sort().forEach(c => {
+      catFilter.innerHTML += '<option value="' + c + '">' + c + '</option>';
+    });
+  }
+
+  // Sort by revenue
+  const sorted = Object.values(products).sort((a, b) => b.revenue - a.revenue);
+
+  body.innerHTML = sorted.length ? sorted.map(p => {
+    const avgPrice = p.qty ? p.revenue / p.qty : 0;
+    const attachRate = totalTransactions ? (p.transactions.size / totalTransactions * 100) : 0;
+    // Color code by category type
+    const catColors = { 'FS': 'var(--primary)', 'OIL': 'var(--blue)', 'OF': 'var(--text-muted)', 'AF': 'var(--green)', 'CAF': 'var(--green)', 'TRS': 'var(--yellow)', 'ATS': 'var(--orange)', 'BKS': 'var(--red)', 'FIS': 'var(--orange)', 'ADD': 'var(--blue)', 'REC': 'var(--text-muted)' };
+    const catColor = catColors[p.cat] || 'var(--text-muted)';
+    return '<tr style="cursor:pointer;" onclick="drillProduct(\'' + p.cat.replace(/'/g,"\\'") + '\',\'' + p.desc.replace(/'/g,"\\'") + '\')">' +
+      '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);"><span style="color:' + catColor + ';font-weight:700;">' + p.cat + '</span></td>' +
+      '<td style="text-align:left;">' + p.desc + '</td>' +
+      '<td>' + num(Math.round(p.qty)) + '</td>' +
+      '<td>' + money(p.revenue) + '</td>' +
+      '<td>' + money(avgPrice) + '</td>' +
+      '<td>' + num(p.transactions.size) + '</td>' +
+      '<td>' + p.stores.size + '</td>' +
+      '<td>' + pct(attachRate) + '</td></tr>';
+  }).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">No products match the selected category</td></tr>';
+
+  // Recommendations table
+  const recBody = document.getElementById('recommendationsBody');
+  if (recBody) {
+    const recs = {};
+    det.forEach(r => {
+      if (r.Invoice_Detail_Type !== 'RECOMMENDATION') return;
+      const desc = r.Invoice_Detail_Description || r.Invoice_Detail_Code || 'Unknown';
+      if (!recs[desc]) recs[desc] = { count: 0, stores: new Set() };
+      recs[desc].count++;
+      if (r.Store_Number) recs[desc].stores.add(r.Store_Number);
+    });
+    const recArr = Object.entries(recs).sort((a,b) => b[1].count - a[1].count);
+    recBody.innerHTML = recArr.length ? recArr.map(([desc, d]) => {
+      const suggestRate = totalTransactions ? (d.count / totalTransactions * 100) : 0;
+      return '<tr><td style="text-align:left;">' + desc + '</td><td>' + num(d.count) + '</td><td>' + d.stores.size + '</td><td>' + pct(suggestRate) + '</td></tr>';
+    }).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No recommendations found</td></tr>';
+  }
+}
+
+function drillProduct(cat, desc) {
+  const det = FILTERED.details.filter(r => r.JLI_Category_Code === cat && (r.Invoice_Detail_Description || r.Invoice_Detail_Code) === desc);
+  const cust = FILTERED.customers;
+
+  // Find which customers bought this product
+  const invoiceNums = new Set(det.map(r => r.Invoice_Number));
+  const buyers = cust.filter(r => invoiceNums.has(r.Invoice_Number));
+
+  // Per-store breakdown
+  const storeMap = {};
+  det.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeMap[s]) storeMap[s] = { qty: 0, rev: 0, txns: 0 };
+    storeMap[s].qty += parseFloat(r.Quantity_Sold) || 0;
+    storeMap[s].rev += parseFloat(r.Extended_Price) || 0;
+    storeMap[s].txns++;
+  });
+
+  const totalRev = det.reduce((s, r) => s + (parseFloat(r.Extended_Price) || 0), 0);
+  const totalQty = det.reduce((s, r) => s + (parseFloat(r.Quantity_Sold) || 0), 0);
+
+  openReportModal(cat + ': ' + desc, function(body) {
+    let html = '<div class="kpi-grid" style="margin-bottom:20px;">';
+    html += '<div class="kpi-card"><div class="kpi-label">Total Revenue</div><div class="kpi-value">' + money(totalRev) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Qty Sold</div><div class="kpi-value">' + num(Math.round(totalQty)) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Transactions</div><div class="kpi-value">' + num(invoiceNums.size) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Avg Price</div><div class="kpi-value">' + money(totalQty ? totalRev / totalQty : 0) + '</div></div>';
+    html += '<div class="kpi-card"><div class="kpi-label">Buyers</div><div class="kpi-value">' + num(buyers.length) + '</div></div>';
+    html += '</div>';
+
+    // Per-store table
+    const storeArr = Object.entries(storeMap).sort((a,b) => b[1].rev - a[1].rev);
+    if (storeArr.length) {
+      html += '<div class="table-wrap" style="margin-bottom:16px;"><h3>By Store</h3><div class="table-scroll" style="max-height:250px;"><table><thead><tr><th style="text-align:left;">Store</th><th>Qty</th><th>Revenue</th><th>Transactions</th></tr></thead><tbody>';
+      storeArr.forEach(([s, d]) => {
+        html += '<tr><td style="text-align:left;font-weight:600;">#' + s + '</td><td>' + num(Math.round(d.qty)) + '</td><td>' + money(d.rev) + '</td><td>' + num(d.txns) + '</td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+    }
+
+    // Customer list (who bought this)
+    if (buyers.length) {
+      html += '<div class="table-wrap"><h3>Customers Who Purchased (' + num(buyers.length) + ')</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th style="text-align:left;">Name</th><th>Email</th><th>Phone</th><th>City</th><th>Store</th><th>Date</th><th>Total</th></tr></thead><tbody>';
+      buyers.sort((a,b) => (+b.Net_Sales||0) - (+a.Net_Sales||0)).slice(0, 200).forEach(r => {
+        const name = ((r.Customer_First_Name||'') + ' ' + (r.Customer_Last_Name||'')).trim() || 'Unknown';
+        html += '<tr><td style="text-align:left;">' + name + '</td><td style="font-size:11px;">' + (r.Customer_Email_Address||'—') + '</td><td style="font-size:11px;">' + (r.Customer_Phone_Number||'—') + '</td><td>' + (r.City||'') + '</td><td>#' + (r.Store_Number||'') + '</td><td>' + (r.Invoice_Date||'').split(' ')[0] + '</td><td>' + money(+r.Net_Sales||0) + '</td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+    }
+
+    body.innerHTML = html;
+  });
 }
 
 // ============================================================
