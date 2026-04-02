@@ -3560,8 +3560,8 @@
             <th title="Green inspection items" style="color:var(--green);">Green</th>
             <th title="Yellow inspection items" style="color:var(--yellow);">Yellow</th>
             <th title="Red inspection items" style="color:var(--red);">Red</th>
-            <th>Sold</th>
-            <th title="Conversion: sold / (yellow+red)">Conv %</th>
+            <th title="Total inspection items">Total</th>
+            <th title="Percentage of items needing attention (yellow+red)">Needs Attn %</th>
           </tr></thead>
           <tbody id="peopleCSABody"></tbody>
         </table>
@@ -3667,15 +3667,15 @@
         <div>
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Car Count Increase</label>
           <div style="display:flex;align-items:center;gap:10px;">
-            <input type="range" id="fcCarTarget" min="0" max="50" value="10" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcCarLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--green);min-width:45px;text-align:right;">+10%</span>
+            <input type="range" id="fcCarTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
+            <span id="fcCarLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Ticket Average Increase</label>
           <div style="display:flex;align-items:center;gap:10px;">
-            <input type="range" id="fcTicketTarget" min="0" max="50" value="5" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcTicketLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--green);min-width:45px;text-align:right;">+5%</span>
+            <input type="range" id="fcTicketTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
+            <span id="fcTicketLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
@@ -4745,9 +4745,9 @@ function renderForecastView(storeOverride) {
     kpiEl.innerHTML = `
       <div class="kpi-card"><div class="kpi-label">Cars Per Day</div><div class="kpi-value">${baseCPD.toFixed(1)}</div><div class="kpi-sub">${storeLabel}</div></div>
       <div class="kpi-card"><div class="kpi-label">Ticket Average</div><div class="kpi-value">${money(baseTA)}</div><div class="kpi-sub">per vehicle</div></div>
-      <div class="kpi-card"><div class="kpi-label">Daily Revenue</div><div class="kpi-value">${money(baseCPD * baseTA * baseStores)}</div><div class="kpi-sub">${storeLabel}</div></div>
-      <div class="kpi-card"><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">${money(baseCPD * baseTA * baseStores * 26)}</div><div class="kpi-sub">26 biz days</div></div>
-      <div class="kpi-card"><div class="kpi-label">Annual Revenue</div><div class="kpi-value">${money(baseCPD * baseTA * baseStores * 312)}</div><div class="kpi-sub">312 biz days</div></div>
+      <div class="kpi-card"><div class="kpi-label">Daily Revenue</div><div class="kpi-value">${money(baseCPD * baseTA)}</div><div class="kpi-sub">${storeLabel}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">${money(baseCPD * baseTA * 26)}</div><div class="kpi-sub">26 biz days</div></div>
+      <div class="kpi-card"><div class="kpi-label">Annual Revenue</div><div class="kpi-value">${money(baseCPD * baseTA * 312)}</div><div class="kpi-sub">312 biz days</div></div>
       <div class="kpi-card"><div class="kpi-label">Upsell Rate</div><div class="kpi-value">${pct(baseConv)}</div><div class="kpi-sub">${num(inspBad.length)} opportunities</div></div>
     `;
   }
@@ -4841,29 +4841,34 @@ function renderForecastResults() {
   const period = +document.getElementById('fcPeriod').value;
 
   // Update labels
-  document.getElementById('fcCarLabel').textContent = '+' + carPct + '%';
-  document.getElementById('fcTicketLabel').textContent = '+' + ticketPct + '%';
+  document.getElementById('fcCarLabel').textContent = (carPct >= 0 ? '+' : '') + carPct + '%';
+  document.getElementById('fcCarLabel').style.color = carPct > 0 ? 'var(--green)' : carPct < 0 ? 'var(--red)' : 'var(--text-muted)';
+  document.getElementById('fcTicketLabel').textContent = (ticketPct >= 0 ? '+' : '') + ticketPct + '%';
+  document.getElementById('fcTicketLabel').style.color = ticketPct > 0 ? 'var(--green)' : ticketPct < 0 ? 'var(--red)' : 'var(--text-muted)';
   document.getElementById('fcConvLabel').textContent = convTarget + '%';
   document.getElementById('fcNewStoresLabel').textContent = newStores;
   document.getElementById('fcPromoLabel').textContent = '-' + promoReduction + '%';
 
   // Calculate projections
+  // NOTE: CPD is already total company cars/day (not per-store), so no * stores needed
   const bizDays = Math.round(period * 26 / 30); // ~26 biz days per 30 calendar
   const projCPD = b.cpd * (1 + carPct / 100);
   const projTA = b.ta * (1 + ticketPct / 100);
   const projStores = b.stores + newStores;
-  const projPromoSavings = b.promoPerCar * (promoReduction / 100) * projCPD * projStores * bizDays;
+  const avgCPDperStore = b.stores ? b.cpd / b.stores : b.cpd;
+  const newStoreRevenue = newStores * avgCPDperStore * (1 + carPct / 100) * projTA * bizDays;
+  const projPromoSavings = b.promoPerCar * (promoReduction / 100) * projCPD * bizDays;
 
-  // Current projected revenue
-  const currentRev = b.cpd * b.ta * b.stores * bizDays;
-  const projectedRev = projCPD * projTA * projStores * bizDays;
+  // Current revenue: CPD * TA * bizDays (CPD already includes all stores)
+  const currentRev = b.cpd * b.ta * bizDays;
+  const projectedRev = projCPD * projTA * bizDays + newStoreRevenue;
   const delta = projectedRev - currentRev + projPromoSavings;
   const deltaPct = currentRev ? (delta / currentRev * 100) : 0;
 
   // Revenue from new upsell conversion
-  const avgUpsellValue = b.ta * 0.15; // assume 15% of ticket avg
+  const avgUpsellValue = b.ta * 0.15;
   const additionalConvPct = Math.max(0, convTarget - b.convRate);
-  const projectedNewUpsells = projCPD * projStores * bizDays * (additionalConvPct / 100) * 0.3; // 30% of cars get inspected
+  const projectedNewUpsells = projCPD * bizDays * (additionalConvPct / 100) * 0.3;
   const upsellRevenue = projectedNewUpsells * avgUpsellValue;
 
   const totalProjected = projectedRev + projPromoSavings + upsellRevenue;
@@ -4880,9 +4885,9 @@ function renderForecastResults() {
   // Breakdown table
   html += '<div class="table-wrap" style="margin:0;"><h3>Revenue Impact Breakdown</h3>';
   html += '<div class="table-scroll"><table><thead><tr><th style="text-align:left;">Growth Driver</th><th>Current</th><th>Projected</th><th>Revenue Impact</th></tr></thead><tbody>';
-  html += '<tr><td style="text-align:left;">Car Count Growth (+' + carPct + '%)</td><td>' + b.cpd.toFixed(1) + ' CPD</td><td>' + projCPD.toFixed(1) + ' CPD</td><td style="color:var(--green);">+' + money((projCPD - b.cpd) * b.ta * b.stores * bizDays) + '</td></tr>';
-  html += '<tr><td style="text-align:left;">Ticket Average Growth (+' + ticketPct + '%)</td><td>' + money(b.ta) + '</td><td>' + money(projTA) + '</td><td style="color:var(--green);">+' + money(b.cpd * (projTA - b.ta) * b.stores * bizDays) + '</td></tr>';
-  if (newStores > 0) html += '<tr><td style="text-align:left;">New Stores (+' + newStores + ')</td><td>' + b.stores + ' stores</td><td>' + projStores + ' stores</td><td style="color:var(--green);">+' + money(projCPD * projTA * newStores * bizDays) + '</td></tr>';
+  html += '<tr><td style="text-align:left;">Car Count Growth (+' + carPct + '%)</td><td>' + b.cpd.toFixed(1) + ' CPD</td><td>' + projCPD.toFixed(1) + ' CPD</td><td style="color:var(--green);">+' + money((projCPD - b.cpd) * b.ta * bizDays) + '</td></tr>';
+  html += '<tr><td style="text-align:left;">Ticket Average Growth (+' + ticketPct + '%)</td><td>' + money(b.ta) + '</td><td>' + money(projTA) + '</td><td style="color:var(--green);">+' + money(b.cpd * (projTA - b.ta) * bizDays) + '</td></tr>';
+  if (newStores > 0) html += '<tr><td style="text-align:left;">New Stores (+' + newStores + ')</td><td>' + b.stores + ' stores</td><td>' + projStores + ' stores</td><td style="color:var(--green);">+' + money(newStoreRevenue) + '</td></tr>';
   if (promoReduction > 0) html += '<tr><td style="text-align:left;">Promo Discount Reduction (-' + promoReduction + '%)</td><td>' + money(b.promoPerCar) + '/car</td><td>' + money(b.promoPerCar * (1 - promoReduction / 100)) + '/car</td><td style="color:var(--green);">+' + money(projPromoSavings) + '</td></tr>';
   if (additionalConvPct > 0) html += '<tr><td style="text-align:left;">Upsell Conversion (' + pct(b.convRate) + ' → ' + convTarget + '%)</td><td>' + pct(b.convRate) + '</td><td>' + convTarget + '%</td><td style="color:var(--green);">+' + money(upsellRevenue) + '</td></tr>';
   html += '<tr style="font-weight:800;border-top:2px solid var(--primary);"><td style="text-align:left;">TOTAL IMPACT</td><td>' + money(currentRev) + '</td><td style="color:var(--green);">' + money(totalProjected) + '</td><td style="color:var(--green);font-size:16px;">+' + money(totalDelta) + '</td></tr>';
@@ -4972,12 +4977,14 @@ function exportForecast() {
   const projCPD = b.cpd * (1 + carPct / 100);
   const projTA = b.ta * (1 + ticketPct / 100);
   const projStores = b.stores + newStores;
-  const currentRev = b.cpd * b.ta * b.stores * bizDays;
-  const projectedRev = projCPD * projTA * projStores * bizDays;
-  const projPromoSavings = b.promoPerCar * (promoReduction / 100) * projCPD * projStores * bizDays;
+  const avgCPDperStore = b.stores ? b.cpd / b.stores : b.cpd;
+  const newStoreRevenue = newStores * avgCPDperStore * (1 + carPct / 100) * projTA * bizDays;
+  const currentRev = b.cpd * b.ta * bizDays;
+  const projectedRev = projCPD * projTA * bizDays + newStoreRevenue;
+  const projPromoSavings = b.promoPerCar * (promoReduction / 100) * projCPD * bizDays;
   const avgUpsellValue = b.ta * 0.15;
   const additionalConvPct = Math.max(0, convTarget - b.convRate);
-  const upsellRevenue = projCPD * projStores * bizDays * (additionalConvPct / 100) * 0.3 * avgUpsellValue;
+  const upsellRevenue = projCPD * bizDays * (additionalConvPct / 100) * 0.3 * avgUpsellValue;
   const totalProjected = projectedRev + projPromoSavings + upsellRevenue;
   const totalDelta = totalProjected - currentRev;
 
@@ -5007,9 +5014,9 @@ function exportForecast() {
   csv += 'Promo Discount Reduction,-' + promoReduction + '%\n\n';
   csv += 'REVENUE IMPACT BREAKDOWN\n';
   csv += 'Growth Driver,Current,Projected,Revenue Impact\n';
-  csv += 'Car Count Growth (+' + carPct + '%),' + b.cpd.toFixed(1) + ' CPD,' + projCPD.toFixed(1) + ' CPD,$' + ((projCPD - b.cpd) * b.ta * b.stores * bizDays).toFixed(2) + '\n';
-  csv += 'Ticket Average Growth (+' + ticketPct + '%),$' + b.ta.toFixed(2) + ',$' + projTA.toFixed(2) + ',$' + (b.cpd * (projTA - b.ta) * b.stores * bizDays).toFixed(2) + '\n';
-  if (newStores > 0) csv += 'New Stores (+' + newStores + '),' + b.stores + ' stores,' + projStores + ' stores,$' + (projCPD * projTA * newStores * bizDays).toFixed(2) + '\n';
+  csv += 'Car Count Growth (+' + carPct + '%),' + b.cpd.toFixed(1) + ' CPD,' + projCPD.toFixed(1) + ' CPD,$' + ((projCPD - b.cpd) * b.ta * bizDays).toFixed(2) + '\n';
+  csv += 'Ticket Average Growth (+' + ticketPct + '%),$' + b.ta.toFixed(2) + ',$' + projTA.toFixed(2) + ',$' + (b.cpd * (projTA - b.ta) * bizDays).toFixed(2) + '\n';
+  if (newStores > 0) csv += 'New Stores (+' + newStores + '),' + b.stores + ' stores,' + projStores + ' stores,$' + (newStoreRevenue).toFixed(2) + '\n';
   if (promoReduction > 0) csv += 'Promo Reduction (-' + promoReduction + '%),$' + b.promoPerCar.toFixed(2) + '/car,$' + (b.promoPerCar * (1 - promoReduction / 100)).toFixed(2) + '/car,$' + projPromoSavings.toFixed(2) + '\n';
   if (additionalConvPct > 0) csv += 'Upsell Conversion (' + b.convRate.toFixed(1) + '% → ' + convTarget + '%),' + b.convRate.toFixed(1) + '%,' + convTarget + '%,$' + upsellRevenue.toFixed(2) + '\n';
   csv += '\nTOTAL PROJECTED REVENUE,$' + totalProjected.toFixed(2) + '\n';
@@ -7926,9 +7933,9 @@ function renderPeople() {
     window._csaSrReport = srReport;
 
     csaBody.innerHTML = advisorList.map((a, idx) => {
-      const opps = a.yellow + a.red;
-      const conv = opps ? (a.sold / opps * 100) : 0;
-      return '<tr style="cursor:pointer;" onclick="openAdvisorDetail(' + idx + ')"><td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>' + a.name + '</strong></td><td>#' + a.store + '</td><td>' + num(a.vehicles) + '</td><td style="color:var(--green);">' + num(a.green) + '</td><td style="color:var(--yellow);">' + num(a.yellow) + '</td><td style="color:var(--red);">' + num(a.red) + '</td><td>' + num(a.sold) + '</td><td class="' + (conv > 50 ? 'cell-green' : conv > 25 ? 'cell-yellow' : 'cell-red') + '">' + pct(conv) + '</td></tr>';
+      const total = a.green + a.yellow + a.red;
+      const needsAttnPct = total ? ((a.yellow + a.red) / total * 100) : 0;
+      return '<tr style="cursor:pointer;" onclick="openAdvisorDetail(' + idx + ')"><td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>' + a.name + '</strong></td><td>#' + a.store + '</td><td>' + num(a.vehicles) + '</td><td style="color:var(--green);">' + num(a.green) + '</td><td style="color:var(--yellow);">' + num(a.yellow) + '</td><td style="color:var(--red);">' + num(a.red) + '</td><td>' + num(total) + '</td><td class="' + (needsAttnPct > 40 ? 'cell-red' : needsAttnPct > 20 ? 'cell-yellow' : 'cell-green') + '">' + pct(needsAttnPct) + '</td></tr>';
     }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">No advisor data found</td></tr>';
   } else {
     if (csaBody) csaBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Upload SR_Productivity CSV via "+ Add Files" to see advisor performance</td></tr>';
