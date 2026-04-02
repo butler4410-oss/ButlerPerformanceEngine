@@ -3368,6 +3368,33 @@
       </div>
     </div>
 
+    <!-- Premium Product Expansion -->
+    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+        Premium Product Opportunity
+        <button class="btn-export" onclick="exportReport('tblBrandExpansion','Premium Product Expansion')" style="font-size:10px;padding:3px 10px;">Export</button>
+      </h3>
+      <div style="font-size:11px;color:var(--text-muted);padding:0 20px 12px;">
+        Shows premium product penetration by store. Identifies stores where premium attach rate is below network average — the biggest growth opportunities.
+      </div>
+      <div class="ops-grid-scroll" style="max-height:350px;">
+        <table class="ops-grid" id="tblBrandExpansion">
+          <thead><tr>
+            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
+            <th>Total Txns</th>
+            <th title="Transactions with any premium product">Premium Txns</th>
+            <th title="% of transactions that included a premium product">Premium Rate</th>
+            <th title="Revenue from premium products">Premium Rev</th>
+            <th title="Average premium ticket vs average standard ticket">Avg Premium Ticket</th>
+            <th title="Average standard (non-premium) ticket">Avg Standard Ticket</th>
+            <th title="Dollar difference per car when premium is sold">Uplift / Car</th>
+            <th title="Estimated additional revenue if store reached network best rate">Revenue Opportunity</th>
+          </tr></thead>
+          <tbody id="brandExpansionBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- PRIMARY: Data Tables (2-column) -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
       <div class="table-wrap" style="margin:0;">
@@ -6600,6 +6627,121 @@ function renderProductAnalysis() {
       const suggestRate = totalTransactions ? (d.count / totalTransactions * 100) : 0;
       return '<tr><td style="text-align:left;">' + desc + '</td><td>' + num(d.count) + '</td><td>' + d.stores.size + '</td><td>' + pct(suggestRate) + '</td></tr>';
     }).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No recommendations found</td></tr>';
+  }
+
+  renderBrandExpansion();
+}
+
+function renderBrandExpansion() {
+  const det = FILTERED.details;
+  const cust = FILTERED.customers;
+  const body = document.getElementById('brandExpansionBody');
+  if (!body || !det.length) {
+    if (body) body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:20px;">Load data to see premium product analysis</td></tr>';
+    return;
+  }
+
+  // Identify premium products — higher-priced service packages and premium brands
+  // Premium indicators: Royal Purple, Advanced Syn, XLT, Premium filter, high-price services
+  const premiumKeywords = ['ROYAL PURPLE', 'ADVANCED SYN', 'FS3', 'FS4', 'XLT', 'PREMIUM', 'RP0W', 'RP5W', 'DURALEC'];
+
+  function isPremium(r) {
+    const desc = ((r.Invoice_Detail_Description || '') + ' ' + (r.Invoice_Detail_Code || '')).toUpperCase();
+    return premiumKeywords.some(k => desc.includes(k));
+  }
+
+  // Build per-store premium data
+  const storeData = {};
+  const invoicePremium = {}; // track which invoices have premium products
+
+  det.forEach(r => {
+    if (r.Invoice_Detail_Type === 'RECOMMENDATION') return;
+    const s = r.Store_Number;
+    if (!s) return;
+    if (!storeData[s]) storeData[s] = { totalTxns: new Set(), premiumTxns: new Set(), premiumRev: 0, standardRev: 0, premiumItems: 0, standardItems: 0 };
+    storeData[s].totalTxns.add(r.Invoice_Number);
+    if (isPremium(r)) {
+      storeData[s].premiumTxns.add(r.Invoice_Number);
+      storeData[s].premiumRev += parseFloat(r.Extended_Price) || 0;
+      storeData[s].premiumItems++;
+      invoicePremium[r.Invoice_Number] = true;
+    } else {
+      storeData[s].standardRev += parseFloat(r.Extended_Price) || 0;
+      storeData[s].standardItems++;
+    }
+  });
+
+  // Calculate per-invoice totals for premium vs standard ticket comparison
+  const invoiceTotals = {};
+  cust.forEach(r => {
+    invoiceTotals[r.Invoice_Number] = { total: parseFloat(r.Net_Sales) || 0, store: r.Store_Number, isPremium: !!invoicePremium[r.Invoice_Number] };
+  });
+
+  // Per-store premium/standard ticket averages
+  Object.keys(storeData).forEach(s => {
+    const storeInvoices = Object.values(invoiceTotals).filter(inv => inv.store === s);
+    const premInvoices = storeInvoices.filter(inv => inv.isPremium);
+    const stdInvoices = storeInvoices.filter(inv => !inv.isPremium);
+    storeData[s].avgPremiumTicket = premInvoices.length ? premInvoices.reduce((sum, inv) => sum + inv.total, 0) / premInvoices.length : 0;
+    storeData[s].avgStandardTicket = stdInvoices.length ? stdInvoices.reduce((sum, inv) => sum + inv.total, 0) / stdInvoices.length : 0;
+  });
+
+  // Find the best premium rate in the network
+  const rates = Object.values(storeData).map(d => d.totalTxns.size ? (d.premiumTxns.size / d.totalTxns.size * 100) : 0);
+  const bestRate = Math.max(...rates, 0);
+  const avgRate = rates.length ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
+
+  const storeArr = Object.entries(storeData).filter(([s]) => /^\d+$/.test(s) || s.length > 0).sort((a, b) => b[1].totalTxns.size - a[1].totalTxns.size);
+
+  let totalOpportunity = 0;
+
+  body.innerHTML = storeArr.map(([s, d]) => {
+    const totalTxns = d.totalTxns.size;
+    const premTxns = d.premiumTxns.size;
+    const premRate = totalTxns ? (premTxns / totalTxns * 100) : 0;
+    const uplift = d.avgPremiumTicket - d.avgStandardTicket;
+    // Opportunity: if this store reached the best rate, how many more premium transactions?
+    const additionalPremTxns = Math.max(0, Math.round(totalTxns * (bestRate / 100) - premTxns));
+    const opportunity = additionalPremTxns * uplift;
+    totalOpportunity += opportunity;
+
+    const isBelow = premRate < avgRate;
+    const rateColor = premRate >= bestRate ? 'var(--green)' : premRate >= avgRate ? 'var(--text)' : 'var(--red)';
+
+    return '<tr>' +
+      '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">#' + s + '</td>' +
+      '<td>' + num(totalTxns) + '</td>' +
+      '<td>' + num(premTxns) + '</td>' +
+      '<td style="color:' + rateColor + ';font-weight:700;">' + pct(premRate) + '</td>' +
+      '<td>' + money(d.premiumRev) + '</td>' +
+      '<td>' + money(d.avgPremiumTicket) + '</td>' +
+      '<td>' + money(d.avgStandardTicket) + '</td>' +
+      '<td style="color:var(--green);font-weight:600;">' + (uplift > 0 ? '+' : '') + money(uplift) + '</td>' +
+      '<td style="color:' + (opportunity > 0 ? 'var(--green)' : 'var(--text-muted)') + ';font-weight:700;">' + (opportunity > 0 ? '+' + money(opportunity) : '—') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  // Totals row
+  if (storeArr.length > 1) {
+    body.innerHTML += '<tr class="totals-row"><td style="text-align:left;position:sticky;left:0;z-index:1;background:rgba(0,0,0,0.2);font-weight:800;">TOTAL OPPORTUNITY</td><td colspan="7"></td><td style="color:var(--green);font-weight:800;font-size:14px;">+' + money(totalOpportunity) + '</td></tr>';
+  }
+
+  // Summary insight above the table
+  const summaryEl = body.closest('.ops-grid-wrap')?.querySelector('.brand-insight');
+  // Add a dynamic insight
+  const worstStore = storeArr.reduce((worst, [s, d]) => {
+    const rate = d.totalTxns.size ? d.premiumTxns.size / d.totalTxns.size * 100 : 100;
+    return rate < worst.rate ? { store: s, rate } : worst;
+  }, { store: '', rate: 100 });
+
+  const insightEl = body.closest('.ops-grid-wrap')?.querySelector('h3');
+  if (insightEl && !insightEl.querySelector('.brand-insight-text')) {
+    const span = document.createElement('span');
+    span.className = 'brand-insight-text';
+    span.style.cssText = 'font-size:11px;font-weight:500;color:var(--green);margin-left:12px;';
+    span.textContent = 'Network opportunity: +' + money(totalOpportunity) + ' if all stores reach ' + pct(bestRate) + ' premium rate';
+    // Insert after the h3 text
+    insightEl.prepend(span);
   }
 }
 
