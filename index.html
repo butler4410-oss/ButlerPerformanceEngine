@@ -3923,6 +3923,8 @@ function parseCSVLine(line) {
 // ============================================================
 function detectFileType(headers) {
   const h = headers.join(',').toLowerCase();
+  // ISI POS detection (Grease Monkey, etc.)
+  if (h.includes('transaction_id') && h.includes('line_items_detail') && h.includes('location_name')) return 'isi_pos';
   // GROW POS file detection (check before generic types)
   if (h.includes('cy_comp_gross_sales') && h.includes('py_comp_gross_sales')) return 'grow_sales_summary';
   if (h.includes('labor_pct_sales') && h.includes('labor_hours_per_vehicle')) return 'grow_kpi_actuals';
@@ -3950,7 +3952,8 @@ const fileLabels = {
   grow_kpi_actuals: 'KPI Actuals',
   grow_time_analysis: 'Time Analysis',
   grow_system_impact: 'System Impact',
-  grow_kpi_retail_comp: 'KPI Retail Comp'
+  grow_kpi_retail_comp: 'KPI Retail Comp',
+  isi_pos: 'ISI POS Transactions'
 };
 
 let loadedFiles = {};
@@ -4140,6 +4143,80 @@ function processFile(file) {
         return;
       }
       const rows = parseCSV(text);
+
+      // ISI POS Adapter: map ISI fields → BPA internal schema
+      if (type === 'isi_pos') {
+        const custRows = [];
+        const detRows = [];
+        rows.forEach(r => {
+          // Extract location as store number (use location name or derive from it)
+          const locName = r.LOCATION_NAME || '';
+          const storeNum = locName.replace(/^(Grease Monkey|Store)\s*#?\s*/i, '').replace(/\s*ISI$/i, '').trim() || locName;
+          const txnDate = r.TRANSACTION_AT ? r.TRANSACTION_AT.split(' ')[0].replace(/-/g, '/') : '';
+
+          // Map to customers format
+          custRows.push({
+            Store_Number: storeNum,
+            Invoice_Number: r.TRANSACTION_ID || '',
+            Invoice_Date: txnDate,
+            Net_Sales: r.TOTAL || r.SUBTOTAL || '0',
+            Customer_First_Name: (r.FIRST_NAME || '').trim(),
+            Customer_Last_Name: (r.LAST_NAME || '').trim(),
+            Customer_Email_Address: r.EMAIL || '',
+            Customer_Phone_Number: r.PHONE || '',
+            Customer_Address: r.ADDRESS1 || '',
+            City: r.CITY || '',
+            Customer_State: r.STATE || '',
+            ZIP_Code: r.ZIP_CODE || '',
+            Business_Account_ID: '',
+            ChekChart_Make: '',
+            Bay_Start_Time: '',
+            Bay_End_Time: '',
+            Greet_Time: '',
+            Ring_Out_End_Time: '',
+            Vehicle_Mileage: ''
+          });
+
+          // Parse LINE_ITEMS_DETAIL: "CODE , CAT , DESC , Qty:N , $P ;; ..."
+          const lineItems = (r.LINE_ITEMS_DETAIL || '').split(';;').map(s => s.trim()).filter(Boolean);
+          lineItems.forEach(item => {
+            const parts = item.split(',').map(s => s.trim());
+            const code = parts[0] || '';
+            const cat = parts[1] || '';
+            const desc = parts[2] || '';
+            let qty = 1, price = 0;
+            parts.forEach(p => {
+              const qMatch = p.match(/Qty:\s*([\d.]+)/i);
+              if (qMatch) qty = parseFloat(qMatch[1]) || 1;
+              const pMatch = p.match(/\$\s*([-\d.]+)/);
+              if (pMatch) price = parseFloat(pMatch[1]) || 0;
+            });
+            if (code && code !== 'CK') { // Skip service checklist marker
+              detRows.push({
+                Store_Number: storeNum,
+                Invoice_Number: r.TRANSACTION_ID || '',
+                Invoice_Date: txnDate,
+                Invoice_Detail_Type: cat.includes('REC') ? 'RECOMMENDATION' : 'SERVICE',
+                Invoice_Detail_Description: desc || code,
+                Invoice_Detail_Code: code,
+                JLI_Category_Code: cat || 'OTHER',
+                Extended_Price: String(price * qty),
+                Quantity_Sold: String(qty)
+              });
+            }
+          });
+        });
+
+        // Store mapped data
+        DATA.customers = DATA.customers.concat(custRows);
+        DATA.details = DATA.details.concat(detRows);
+        loadedFiles['customers'] = true;
+        loadedFiles['details'] = true;
+        loadedFiles['isi_pos'] = true;
+        resolve({ name: file.name, type: 'isi_pos', rows: rows.length });
+        return;
+      }
+
       // Route GROW files to GROW object, others to DATA
       // Append to existing data (allows loading multiple files to expand date range)
       // Dedup by creating a row fingerprint to avoid duplicates from same file loaded twice
