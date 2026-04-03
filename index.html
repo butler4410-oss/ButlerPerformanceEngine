@@ -12662,6 +12662,13 @@ async function doLogin() {
     }
     launchDashboard();
     updateDataSavedIndicator(true);
+  } else {
+    // No saved data for this user — show upload zone
+    document.getElementById('uploadZone').style.display = '';
+    document.getElementById('dashboard').classList.remove('active');
+    document.getElementById('fileList').innerHTML = '';
+    const launchBtn = document.getElementById('launchBtnWrap');
+    if (launchBtn) launchBtn.style.display = 'none';
   }
 }
 
