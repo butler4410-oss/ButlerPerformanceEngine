@@ -4418,7 +4418,7 @@ async function handleFiles(files) {
 // UTILITY FUNCTIONS
 // ============================================================
 // Valid store number: digits only, no decimals, no empty, no garbage
-function validStore(s) { return s && /^\d+$/.test(String(s).trim()); }
+function validStore(s) { return s && /^\d+$/.test(String(s).replace(/["\s]/g, '')); }
 
 function parseDate(str) {
   if (!str) return null;
@@ -4541,7 +4541,10 @@ function launchDashboard() {
   // Populate store filter (include GROW stores too)
   const stores = new Set();
   [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(arr => {
-    arr.forEach(r => { if (validStore(r.Store_Number)) stores.add(r.Store_Number); });
+    arr.forEach(r => {
+      const s = String(r.Store_Number || '').replace(/["\s]/g, '');
+      if (validStore(s)) stores.add(s);
+    });
   });
   [GROW.sales_summary, GROW.kpi_actuals, GROW.time_analysis, GROW.kpi_retail_comp].forEach(arr => {
     arr.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
@@ -4552,14 +4555,17 @@ function launchDashboard() {
     sel.innerHTML += `<option value="${s}">${s}</option>`;
   });
 
-  // Date range — from transaction data or GROW reports
+  // Date range — scan ALL data sources for dates
   let minD = null, maxD = null;
-  DATA.customers.forEach(r => {
-    const d = parseDate(r.Invoice_Date);
-    if (d) {
-      if (!minD || d < minD) minD = d;
-      if (!maxD || d > maxD) maxD = d;
-    }
+  [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(arr => {
+    arr.forEach(r => {
+      const dateStr = r.Invoice_Date || r.Update_Date || '';
+      const d = parseDate(dateStr);
+      if (d) {
+        if (!minD || d < minD) minD = d;
+        if (!maxD || d > maxD) maxD = d;
+      }
+    });
   });
   if (minD && maxD) {
     document.getElementById('filterFrom').value = fmtDateISO(minD);
@@ -4589,6 +4595,9 @@ function launchDashboard() {
 
   applyFilters();
   updateFilterSummary();
+
+  // Log data load summary to console for debugging
+  console.info('BPA Data Loaded:', Object.keys(loadedFiles).length, 'files.', 'Customers:', DATA.customers.length, 'Details:', DATA.details.length, 'Promos:', DATA.promos.length, 'Inspections:', DATA.inspections.length, 'Stores:', stores.size, 'Date range:', minD ? fmtDateISO(minD) : 'none', '→', maxD ? fmtDateISO(maxD) : 'none');
 }
 
 // ============================================================
