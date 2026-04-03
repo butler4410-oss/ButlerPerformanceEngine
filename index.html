@@ -4417,6 +4417,9 @@ async function handleFiles(files) {
 // ============================================================
 // UTILITY FUNCTIONS
 // ============================================================
+// Valid store number: digits only, no decimals, no empty, no garbage
+function validStore(s) { return s && /^\d+$/.test(String(s).trim()); }
+
 function parseDate(str) {
   if (!str) return null;
   const match = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -4538,7 +4541,7 @@ function launchDashboard() {
   // Populate store filter (include GROW stores too)
   const stores = new Set();
   [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(arr => {
-    arr.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
+    arr.forEach(r => { if (validStore(r.Store_Number)) stores.add(r.Store_Number); });
   });
   [GROW.sales_summary, GROW.kpi_actuals, GROW.time_analysis, GROW.kpi_retail_comp].forEach(arr => {
     arr.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
@@ -10342,6 +10345,7 @@ function renderOpsGrid() {
   const storeData = {};
   cust.forEach(r => {
     const s = r.Store_Number;
+    if (!validStore(s)) return;
     if (!storeData[s]) storeData[s] = { gc: 0, sales: 0, bayTimes: [], waitTimes: [], promos: 0, promoDollars: 0, inspTotal: 0, inspBad: 0 };
     storeData[s].gc++;
     storeData[s].sales += (+r.Net_Sales || 0);
@@ -10353,13 +10357,15 @@ function renderOpsGrid() {
 
   promo.forEach(r => {
     const s = r.Store_Number;
+    if (!validStore(s)) return;
     if (!storeData[s]) storeData[s] = { gc: 0, sales: 0, bayTimes: [], waitTimes: [], promos: 0, promoDollars: 0, inspTotal: 0, inspBad: 0 };
     storeData[s].promos++;
-    storeData[s].promoDollars += (+r.Promo_Amount || 0);
+    storeData[s].promoDollars += Math.abs(parseFloat(String(r.Promo_Amount || '0').replace(/[$,]/g, '')) || 0);
   });
 
   insp.forEach(r => {
     const s = r.Store_Number;
+    if (!validStore(s)) return;
     if (!storeData[s]) storeData[s] = { gc: 0, sales: 0, bayTimes: [], waitTimes: [], promos: 0, promoDollars: 0, inspTotal: 0, inspBad: 0 };
     if (r.Inspection_Status && r.Inspection_Status !== 'NotCheck' && r.Inspection_Status !== 'NotEquip') {
       storeData[s].inspTotal++;
@@ -10412,7 +10418,7 @@ function renderOpsGrid() {
   }
 
   let html = '';
-  const allStores = Object.keys(storeData).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  const allStores = Object.keys(storeData).filter(validStore).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   const renderedStores = new Set();
 
   if (bp_districts.length > 0) {
