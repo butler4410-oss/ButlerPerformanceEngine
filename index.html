@@ -12676,8 +12676,11 @@ function doLogout() {
   if (!confirm('Sign out?')) return;
   const cu = getCurrentUser();
   logAudit('LOGOUT', cu?.email || '—', cu?.name || '');
+  // Clear this user's saved data so stale/contaminated data doesn't persist
+  const dataKey = getDataStorageKey();
+  if (dataKey) localStorage.removeItem(dataKey);
   sessionStorage.removeItem('bp_session');
-  // Full page reload — cleanest way to ensure zero data leakage
+  // Full page reload
   window.location.href = location.pathname;
 }
 
