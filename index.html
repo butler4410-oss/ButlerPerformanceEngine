@@ -12670,10 +12670,20 @@ function doLogout() {
   const cu = getCurrentUser();
   logAudit('LOGOUT', cu?.email || '—', cu?.name || '');
   sessionStorage.removeItem('bp_session');
+  // Hide dashboard and show login
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('uploadZone').style.display = 'none';
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPassword').value = '';
   document.getElementById('loginError').textContent = '';
+  // Reset all data so next user starts fresh
+  DATA = { invoices: [], promos: [], odi: [], details: [], customers: [], inspections: [] };
+  GROW = { sales_summary: [], kpi_actuals: [], time_analysis: [], system_impact: [], kpi_retail_comp: [] };
+  CUSTOM_REPORTS = [];
+  loadedFiles = {};
+  FILTERED = {};
+  _allUploadResults = [];
 }
 
 function updateUserAvatar(user) {
