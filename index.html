@@ -3750,10 +3750,10 @@
           </div>
         </div>
         <div>
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Upsell Conversion Target</label>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Upsell Conversion Change</label>
           <div style="display:flex;align-items:center;gap:10px;">
-            <input type="range" id="fcConvTarget" min="0" max="100" value="30" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcConvLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--blue);min-width:45px;text-align:right;">30%</span>
+            <input type="range" id="fcConvTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
+            <span id="fcConvLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--text-muted);min-width:45px;text-align:right;">0%</span>
           </div>
         </div>
       </div>
@@ -4992,7 +4992,8 @@ function renderForecastResults() {
   document.getElementById('fcCarLabel').style.color = carPct > 0 ? 'var(--green)' : carPct < 0 ? 'var(--red)' : 'var(--text-muted)';
   document.getElementById('fcTicketLabel').textContent = (ticketPct >= 0 ? '+' : '') + ticketPct + '%';
   document.getElementById('fcTicketLabel').style.color = ticketPct > 0 ? 'var(--green)' : ticketPct < 0 ? 'var(--red)' : 'var(--text-muted)';
-  document.getElementById('fcConvLabel').textContent = convTarget + '%';
+  document.getElementById('fcConvLabel').textContent = (convTarget >= 0 ? '+' : '') + convTarget + '%';
+  document.getElementById('fcConvLabel').style.color = convTarget > 0 ? 'var(--green)' : convTarget < 0 ? 'var(--red)' : 'var(--text-muted)';
   document.getElementById('fcNewStoresLabel').textContent = newStores;
   document.getElementById('fcPromoLabel').textContent = '-' + promoReduction + '%';
 
@@ -5014,7 +5015,8 @@ function renderForecastResults() {
 
   // Revenue from new upsell conversion
   const avgUpsellValue = b.ta * 0.15;
-  const additionalConvPct = Math.max(0, convTarget - b.convRate);
+  const projConvRate = b.convRate * (1 + convTarget / 100);
+  const additionalConvPct = Math.max(0, projConvRate - b.convRate);
   const projectedNewUpsells = projCPD * bizDays * (additionalConvPct / 100) * 0.3;
   const upsellRevenue = projectedNewUpsells * avgUpsellValue;
 
@@ -5036,7 +5038,7 @@ function renderForecastResults() {
   html += '<tr><td style="text-align:left;">Ticket Average Growth (+' + ticketPct + '%)</td><td>' + money(b.ta) + '</td><td>' + money(projTA) + '</td><td style="color:var(--green);">+' + money(b.cpd * (projTA - b.ta) * bizDays) + '</td></tr>';
   if (newStores > 0) html += '<tr><td style="text-align:left;">New Stores (+' + newStores + ')</td><td>' + b.stores + ' stores</td><td>' + projStores + ' stores</td><td style="color:var(--green);">+' + money(newStoreRevenue) + '</td></tr>';
   if (promoReduction > 0) html += '<tr><td style="text-align:left;">Promo Discount Reduction (-' + promoReduction + '%)</td><td>' + money(b.promoPerCar) + '/car</td><td>' + money(b.promoPerCar * (1 - promoReduction / 100)) + '/car</td><td style="color:var(--green);">+' + money(projPromoSavings) + '</td></tr>';
-  if (additionalConvPct > 0) html += '<tr><td style="text-align:left;">Upsell Conversion (' + pct(b.convRate) + ' → ' + convTarget + '%)</td><td>' + pct(b.convRate) + '</td><td>' + convTarget + '%</td><td style="color:var(--green);">+' + money(upsellRevenue) + '</td></tr>';
+  if (convTarget !== 0) html += '<tr><td style="text-align:left;">Upsell Conversion (' + (convTarget >= 0 ? '+' : '') + convTarget + '%)</td><td>' + pct(b.convRate) + '</td><td>' + pct(projConvRate) + '</td><td style="color:' + (upsellRevenue >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + (upsellRevenue >= 0 ? '+' : '') + money(upsellRevenue) + '</td></tr>';
   html += '<tr style="font-weight:800;border-top:2px solid var(--primary);"><td style="text-align:left;">TOTAL IMPACT</td><td>' + money(currentRev) + '</td><td style="color:var(--green);">' + money(totalProjected) + '</td><td style="color:var(--green);font-size:16px;">+' + money(totalDelta) + '</td></tr>';
   html += '</tbody></table></div></div>';
 
@@ -5130,7 +5132,8 @@ function exportForecast() {
   const projectedRev = projCPD * projTA * bizDays + newStoreRevenue;
   const projPromoSavings = b.promoPerCar * (promoReduction / 100) * projCPD * bizDays;
   const avgUpsellValue = b.ta * 0.15;
-  const additionalConvPct = Math.max(0, convTarget - b.convRate);
+  const projConvRate = b.convRate * (1 + convTarget / 100);
+  const additionalConvPct = Math.max(0, projConvRate - b.convRate);
   const upsellRevenue = projCPD * bizDays * (additionalConvPct / 100) * 0.3 * avgUpsellValue;
   const totalProjected = projectedRev + projPromoSavings + upsellRevenue;
   const totalDelta = totalProjected - currentRev;
@@ -5165,7 +5168,7 @@ function exportForecast() {
   csv += 'Ticket Average Growth (+' + ticketPct + '%),$' + b.ta.toFixed(2) + ',$' + projTA.toFixed(2) + ',$' + (b.cpd * (projTA - b.ta) * bizDays).toFixed(2) + '\n';
   if (newStores > 0) csv += 'New Stores (+' + newStores + '),' + b.stores + ' stores,' + projStores + ' stores,$' + (newStoreRevenue).toFixed(2) + '\n';
   if (promoReduction > 0) csv += 'Promo Reduction (-' + promoReduction + '%),$' + b.promoPerCar.toFixed(2) + '/car,$' + (b.promoPerCar * (1 - promoReduction / 100)).toFixed(2) + '/car,$' + projPromoSavings.toFixed(2) + '\n';
-  if (additionalConvPct > 0) csv += 'Upsell Conversion (' + b.convRate.toFixed(1) + '% → ' + convTarget + '%),' + b.convRate.toFixed(1) + '%,' + convTarget + '%,$' + upsellRevenue.toFixed(2) + '\n';
+  if (additionalConvPct > 0) csv += 'Upsell Conversion (' + (convTarget >= 0 ? '+' : '') + convTarget + '%),' + b.convRate.toFixed(1) + '%,' + convTarget + '%,$' + upsellRevenue.toFixed(2) + '\n';
   csv += '\nTOTAL PROJECTED REVENUE,$' + totalProjected.toFixed(2) + '\n';
   csv += 'TOTAL REVENUE INCREASE,$' + totalDelta.toFixed(2) + '\n';
   csv += 'ANNUALIZED IMPACT,$' + (totalDelta * 365 / period).toFixed(2) + '\n';
