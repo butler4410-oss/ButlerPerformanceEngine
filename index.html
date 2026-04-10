@@ -6,36 +6,36 @@
 <title>Butler Performance Analytics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   :root {
-    --primary: #e31837;
-    --primary-dark: #b8132d;
-    --accent: #0d0d1a;
-    --accent-light: #131328;
-    --bg: #0a0a14;
-    --card: #12122a;
-    --card-hover: #1a1a3a;
-    --text: #e8e8f0;
-    --text-muted: #7878a0;
-    --border: #1e1e3a;
-    --green: #00c853;
-    --yellow: #ffd600;
-    --orange: #ff9100;
-    --red: #ff1744;
-    --blue: #448aff;
+    --primary: #dc2626;
+    --primary-dark: #b91c1c;
+    --accent: #0f172a;
+    --accent-light: #1e293b;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --card-hover: #f1f5f9;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --green: #16a34a;
+    --yellow: #ca8a04;
+    --orange: #ea580c;
+    --red: #dc2626;
+    --blue: #2563eb;
     --nav-height: 0px;
-    --surface-glass: rgba(18,18,42,0.85);
+    --surface-glass: rgba(255,255,255,0.95);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -49,8 +49,8 @@
     position: sticky;
     top: 0;
     z-index: 200;
-    background: var(--accent);
-    border-bottom: 1px solid var(--border);
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
   }
 
   /* Tier 1 */
@@ -71,7 +71,7 @@
   }
 
   .nav-brand-text {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 14px;
     font-weight: 700;
     color: white;
@@ -93,7 +93,7 @@
     border-radius: 6px;
     background: transparent;
     color: rgba(255,255,255,0.5);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 12.5px;
     font-weight: 500;
     cursor: pointer;
@@ -119,7 +119,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-weight: 700;
     font-size: 14px;
     color: white;
@@ -128,7 +128,7 @@
   }
 
   .logo-text {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 15px;
     font-weight: 700;
     color: white;
@@ -141,7 +141,7 @@
   .logo-text .red { color: var(--primary); }
 
   .logo-analytics {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 2px;
@@ -153,7 +153,7 @@
   .logo-line {
     width: 100%;
     height: 2px;
-    background: rgba(255,255,255,0.2);
+    background: var(--border);
     margin: 5px 0 4px;
   }
 
@@ -233,7 +233,7 @@
     border-radius: 5px;
     background: var(--primary);
     color: white;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
@@ -252,7 +252,7 @@
   }
 
   .nav-context-sep { color: rgba(255,255,255,0.15); }
-  .nav-context-info { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-context-info { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .nav-utils {
     display: flex;
@@ -268,7 +268,7 @@
     border-radius: 5px;
     background: transparent;
     color: rgba(255,255,255,0.45);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 11px;
     cursor: pointer;
     transition: all 0.15s;
@@ -281,11 +281,11 @@
     height: 28px;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
-    color: var(--text);
+    color: #e8e8f0;
     padding: 0 10px;
     padding-right: 24px;
     border-radius: 6px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
@@ -308,7 +308,7 @@
     box-shadow: 0 0 0 2px rgba(227,24,55,0.15);
   }
 
-  .cmd-select option { background: var(--accent); color: var(--text); }
+  .cmd-select option { background: #0f172a; color: #e8e8f0; }
 
   .cmd-input {
     height: 28px;
@@ -317,7 +317,7 @@
     color: #e8e8f0;
     padding: 0 10px;
     border-radius: 6px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     width: 130px;
     transition: all 0.15s;
@@ -339,7 +339,7 @@
     padding: 0 14px;
     border: none;
     border-radius: 6px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
@@ -551,7 +551,7 @@
     text-align: center;
     transition: all 0.2s;
     cursor: pointer;
-    background: rgba(255,255,255,0.01);
+    background: var(--card);
   }
 
   .upload-drop.drag-over {
@@ -633,7 +633,7 @@
     align-items: center;
     gap: 10px;
     padding: 8px 12px;
-    background: rgba(255,255,255,0.03);
+    background: rgba(0,0,0,0.02);
     border-radius: 6px;
     margin-bottom: 6px;
     font-size: 13px;
@@ -735,7 +735,7 @@
 
   .tab:hover {
     color: var(--text);
-    background: rgba(255,255,255,0.03);
+    background: rgba(0,0,0,0.03);
   }
 
   .tab.active {
@@ -764,7 +764,7 @@
     border: none;
     border-right: 1px solid var(--border);
     color: var(--text-muted);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
@@ -776,7 +776,7 @@
 
   .sub-tab:hover {
     color: var(--text);
-    background: rgba(255,255,255,0.03);
+    background: rgba(0,0,0,0.03);
   }
 
   .sub-tab.active {
@@ -788,10 +788,7 @@
   .sub-panel { display: none; }
   .sub-panel.active { display: block; }
 
-  body.light-mode .sub-tabs { border-color: #e0e0e0; }
-  body.light-mode .sub-tab { color: #6b7280; }
-  body.light-mode .sub-tab:hover { color: #1a1a2e; background: rgba(0,0,0,0.02); }
-  body.light-mode .sub-tab.active { color: white; background: var(--primary); }
+  /* sub-tabs use CSS vars — no dark-mode overrides needed */
 
   /* KPI Cards */
   .kpi-grid {
@@ -805,6 +802,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     padding: 20px;
     cursor: grab;
     transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s, border-color 0.15s;
@@ -840,7 +838,7 @@
   }
 
   .btn-configure {
-    background: rgba(255,255,255,0.04);
+    background: var(--card);
     border: 1px solid var(--border);
     color: var(--text-muted);
     padding: 6px 14px;
@@ -851,8 +849,8 @@
   }
 
   .btn-configure:hover {
-    color: white;
-    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    background: var(--card-hover);
     border-color: var(--text-muted);
   }
 
@@ -871,7 +869,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
-    background: rgba(255,255,255,0.02);
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
     cursor: pointer;
@@ -880,7 +878,7 @@
   }
 
   .tile-option:hover {
-    background: rgba(255,255,255,0.05);
+    background: var(--card-hover);
     border-color: var(--text-muted);
   }
 
@@ -976,6 +974,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     padding: 20px;
     overflow: hidden;
     position: relative;
@@ -1001,6 +1000,7 @@
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
   .table-wrap h3 {
@@ -1028,7 +1028,7 @@
   }
 
   thead th {
-    background: #1e1e35;
+    background: var(--card);
     padding: 10px 14px;
     text-align: left;
     font-weight: 600;
@@ -1040,7 +1040,7 @@
     top: 0;
     z-index: 10;
     border-bottom: 2px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
 
   thead th.sortable {
@@ -1051,7 +1051,7 @@
 
   thead th.sortable:hover {
     color: var(--text);
-    background: rgba(255,255,255,0.06);
+    background: rgba(0,0,0,0.04);
   }
 
   thead th[title] {
@@ -1062,10 +1062,11 @@
 
   tbody td {
     padding: 8px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
   }
 
-  tbody tr:hover { background: rgba(255,255,255,0.04); }
+  tbody tr:hover { background: var(--card-hover); }
+  tbody tr:nth-child(even) td { background: rgba(0,0,0,0.015); }
 
   .status-dot {
     display: inline-block;
@@ -1153,7 +1154,7 @@
   }
 
   .cust-modal-close {
-    background: rgba(255,255,255,0.05);
+    background: var(--card-hover);
     border: 1px solid var(--border);
     color: var(--text-muted);
     font-size: 20px;
@@ -1185,7 +1186,7 @@
   }
 
   .cust-detail-section {
-    background: rgba(255,255,255,0.02);
+    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 16px;
@@ -1343,7 +1344,7 @@
   }
 
   .report-card-metric {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 22px;
     font-weight: 700;
     color: var(--text);
@@ -1413,7 +1414,7 @@
   }
 
   .report-modal-header h2 {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 16px;
     font-weight: 700;
     color: var(--text);
@@ -1452,15 +1453,7 @@
     padding: 24px;
   }
 
-  /* Light mode */
-  body.light-mode .report-card { background: white; border-color: #e0e0e0; }
-  body.light-mode .report-card:hover { border-color: var(--primary); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-  body.light-mode .report-card-title { color: #1a1a2e; }
-  body.light-mode .report-card-metric { color: #1a1a2e; }
-  body.light-mode .report-modal { background: #f3f4f6; border-color: #e0e0e0; }
-  body.light-mode .report-modal-header { background: white; border-color: #e0e0e0; }
-  body.light-mode .report-modal-header h2 { color: #1a1a2e; }
-  body.light-mode .report-modal-close { border-color: #e0e0e0; color: #6b7280; }
+  /* report cards use CSS vars — no dark-mode overrides needed */
 
   @media (max-width: 768px) {
     .report-cards { grid-template-columns: 1fr; }
@@ -1503,14 +1496,11 @@
   .mapping-preview { overflow-x: auto; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; }
   .mapping-preview table { width: 100%; border-collapse: collapse; font-size: 11px; }
   .mapping-preview th { background: var(--card); padding: 6px 10px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
-  .mapping-preview td { padding: 5px 10px; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); }
+  .mapping-preview td { padding: 5px 10px; white-space: nowrap; border-bottom: 1px solid var(--border); color: var(--text-muted); }
   .mapping-select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 5px; font-size: 11px; margin-top: 4px; }
   .mapping-select option { background: var(--bg); }
   .mapping-col-header { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
-  body.light-mode .mapping-wizard { background: #f3f4f6; }
-  body.light-mode .mapping-wizard-header { background: white; border-color: #e0e0e0; }
-  body.light-mode .mapping-preview th { background: #f0f2f5; }
-  body.light-mode .mapping-select { background: white; border-color: #e0e0e0; color: #1a1a2e; }
+  /* mapping wizard uses CSS vars — no dark-mode overrides needed */
 
   /* BPA Insights Panel */
   .bpa-panel {
@@ -1520,7 +1510,7 @@
     border-radius: 10px;
     padding: 18px 22px;
     margin-bottom: 20px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
   .bpa-header {
@@ -1545,14 +1535,14 @@
     background: rgba(227,24,55,0.06);
     padding: 2px 7px;
     border-radius: 10px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
   }
 
   .bpa-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
   .bpa-toggle {
@@ -1571,7 +1561,7 @@
   .bpa-insights { display: flex; flex-direction: column; gap: 8px; }
 
   .bpa-insight {
-    background: rgba(255,255,255,0.015);
+    background: var(--card);
     border: 1px solid var(--border);
     border-left: 4px solid transparent;
     border-radius: 8px;
@@ -1584,7 +1574,7 @@
     gap: 4px;
   }
 
-  .bpa-insight:hover { background: rgba(255,255,255,0.035); }
+  .bpa-insight:hover { background: var(--card-hover); }
 
   .bpa-insight.critical { border-left-color: var(--red); }
   .bpa-insight.warning { border-left-color: var(--orange); }
@@ -1610,7 +1600,7 @@
   .bpa-insight.suggestion .bpa-icon { background: var(--blue); }
   .bpa-insight.positive .bpa-icon { background: var(--green); }
 
-  .bpa-insight .bpa-msg { color: var(--text); font-family: 'DM Sans', sans-serif; flex: 1; }
+  .bpa-insight .bpa-msg { color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; flex: 1; }
   .bpa-insight .bpa-msg strong { color: var(--text); }
   .bpa-insight .bpa-msg .bpa-detail { color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px; line-height: 1.4; }
 
@@ -1641,7 +1631,7 @@
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
   .bpa-action-btn:hover {
@@ -1658,7 +1648,7 @@
   .filter-summary {
     background: rgba(227,24,55,0.06);
     border: 1px solid rgba(227,24,55,0.15);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--text);
     padding: 4px 12px;
@@ -1666,23 +1656,7 @@
     white-space: nowrap;
   }
   .filter-summary:empty { display: none; }
-  body.light-mode .filter-summary {
-    background: rgba(227,24,55,0.05);
-    border-color: rgba(227,24,55,0.12);
-    color: #1a1a2e;
-  }
-
-  /* BPA Light Mode Overrides */
-  body.light-mode .bpa-panel { background: #fff; border-color: #e0e0e0; }
-  body.light-mode .bpa-insight { background: #fafafa; border-color: #e8e8e8; }
-  body.light-mode .bpa-insight:hover { background: #f3f3f3; }
-  body.light-mode .bpa-insight.critical { border-left-color: var(--red); }
-  body.light-mode .bpa-insight.warning { border-left-color: var(--orange); }
-  body.light-mode .bpa-insight.suggestion { border-left-color: var(--blue); }
-  body.light-mode .bpa-insight.positive { border-left-color: var(--green); }
-  body.light-mode .bpa-action-btn { background: transparent; border-color: #ddd; color: #555; }
-  body.light-mode .bpa-action-btn:hover { color: white; }
-  body.light-mode .bpa-logo { background: rgba(227,24,55,0.06); }
+  /* BPA/filter overrides removed — uses CSS vars */
 
   /* Checklist */
   .checklist-section {
@@ -1711,7 +1685,7 @@
     user-select: none;
   }
 
-  .checklist-item:hover { background: rgba(255,255,255,0.03); }
+  .checklist-item:hover { background: var(--card-hover); }
 
   .checklist-item .ck-box {
     width: 20px;
@@ -1850,16 +1824,16 @@
     align-items: center;
     gap: 16px;
     padding: 14px 24px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
     transition: background 0.1s;
   }
 
   .token-row:hover {
-    background: rgba(255,255,255,0.02);
+    background: var(--card-hover);
   }
 
   .token-row-header {
-    background: rgba(0,0,0,0.15);
+    background: var(--bg);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1921,7 +1895,7 @@
   }
 
   .token-action-btn {
-    background: rgba(255,255,255,0.05);
+    background: var(--card-hover);
     border: 1px solid var(--border);
     color: var(--text-muted);
     width: 28px;
@@ -1936,9 +1910,9 @@
   }
 
   .token-action-btn:hover {
-    background: rgba(255,255,255,0.1);
-    color: white;
-    border-color: rgba(255,255,255,0.2);
+    background: var(--border);
+    color: var(--text);
+    border-color: var(--text-muted);
   }
 
   .token-action-btn.delete:hover {
@@ -2212,6 +2186,7 @@
     border-radius: 14px;
     margin-bottom: 24px;
     overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
   .ops-grid-wrap h3 {
     font-size: 15px;
@@ -2253,7 +2228,7 @@
   .ops-grid td {
     padding: 7px 10px;
     text-align: right;
-    border-bottom: 1px solid rgba(42,42,69,0.5);
+    border-bottom: 1px solid var(--border);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
@@ -2265,7 +2240,7 @@
     z-index: 1;
     background: var(--card);
   }
-  .ops-grid tr:hover td { background: rgba(255,255,255,0.03); }
+  .ops-grid tr:hover td { background: var(--card-hover); }
   .ops-grid tr:hover td:first-child { background: var(--card-hover); }
   .ops-grid .district-row td {
     background: rgba(227,24,55,0.06);
@@ -2295,12 +2270,12 @@
   .ops-grid .store-child.visible { display: table-row; }
   .ops-grid .store-child td:first-child { padding-left: 28px; }
   .ops-grid .totals-row td {
-    background: rgba(0,0,0,0.2);
+    background: var(--card-hover);
     font-weight: 800;
     border-top: 2px solid var(--primary);
     font-size: 12px;
   }
-  .ops-grid .totals-row td:first-child { background: rgba(0,0,0,0.3); }
+  .ops-grid .totals-row td:first-child { background: var(--card-hover); }
 
   /* Cell color coding */
   .cell-green { background: rgba(0,200,83,0.12) !important; color: var(--green); }
@@ -2309,7 +2284,7 @@
 
   /* Today Snapshot */
   .today-snapshot {
-    background: linear-gradient(135deg, rgba(227,24,55,0.08) 0%, rgba(26,26,46,0.95) 100%);
+    background: linear-gradient(135deg, rgba(227,24,55,0.04) 0%, var(--card) 100%);
     border: 1px solid rgba(227,24,55,0.25);
     border-radius: 14px;
     padding: 18px 24px;
@@ -2428,7 +2403,7 @@
     align-items: center;
     gap: 12px;
     padding: 14px;
-    background: rgba(255,255,255,0.02);
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
     margin-bottom: 8px;
@@ -2465,7 +2440,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
-    background: rgba(255,255,255,0.02);
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
     margin-bottom: 6px;
@@ -2478,7 +2453,7 @@
   .login-screen {
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, #0a0a18 0%, #0f1628 50%, #1a1a2e 100%);
+    background: linear-gradient(135deg, #e8ecf1 0%, #f0f2f5 50%, #f8fafc 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2498,22 +2473,22 @@
     margin-bottom: 40px;
   }
 
-  .login-logo .logo-text { font-size: 28px; }
-  .login-logo .logo-analytics { font-size: 20px; letter-spacing: 10px; }
+  .login-logo .logo-text { font-size: 28px; color: var(--text); }
+  .login-logo .logo-analytics { font-size: 20px; letter-spacing: 10px; color: var(--text-muted); }
   .login-logo .logo-line { width: 240px; margin: 6px auto 5px; }
 
   .login-box {
-    background: rgba(26,26,46,0.8);
+    background: white;
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 32px;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
   }
 
   .login-box h2 {
     font-size: 18px;
     font-weight: 700;
-    color: white;
+    color: var(--text);
     margin-bottom: 4px;
   }
 
@@ -2563,171 +2538,23 @@
   }
 
   /* Print */
-  /* Light Mode */
-  body.light-mode {
-    --bg: #f3f4f6;
-    --card: #ffffff;
-    --card-hover: #f8f9fa;
-    --text: #111827;
-    --text-muted: #6b7280;
-    --border: #e5e7eb;
-    --accent: #ffffff;
-    --accent-light: #f8f9fa;
-    --surface-glass: rgba(255,255,255,0.92);
+  /* Dark Mode */
+  body.dark-mode {
+    --bg: #0a0a14;
+    --card: #141428;
+    --card-hover: #1a1a3a;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border: #1e293b;
+    --accent: #0f172a;
+    --accent-light: #1e293b;
+    --surface-glass: rgba(15,23,42,0.95);
   }
 
-  body.light-mode .nav-shell { background: #111827; }
-  body.light-mode .nav-tier1 { border-bottom-color: rgba(255,255,255,0.06); }
-  body.light-mode .nav-tier2 { background: rgba(0,0,0,0.1); }
-  body.light-mode .view-btn { color: rgba(255,255,255,0.5); }
-  body.light-mode .view-btn:hover { color: rgba(255,255,255,0.8); }
-  body.light-mode .view-btn.active { color: white; background: var(--primary); }
-  body.light-mode .nav-brand-text { color: white; }
-  body.light-mode .cmd-select { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #e8e8f0; }
-  body.light-mode .cmd-input { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #e8e8f0; }
-  body.light-mode .nav-filter-label { color: rgba(255,255,255,0.35); }
-  body.light-mode .nav-util-btn { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.08); }
-  body.light-mode .nav-util-btn:hover { color: rgba(255,255,255,0.8); }
-  body.light-mode .nav-context-info { color: rgba(255,255,255,0.4); }
-  body.light-mode .client-badge { color: #f87171; background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.2); }
-  body.light-mode .data-saved-pill { color: #34d399; background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.15); }
+  /* Nav stays dark in both themes — no overrides needed */
 
-  body.light-mode .login-screen {
-    background: linear-gradient(135deg, #e8ecf1 0%, #f0f2f5 100%);
-  }
-
-  body.light-mode .login-box {
-    background: white;
-    border-color: #e0e0e0;
-  }
-
-  body.light-mode .login-box h2,
-  body.light-mode .login-box .login-sub { color: #1a1a2e; }
-  body.light-mode .login-box .login-sub { color: #6b7280; }
-
-  body.light-mode thead th {
-    background: #f0f2f5;
-    color: #6b7280;
-    border-bottom-color: #e0e0e0;
-  }
-
-  body.light-mode tbody td { border-bottom-color: #f0f2f5; }
-  body.light-mode thead th.sortable:hover { color: #1a1a2e; background: rgba(0,0,0,0.04); }
-  body.light-mode tbody tr:hover { background: rgba(0,0,0,0.02); }
-  body.light-mode tbody tr.clickable-row:hover { background: rgba(227,24,55,0.06); }
-
-  body.light-mode .bpa-panel {
-    background: #ffffff;
-    border-color: #e0e0e0;
-  }
-
-  body.light-mode .kpi-value { color: #1a1a2e; }
-  body.light-mode .chart-card h3 { color: #1a1a2e; }
-
-  body.light-mode .modal { background: white; border-color: #e0e0e0; }
-  body.light-mode .cust-modal { background: white; border-color: #e0e0e0; }
-  body.light-mode .cust-detail-section { background: #f8f9fa; border-color: #e0e0e0; }
-  body.light-mode .cust-field .value { color: #1a1a2e; }
-
-  body.light-mode .form-group input,
-  body.light-mode .form-group select,
-  body.light-mode .form-group textarea {
-    background: #f8f9fa;
-    border-color: #e0e0e0;
-    color: #1a1a2e;
-  }
-
-  body.light-mode .logo-line { background: rgba(255,255,255,0.3); }
-
-  /* ===== Light Mode: Tokens ===== */
-  body.light-mode .tokens-container { background: white; border-color: #e0e0e0; }
-  body.light-mode .tokens-header { background: #f8f9fa; border-bottom-color: #e0e0e0; }
-  body.light-mode .tokens-header-left .tokens-icon { background: rgba(68,138,255,0.08); }
-  body.light-mode .tokens-description { border-bottom-color: #e0e0e0; color: #6b7280; }
-  body.light-mode .tokens-description strong { color: #448aff; }
-  body.light-mode .token-row { border-bottom-color: #f0f2f5; }
-  body.light-mode .token-row:hover { background: #f8f9fa; }
-  body.light-mode .token-row-header { background: #f0f2f5; color: #6b7280; }
-  body.light-mode .token-row-header:hover { background: #f0f2f5; }
-  body.light-mode .token-name { color: #1a1a2e; }
-  body.light-mode .token-value { color: #1a1a2e; }
-  body.light-mode .token-action-btn { background: #f0f2f5; border-color: #e0e0e0; color: #6b7280; }
-  body.light-mode .token-action-btn:hover { background: #e0e0e0; color: #1a1a2e; }
-  body.light-mode .token-action-btn.delete:hover { background: rgba(255,23,68,0.1); color: #e31837; }
-  body.light-mode .token-modal { background: white; border-color: #e0e0e0; }
-  body.light-mode .token-preview { background: #f8f9fa; border-color: #e0e0e0; color: #448aff; }
-  body.light-mode .token-overrides-section { border-top-color: #e0e0e0; }
-  body.light-mode .token-override-row select,
-  body.light-mode .token-override-row input { background: #f8f9fa; border-color: #e0e0e0; color: #1a1a2e; }
-  body.light-mode .token-override-remove { border-color: #e0e0e0; color: #6b7280; }
-  body.light-mode .token-search { background: white; border-color: #e0e0e0; color: #1a1a2e; }
-  body.light-mode .btn-add-override { background: rgba(68,138,255,0.04); border-color: rgba(68,138,255,0.2); }
-  body.light-mode .tokens-empty-text { color: #1a1a2e; }
-
-  /* ===== Light Mode: District Modal ===== */
-  body.light-mode .district-item { background: #f8f9fa; border-color: #e0e0e0; }
-  body.light-mode .district-item-header input { color: #1a1a2e; }
-  body.light-mode .district-stores-wrap { background: rgba(0,0,0,0.04); }
-  body.light-mode .district-unassigned { background: rgba(0,0,0,0.02); border-color: #e0e0e0; }
-
-  /* ===== Light Mode: Operations Grid ===== */
-  body.light-mode .ops-quick-btn { background: white; border-color: #e0e0e0; color: #6b7280; }
-  body.light-mode .ops-quick-btn:hover { border-color: #e31837; color: #1a1a2e; }
-  body.light-mode .ops-quick-btn.active { background: #e31837; border-color: #e31837; color: white; }
-  body.light-mode .ops-grid-wrap { background: white; border-color: #e0e0e0; }
-  body.light-mode .ops-grid-wrap h3 { color: #1a1a2e; }
-  body.light-mode .ops-grid th { background: white; color: #6b7280; border-bottom-color: #e0e0e0; }
-  body.light-mode .ops-grid td:first-child { background: white; }
-  body.light-mode .ops-grid tr:hover td:first-child { background: #f8f9fa; }
-  body.light-mode .ops-grid .district-row td:first-child { background: rgba(227,24,55,0.04); }
-  body.light-mode .ops-grid .totals-row td:first-child { background: #f0f2f5; }
-  body.light-mode .ops-grid td { border-bottom-color: #f0f2f5; color: #1a1a2e; }
-  body.light-mode .ops-grid td:first-child { color: #1a1a2e; }
-  body.light-mode .ops-grid tr:hover td { background: rgba(0,0,0,0.02); }
-  body.light-mode .ops-grid .district-row td { background: rgba(227,24,55,0.04); color: #1a1a2e; border-bottom-color: #e0e0e0; }
-  body.light-mode .ops-grid .district-row:hover td { background: rgba(227,24,55,0.08); }
-  body.light-mode .ops-grid .district-row td:first-child::before { border-left-color: #6b7280; }
-  body.light-mode .ops-grid .totals-row td { background: #f0f2f5; color: #1a1a2e; border-top-color: #e31837; }
-  body.light-mode .cell-green { background: rgba(0,200,83,0.08) !important; color: #00913c; }
-  body.light-mode .cell-yellow { background: rgba(255,214,0,0.10) !important; color: #9e8600; }
-  body.light-mode .cell-red { background: rgba(255,23,68,0.08) !important; color: #c41230; }
-
-  /* ===== Light Mode: Today Snapshot ===== */
-  body.light-mode .today-snapshot { background: linear-gradient(135deg, rgba(227,24,55,0.04) 0%, #f8f9fa 100%); border-color: rgba(227,24,55,0.15); }
-  body.light-mode .today-snapshot-header h3 { color: #1a1a2e; }
-  body.light-mode .today-stat-value { color: #1a1a2e; }
-
-  /* ===== Light Mode: Zero Dollar Section ===== */
-  body.light-mode .zero-dollar-section .kpi-card { background: white; border-color: #e0e0e0; }
-
-  /* ===== Light Mode: General heading and text fixes ===== */
-  body.light-mode .modal h3 { color: #1a1a2e; }
-  body.light-mode .table-wrap h3 { color: #1a1a2e; }
-  body.light-mode .kpi-label { color: #6b7280; }
-  body.light-mode .kpi-sub { color: #6b7280; }
-  body.light-mode .btn-export { background: #f8f9fa; border-color: #e0e0e0; color: #1a1a2e; }
-  body.light-mode .btn-export:hover { background: #e0e0e0; }
-  body.light-mode .btn-configure { border-color: #e0e0e0; color: #6b7280; }
-  body.light-mode .btn-cancel { border-color: #e0e0e0; color: #6b7280; }
-  body.light-mode .checklist-item .ck-text { color: #1a1a2e; }
-  body.light-mode .checklist-section-title { color: #e31837; border-bottom-color: #e0e0e0; }
-  body.light-mode .client-badge { color: #e31837; background: rgba(227,24,55,0.06); border-color: rgba(227,24,55,0.2); }
-  body.light-mode .tab { color: #6b7280; }
-  body.light-mode .tab:hover { color: #1a1a2e; background: rgba(0,0,0,0.03); }
-  body.light-mode .tab.active { color: #e31837; border-bottom-color: #e31837; background: rgba(227,24,55,0.04); }
-  body.light-mode .upload-drop { border-color: #e0e0e0; background: rgba(0,0,0,0.01); }
-  body.light-mode .upload-drop.drag-over { border-color: var(--primary); background: rgba(227,24,55,0.03); }
-  body.light-mode .upload-type-group { background: white; border-color: #e0e0e0; }
-  body.light-mode .bpa-insight { color: #1a1a2e; }
-  body.light-mode .bpa-panel h4, body.light-mode .bpa-panel .bpa-title { color: #1a1a2e; }
-  body.light-mode .bpa-action-btn { background: rgba(0,0,0,0.03); border-color: #e0e0e0; color: #1a1a2e; }
-  body.light-mode .campaign-status.draft { color: #6b7280; }
-
-  /* ===== Light Mode: Data saved badge ===== */
-  body.light-mode #dataSavedBadge { background: rgba(0,200,83,0.06); border-color: rgba(0,200,83,0.2); }
-
-  /* ===== Light Mode: Sidebar cards in reporting/marketing ===== */
-  body.light-mode [style*="background:var(--card)"] { background: white !important; }
+  /* Old light-mode element overrides removed — base CSS vars handle light theme */
+  /* Dark theme uses body.dark-mode CSS variable overrides above */
 
   /* ═══════════════════════════════════════════
      GROW REPORTS — KPI Cards & Grids
@@ -2782,7 +2609,7 @@
     margin-bottom: 4px;
   }
   .grow-kpi-value {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 24px;
     font-weight: 700;
     color: var(--text);
@@ -2835,22 +2662,7 @@
     margin-bottom: 6px;
   }
 
-  /* ===== Light Mode: GROW Reports ===== */
-  body.light-mode .grow-section-title { color: #1a1a2e; }
-  body.light-mode .grow-kpi-card { background: white; border-color: #e0e0e0; }
-  body.light-mode .grow-kpi-card:hover { border-color: rgba(227,24,55,0.3); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-  body.light-mode .grow-kpi-value { color: #1a1a2e; }
-  body.light-mode .grow-kpi-label { color: #6b7280; }
-  body.light-mode .grow-kpi-prior { color: #6b7280; }
-  body.light-mode .grow-kpi-change.up { color: #00913c; background: rgba(0,200,83,0.08); }
-  body.light-mode .grow-kpi-change.down { color: #c41230; background: rgba(255,23,68,0.08); }
-  body.light-mode .grow-kpi-change.flat { color: #6b7280; background: rgba(0,0,0,0.04); }
-  body.light-mode .pct-up { color: #00913c; }
-  body.light-mode .pct-down { color: #c41230; }
-  body.light-mode .pct-flat { color: #6b7280; }
-  body.light-mode .grow-no-data { color: #6b7280; }
-  body.light-mode .grow-no-data strong { color: #1a1a2e; }
-  body.light-mode .grow-badge { color: #e31837; background: rgba(227,24,55,0.08); }
+  /* GROW reports use CSS vars — no dark-mode overrides needed */
 
   @media print {
     .header { position: static; }
@@ -2868,11 +2680,11 @@
     <div class="login-logo">
       <div class="logo-text" style="font-size:28px;"><span class="red">BUTLER</span> PERFORMANCE</div>
       <div class="logo-line" style="width:240px;margin:6px auto 5px;"></div>
-      <div class="logo-analytics" style="font-size:20px;letter-spacing:10px;">ANALYTICS</div>
+      <div class="logo-analytics" style="font-size:12px;letter-spacing:4px;">ENTERPRISE ANALYTICS</div>
     </div>
     <div class="login-box">
       <h2>Sign In</h2>
-      <div class="login-sub">Enter your credentials to access the platform</div>
+      <div class="login-sub">Enterprise Analytics Platform</div>
       <form onsubmit="event.preventDefault();doLogin();" autocomplete="on">
         <div class="form-group">
           <label for="loginEmail">Email</label>
@@ -2938,9 +2750,9 @@
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
   <div style="margin-bottom:24px;text-align:center;">
-    <div class="logo-text" style="font-size:28px;"><span class="red">BUTLER</span> PERFORMANCE</div>
-    <div style="width:200px;height:1px;background:rgba(255,255,255,0.25);margin:6px auto 4px;"></div>
-    <div class="logo-analytics" style="font-size:24px;letter-spacing:6px;">ANALYTICS</div>
+    <div class="logo-text" style="font-size:28px;color:var(--text);"><span class="red">BUTLER</span> PERFORMANCE</div>
+    <div style="width:200px;height:1px;background:var(--border);margin:6px auto 4px;"></div>
+    <div class="logo-analytics" style="font-size:24px;letter-spacing:6px;color:var(--text-muted);">ANALYTICS</div>
   </div>
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
@@ -2987,7 +2799,6 @@
         <span class="data-saved-dot"></span> Saved
       </div>
       <button class="nav-util-btn" onclick="openAddFiles()" title="Add more data files">+ Add Files</button>
-      <button class="nav-util-btn" onclick="openMapFiles()" title="Upload and map columns manually" style="background:rgba(68,138,255,0.1);border-color:rgba(68,138,255,0.2);color:var(--blue);">Map Data</button>
       <button class="nav-util-btn" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">&#9790;</button>
       <button class="nav-util-btn" onclick="openSettings()" title="Settings">&#9881;</button>
       <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" title="Alerts">&#9888;</button>
@@ -3314,11 +3125,11 @@
     <div class="upload-file-types">
       <div class="upload-type-group">
         <div class="upload-type-label">Supported Formats</div>
-        <div class="upload-type-items">CSV · Excel (.xlsx, .xls) · GROW POS · ISI POS · Any spreadsheet export</div>
+        <div class="upload-type-items">CSV · Excel (.xlsx) · Any spreadsheet export</div>
       </div>
       <div class="upload-type-group">
-        <div class="upload-type-label">Supported POS Systems</div>
-        <div class="upload-type-items">Jiffy Lube (GROW) · Grease Monkey (ISI) · Captain's · E-Lube · Any POS export</div>
+        <div class="upload-type-label">Compatibility</div>
+        <div class="upload-type-items">Works with any point-of-sale system export</div>
       </div>
     </div>
 
@@ -3743,7 +3554,7 @@
     <div class="modal" style="width:700px;max-height:85vh;overflow-y:auto;">
       <h3>District Settings</h3>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Organize stores into districts and assign district managers. Changes are saved locally and reflected in the Operations grid.</div>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;font-family:'JetBrains Mono',monospace;opacity:0.7;">Each district can have a manager name and email for reporting.</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;font-family:'IBM Plex Mono',monospace;opacity:0.7;">Each district can have a manager name and email for reporting.</div>
       <div class="district-list" id="districtList"></div>
       <div class="district-unassigned" id="districtUnassigned">
         <div class="district-unassigned-title">Unassigned Stores</div>
@@ -3826,21 +3637,21 @@
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Car Count Increase</label>
           <div style="display:flex;align-items:center;gap:10px;">
             <input type="range" id="fcCarTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcCarLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0%</span>
+            <span id="fcCarLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Ticket Average Increase</label>
           <div style="display:flex;align-items:center;gap:10px;">
             <input type="range" id="fcTicketTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcTicketLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0%</span>
+            <span id="fcTicketLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Upsell Conversion Change</label>
           <div style="display:flex;align-items:center;gap:10px;">
             <input type="range" id="fcConvTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcConvLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--text-muted);min-width:45px;text-align:right;">0%</span>
+            <span id="fcConvLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--text-muted);min-width:45px;text-align:right;">0%</span>
           </div>
         </div>
       </div>
@@ -3849,14 +3660,14 @@
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">New Stores to Add</label>
           <div style="display:flex;align-items:center;gap:10px;">
             <input type="range" id="fcNewStores" min="0" max="20" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcNewStoresLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0</span>
+            <span id="fcNewStoresLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0</span>
           </div>
         </div>
         <div>
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Promo Discount Reduction</label>
           <div style="display:flex;align-items:center;gap:10px;">
             <input type="range" id="fcPromoReduction" min="0" max="50" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcPromoLabel" style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:var(--orange);min-width:45px;text-align:right;">0%</span>
+            <span id="fcPromoLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--orange);min-width:45px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
@@ -5949,7 +5760,7 @@ function bpaHTML(panelId, title, insights) {
         <span class="bpa-title">${title}</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">${insights.length} insight${insights.length>1?'s':''}</span>
+        <span style="font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;">${insights.length} insight${insights.length>1?'s':''}</span>
         <button class="bpa-action-btn green" onclick="bpaExportInsights('${panelId}')" style="font-size:10px;padding:3px 8px;">Email All</button>
       </div>
     </div>
@@ -6622,14 +6433,14 @@ function makeChart(canvasId, config) {
   if (config.options.scales) {
     Object.entries(config.options.scales).forEach(([key, s]) => {
       s.ticks = s.ticks || {};
-      s.ticks.color = s.ticks.color || '#8888a8';
+      s.ticks.color = s.ticks.color || '#64748b';
       s.ticks.font = s.ticks.font || { size: 11 };
       s.ticks.padding = s.ticks.padding || 6;
       s.grid = s.grid || {};
-      s.grid.color = s.grid.color || 'rgba(255,255,255,0.05)';
+      s.grid.color = s.grid.color || 'rgba(0,0,0,0.06)';
       s.grid.drawBorder = false;
       s.border = s.border || {};
-      s.border.color = 'rgba(255,255,255,0.08)';
+      s.border.color = 'rgba(0,0,0,0.08)';
     });
   }
   // Doughnut / Pie specifics
@@ -9073,7 +8884,7 @@ function renderPeople() {
       </div>
       <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Top Customers</div>
       <div style="max-height:120px;overflow-y:auto;">
-        ${seg.customers.map(c => '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:var(--text);">'+c.name.trim()+'</span><span style="color:var(--text-muted);font-family:JetBrains Mono,monospace;font-size:10px;">'+money(c.revenue)+' ('+c.visits+'x)</span></div>').join('')}
+        ${seg.customers.map(c => '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:var(--text);">'+c.name.trim()+'</span><span style="color:var(--text-muted);font-family:IBM Plex Mono,monospace;font-size:10px;">'+money(c.revenue)+' ('+c.visits+'x)</span></div>').join('')}
       </div>
     </div>`;
   });
@@ -9303,11 +9114,11 @@ function previewSegment() {
   document.getElementById('segPreviewTable').innerHTML = display.length ? `
     <table style="width:100%;font-size:12px;border-collapse:collapse;">
       <thead><tr>
-        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">NAME</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">VEHICLE</th>
-        <th style="text-align:center;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">STORE</th>
-        <th style="text-align:right;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">MILEAGE</th>
-        <th style="text-align:right;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;">NET SALES</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);">NAME</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);">VEHICLE</th>
+        <th style="text-align:center;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);">STORE</th>
+        <th style="text-align:right;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);">MILEAGE</th>
+        <th style="text-align:right;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);">NET SALES</th>
       </tr></thead>
       <tbody>${display.map(r => `<tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
         <td style="padding:6px 10px;">${((r.Customer_First_Name||'')+' '+(r.Customer_Last_Name||'')).trim()||'Unknown'}</td>
@@ -9622,7 +9433,7 @@ function renderMarketing() {
       const barW = Math.round(d.count / maxCount * 100);
       return `<div style="margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--text);">${zip}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text);">${zip}</span>
           <span style="font-size:11px;color:var(--text-muted);">${num(d.count)} customers · ${money(d.revenue)} · Avg ${money(avgTicket)} · ${pct(pctOfTotal)}</span>
         </div>
         <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
@@ -9699,7 +9510,7 @@ function renderMarketing() {
       <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px;">Top 5 Most Frequent</div>
       ${top5.map((c, i) => `<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;${i < 4 ? 'border-bottom:1px solid var(--border);' : ''}">
         <span style="color:var(--text);">${c.name.trim() || 'Unknown'}</span>
-        <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;">${c.count}x · ${money(c.revenue)}</span>
+        <span style="color:var(--text-muted);font-family:'IBM Plex Mono',monospace;">${c.count}x · ${money(c.revenue)}</span>
       </div>`).join('')}
     `;
   }
@@ -9770,7 +9581,7 @@ function renderMarketing() {
         <td>${pct(s.dataQuality)}</td>
         <td>${s.avgBayTime ? s.avgBayTime.toFixed(1) + ' min' : '—'}</td>
         <td>${s.inspCount ? pct(s.storeUpsell) : '—'}</td>
-        <td style="font-weight:800;color:${scoreColor};font-family:'JetBrains Mono',monospace;font-size:15px;">${s.score}</td>
+        <td style="font-weight:800;color:${scoreColor};font-family:'IBM Plex Mono',monospace;font-size:15px;">${s.score}</td>
       </tr>`;
     }).join('');
   }
@@ -10790,8 +10601,8 @@ function renderDistrictModal() {
         <button class="btn-cancel" onclick="removeDistrict(${idx})" style="padding:3px 10px;font-size:11px;">Delete</button>
       </div>
       <div style="display:flex;gap:8px;margin:8px 0 10px 0;">
-        <input type="text" value="${d.manager||''}" onchange="bp_districts[${idx}].manager=this.value" placeholder="Manager Name" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;">
-        <input type="email" value="${d.managerEmail||''}" onchange="bp_districts[${idx}].managerEmail=this.value" placeholder="Manager Email" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;">
+        <input type="text" value="${d.manager||''}" onchange="bp_districts[${idx}].manager=this.value" placeholder="Manager Name" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;">
+        <input type="email" value="${d.managerEmail||''}" onchange="bp_districts[${idx}].managerEmail=this.value" placeholder="Manager Email" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;">
       </div>
       <div class="district-stores-wrap">
         ${d.stores.map(s => `<div class="district-store-chip" onclick="unassignStore(${idx},'${s}')">#${s} <span class="remove-store">x</span></div>`).join('')}
@@ -13076,10 +12887,10 @@ function openAuditLog() {
   document.getElementById('auditLogTable').innerHTML = log.length ? `
     <table style="width:100%;font-size:12px;border-collapse:collapse;">
       <thead><tr>
-        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;position:sticky;top:0;z-index:1;">Time</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;position:sticky;top:0;z-index:1;">Action</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;position:sticky;top:0;z-index:1;">Email</th>
-        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:#1e1e35;position:sticky;top:0;z-index:1;">Detail</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:1;">Time</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:1;">Action</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:1;">Email</th>
+        <th style="text-align:left;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:1;">Detail</th>
       </tr></thead>
       <tbody>${log.map(e => {
         const d = new Date(e.timestamp);
@@ -13451,16 +13262,16 @@ resetInactivityTimer();
 
 // Light/Dark mode
 function toggleTheme() {
-  const isLight = document.body.classList.toggle('light-mode');
-  localStorage.setItem('bp_theme', isLight ? 'light' : 'dark');
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('bp_theme', isDark ? 'dark' : 'light');
   const btn = document.getElementById('themeToggle');
-  if (btn) btn.innerHTML = isLight ? '&#9728;' : '&#9790;';
+  if (btn) btn.innerHTML = isDark ? '&#9728;' : '&#9790;';
 }
 
 function loadTheme() {
   const theme = localStorage.getItem('bp_theme');
-  if (theme === 'light') {
-    document.body.classList.add('light-mode');
+  if (theme === 'dark') {
+    document.body.classList.add('dark-mode');
     const btn = document.getElementById('themeToggle');
     if (btn) btn.innerHTML = '&#9728;';
   }
