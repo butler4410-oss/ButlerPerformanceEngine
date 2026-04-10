@@ -2684,7 +2684,7 @@
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
-      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:80px;object-fit:contain;margin-bottom:8px;">
+      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:120px;object-fit:contain;margin-bottom:12px;">
     </div>
     <div class="login-box">
       <h2>Sign In</h2>
@@ -2754,7 +2754,7 @@
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
   <div style="margin-bottom:24px;text-align:center;">
-    <img src="logo-full.png" alt="Butler Performance Analytics" style="height:60px;object-fit:contain;margin-bottom:16px;">
+    <img src="logo-full.png" alt="Butler Performance Analytics" style="height:100px;object-fit:contain;margin-bottom:20px;">
   </div>
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
@@ -2765,7 +2765,7 @@
   <!-- Tier 1: Header + Views -->
   <div class="nav-tier1">
     <div class="nav-brand">
-      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:32px;object-fit:contain;" class="nav-logo">
+      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:38px;object-fit:contain;" class="nav-logo">
     </div>
     <div class="nav-views">
       <button class="view-btn active" data-view="dashboard">Dashboard</button>
@@ -3093,16 +3093,21 @@
 </div>
 
 <!-- Upload Zone (shown when no data) -->
-<div id="uploadZone" class="upload-screen">
-  <div class="upload-card">
-    <div class="upload-header">
-      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;">
-      <div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);">Upload your data to get started</div>
-      </div>
+<div id="uploadZone" class="upload-screen" style="position:relative;overflow:hidden;">
+  <!-- Logo watermark background -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.04;pointer-events:none;z-index:0;">
+    <img src="logo-full.png" alt="" style="width:700px;max-width:90vw;object-fit:contain;">
+  </div>
+  <div class="upload-card" style="position:relative;z-index:1;">
+    <!-- Big centered logo -->
+    <div style="text-align:center;margin-bottom:24px;">
+      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:100px;object-fit:contain;">
+    </div>
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:13px;font-weight:500;color:var(--text-muted);">Upload your data to get started</div>
     </div>
 
-    <div id="restoreDataHint" style="display:none;margin-bottom:20px;padding:16px 20px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:10px;">
+    <div id="restoreDataHint" style="display:none;margin-bottom:20px;padding:16px 20px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.15);border-radius:10px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <div style="width:8px;height:8px;background:var(--green);border-radius:50%;"></div>
         <div style="font-size:13px;font-weight:600;color:var(--green);">Previously saved data found</div>
