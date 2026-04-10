@@ -13,25 +13,23 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   :root {
-    --primary: #ef4444;
-    --primary-dark: #dc2626;
-    --accent: #0c1222;
-    --accent-light: #162036;
-    --bg: #0e1525;
-    --card: rgba(22,32,54,0.6);
-    --card-hover: rgba(30,42,68,0.7);
-    --text: #edf2f7;
-    --text-muted: #8fa3bf;
-    --border: rgba(99,130,180,0.12);
-    --green: #34d399;
-    --yellow: #fbbf24;
-    --orange: #fb923c;
-    --red: #f87171;
-    --blue: #60a5fa;
+    --primary: #1e40af;
+    --primary-dark: #1e3a8a;
+    --accent: #0f172a;
+    --accent-light: #1e293b;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --card-hover: #f8fafc;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --green: #059669;
+    --yellow: #d97706;
+    --orange: #ea580c;
+    --red: #dc2626;
+    --blue: #2563eb;
     --nav-height: 0px;
-    --surface-glass: rgba(14,21,37,0.85);
-    --glow-primary: rgba(239,68,68,0.08);
-    --glow-blue: rgba(96,165,250,0.06);
+    --surface-glass: rgba(255,255,255,0.9);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,19 +42,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
-    background-image:
-      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(96,165,250,0.04) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 85% 70%, rgba(239,68,68,0.03) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 50% 0%, rgba(52,211,153,0.025) 0%, transparent 50%);
-    background-attachment: fixed;
   }
 
-  ::selection { background: rgba(239,68,68,0.35); color: white; }
+  ::selection { background: rgba(30,64,175,0.2); color: var(--text); }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
 
   /* ═══════════════════════════════════════════
      NAVIGATION — 2-tier command center
@@ -65,11 +58,9 @@
     position: sticky;
     top: 0;
     z-index: 200;
-    background: rgba(12,18,34,0.92);
-    backdrop-filter: blur(20px) saturate(1.5);
-    -webkit-backdrop-filter: blur(20px) saturate(1.5);
-    border-bottom: 1px solid rgba(99,130,180,0.1);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
 
   /* Tier 1 */
@@ -100,27 +91,27 @@
 
   .nav-views {
     display: flex;
-    gap: 2px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 8px;
-    padding: 3px;
+    gap: 4px;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 4px;
   }
 
   .view-btn {
-    padding: 6px 16px;
+    padding: 7px 18px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     background: transparent;
-    color: rgba(255,255,255,0.45);
+    color: var(--text-muted);
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
   }
-  .view-btn:hover { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.05); }
-  .view-btn.active { color: white; background: var(--primary); font-weight: 700; }
+  .view-btn:hover { color: var(--text); background: var(--bg); }
+  .view-btn.active { color: white; background: var(--primary); font-weight: 700; border-radius: 8px; }
 
   .nav-user {
     display: flex;
@@ -179,14 +170,14 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    height: 32px;
+    height: 30px;
     padding: 0 12px;
-    background: rgba(227,24,55,0.08);
-    border: 1px solid rgba(227,24,55,0.15);
+    background: transparent;
+    border: none;
     border-radius: 8px;
     font-size: 12px;
-    font-weight: 600;
-    color: var(--primary);
+    font-weight: 500;
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
@@ -223,11 +214,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 40px;
+    height: 42px;
     padding: 0 20px;
-    background: rgba(0,0,0,0.15);
+    background: #ffffff;
     gap: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid var(--border);
   }
 
   .nav-filters {
@@ -281,12 +272,12 @@
   }
 
   .nav-util-btn {
-    height: 26px;
+    height: 28px;
     padding: 0 10px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 5px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
     background: transparent;
-    color: rgba(255,255,255,0.45);
+    color: var(--text-muted);
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 11px;
     cursor: pointer;
@@ -294,13 +285,13 @@
     white-space: nowrap;
   }
 
-  .nav-util-btn:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); }
+  .nav-util-btn:hover { color: var(--text); background: var(--bg); border-color: var(--text-muted); }
 
   .cmd-select {
-    height: 28px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #e8e8f0;
+    height: 30px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
     padding: 0 10px;
     padding-right: 24px;
     border-radius: 6px;
@@ -309,6 +300,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
+    color-scheme: light;
     appearance: none;
     -webkit-appearance: none;
     color-scheme: dark;
@@ -331,16 +323,17 @@
   .cmd-select option { background: #0f172a; color: #e8e8f0; }
 
   .cmd-input {
-    height: 28px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #e8e8f0;
+    height: 30px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
     padding: 0 10px;
     border-radius: 6px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     width: 130px;
     transition: all 0.15s;
+    color-scheme: light;
     color-scheme: dark;
   }
 
@@ -513,7 +506,7 @@
   .loading-screen {
     position: fixed;
     inset: 0;
-    background: #0f172a;
+    background: var(--bg);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -530,7 +523,7 @@
   .loading-spinner {
     width: 48px;
     height: 48px;
-    border: 3px solid rgba(255,255,255,0.1);
+    border: 3px solid var(--border);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -541,7 +534,7 @@
   .loading-text {
     margin-top: 16px;
     font-size: 12px;
-    color: rgba(255,255,255,0.4);
+    color: var(--text-muted);
     letter-spacing: 1px;
     text-transform: uppercase;
   }
@@ -787,13 +780,11 @@
   }
 
   .kpi-card {
-    background: rgba(22,32,54,0.5);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(99,130,180,0.1);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 16px 18px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     transition: all 0.2s ease;
     cursor: grab;
     user-select: none;
@@ -803,10 +794,9 @@
     overflow: hidden;
   }
   .kpi-card:hover {
-    border-color: rgba(239,68,68,0.3);
-    box-shadow: 0 0 20px rgba(239,68,68,0.08), 0 8px 24px rgba(0,0,0,0.2);
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     transform: translateY(-1px);
-    background: rgba(26,36,58,0.65);
   }
 
   .kpi-card:active { cursor: grabbing; }
@@ -978,14 +968,12 @@
   .charts-row.single { grid-template-columns: 1fr; }
 
   .chart-card {
-    background: rgba(22,32,54,0.45);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(99,130,180,0.1);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 16px 20px;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.03);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     position: relative;
   }
   .chart-card h3 {
@@ -1003,14 +991,12 @@
 
   /* Data Tables */
   .table-wrap {
-    background: rgba(22,32,54,0.45);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(99,130,180,0.1);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 24px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.03);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
   .table-wrap h3 {
@@ -1041,7 +1027,7 @@
   }
 
   thead th {
-    background: rgba(0,0,0,0.25);
+    background: #f8fafc;
     padding: 10px 14px;
     text-transform: uppercase;
     font-size: 10px;
@@ -1052,7 +1038,7 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    border-bottom: 2px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
 
   thead th.sortable {
@@ -1079,8 +1065,8 @@
     font-variant-numeric: tabular-nums;
   }
 
-  tbody tr:hover { background: rgba(255,255,255,0.04); }
-  tbody tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  tbody tr:hover { background: rgba(0,0,0,0.02); }
+  tbody tr:nth-child(even) td { background: rgba(0,0,0,0.015); }
 
   .status-dot {
     display: inline-block;
@@ -1532,15 +1518,13 @@
 
   /* BPA Insights Panel */
   .bpa-panel {
-    background: rgba(22,32,54,0.45);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(99,130,180,0.1);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-left: 3px solid var(--primary);
     border-radius: 12px;
     padding: 16px 20px;
     margin-bottom: 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
   .bpa-header {
@@ -2211,14 +2195,12 @@
   .ops-quick-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
 
   .ops-grid-wrap {
-    background: rgba(22,32,54,0.45);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(99,130,180,0.1);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     margin-bottom: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.03);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
   .ops-grid-wrap h3 {
     font-size: 14px;
@@ -2312,9 +2294,9 @@
   .ops-grid .totals-row td:first-child { background: var(--card-hover); }
 
   /* Cell color coding */
-  .cell-green { background: rgba(52,211,153,0.15) !important; color: #34d399; }
-  .cell-yellow { background: rgba(251,191,36,0.15) !important; color: #fbbf24; }
-  .cell-red { background: rgba(248,113,113,0.15) !important; color: #f87171; }
+  .cell-green { background: rgba(5,150,105,0.06) !important; color: #059669; }
+  .cell-yellow { background: rgba(217,119,6,0.06) !important; color: #d97706; }
+  .cell-red { background: rgba(220,38,38,0.06) !important; color: #dc2626; }
 
   /* Today Snapshot */
   .today-snapshot {
@@ -2451,10 +2433,6 @@
     position: fixed;
     inset: 0;
     background: var(--bg);
-    background-image:
-      radial-gradient(ellipse 70% 50% at 20% 30%, rgba(239,68,68,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 60%, rgba(96,165,250,0.05) 0%, transparent 55%),
-      radial-gradient(ellipse 40% 30% at 50% 10%, rgba(52,211,153,0.04) 0%, transparent 45%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2464,13 +2442,11 @@
   .login-screen.hidden { opacity: 0; pointer-events: none; }
   .login-card { width: 400px; max-width: 92vw; }
   .login-box {
-    background: rgba(22,32,54,0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(99,130,180,0.12);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 36px;
-    box-shadow: 0 16px 48px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
   }
   .login-box h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; text-align: center; }
   .login-box .login-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; text-align: center; }
@@ -2616,7 +2592,7 @@
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div style="text-align:center;margin-bottom:36px;">
-      <img src="logo.svg" alt="Butler Performance Analytics" style="height:110px;filter:drop-shadow(0 0 20px rgba(220,38,38,0.2));">
+      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:110px;filter:drop-shadow(0 0 20px rgba(220,38,38,0.2));">
     </div>
     <div class="login-box">
       <h2>Sign In</h2>
@@ -2686,7 +2662,7 @@
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
   <div style="margin-bottom:24px;text-align:center;">
-    <img src="logo.svg" alt="Butler Performance Analytics" style="height:100px;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(220,38,38,0.2));">
+    <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:100px;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(220,38,38,0.2));">
   </div>
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
@@ -2697,7 +2673,7 @@
   <!-- Tier 1: Header + Views -->
   <div class="nav-tier1">
     <div class="nav-brand">
-      <img src="logo.svg" alt="Butler Performance Analytics" style="height:42px;filter:drop-shadow(0 0 12px rgba(220,38,38,0.25));" class="nav-logo">
+      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:42px;filter:drop-shadow(0 0 12px rgba(220,38,38,0.25));" class="nav-logo">
     </div>
     <div class="nav-views">
       <button class="view-btn active" data-view="business">My Business</button>
@@ -3020,7 +2996,7 @@
 <div id="uploadZone" class="upload-screen">
   <div class="upload-card">
     <div style="text-align:center;margin-bottom:28px;">
-      <img src="logo.svg" alt="Butler Performance Analytics" style="height:90px;filter:drop-shadow(0 0 16px rgba(220,38,38,0.2));">
+      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:90px;filter:drop-shadow(0 0 16px rgba(220,38,38,0.2));">
       <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Upload your data to get started</div>
     </div>
 
