@@ -2945,6 +2945,7 @@
       <button class="nav-util-btn" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">&#9790;</button>
       <button class="nav-util-btn" onclick="openSettings()" title="Settings">&#9881;</button>
       <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" title="Alerts">&#9888;</button>
+      <button class="nav-util-btn" id="auditLogBtn" onclick="openAuditLog()" title="Audit Log" style="display:none;">&#9776;</button>
     </div>
   </div>
 </div>
@@ -3219,7 +3220,7 @@
       <div class="upload-drop-icon">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       </div>
-      <div class="upload-drop-text">Drop CSV files here</div>
+      <div class="upload-drop-text">Drop your data files here</div>
       <div class="upload-drop-sub">CSV and Excel files supported</div>
       <button class="file-input-btn" onclick="document.getElementById('fileInput').click()" style="margin-top:16px;">Choose Files</button>
       <input type="file" id="fileInput" multiple accept=".csv,.CSV,.xlsx,.xls,.XLSX,.XLS">
@@ -3227,12 +3228,12 @@
 
     <div class="upload-file-types">
       <div class="upload-type-group">
-        <div class="upload-type-label">POS Reports</div>
-        <div class="upload-type-items">Sales Summary · KPI Actuals · Time Analysis · System Impact · Any CSV or Excel</div>
+        <div class="upload-type-label">Supported Formats</div>
+        <div class="upload-type-items">CSV · Excel (.xlsx, .xls) · GROW POS · ISI POS · Any spreadsheet export</div>
       </div>
       <div class="upload-type-group">
-        <div class="upload-type-label">Transaction Data</div>
-        <div class="upload-type-items">Customers · Invoice Details · Promotions · Inspections · Invoices · ODI</div>
+        <div class="upload-type-label">Supported POS Systems</div>
+        <div class="upload-type-items">Jiffy Lube (GROW) · Grease Monkey (ISI) · Captain's · E-Lube · Any POS export</div>
       </div>
     </div>
 
