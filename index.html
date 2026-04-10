@@ -68,7 +68,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 44px;
+    height: 52px;
     padding: 0 20px;
     border-bottom: 1px solid rgba(255,255,255,0.04);
   }
@@ -2587,8 +2587,8 @@
 <!-- Login Screen -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <div style="text-align:center;margin-bottom:32px;">
-      <img src="logo.svg" alt="Butler Performance Analytics" style="height:80px;">
+    <div style="text-align:center;margin-bottom:36px;">
+      <img src="logo.svg" alt="Butler Performance Analytics" style="height:110px;filter:drop-shadow(0 0 20px rgba(220,38,38,0.2));">
     </div>
     <div class="login-box">
       <h2>Sign In</h2>
@@ -2658,7 +2658,7 @@
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
   <div style="margin-bottom:24px;text-align:center;">
-    <img src="logo.svg" alt="Butler Performance Analytics" style="height:80px;margin-bottom:16px;">
+    <img src="logo.svg" alt="Butler Performance Analytics" style="height:100px;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(220,38,38,0.2));">
   </div>
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
@@ -2669,15 +2669,13 @@
   <!-- Tier 1: Header + Views -->
   <div class="nav-tier1">
     <div class="nav-brand">
-      <img src="logo.svg" alt="Butler Performance Analytics" style="height:34px;" class="nav-logo">
+      <img src="logo.svg" alt="Butler Performance Analytics" style="height:42px;filter:drop-shadow(0 0 12px rgba(220,38,38,0.25));" class="nav-logo">
     </div>
     <div class="nav-views">
-      <button class="view-btn active" data-view="dashboard">Dashboard</button>
-      <button class="view-btn" data-view="stores">Stores</button>
-      <button class="view-btn" data-view="financials">Financials</button>
-      <button class="view-btn" data-view="people">People</button>
-      <button class="view-btn" data-view="forecast">Forecast</button>
-      <button class="view-btn" data-view="reports">Reports</button>
+      <button class="view-btn active" data-view="business">My Business</button>
+      <button class="view-btn" data-view="stores">My Stores</button>
+      <button class="view-btn" data-view="growth">Growth</button>
+      <button class="view-btn" data-view="dataroom">Data Room</button>
     </div>
     <div class="nav-user">
       <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
@@ -2996,7 +2994,7 @@
 <div id="uploadZone" class="upload-screen">
   <div class="upload-card">
     <div style="text-align:center;margin-bottom:28px;">
-      <img src="logo.svg" alt="Butler Performance Analytics" style="height:72px;">
+      <img src="logo.svg" alt="Butler Performance Analytics" style="height:90px;filter:drop-shadow(0 0 16px rgba(220,38,38,0.2));">
       <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Upload your data to get started</div>
     </div>
 
@@ -3045,30 +3043,36 @@
 <div class="dashboard" id="dashboard">
   <!-- Filters moved to header -->
 
-  <!-- Alert Banner -->
-  <div class="alert-banner" id="alertBanner" style="display:flex;align-items:center;gap:10px;padding:8px 16px;margin-bottom:12px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.12);border-radius:8px;font-size:12px;cursor:pointer;" onclick="openAlerts()">
-    <span style="color:var(--yellow);font-weight:700;" id="alertBannerCount"></span>
-    <span style="color:var(--text-muted);flex:1;" id="alertBannerSummary"></span>
-    <button onclick="event.stopPropagation();this.parentElement.style.display='none';" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:0 4px;">&times;</button>
-  </div>
+  <!-- MY BUSINESS VIEW -->
+  <div class="view-content active" id="view-business">
+    <!-- Alert banner (compact) -->
+    <div class="alert-banner" id="alertBanner" onclick="openAlerts()">
+      <span style="color:var(--yellow);font-weight:700;" id="alertBannerCount"></span>
+      <span style="color:var(--text-muted);flex:1;" id="alertBannerSummary"></span>
+      <button onclick="event.stopPropagation();this.parentElement.style.display='none';" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:0 4px;">&times;</button>
+    </div>
 
-  <!-- Tabs moved to nav-shell above -->
+    <!-- Split: KPIs left + Insights right -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div>
+        <div class="kpi-grid" id="dashKPIs" style="margin-bottom:0;"></div>
+      </div>
+      <div>
+        <div class="bpa-panel" id="bpaOverview" style="margin:0;max-height:220px;overflow-y:auto;"></div>
+      </div>
+    </div>
 
-  <!-- OVERVIEW TAB -->
-  <div class="view-content active" id="view-dashboard">
-    <div class="kpi-grid" id="dashKPIs"></div>
-
-    <!-- Store Performance Table (HERO) -->
-    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+    <!-- Store Rankings (HERO — fills viewport) -->
+    <div class="ops-grid-wrap" style="margin-bottom:12px;">
       <h3>
         Store Performance
         <div style="display:flex;gap:8px;align-items:center;">
-          <button class="btn-export" onclick="exportReport('dashStoreTable','Store Performance')" style="font-size:10px;padding:3px 10px;">Export</button>
-          <button class="btn-export" onclick="navigateTo('stores')" style="font-size:10px;padding:3px 10px;">All Stores &rarr;</button>
-          <button class="btn-export" onclick="navigateTo('forecast')" style="font-size:10px;padding:3px 10px;border-color:var(--blue);color:var(--blue);">Forecast Tool</button>
+          <button class="btn-export" onclick="exportReport('dashStoreTable','Store Performance')">Export</button>
+          <button class="btn-export" onclick="navigateTo('stores')">All Stores &rarr;</button>
+          <button class="btn-export" onclick="navigateTo('growth')" style="border-color:var(--blue);color:var(--blue);">Growth &rarr;</button>
         </div>
       </h3>
-      <div class="ops-grid-scroll" style="max-height:calc(100vh - 280px);min-height:250px;">
+      <div class="ops-grid-scroll" style="max-height:calc(100vh - 340px);min-height:200px;">
         <table class="ops-grid" id="dashStoreTable">
           <thead><tr>
             <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
@@ -3082,93 +3086,22 @@
       </div>
     </div>
 
-    <!-- Secondary row: BPA + Charts -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-      <div class="bpa-panel" id="bpaOverview" style="margin:0;"></div>
-      <div class="chart-card" style="margin:0;"><h3>Revenue Trend</h3><div class="chart-wrap" style="height:200px;"><canvas id="chartDashRevenue"></canvas></div></div>
-      <div class="chart-card" style="margin:0;"><h3>Daily Volume</h3><div class="chart-wrap" style="height:200px;"><canvas id="chartDashVolume"></canvas></div></div>
+    <!-- Charts row (compact) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="chart-card"><h3>Revenue Trend</h3><div class="chart-wrap" style="height:180px;"><canvas id="chartDashRevenue"></canvas></div></div>
+      <div class="chart-card"><h3>Daily Volume</h3><div class="chart-wrap" style="height:180px;"><canvas id="chartDashVolume"></canvas></div></div>
     </div>
 
-    <!-- Today's Snapshot (only if data) -->
+    <!-- Today snapshot (hidden until data) -->
     <div class="today-snapshot" id="todaySnapshot" style="margin-top:12px;">
-      <div class="today-snapshot-header">
-        <h3><div class="live-dot"></div> Today</h3>
-        <div id="todayDate" style="font-size:11px;color:var(--text-muted);"></div>
-      </div>
+      <div class="today-snapshot-header"><h3><div class="live-dot"></div> Today</h3><div id="todayDate" style="font-size:11px;color:var(--text-muted);"></div></div>
       <div class="today-snapshot-grid" id="todayStats"></div>
     </div>
   </div>
 
-  <!-- REVENUE TAB -->
-  <div class="view-content" id="view-financials">
+  <!-- REVENUE TAB (hidden - elements moved to Data Room) -->
+  <div class="tab-content" id="view-financials" style="display:none !important">
     <div class="kpi-grid" id="revenueKPIs"></div>
-
-    <!-- Product & Service Analysis (HERO) -->
-    <div class="ops-grid-wrap" style="margin-bottom:12px;">
-      <h3>
-        Product & Service Analysis
-        <div style="display:flex;gap:8px;align-items:center;">
-          <select id="productCatFilter" class="cmd-select" style="min-width:120px;height:26px;font-size:11px;" onchange="renderProductAnalysis()">
-            <option value="">All Categories</option>
-          </select>
-          <button class="btn-export" onclick="exportReport('tblProductAnalysis','Product Analysis')">Export</button>
-        </div>
-      </h3>
-      <div class="ops-grid-scroll" style="max-height:400px;">
-        <table class="ops-grid" id="tblProductAnalysis">
-          <thead><tr>
-            <th style="text-align:left;min-width:50px;position:sticky;left:0;z-index:3;background:var(--card);">Cat</th>
-            <th style="text-align:left;min-width:180px;">Product / Service</th>
-            <th>Qty</th>
-            <th>Revenue</th>
-            <th>Avg Price</th>
-            <th>Txns</th>
-            <th>Stores</th>
-            <th>Attach %</th>
-          </tr></thead>
-          <tbody id="productAnalysisBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Two tables side by side -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-      <div class="table-wrap" style="margin:0;">
-        <h3>Services & Products <button class="btn-export" onclick="exportReport('tblServices','Services')">Export</button></h3>
-        <div class="table-scroll" style="max-height:300px;">
-          <table id="tblServices"><thead><tr>
-            <th class="sortable" data-col="0">Category</th><th class="sortable" data-col="1">Description</th><th class="sortable" data-col="2">Type</th><th class="sortable" data-col="3">Qty</th><th class="sortable" data-col="4">Revenue</th><th class="sortable" data-col="5">Avg Price</th>
-          </tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-      <div class="table-wrap" style="margin:0;">
-        <h3>Promotions <button class="btn-export" onclick="exportReport('tblPromos','Promotions')">Export</button></h3>
-        <div class="table-scroll" style="max-height:300px;">
-          <table id="tblPromos"><thead><tr>
-            <th class="sortable" data-col="0">Code</th><th class="sortable" data-col="1">Uses</th><th class="sortable" data-col="2">Total</th><th class="sortable" data-col="3">Avg</th><th class="sortable" data-col="4">Stores</th><th class="sortable" data-col="5">Avg Invoice</th>
-          </tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-    </div>
-
-    <!-- BPA + Charts -->
-    <div class="bpa-panel" id="bpaRevenue"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-      <div class="chart-card"><h3>Revenue by Category</h3><div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div></div>
-      <div class="chart-card"><h3>Discount Impact</h3><div class="chart-wrap"><canvas id="chartDiscountImpact"></canvas></div></div>
-    </div>
-
-    <!-- Hidden elements for render functions -->
-    <div style="display:none;">
-      <canvas id="chartRevForecast"></canvas><canvas id="chartSeasonal"></canvas>
-      <canvas id="chartRevByType"></canvas><canvas id="chartTicketDist"></canvas>
-      <canvas id="chartFleetMix"></canvas>
-      <div id="zipAnalysis"></div><div id="serviceMixAnalysis"></div><div id="retentionAnalysis"></div>
-      <div id="fleetAnalysis"></div><div id="bpaMarket"></div>
-      <table id="tblOpportunity"><tbody id="opportunityBody"></tbody></table>
-      <table id="tblRecommendations"><tbody id="recommendationsBody"></tbody></table>
-      <table id="tblBrandExpansion"><tbody id="brandExpansionBody"></tbody></table>
-    </div>
   </div>
 
   <!-- INSPECTIONS TAB -->
@@ -3222,7 +3155,7 @@
       <button class="ops-quick-btn" onclick="setOpsDateRange('DTD')">DTD</button>
       <div style="flex:1;"></div>
       <button class="btn-export" id="storeBackBtn" style="display:none;" onclick="navigateTo('stores')">&#8592; All Stores</button>
-      <button class="btn-export" onclick="navigateTo('forecast')" style="border-color:var(--blue);color:var(--blue);">Forecast</button>
+      <button class="btn-export" onclick="navigateTo('growth')" style="border-color:var(--blue);color:var(--blue);">Growth</button>
     </div>
 
     <!-- All Stores Mode -->
@@ -3301,37 +3234,8 @@
     </div>
   </div>
 
-  <!-- SEGMENTS TAB -->
-  <div class="view-content" id="view-people">
-    <div class="kpi-grid" id="peopleKPIs"></div>
-
-    <!-- Service Advisor Table (HERO) -->
-    <div class="ops-grid-wrap" style="margin-bottom:16px;">
-      <h3>
-        Service Advisor Performance
-        <button class="btn-export" onclick="exportReport('peopleCSAGrid','Service Advisors')">Export</button>
-      </h3>
-      <div class="ops-grid-scroll" style="max-height:calc(100vh - 340px);min-height:200px;">
-        <table class="ops-grid" id="peopleCSAGrid">
-          <thead><tr>
-            <th style="min-width:160px;position:sticky;left:0;z-index:3;background:var(--card);">Advisor</th>
-            <th>Store</th>
-            <th>Vehicles</th>
-            <th title="Green inspection items" style="color:var(--green);">Green</th>
-            <th title="Yellow inspection items" style="color:var(--yellow);">Yellow</th>
-            <th title="Red inspection items" style="color:var(--red);">Red</th>
-            <th>Total</th>
-            <th title="% of items needing attention">Attn %</th>
-          </tr></thead>
-          <tbody id="peopleCSABody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Customer Segments -->
-    <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700;margin-bottom:8px;">Customer Segments</div>
-    <div id="smartSegments"></div>
-  </div>
+  <!-- SEGMENTS TAB (hidden - elements moved to Data Room) -->
+  <div class="tab-content" id="view-people" style="display:none !important"></div>
 
   <!-- MARKET ANALYSIS TAB -->
   <div class="tab-content" id="tab-marketing" style="display:none !important">
@@ -3377,8 +3281,8 @@
     <div id="customReportsContent"></div>
   </div>
 
-  <!-- Forecast View -->
-  <div class="view-content" id="view-forecast">
+  <!-- GROWTH VIEW -->
+  <div class="view-content" id="view-growth">
     <!-- Header row -->
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
       <select id="fcStoreSelect" class="cmd-select" style="min-width:180px;" onchange="renderForecastView()">
@@ -3393,159 +3297,150 @@
     <!-- Baseline KPIs -->
     <div class="kpi-grid" id="fcBaselineKPIs"></div>
 
-    <!-- Actuals Table -->
-    <div class="ops-grid-wrap" style="margin-bottom:12px;">
-      <h3>Current Period Actuals <button class="btn-export" onclick="exportReport('fcActualsTable','Store Actuals')">Export</button></h3>
-      <div class="ops-grid-scroll" style="max-height:240px;">
-        <table class="ops-grid" id="fcActualsTable">
-          <thead><tr>
-            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
-            <th>Net Sales</th><th>Vehicles</th><th>Ticket Avg</th><th>Labor %</th><th>CPD</th><th>MHPV</th>
-            <th>AF %</th><th>CAF %</th><th>WB %</th><th>Tire Rot %</th><th>Brakes</th>
-          </tr></thead>
-          <tbody id="fcActualsBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Growth Targets (compact) -->
+    <!-- Forecast Sliders (compact 6-column) -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:12px;">
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700;margin-bottom:12px;">Growth Targets</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:14px;">
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Car Count</div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input type="range" id="fcCarTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcCarLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Ticket Avg</div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input type="range" id="fcTicketTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcTicketLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Upsell Conv</div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input type="range" id="fcConvTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcConvLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">New Stores</div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input type="range" id="fcNewStores" min="0" max="20" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcNewStoresLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text);min-width:40px;text-align:right;">0</span>
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Promo Cut</div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input type="range" id="fcPromoReduction" min="0" max="50" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcPromoLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--orange);min-width:40px;text-align:right;">0%</span>
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Period</div>
-          <select id="fcPeriod" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:11px;" onchange="renderForecastResults()">
-            <option value="30">30 Days</option>
-            <option value="90" selected>Quarter</option>
-            <option value="180">Half Year</option>
-            <option value="365">Annual</option>
-          </select>
-        </div>
+        <div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Car Count</div><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="fcCarTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()"><span id="fcCarLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span></div></div>
+        <div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Ticket Avg</div><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="fcTicketTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()"><span id="fcTicketLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span></div></div>
+        <div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Upsell Conv</div><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="fcConvTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()"><span id="fcConvLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span></div></div>
+        <div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">New Stores</div><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="fcNewStores" min="0" max="20" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()"><span id="fcNewStoresLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text);min-width:40px;text-align:right;">0</span></div></div>
+        <div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Promo Cut</div><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="fcPromoReduction" min="0" max="50" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()"><span id="fcPromoLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--orange);min-width:40px;text-align:right;">0%</span></div></div>
+        <div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Period</div><select id="fcPeriod" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:11px;" onchange="renderForecastResults()"><option value="30">30 Days</option><option value="90" selected>Quarter</option><option value="180">Half Year</option><option value="365">Annual</option></select></div>
       </div>
     </div>
 
-    <!-- Targets Table -->
-    <div class="ops-grid-wrap" style="margin-bottom:12px;">
-      <h3>Store Targets <button class="btn-export" onclick="exportForecastTargets()">Export Targets</button></h3>
-      <div class="ops-grid-scroll" style="max-height:240px;">
-        <table class="ops-grid" id="fcTargetsTable">
-          <thead><tr>
-            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);" title="Store">Store</th>
-            <th title="Current revenue × growth %">Target Net Sales</th>
-            <th title="Current cars × growth % × biz days">Target Cars</th>
-            <th title="Current TA × growth %">Target TA</th>
-            <th title="Editable labor target">Target Labor %</th>
-            <th title="Auto: net sales ÷ biz days">Daily Rev</th>
-            <th title="Auto: target CPD">Weekly Cars</th>
-          </tr></thead>
-          <tbody id="fcTargetsBody"></tbody>
-        </table>
+    <!-- Two tables: Actuals + Targets side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div class="ops-grid-wrap" style="margin:0;">
+        <h3>Current Actuals <button class="btn-export" onclick="exportReport('fcActualsTable','Actuals')">Export</button></h3>
+        <div class="ops-grid-scroll" style="max-height:260px;">
+          <table class="ops-grid" id="fcActualsTable">
+            <thead><tr>
+              <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
+              <th>Net Sales</th><th>Vehicles</th><th>TA</th><th>Labor %</th><th>CPD</th><th>MHPV</th>
+            </tr></thead>
+            <tbody id="fcActualsBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ops-grid-wrap" style="margin:0;">
+        <h3>Store Targets <button class="btn-export" onclick="exportForecastTargets()">Export</button></h3>
+        <div class="ops-grid-scroll" style="max-height:260px;">
+          <table class="ops-grid" id="fcTargetsTable">
+            <thead><tr>
+              <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
+              <th title="Target Net Sales">Target Sales</th><th title="Target Cars">Cars</th><th title="Target TA">TA</th><th title="Target Labor %">Labor %</th><th title="Daily Revenue">Daily Rev</th><th title="Weekly Cars">Wk Cars</th>
+            </tr></thead>
+            <tbody id="fcTargetsBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Projected Results -->
     <div id="forecastResults"></div>
+
+    <!-- Prescriptions -->
+    <div class="bpa-panel" id="bpaGrowth" style="margin-top:12px;"></div>
   </div>
 
-  <!-- Reports View -->
-  <div class="view-content" id="view-reports">
+  <!-- DATA ROOM VIEW -->
+  <div class="view-content" id="view-dataroom">
     <div class="kpi-grid" id="reportingKPIs"></div>
 
-    <!-- Service Mix (HERO) -->
+    <!-- Product & Service Analysis -->
     <div class="ops-grid-wrap" style="margin-bottom:12px;">
-      <h3>Service Mix <button class="btn-export" onclick="exportReport('tblServiceMix','Service Mix')">Export</button></h3>
+      <h3>Product & Service Analysis <div style="display:flex;gap:8px;align-items:center;"><select id="productCatFilter" class="cmd-select" style="min-width:120px;height:26px;font-size:11px;" onchange="renderProductAnalysis()"><option value="">All</option></select><button class="btn-export" onclick="exportReport('tblProductAnalysis','Products')">Export</button></div></h3>
       <div class="ops-grid-scroll" style="max-height:350px;">
-        <table class="ops-grid" id="tblServiceMix">
+        <table class="ops-grid" id="tblProductAnalysis">
           <thead><tr>
-            <th style="text-align:left;min-width:120px;position:sticky;left:0;z-index:3;background:var(--card);">Category</th>
-            <th>Revenue</th><th>Qty</th><th>Avg Price</th><th>Stores</th><th>Penetration</th><th>Rev Share</th>
+            <th style="text-align:left;min-width:50px;position:sticky;left:0;z-index:3;background:var(--card);">Cat</th>
+            <th style="text-align:left;min-width:160px;">Product / Service</th>
+            <th>Qty</th><th>Revenue</th><th>Avg Price</th><th>Txns</th><th>Stores</th><th>Attach %</th>
           </tr></thead>
-          <tbody id="serviceMixBody"></tbody>
+          <tbody id="productAnalysisBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Data quality row -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Mailable Customers</div>
-        <div id="mailableStats"></div>
+    <!-- Service Mix + Data Quality row -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px;">
+      <div class="ops-grid-wrap" style="margin:0;">
+        <h3>Service Mix <button class="btn-export" onclick="exportReport('tblServiceMix','Service Mix')">Export</button></h3>
+        <div class="ops-grid-scroll" style="max-height:250px;">
+          <table class="ops-grid" id="tblServiceMix">
+            <thead><tr>
+              <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Category</th>
+              <th>Revenue</th><th>Qty</th><th>Avg Price</th><th>Stores</th><th>Penetration</th><th>Rev Share</th>
+            </tr></thead>
+            <tbody id="serviceMixBody"></tbody>
+          </table>
+        </div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Data Quality</div>
-        <div id="dataQualityStats"></div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Store Coverage</div>
-        <div id="storeMailStats" style="max-height:120px;overflow-y:auto;"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Mailable</div>
+          <div id="mailableStats"></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Data Quality</div>
+          <div id="dataQualityStats"></div>
+        </div>
       </div>
     </div>
 
+    <!-- BPA -->
     <div class="bpa-panel" id="bpaReporting"></div>
 
-    <!-- Warranty + Zero Dollar side by side -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-      <div class="table-wrap" style="margin:0;">
-        <h3>Warranty Services <button class="btn-export" onclick="exportReport('tblWarranty','Warranty')">Export</button></h3>
-        <div class="table-scroll" style="max-height:250px;">
-          <table id="tblWarranty"><thead><tr>
-            <th class="sortable" data-col="0">Service</th><th class="sortable" data-col="1">Cat</th><th class="sortable" data-col="2">Qty</th><th class="sortable" data-col="3">Rev</th><th class="sortable" data-col="4">Inv</th><th class="sortable" data-col="5">Stores</th><th class="sortable" data-col="6">Avg</th>
-          </tr></thead><tbody id="warrantyTableBody"></tbody></table>
-        </div>
-      </div>
-      <div class="table-wrap" style="margin:0;">
-        <h3>Zero Dollar Invoices <button class="btn-export" onclick="exportReport('tblZeroDollar','Zero Dollar')">Export</button></h3>
-        <div class="table-scroll" style="max-height:250px;">
-          <table id="tblZeroDollar"><thead><tr>
-            <th class="sortable" data-col="0">Store</th><th class="sortable" data-col="1">Date</th><th class="sortable" data-col="2">Inv #</th><th class="sortable" data-col="3">Customer</th><th class="sortable" data-col="4">Sales</th><th class="sortable" data-col="5">Services</th><th class="sortable" data-col="6">Bay</th>
-          </tr></thead><tbody id="zeroDollarBody"></tbody></table>
-        </div>
+    <!-- Service Advisors (compact) -->
+    <div class="ops-grid-wrap" style="margin-bottom:12px;">
+      <h3>Service Advisors <button class="btn-export" onclick="exportReport('peopleCSAGrid','Service Advisors')">Export</button></h3>
+      <div class="ops-grid-scroll" style="max-height:220px;">
+        <table class="ops-grid" id="peopleCSAGrid">
+          <thead><tr>
+            <th style="min-width:140px;position:sticky;left:0;z-index:3;background:var(--card);">Advisor</th>
+            <th>Store</th><th>Vehicles</th>
+            <th style="color:var(--green);">Green</th><th style="color:var(--yellow);">Yellow</th><th style="color:var(--red);">Red</th>
+            <th>Total</th><th>Attn %</th>
+          </tr></thead>
+          <tbody id="peopleCSABody"></tbody>
+        </table>
       </div>
     </div>
 
-    <div class="kpi-grid" id="zeroDollarKPIs" style="margin-bottom:12px;"></div>
+    <!-- Customer Segments -->
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700;margin-bottom:8px;">Customer Segments</div>
+    <div id="smartSegments"></div>
 
     <!-- Uploaded Files -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px;">
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700;">Data Files</div>
       <button class="btn-export" onclick="openAddFiles()">+ Add Files</button>
     </div>
     <div class="report-cards" id="reportsCards"></div>
+
+    <!-- Hidden elements for render functions -->
+    <div style="display:none;">
+      <div id="storeMailStats"></div>
+      <div id="zeroDollarKPIs"></div>
+      <div id="bpaRevenue"></div>
+      <div id="bpaMarket"></div>
+      <table id="tblWarranty"><tbody id="warrantyTableBody"></tbody></table>
+      <table id="tblZeroDollar"><tbody id="zeroDollarBody"></tbody></table>
+      <table id="tblServices"><thead><tr><th>Category</th><th>Description</th><th>Type</th><th>Qty</th><th>Revenue</th><th>Avg Price</th></tr></thead><tbody></tbody></table>
+      <table id="tblPromos"><thead><tr><th>Code</th><th>Uses</th><th>Total</th><th>Avg</th><th>Stores</th><th>Avg Invoice</th></tr></thead><tbody></tbody></table>
+      <table id="tblRecommendations"><tbody id="recommendationsBody"></tbody></table>
+      <table id="tblBrandExpansion"><tbody id="brandExpansionBody"></tbody></table>
+      <canvas id="chartRevByCat"></canvas><canvas id="chartDiscountImpact"></canvas>
+      <canvas id="chartRevForecast"></canvas><canvas id="chartSeasonal"></canvas>
+      <canvas id="chartRevByType"></canvas><canvas id="chartTicketDist"></canvas>
+      <canvas id="chartFleetMix"></canvas>
+      <div id="zipAnalysis"></div><div id="serviceMixAnalysis"></div><div id="retentionAnalysis"></div>
+      <div id="fleetAnalysis"></div>
+      <table id="tblOpportunity"><tbody id="opportunityBody"></tbody></table>
+      <div id="peopleKPIs"></div>
+    </div>
   </div>
 
   <!-- Hidden: Store Rankings (data still renders) -->
@@ -4482,7 +4377,7 @@ function launchDashboard() {
   if (!hasStandardData && hasAnyGrowData()) {
     navigateTo('stores', true);
   } else {
-    navigateTo(location.hash ? location.hash.replace('#','').split('/')[0] || 'dashboard' : 'dashboard', true);
+    navigateTo(location.hash ? location.hash.replace('#','').split('/')[0] || 'business' : 'business', true);
   }
 
   applyFilters();
@@ -4725,7 +4620,7 @@ function openReportDetail(reportId) {
 // BUSINESS FORECASTING TOOL
 // ============================================================
 function openForecastTool() {
-  navigateTo('forecast');
+  navigateTo('growth');
 }
 
 function renderForecastView(storeOverride) {
@@ -5170,7 +5065,7 @@ function exportForecastTargets() {
 }
 
 function printForecast() {
-  const content = document.getElementById('view-forecast');
+  const content = document.getElementById('view-growth');
   if (!content) return;
   const w = window.open('', '_blank');
   w.document.write('<html><head><title>BPA Forecast Report</title><style>');
@@ -5587,9 +5482,11 @@ function navigateTo(path, replace) {
 }
 
 function applyRoute() {
-  const hash = (location.hash || '#/dashboard').replace('#', '');
+  const hash = (location.hash || '#/business').replace('#', '');
   const parts = hash.split('/').filter(Boolean);
-  const view = parts[0] || 'dashboard';
+  // View aliases for backward compatibility
+  const viewAliases = { dashboard: 'business', forecast: 'growth', reports: 'dataroom', financials: 'dataroom', people: 'dataroom' };
+  const view = viewAliases[parts[0]] || parts[0] || 'business';
   const param = parts[1] || null;
 
   // Activate the correct view
