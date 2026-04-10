@@ -3321,13 +3321,15 @@
 
   <!-- SEGMENTS TAB -->
   <div class="view-content" id="view-people">
-    <!-- People KPIs -->
     <div class="kpi-grid" id="peopleKPIs"></div>
 
-    <!-- Service Advisor Performance (always visible) -->
-    <div class="ops-grid-wrap" style="margin-bottom:20px;">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">Service Advisor Performance <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">From SR_Productivity Data</span><button class="btn-export" onclick="exportReport('peopleCSAGrid','Service Advisor Performance')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
-      <div class="ops-grid-scroll" style="max-height:450px;">
+    <!-- Service Advisor Table (HERO) -->
+    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+      <h3>
+        Service Advisor Performance
+        <button class="btn-export" onclick="exportReport('peopleCSAGrid','Service Advisors')">Export</button>
+      </h3>
+      <div class="ops-grid-scroll" style="max-height:calc(100vh - 340px);min-height:200px;">
         <table class="ops-grid" id="peopleCSAGrid">
           <thead><tr>
             <th style="min-width:160px;position:sticky;left:0;z-index:3;background:var(--card);">Advisor</th>
@@ -3336,16 +3338,16 @@
             <th title="Green inspection items" style="color:var(--green);">Green</th>
             <th title="Yellow inspection items" style="color:var(--yellow);">Yellow</th>
             <th title="Red inspection items" style="color:var(--red);">Red</th>
-            <th title="Total inspection items">Total</th>
-            <th title="Percentage of items needing attention (yellow+red)">Needs Attn %</th>
+            <th>Total</th>
+            <th title="% of items needing attention">Attn %</th>
           </tr></thead>
           <tbody id="peopleCSABody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Customer Segments (auto-generated) -->
-    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">Customer Segments</div>
+    <!-- Customer Segments -->
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700;margin-bottom:8px;">Customer Segments</div>
     <div id="smartSegments"></div>
   </div>
 
@@ -3395,192 +3397,171 @@
 
   <!-- Forecast View -->
   <div class="view-content" id="view-forecast">
-    <!-- Store Selector + Export -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;">Forecast For:</div>
+    <!-- Header row -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
       <select id="fcStoreSelect" class="cmd-select" style="min-width:180px;" onchange="renderForecastView()">
         <option value="">All Stores (Company-Wide)</option>
       </select>
       <div style="flex:1;"></div>
-      <button class="btn-export" onclick="exportForecast()" style="font-size:11px;padding:5px 14px;">Export Forecast</button>
-      <button class="btn-export" onclick="printForecast()" style="font-size:11px;padding:5px 14px;">Print / PDF</button>
+      <button class="btn-export" onclick="exportForecast()">Export Forecast</button>
+      <button class="btn-export" onclick="exportForecastTargets()">Export Targets</button>
+      <button class="btn-export" onclick="printForecast()">Print / PDF</button>
     </div>
 
     <!-- Baseline KPIs -->
     <div class="kpi-grid" id="fcBaselineKPIs"></div>
 
-    <!-- Month Actuals Table (auto-populated) -->
-    <div class="ops-grid-wrap" style="margin-bottom:16px;">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">
-        Store Performance — Current Period
-        <button class="btn-export" onclick="exportReport('fcActualsTable','Store Actuals')" style="font-size:10px;padding:3px 10px;">Export</button>
-      </h3>
-      <div class="ops-grid-scroll" style="max-height:280px;">
+    <!-- Actuals Table -->
+    <div class="ops-grid-wrap" style="margin-bottom:12px;">
+      <h3>Current Period Actuals <button class="btn-export" onclick="exportReport('fcActualsTable','Store Actuals')">Export</button></h3>
+      <div class="ops-grid-scroll" style="max-height:240px;">
         <table class="ops-grid" id="fcActualsTable">
           <thead><tr>
             <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
-            <th title="Net Sales">Net Sales</th>
-            <th title="Total Vehicles">Vehicles</th>
-            <th title="Ticket Average">Ticket Avg</th>
-            <th title="Labor % of Net Sales">Labor %</th>
-            <th title="Cars Per Day">CPD</th>
-            <th title="Labor Hours Per Vehicle">MHPV</th>
-            <th title="Air Filter % of Vehicles">AF %</th>
-            <th title="Cabin Air Filter %">CAF %</th>
-            <th title="Wiper Blades %">WB %</th>
-            <th title="Tire Rotation %">Tire Rot %</th>
-            <th title="Brake Service Count">Brakes</th>
+            <th>Net Sales</th><th>Vehicles</th><th>Ticket Avg</th><th>Labor %</th><th>CPD</th><th>MHPV</th>
+            <th>AF %</th><th>CAF %</th><th>WB %</th><th>Tire Rot %</th><th>Brakes</th>
           </tr></thead>
           <tbody id="fcActualsBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Target Sliders -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;">
-      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;">Growth Targets</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+    <!-- Growth Targets (compact) -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:12px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700;margin-bottom:12px;">Growth Targets</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:14px;">
         <div>
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Car Count Increase</label>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Car Count</div>
+          <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcCarTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcCarLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0%</span>
+            <span id="fcCarLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Ticket Average Increase</label>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Ticket Avg</div>
+          <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcTicketTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcTicketLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0%</span>
+            <span id="fcTicketLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Upsell Conversion Change</label>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Upsell Conv</div>
+          <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcConvTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcConvLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--text-muted);min-width:45px;text-align:right;">0%</span>
+            <span id="fcConvLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
           </div>
         </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:16px;">
         <div>
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">New Stores to Add</label>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">New Stores</div>
+          <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcNewStores" min="0" max="20" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcNewStoresLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--text);min-width:45px;text-align:right;">0</span>
+            <span id="fcNewStoresLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text);min-width:40px;text-align:right;">0</span>
           </div>
         </div>
         <div>
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Promo Discount Reduction</label>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Promo Cut</div>
+          <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcPromoReduction" min="0" max="50" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
-            <span id="fcPromoLabel" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--orange);min-width:45px;text-align:right;">0%</span>
+            <span id="fcPromoLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--orange);min-width:40px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:6px;">Forecast Period</label>
-          <select id="fcPeriod" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;" onchange="renderForecastResults()">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Period</div>
+          <select id="fcPeriod" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:11px;" onchange="renderForecastResults()">
             <option value="30">30 Days</option>
-            <option value="90" selected>90 Days (Quarter)</option>
-            <option value="180">180 Days (Half Year)</option>
-            <option value="365">365 Days (Annual)</option>
+            <option value="90" selected>Quarter</option>
+            <option value="180">Half Year</option>
+            <option value="365">Annual</option>
           </select>
         </div>
       </div>
     </div>
 
-    <!-- Per-Store Targets Table (editable) -->
-    <div class="ops-grid-wrap" style="margin-bottom:16px;">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">
-        Store Targets — Forecast Period
-        <button class="btn-export" onclick="exportForecastTargets()" style="font-size:10px;padding:3px 10px;">Export Targets</button>
-      </h3>
-      <div class="ops-grid-scroll" style="max-height:280px;">
+    <!-- Targets Table -->
+    <div class="ops-grid-wrap" style="margin-bottom:12px;">
+      <h3>Store Targets <button class="btn-export" onclick="exportForecastTargets()">Export Targets</button></h3>
+      <div class="ops-grid-scroll" style="max-height:240px;">
         <table class="ops-grid" id="fcTargetsTable">
           <thead><tr>
-            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
-            <th title="Current revenue × growth % — click cells to edit">Target Net Sales</th>
-            <th title="Current cars/day × growth % × business days — editable">Target Cars</th>
-            <th title="Current ticket avg × growth % — editable">Target TA</th>
-            <th title="Target labor cost as % of sales — editable">Target Labor %</th>
-            <th title="Target net sales ÷ business days (auto-calculated)">Daily Revenue</th>
-            <th title="Target cars per day (auto-calculated)">Weekly Cars</th>
+            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);" title="Store">Store</th>
+            <th title="Current revenue × growth %">Target Net Sales</th>
+            <th title="Current cars × growth % × biz days">Target Cars</th>
+            <th title="Current TA × growth %">Target TA</th>
+            <th title="Editable labor target">Target Labor %</th>
+            <th title="Auto: net sales ÷ biz days">Daily Rev</th>
+            <th title="Auto: target CPD">Weekly Cars</th>
           </tr></thead>
           <tbody id="fcTargetsBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Results -->
+    <!-- Projected Results -->
     <div id="forecastResults"></div>
   </div>
 
   <!-- Reports View -->
   <div class="view-content" id="view-reports">
-    <!-- Service Mix Report (PRIMARY) -->
-    <div class="ops-grid-wrap" style="margin-bottom:16px;">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">Service Mix Report <button class="btn-export" onclick="exportReport('tblServiceMix','Service Mix Report')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
-      <div class="ops-grid-scroll" style="max-height:380px;">
+    <div class="kpi-grid" id="reportingKPIs"></div>
+
+    <!-- Service Mix (HERO) -->
+    <div class="ops-grid-wrap" style="margin-bottom:12px;">
+      <h3>Service Mix <button class="btn-export" onclick="exportReport('tblServiceMix','Service Mix')">Export</button></h3>
+      <div class="ops-grid-scroll" style="max-height:350px;">
         <table class="ops-grid" id="tblServiceMix">
           <thead><tr>
-            <th style="min-width:120px;text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Category</th>
-            <th title="Total revenue from this category">Revenue</th>
-            <th title="Total units sold">Qty Sold</th>
-            <th title="Average price per unit">Avg Price</th>
-            <th title="Number of stores selling this category">Stores</th>
-            <th title="% of stores with this service">Penetration</th>
-            <th title="% of total revenue">Rev Share</th>
+            <th style="text-align:left;min-width:120px;position:sticky;left:0;z-index:3;background:var(--card);">Category</th>
+            <th>Revenue</th><th>Qty</th><th>Avg Price</th><th>Stores</th><th>Penetration</th><th>Rev Share</th>
           </tr></thead>
           <tbody id="serviceMixBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- KPIs + Data Quality side by side -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Mailable Customers</div>
+    <!-- Data quality row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Mailable Customers</div>
         <div id="mailableStats"></div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Data Quality</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Data Quality</div>
         <div id="dataQualityStats"></div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Store Mailing Coverage</div>
-        <div id="storeMailStats" style="max-height:150px;overflow-y:auto;"></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Store Coverage</div>
+        <div id="storeMailStats" style="max-height:120px;overflow-y:auto;"></div>
       </div>
     </div>
 
-    <div class="kpi-grid" id="reportingKPIs"></div>
     <div class="bpa-panel" id="bpaReporting"></div>
 
-    <!-- Two tables side by side with export buttons -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+    <!-- Warranty + Zero Dollar side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <div class="table-wrap" style="margin:0;">
-        <h3 style="display:flex;align-items:center;justify-content:space-between;">Warranty Services <button class="btn-export" onclick="exportReport('tblWarranty','Warranty Services')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
-        <div class="table-scroll" style="max-height:280px;">
+        <h3>Warranty Services <button class="btn-export" onclick="exportReport('tblWarranty','Warranty')">Export</button></h3>
+        <div class="table-scroll" style="max-height:250px;">
           <table id="tblWarranty"><thead><tr>
-            <th class="sortable" data-col="0">Service</th><th class="sortable" data-col="1">Category</th><th class="sortable" data-col="2">Qty Sold</th><th class="sortable" data-col="3">Revenue</th><th class="sortable" data-col="4">Invoices</th><th class="sortable" data-col="5">Stores</th><th class="sortable" data-col="6">Avg Price</th>
+            <th class="sortable" data-col="0">Service</th><th class="sortable" data-col="1">Cat</th><th class="sortable" data-col="2">Qty</th><th class="sortable" data-col="3">Rev</th><th class="sortable" data-col="4">Inv</th><th class="sortable" data-col="5">Stores</th><th class="sortable" data-col="6">Avg</th>
           </tr></thead><tbody id="warrantyTableBody"></tbody></table>
         </div>
       </div>
       <div class="table-wrap" style="margin:0;">
-        <h3 style="display:flex;align-items:center;justify-content:space-between;">Zero Dollar Invoices <button class="btn-export" onclick="exportReport('tblZeroDollar','Zero Dollar Invoices')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
-        <div class="table-scroll" style="max-height:280px;">
+        <h3>Zero Dollar Invoices <button class="btn-export" onclick="exportReport('tblZeroDollar','Zero Dollar')">Export</button></h3>
+        <div class="table-scroll" style="max-height:250px;">
           <table id="tblZeroDollar"><thead><tr>
-            <th class="sortable" data-col="0">Store #</th><th class="sortable" data-col="1">Date</th><th class="sortable" data-col="2">Invoice #</th><th class="sortable" data-col="3">Customer</th><th class="sortable" data-col="4">Net Sales</th><th class="sortable" data-col="5">Services</th><th class="sortable" data-col="6">Bay Time</th>
+            <th class="sortable" data-col="0">Store</th><th class="sortable" data-col="1">Date</th><th class="sortable" data-col="2">Inv #</th><th class="sortable" data-col="3">Customer</th><th class="sortable" data-col="4">Sales</th><th class="sortable" data-col="5">Services</th><th class="sortable" data-col="6">Bay</th>
           </tr></thead><tbody id="zeroDollarBody"></tbody></table>
         </div>
       </div>
     </div>
 
-    <div class="kpi-grid" id="zeroDollarKPIs" style="margin-bottom:16px;"></div>
+    <div class="kpi-grid" id="zeroDollarKPIs" style="margin-bottom:12px;"></div>
 
-    <!-- Uploaded Data Files -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:14px;font-weight:700;color:var(--text);">Uploaded Data Files</div>
-      <button class="nav-util-btn" onclick="openAddFiles()">+ Add Files</button>
+    <!-- Uploaded Files -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700;">Data Files</div>
+      <button class="btn-export" onclick="openAddFiles()">+ Add Files</button>
     </div>
     <div class="report-cards" id="reportsCards"></div>
   </div>
