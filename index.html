@@ -1467,6 +1467,51 @@
     .report-modal { inset: 0; border-radius: 0; }
   }
 
+  /* Mapping Wizard */
+  .mapping-wizard-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .mapping-wizard-overlay.active { opacity: 1; pointer-events: all; }
+  .mapping-wizard {
+    position: fixed;
+    inset: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 601;
+  }
+  .mapping-wizard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .mapping-wizard-header h2 { font-size: 16px; font-weight: 700; color: var(--text); }
+  .mapping-wizard-body { flex: 1; overflow: auto; padding: 24px; }
+  .mapping-preview { overflow-x: auto; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; }
+  .mapping-preview table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .mapping-preview th { background: var(--card); padding: 6px 10px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
+  .mapping-preview td { padding: 5px 10px; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); }
+  .mapping-select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 5px; font-size: 11px; margin-top: 4px; }
+  .mapping-select option { background: var(--bg); }
+  .mapping-col-header { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  body.light-mode .mapping-wizard { background: #f3f4f6; }
+  body.light-mode .mapping-wizard-header { background: white; border-color: #e0e0e0; }
+  body.light-mode .mapping-preview th { background: #f0f2f5; }
+  body.light-mode .mapping-select { background: white; border-color: #e0e0e0; color: #1a1a2e; }
+
   /* BPA Insights Panel */
   .bpa-panel {
     background: var(--card);
@@ -3020,6 +3065,17 @@
       <div id="dataSourceTestResult" style="font-size:12px;margin-top:8px;"></div>
     </div>
 
+    <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Store Registry</div>
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Define your stores with display names and aliases. Aliases help BPA match store identifiers from different POS systems.</p>
+    <div id="storeRegistryList" style="max-height:200px;overflow-y:auto;margin-bottom:10px;"></div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="newStoreId" placeholder="Store ID (e.g. 319)" style="width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
+      <input type="text" id="newStoreName" placeholder="Display Name" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
+      <input type="text" id="newStoreAliases" placeholder="Aliases (comma-sep)" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
+      <button class="nav-apply-btn" onclick="addStoreToRegistry()" style="padding:6px 12px;font-size:11px;">Add</button>
+    </div>
+
     <div class="modal-buttons">
       <button class="btn-cancel" onclick="testEmailSetup()" style="border-color:var(--green);color:var(--green);">Test Email</button>
       <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
@@ -3193,6 +3249,33 @@
       </div>
     </div>
     <div class="report-modal-body" id="reportModalBody"></div>
+  </div>
+</div>
+
+<!-- Mapping Wizard Modal -->
+<div class="mapping-wizard-overlay" id="mappingWizardModal">
+  <div class="mapping-wizard">
+    <div class="mapping-wizard-header">
+      <h2 id="mappingWizardTitle">Map Your Data</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-export" onclick="skipMapping()" style="font-size:11px;">Skip — Load as Raw Report</button>
+        <button class="report-modal-close" onclick="closeMappingWizard()">&times;</button>
+      </div>
+    </div>
+    <div class="mapping-wizard-body">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div style="font-size:13px;color:var(--text);" id="mappingFileInfo"></div>
+        <div style="flex:1;"></div>
+        <div class="form-group" style="margin:0;display:flex;align-items:center;gap:8px;">
+          <label style="font-size:11px;white-space:nowrap;margin:0;">Save as:</label>
+          <input type="text" id="mappingLabel" placeholder="e.g. E-Lube POS" style="width:160px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
+        </div>
+      </div>
+      <div id="mappingPreview"></div>
+      <div style="display:flex;gap:12px;margin-top:20px;">
+        <button class="nav-apply-btn" onclick="applyMapping()" style="padding:10px 24px;font-size:13px;border-radius:8px;">Apply Mapping & Load Data</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4334,20 +4417,25 @@ function processFile(file) {
       const headers = parseCSVLine(firstLine);
       const type = detectFileType(headers);
       if (type === 'unknown') {
-        // Store as custom report — any CSV can be viewed
         const rows = parseCSV(text);
         if (rows.length > 0) {
-          // Clean the store number prefix if present (e.g. "Store Id: 319" -> "319")
-          rows.forEach(r => {
-            if (r.Store_Number) r.Store_Number = r.Store_Number.replace(/^Store\s*Id:\s*/i, '').trim();
-            if (r.Employee_Name1) r.Employee_Name1 = r.Employee_Name1.replace(/^Employee\s*:\s*/i, '').trim();
-            if (r.User_name) r.User_name = r.User_name.replace(/^User\s*Name\s*:\s*/i, '').trim();
-          });
-          // Remove existing report with same name to prevent dupes
-          CUSTOM_REPORTS = CUSTOM_REPORTS.filter(r => r.name !== file.name);
-          CUSTOM_REPORTS.push({ name: file.name, headers: headers.filter(h => h.trim()), rows: rows });
-          loadedFiles['custom_' + file.name] = true;
-          resolve({ name: file.name, type: 'custom', rows: rows.length });
+          // Check for saved mapping
+          const savedMapping = findSavedMapping(headers);
+          if (savedMapping) {
+            // Auto-apply saved mapping
+            applyMappingToData(savedMapping.mapping, rows);
+            resolve({ name: file.name, type: 'mapped', rows: rows.length });
+          } else {
+            // Clean GROW prefixes
+            rows.forEach(r => {
+              if (r.Store_Number) r.Store_Number = r.Store_Number.replace(/^Store\s*Id:\s*/i, '').trim();
+              if (r.Employee_Name1) r.Employee_Name1 = r.Employee_Name1.replace(/^Employee\s*:\s*/i, '').trim();
+              if (r.User_name) r.User_name = r.User_name.replace(/^User\s*Name\s*:\s*/i, '').trim();
+            });
+            // Open mapping wizard for user to map columns
+            openMappingWizard(file.name, headers.filter(h => h.trim()), rows);
+            resolve({ name: file.name, type: 'mapping', rows: rows.length });
+          }
         } else {
           resolve({ name: file.name, type: 'unknown', rows: 0 });
         }
@@ -4539,7 +4627,7 @@ async function handleFiles(files) {
     <div class="file-item">
       <span class="check">${r.type === 'unknown' ? '?' : '✓'}</span>
       <span class="name">${r.name}</span>
-      <span class="rows">${r.type === 'unknown' ? 'Unknown format' : (r.type === 'custom' ? 'Custom Report — ' + r.rows.toLocaleString() + ' rows' : (fileLabels[r.type] || r.type) + ' — ' + r.rows.toLocaleString() + ' rows')}</span>
+      <span class="rows">${r.type === 'unknown' ? 'Unknown format' : r.type === 'mapping' ? 'Mapping required — ' + r.rows.toLocaleString() + ' rows' : r.type === 'mapped' ? 'Auto-mapped — ' + r.rows.toLocaleString() + ' rows' : (r.type === 'custom' ? 'Custom Report — ' + r.rows.toLocaleString() + ' rows' : (fileLabels[r.type] || r.type) + ' — ' + r.rows.toLocaleString() + ' rows')}</span>
     </div>
   `).join('');
 
@@ -5394,6 +5482,320 @@ function printForecast() {
   w.document.write('</body></html>');
   w.document.close();
   setTimeout(() => w.print(), 300);
+}
+
+// ============================================================
+// MAPPING WIZARD
+// ============================================================
+const BPA_FIELDS = [
+  { id: '_skip', label: '— Skip this column —' },
+  { id: 'Store_Number', label: 'Store / Location' },
+  { id: 'Invoice_Number', label: 'Invoice / Transaction ID' },
+  { id: 'Invoice_Date', label: 'Date' },
+  { id: 'Net_Sales', label: 'Net Sales / Total' },
+  { id: 'Customer_First_Name', label: 'Customer First Name' },
+  { id: 'Customer_Last_Name', label: 'Customer Last Name' },
+  { id: 'Customer_Email_Address', label: 'Email' },
+  { id: 'Customer_Phone_Number', label: 'Phone' },
+  { id: 'Customer_Address', label: 'Address' },
+  { id: 'City', label: 'City' },
+  { id: 'Customer_State', label: 'State' },
+  { id: 'ZIP_Code', label: 'ZIP Code' },
+  { id: 'Invoice_Detail_Description', label: 'Service / Product Description' },
+  { id: 'Invoice_Detail_Code', label: 'Service / Product Code' },
+  { id: 'JLI_Category_Code', label: 'Service Category' },
+  { id: 'Extended_Price', label: 'Line Item Price' },
+  { id: 'Quantity_Sold', label: 'Quantity' },
+  { id: 'Promo_Code', label: 'Promo / Coupon Code' },
+  { id: 'Promo_Amount', label: 'Promo / Discount Amount' },
+  { id: 'Business_Account_ID', label: 'Business / Fleet Account' },
+  { id: 'ChekChart_Make', label: 'Vehicle Make' },
+  { id: 'Vehicle_Mileage', label: 'Vehicle Mileage' },
+  { id: 'Bay_Start_Time', label: 'Bay Start Time' },
+  { id: 'Bay_End_Time', label: 'Bay End Time' },
+  { id: 'Greet_Time', label: 'Greet / Check-in Time' },
+  { id: 'Ring_Out_End_Time', label: 'Checkout / Ring-out Time' },
+  { id: 'Employee_Name', label: 'Employee / Technician Name' }
+];
+
+let _mappingPendingData = null; // { fileName, headers, rows }
+
+function getHeaderFingerprint(headers) {
+  return headers.map(h => h.toLowerCase().trim()).sort().join('|');
+}
+
+function getSavedMappings() {
+  try { return JSON.parse(localStorage.getItem('bp_mappings') || '[]'); } catch(e) { return []; }
+}
+
+function saveMappingConfig(fingerprint, mapping, label) {
+  const mappings = getSavedMappings();
+  const existing = mappings.findIndex(m => m.fingerprint === fingerprint);
+  const entry = { fingerprint, mapping, label, savedAt: new Date().toISOString() };
+  if (existing >= 0) mappings[existing] = entry; else mappings.push(entry);
+  localStorage.setItem('bp_mappings', JSON.stringify(mappings));
+}
+
+function findSavedMapping(headers) {
+  const fp = getHeaderFingerprint(headers);
+  return getSavedMappings().find(m => m.fingerprint === fp);
+}
+
+function autoGuessField(header) {
+  const h = header.toLowerCase().trim();
+  if (h.includes('store') || h.includes('location') || h.includes('site')) return 'Store_Number';
+  if (h.includes('invoice') && h.includes('date') || h === 'date' || h.includes('transaction_at') || h.includes('trans date')) return 'Invoice_Date';
+  if (h.includes('invoice') || h.includes('transaction_id') || h.includes('ticket')) return 'Invoice_Number';
+  if (h.includes('total') || h.includes('net sales') || h.includes('amount') || h.includes('subtotal') || h.includes('net_sales')) return 'Net_Sales';
+  if (h.includes('first') && h.includes('name')) return 'Customer_First_Name';
+  if (h.includes('last') && h.includes('name')) return 'Customer_Last_Name';
+  if (h.includes('email')) return 'Customer_Email_Address';
+  if (h.includes('phone') || h.includes('mobile')) return 'Customer_Phone_Number';
+  if (h.includes('address') || h.includes('street')) return 'Customer_Address';
+  if (h === 'city' || h.includes('city')) return 'City';
+  if (h === 'state' || h.includes('state')) return 'Customer_State';
+  if (h.includes('zip') || h.includes('postal')) return 'ZIP_Code';
+  if (h.includes('description') || h.includes('desc') || h.includes('service') || h.includes('part')) return 'Invoice_Detail_Description';
+  if (h.includes('code') && !h.includes('zip') && !h.includes('promo')) return 'Invoice_Detail_Code';
+  if (h.includes('category') || h.includes('cat')) return 'JLI_Category_Code';
+  if (h.includes('price') || h.includes('ext') || h.includes('line_total')) return 'Extended_Price';
+  if (h.includes('qty') || h.includes('quantity')) return 'Quantity_Sold';
+  if (h.includes('promo') && h.includes('code') || h.includes('coupon')) return 'Promo_Code';
+  if (h.includes('promo') && (h.includes('amount') || h.includes('discount'))) return 'Promo_Amount';
+  if (h.includes('fleet') || h.includes('business') || h.includes('account')) return 'Business_Account_ID';
+  if (h.includes('make') || h.includes('vehicle_make')) return 'ChekChart_Make';
+  if (h.includes('mileage') || h.includes('odometer')) return 'Vehicle_Mileage';
+  if (h.includes('employee') || h.includes('tech') || h.includes('staff')) return 'Employee_Name';
+  return '_skip';
+}
+
+function openMappingWizard(fileName, headers, rows) {
+  _mappingPendingData = { fileName, headers, rows };
+  document.getElementById('mappingWizardTitle').textContent = 'Map Your Data — ' + fileName;
+  document.getElementById('mappingFileInfo').textContent = rows.length.toLocaleString() + ' rows · ' + headers.length + ' columns';
+  document.getElementById('mappingLabel').value = '';
+
+  // Build preview
+  const preview = rows.slice(0, 5);
+  let html = '<div class="mapping-preview"><table><thead><tr>';
+  headers.forEach(h => {
+    const guess = autoGuessField(h);
+    html += '<th><div class="mapping-col-header">' + h + '</div>';
+    html += '<select class="mapping-select" data-col="' + h + '">';
+    BPA_FIELDS.forEach(f => {
+      html += '<option value="' + f.id + '"' + (f.id === guess ? ' selected' : '') + '>' + f.label + '</option>';
+    });
+    html += '</select></th>';
+  });
+  html += '</tr></thead><tbody>';
+  preview.forEach(row => {
+    html += '<tr>';
+    headers.forEach(h => { html += '<td>' + (String(row[h] || '').substring(0, 40)) + '</td>'; });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+
+  document.getElementById('mappingPreview').innerHTML = html;
+  document.getElementById('mappingWizardModal').classList.add('active');
+}
+
+function closeMappingWizard() {
+  document.getElementById('mappingWizardModal').classList.remove('active');
+  _mappingPendingData = null;
+}
+
+function skipMapping() {
+  if (_mappingPendingData) {
+    const d = _mappingPendingData;
+    CUSTOM_REPORTS = CUSTOM_REPORTS.filter(r => r.name !== d.fileName);
+    CUSTOM_REPORTS.push({ name: d.fileName, headers: d.headers, rows: d.rows });
+    loadedFiles['custom_' + d.fileName] = true;
+  }
+  closeMappingWizard();
+  // Show launch button
+  const btn = document.getElementById('launchBtnWrap');
+  if (btn && Object.keys(loadedFiles).length > 0) { btn.style.display = ''; btn.querySelector('button').textContent = 'Launch Dashboard (' + Object.keys(loadedFiles).length + ' files loaded)'; }
+}
+
+function applyMapping() {
+  if (!_mappingPendingData) return;
+  const d = _mappingPendingData;
+
+  // Read dropdown selections
+  const mapping = {};
+  document.querySelectorAll('#mappingPreview .mapping-select').forEach(sel => {
+    mapping[sel.dataset.col] = sel.value;
+  });
+
+  // Save the mapping
+  const label = document.getElementById('mappingLabel').value.trim() || d.fileName;
+  saveMappingConfig(getHeaderFingerprint(d.headers), mapping, label);
+
+  // Apply mapping to rows
+  applyMappingToData(mapping, d.rows);
+
+  closeMappingWizard();
+
+  // Update UI
+  const btn = document.getElementById('launchBtnWrap');
+  if (btn && Object.keys(loadedFiles).length > 0) { btn.style.display = ''; btn.querySelector('button').textContent = 'Launch Dashboard (' + Object.keys(loadedFiles).length + ' files loaded)'; }
+
+  // If dashboard is active, re-render
+  if (document.getElementById('dashboard')?.classList.contains('active')) {
+    applyFilters();
+    saveUserData();
+  }
+}
+
+function applyMappingToData(mapping, rows) {
+  const custRows = [];
+  const detRows = [];
+  const promoRows = [];
+
+  // Determine which BPA fields are mapped
+  const fieldMap = {}; // bpaField → sourceColumn
+  Object.entries(mapping).forEach(([col, field]) => {
+    if (field !== '_skip') fieldMap[field] = col;
+  });
+
+  const hasDetailFields = fieldMap['Invoice_Detail_Description'] || fieldMap['Invoice_Detail_Code'];
+
+  rows.forEach(r => {
+    const get = (field) => r[fieldMap[field]] || '';
+    const storeRaw = get('Store_Number');
+    const store = resolveStore(storeRaw) || storeRaw;
+
+    // Customer/invoice record
+    custRows.push({
+      Store_Number: store,
+      Invoice_Number: get('Invoice_Number'),
+      Invoice_Date: get('Invoice_Date'),
+      Net_Sales: get('Net_Sales'),
+      Customer_First_Name: get('Customer_First_Name'),
+      Customer_Last_Name: get('Customer_Last_Name'),
+      Customer_Email_Address: get('Customer_Email_Address'),
+      Customer_Phone_Number: get('Customer_Phone_Number'),
+      Customer_Address: get('Customer_Address'),
+      City: get('City'),
+      Customer_State: get('Customer_State'),
+      ZIP_Code: get('ZIP_Code'),
+      Business_Account_ID: get('Business_Account_ID'),
+      ChekChart_Make: get('ChekChart_Make'),
+      Vehicle_Mileage: get('Vehicle_Mileage'),
+      Bay_Start_Time: get('Bay_Start_Time'),
+      Bay_End_Time: get('Bay_End_Time'),
+      Greet_Time: get('Greet_Time'),
+      Ring_Out_End_Time: get('Ring_Out_End_Time')
+    });
+
+    // Detail record (if mapped)
+    if (hasDetailFields) {
+      detRows.push({
+        Store_Number: store,
+        Invoice_Number: get('Invoice_Number'),
+        Invoice_Date: get('Invoice_Date'),
+        Invoice_Detail_Type: 'SERVICE',
+        Invoice_Detail_Description: get('Invoice_Detail_Description'),
+        Invoice_Detail_Code: get('Invoice_Detail_Code'),
+        JLI_Category_Code: get('JLI_Category_Code') || 'OTHER',
+        Extended_Price: get('Extended_Price'),
+        Quantity_Sold: get('Quantity_Sold') || '1'
+      });
+    }
+
+    // Promo record (if mapped)
+    if (fieldMap['Promo_Code'] && get('Promo_Code')) {
+      promoRows.push({
+        Store_Number: store,
+        Invoice_Number: get('Invoice_Number'),
+        Invoice_Date: get('Invoice_Date'),
+        Promo_Code: get('Promo_Code'),
+        Promo_Amount: get('Promo_Amount') || '0'
+      });
+    }
+  });
+
+  DATA.customers = DATA.customers.concat(custRows);
+  if (detRows.length) DATA.details = DATA.details.concat(detRows);
+  if (promoRows.length) DATA.promos = DATA.promos.concat(promoRows);
+  loadedFiles['customers'] = true;
+  if (detRows.length) loadedFiles['details'] = true;
+  if (promoRows.length) loadedFiles['promos'] = true;
+  loadedFiles['mapped'] = true;
+}
+
+// ============================================================
+// STORE REGISTRY
+// ============================================================
+function getStoreRegistry() {
+  try { return JSON.parse(localStorage.getItem('bp_store_registry') || '[]'); } catch(e) { return []; }
+}
+
+function saveStoreRegistry(registry) {
+  localStorage.setItem('bp_store_registry', JSON.stringify(registry));
+}
+
+function resolveStore(rawValue) {
+  if (!rawValue) return rawValue;
+  const clean = String(rawValue).replace(/["\s]/g, '').trim();
+  const registry = getStoreRegistry();
+  // Exact ID match
+  const exact = registry.find(s => s.id === clean);
+  if (exact) return exact.id;
+  // Alias match
+  for (const s of registry) {
+    if (s.aliases && s.aliases.some(a => a.trim().toLowerCase() === clean.toLowerCase() || rawValue.toLowerCase().includes(a.trim().toLowerCase()))) {
+      return s.id;
+    }
+  }
+  return clean;
+}
+
+function getStoreDisplayName(storeId) {
+  const registry = getStoreRegistry();
+  const entry = registry.find(s => s.id === storeId);
+  return entry ? entry.name || ('#' + entry.id) : ('#' + storeId);
+}
+
+function renderStoreRegistry() {
+  const registry = getStoreRegistry();
+  const el = document.getElementById('storeRegistryList');
+  if (!el) return;
+  if (!registry.length) {
+    el.innerHTML = '<div style="color:var(--text-muted);font-size:11px;padding:8px;">No stores registered. Stores will be auto-detected from uploaded data.</div>';
+    return;
+  }
+  el.innerHTML = registry.map((s, i) => {
+    return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">' +
+      '<strong style="min-width:60px;color:var(--text);">' + s.id + '</strong>' +
+      '<span style="flex:1;color:var(--text-muted);">' + (s.name || '—') + '</span>' +
+      '<span style="font-size:10px;color:var(--text-muted);">' + (s.aliases || []).join(', ') + '</span>' +
+      '<button onclick="removeStoreFromRegistry(' + i + ')" style="background:none;border:1px solid var(--border);color:var(--red);width:22px;height:22px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button>' +
+    '</div>';
+  }).join('');
+}
+
+function addStoreToRegistry() {
+  const id = document.getElementById('newStoreId')?.value?.trim();
+  const name = document.getElementById('newStoreName')?.value?.trim();
+  const aliasStr = document.getElementById('newStoreAliases')?.value?.trim();
+  if (!id) { alert('Store ID is required'); return; }
+  const aliases = aliasStr ? aliasStr.split(',').map(a => a.trim()).filter(Boolean) : [];
+  const registry = getStoreRegistry();
+  registry.push({ id, name: name || '', aliases });
+  saveStoreRegistry(registry);
+  renderStoreRegistry();
+  // Clear inputs
+  document.getElementById('newStoreId').value = '';
+  document.getElementById('newStoreName').value = '';
+  document.getElementById('newStoreAliases').value = '';
+}
+
+function removeStoreFromRegistry(idx) {
+  const registry = getStoreRegistry();
+  registry.splice(idx, 1);
+  saveStoreRegistry(registry);
+  renderStoreRegistry();
 }
 
 function renderDashboard() {
@@ -12387,6 +12789,7 @@ function openSettings() {
   const apiSchedEl = document.getElementById('settingApiSchedule');
   if (apiSchedEl) apiSchedEl.value = localStorage.getItem('bp_api_schedule') || 'manual';
   document.getElementById('settingsModal').classList.add('active');
+  renderStoreRegistry();
   document.getElementById('settingCompany').focus();
 }
 
