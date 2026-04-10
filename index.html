@@ -1028,7 +1028,7 @@
   }
 
   thead th {
-    background: var(--card);
+    background: #f8fafc;
     padding: 10px 14px;
     text-align: left;
     font-weight: 600;
@@ -2278,9 +2278,9 @@
   .ops-grid .totals-row td:first-child { background: var(--card-hover); }
 
   /* Cell color coding */
-  .cell-green { background: rgba(0,200,83,0.12) !important; color: var(--green); }
-  .cell-yellow { background: rgba(255,214,0,0.10) !important; color: var(--yellow); }
-  .cell-red { background: rgba(255,23,68,0.10) !important; color: var(--red); }
+  .cell-green { background: rgba(22,163,74,0.08) !important; color: #16a34a; }
+  .cell-yellow { background: rgba(202,138,4,0.08) !important; color: #ca8a04; }
+  .cell-red { background: rgba(220,38,38,0.08) !important; color: #dc2626; }
 
   /* Today Snapshot */
   .today-snapshot {
@@ -2553,6 +2553,12 @@
 
   /* Nav stays dark in both themes — no overrides needed */
 
+  /* Dark-mode overrides for hardcoded light-theme values */
+  body.dark-mode thead th { background: var(--card); }
+  body.dark-mode .cell-green { color: var(--green); }
+  body.dark-mode .cell-yellow { color: var(--yellow); }
+  body.dark-mode .cell-red { color: var(--red); }
+
   /* Old light-mode element overrides removed — base CSS vars handle light theme */
   /* Dark theme uses body.dark-mode CSS variable overrides above */
 
@@ -2678,9 +2684,7 @@
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
-      <div class="logo-text" style="font-size:28px;"><span class="red">BUTLER</span> PERFORMANCE</div>
-      <div class="logo-line" style="width:240px;margin:6px auto 5px;"></div>
-      <div class="logo-analytics" style="font-size:12px;letter-spacing:4px;">ENTERPRISE ANALYTICS</div>
+      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:80px;object-fit:contain;margin-bottom:8px;">
     </div>
     <div class="login-box">
       <h2>Sign In</h2>
@@ -2750,9 +2754,7 @@
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
   <div style="margin-bottom:24px;text-align:center;">
-    <div class="logo-text" style="font-size:28px;color:var(--text);"><span class="red">BUTLER</span> PERFORMANCE</div>
-    <div style="width:200px;height:1px;background:var(--border);margin:6px auto 4px;"></div>
-    <div class="logo-analytics" style="font-size:24px;letter-spacing:6px;color:var(--text-muted);">ANALYTICS</div>
+    <img src="logo-full.png" alt="Butler Performance Analytics" style="height:60px;object-fit:contain;margin-bottom:16px;">
   </div>
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
@@ -2763,8 +2765,7 @@
   <!-- Tier 1: Header + Views -->
   <div class="nav-tier1">
     <div class="nav-brand">
-      <div class="logo-mark">BP</div>
-      <span class="nav-brand-text"><span class="red">Butler</span> Performance</span>
+      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:32px;object-fit:contain;" class="nav-logo">
     </div>
     <div class="nav-views">
       <button class="view-btn active" data-view="dashboard">Dashboard</button>
@@ -3095,10 +3096,9 @@
 <div id="uploadZone" class="upload-screen">
   <div class="upload-card">
     <div class="upload-header">
-      <div class="logo-mark" style="width:40px;height:40px;font-size:18px;">BP</div>
+      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;">
       <div>
-        <div style="font-size:18px;font-weight:700;color:var(--text);">Butler Performance Analytics</div>
-        <div style="font-size:12px;color:var(--text-muted);">Upload your data to get started</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">Upload your data to get started</div>
       </div>
     </div>
 
@@ -3252,7 +3252,7 @@
 
     <!-- Recommendations (suggested but not sold) -->
     <div class="ops-grid-wrap" style="margin-bottom:16px;">
-      <h3>Recommendations <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Suggested but not purchased</span></h3>
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">Recommendations <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Suggested but not purchased</span><button class="btn-export" onclick="exportReport('tblRecommendations','Recommendations')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
       <div class="ops-grid-scroll" style="max-height:250px;">
         <table class="ops-grid" id="tblRecommendations">
           <thead><tr>
@@ -3519,7 +3519,7 @@
 
     <!-- Service Advisor Performance (always visible) -->
     <div class="ops-grid-wrap" style="margin-bottom:20px;">
-      <h3>Service Advisor Performance <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">From SR_Productivity Data</span></h3>
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">Service Advisor Performance <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">From SR_Productivity Data</span><button class="btn-export" onclick="exportReport('peopleCSAGrid','Service Advisor Performance')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
       <div class="ops-grid-scroll" style="max-height:450px;">
         <table class="ops-grid" id="peopleCSAGrid">
           <thead><tr>
@@ -4774,7 +4774,7 @@ function modalTable(container, sourceTableId, title) {
   const wrap = document.createElement('div');
   wrap.className = 'table-wrap';
   wrap.style.margin = '0';
-  if (title) wrap.innerHTML = '<h3>' + title + '</h3>';
+  if (title) wrap.innerHTML = '<h3 style="display:flex;align-items:center;justify-content:space-between;">' + title + '<button class="btn-export" onclick="exportReport(\'' + sourceTableId + '\',\'' + title.replace(/'/g, "\\'") + '\')" style="font-size:10px;padding:3px 10px;">Export</button></h3>';
   const scroll = document.createElement('div');
   scroll.className = 'table-scroll';
   scroll.style.maxHeight = 'calc(100vh - 160px)';
@@ -4989,17 +4989,19 @@ function renderForecastView(storeOverride) {
   const baseStores = selectedStore ? 1 : (stores.length || 1);
   const storeLabel = selectedStore ? 'Store #' + selectedStore : baseStores + ' stores';
 
-  // Write baseline KPIs
+  // Write baseline KPIs — only show tiles with data
   const kpiEl = document.getElementById('fcBaselineKPIs');
   if (kpiEl) {
-    kpiEl.innerHTML = `
-      <div class="kpi-card"><div class="kpi-label">Cars Per Day</div><div class="kpi-value">${baseCPD.toFixed(1)}</div><div class="kpi-sub">${storeLabel}</div></div>
-      <div class="kpi-card"><div class="kpi-label">Ticket Average</div><div class="kpi-value">${money(baseTA)}</div><div class="kpi-sub">per vehicle</div></div>
-      <div class="kpi-card"><div class="kpi-label">Daily Revenue</div><div class="kpi-value">${money(baseCPD * baseTA)}</div><div class="kpi-sub">${storeLabel}</div></div>
-      <div class="kpi-card"><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">${money(baseCPD * baseTA * 26)}</div><div class="kpi-sub">26 biz days</div></div>
-      <div class="kpi-card"><div class="kpi-label">Annual Revenue</div><div class="kpi-value">${money(baseCPD * baseTA * 312)}</div><div class="kpi-sub">312 biz days</div></div>
-      <div class="kpi-card"><div class="kpi-label">Upsell Rate</div><div class="kpi-value">${pct(baseConv)}</div><div class="kpi-sub">${num(inspBad.length)} opportunities</div></div>
-    `;
+    const fcKpis = [];
+    fcKpis.push({ label: 'Cars Per Day', value: baseCPD.toFixed(1), sub: storeLabel, show: baseCPD > 0 });
+    fcKpis.push({ label: 'Ticket Average', value: money(baseTA), sub: 'per vehicle', show: baseTA > 0 });
+    fcKpis.push({ label: 'Daily Revenue', value: money(baseCPD * baseTA), sub: storeLabel, show: baseCPD > 0 && baseTA > 0 });
+    fcKpis.push({ label: 'Monthly Revenue', value: money(baseCPD * baseTA * 26), sub: '26 biz days', show: baseCPD > 0 && baseTA > 0 });
+    fcKpis.push({ label: 'Annual Revenue', value: money(baseCPD * baseTA * 312), sub: '312 biz days', show: baseCPD > 0 && baseTA > 0 });
+    fcKpis.push({ label: 'Upsell Rate', value: pct(baseConv), sub: num(inspBad.length) + ' opportunities', show: baseConv > 0 });
+    kpiEl.innerHTML = fcKpis.filter(k => k.show).map(k =>
+      `<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`
+    ).join('');
   }
 
   // ── Actuals Table ──
@@ -5347,6 +5349,7 @@ function printForecast() {
   w.document.write('h1{font-size:18px;margin-bottom:4px;} .sub{font-size:12px;color:#666;margin-bottom:16px;}');
   w.document.write('@media print{body{padding:0;}}');
   w.document.write('</style></head><body>');
+  w.document.write('<div style="margin-bottom:12px;"><img src="logo-full.png" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;"></div>');
   w.document.write('<h1>Butler Performance Analytics — Business Forecast</h1>');
   w.document.write('<div class="sub">' + (localStorage.getItem('bp_company') || '') + ' · Generated ' + new Date().toLocaleDateString() + '</div>');
   // Clone the baseline KPIs and results (skip the sliders)
@@ -6707,25 +6710,23 @@ function renderOverview() {
       const pri = findGrowPrior('Net Sales Adjusted');
       if (cur != null && pri != null && pri !== 0) yoyChange = ((cur - pri) / Math.abs(pri) * 100);
     }
-    // 6th tile: YoY if available, otherwise Repeat %
-    let tile6 = '';
+    // Build KPI array and only show tiles with actual data
+    const kpis = [];
+    kpis.push({ label: 'Net Sales', value: money(totalRev), sub: hasTransactions ? 'transaction total' : 'GROW adjusted', show: totalRev > 0 });
+    kpis.push({ label: 'Cars / Day', value: carsPerDay ? carsPerDay.toFixed(1) : '--', sub: storeSet.size > 1 ? 'per store avg' : 'daily avg', show: carsPerDay > 0 });
+    kpis.push({ label: 'Ticket Average', value: money(avgTicket), sub: 'net sales / car', show: avgTicket > 0 });
+    kpis.push({ label: 'Vehicles Serviced', value: totalInv ? num(totalInv) : '--', sub: 'total invoices', show: totalInv > 0 });
+    kpis.push({ label: 'Active Stores', value: storeSet.size || '--', sub: 'reporting', show: storeSet.size > 0 });
     if (yoyChange != null) {
       const color = yoyChange >= 0 ? 'var(--green)' : 'var(--red)';
       const arrow = yoyChange >= 0 ? '&#9650;' : '&#9660;';
-      tile6 = `<div class="kpi-card"><div class="kpi-label">YoY Change</div><div class="kpi-value" style="color:${color};">${arrow} ${pct(Math.abs(yoyChange))}</div><div class="kpi-sub">vs prior comp</div></div>`;
+      kpis.push({ label: 'YoY Change', value: `<span style="color:${color};">${arrow} ${pct(Math.abs(yoyChange))}</span>`, sub: 'vs prior comp', show: true });
     } else if (repeatPct != null) {
-      tile6 = `<div class="kpi-card"><div class="kpi-label">Repeat Customers</div><div class="kpi-value">${pct(repeatPct)}</div><div class="kpi-sub">multi-visit</div></div>`;
-    } else {
-      tile6 = `<div class="kpi-card"><div class="kpi-label">YoY Change</div><div class="kpi-value">--</div><div class="kpi-sub">no data</div></div>`;
+      kpis.push({ label: 'Repeat Customers', value: pct(repeatPct), sub: 'multi-visit', show: repeatPct > 0 });
     }
-    kpiEl.innerHTML = `
-      <div class="kpi-card"><div class="kpi-label">Net Sales</div><div class="kpi-value">${money(totalRev)}</div><div class="kpi-sub">${hasTransactions ? 'transaction total' : 'GROW adjusted'}</div></div>
-      <div class="kpi-card"><div class="kpi-label">Cars / Day</div><div class="kpi-value">${carsPerDay ? carsPerDay.toFixed(1) : '--'}</div><div class="kpi-sub">${storeSet.size > 1 ? 'per store avg' : 'daily avg'}</div></div>
-      <div class="kpi-card"><div class="kpi-label">Ticket Average</div><div class="kpi-value">${money(avgTicket)}</div><div class="kpi-sub">net sales / car</div></div>
-      <div class="kpi-card"><div class="kpi-label">Vehicles Serviced</div><div class="kpi-value">${totalInv ? num(totalInv) : '--'}</div><div class="kpi-sub">total invoices</div></div>
-      <div class="kpi-card"><div class="kpi-label">Active Stores</div><div class="kpi-value">${storeSet.size || '--'}</div><div class="kpi-sub">reporting</div></div>
-      ${tile6}
-    `;
+    kpiEl.innerHTML = kpis.filter(k => k.show).map(k =>
+      `<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`
+    ).join('');
   }
 
   // ── Revenue Trend Chart ──
@@ -11941,7 +11942,7 @@ function buildReportHTML(tableId, title) {
   const generated = (now.getMonth()+1) + '/' + now.getDate() + '/' + now.getFullYear() + ' ' + now.toLocaleTimeString();
 
   return `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>${title} - Butler Performance</title>
+<html><head><meta charset="UTF-8"><title>${title} - Butler Performance Analytics</title>
 <style>
   @page { margin: 0.5in; size: landscape; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; color: #222; margin: 0; padding: 40px; max-width: 1200px; margin: 0 auto; }
@@ -11949,9 +11950,7 @@ function buildReportHTML(tableId, title) {
 </style></head><body>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #e31837;">
   <div>
-    <div style="font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;"><span style="color:#e31837;">BUTLER</span> PERFORMANCE</div>
-    <div style="width:180px;height:1px;background:#ccc;margin:4px 0 3px;"></div>
-    <div style="font-size:18px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#e31837;">ANALYTICS</div>
+    <img src="logo-full.png" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;">
   </div>
   <div style="text-align:right;">
     ${meta.company ? '<div style="font-size:14px;font-weight:600;">'+meta.company+'</div>' : ''}
@@ -12644,7 +12643,7 @@ function updateBadge(company, user) {
   const parts = [company, user].filter(Boolean);
   const badge = document.getElementById('clientBadgeText');
   badge.textContent = parts.length ? parts.join(' - ') : 'Click to set client';
-  document.title = 'Butler Performance' + (company ? ' - ' + company : '');
+  document.title = 'Butler Performance Analytics' + (company ? ' - ' + company : '');
 }
 
 function openSettings() {
