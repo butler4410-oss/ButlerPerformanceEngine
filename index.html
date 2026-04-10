@@ -2704,7 +2704,7 @@
 <!-- Login Screen -->
 <div class="login-screen" id="loginScreen">
   <div class="login-hero">
-    <img src="logo-full.png" alt="Butler Performance Analytics">
+    <img src="logo.svg" alt="Butler Performance Analytics" style="height:80px;">
     <div class="login-hero-tagline">Enterprise Analytics Platform</div>
   </div>
   <div class="login-body">
@@ -2778,7 +2778,7 @@
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
   <div style="margin-bottom:24px;text-align:center;">
-    <img src="logo-full.png" alt="Butler Performance Analytics" style="height:100px;object-fit:contain;margin-bottom:20px;">
+    <img src="logo.svg" alt="Butler Performance Analytics" style="height:80px;margin-bottom:16px;">
   </div>
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
@@ -2789,7 +2789,7 @@
   <!-- Tier 1: Header + Views -->
   <div class="nav-tier1">
     <div class="nav-brand">
-      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:38px;object-fit:contain;" class="nav-logo">
+      <img src="logo.svg" alt="Butler Performance Analytics" style="height:34px;" class="nav-logo">
     </div>
     <div class="nav-views">
       <button class="view-btn active" data-view="dashboard">Dashboard</button>
@@ -3120,7 +3120,7 @@
 <div id="uploadZone" class="upload-screen">
   <!-- Dark hero with logo -->
   <div style="background:#0f172a;padding:36px 24px 44px;text-align:center;flex-shrink:0;">
-    <img src="logo-full.png" alt="Butler Performance Analytics" style="height:72px;object-fit:contain;">
+    <img src="logo.svg" alt="Butler Performance Analytics" style="height:60px;">
     <div style="margin-top:12px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);">Upload your data to get started</div>
   </div>
 
@@ -5389,7 +5389,7 @@ function printForecast() {
   w.document.write('h1{font-size:18px;margin-bottom:4px;} .sub{font-size:12px;color:#666;margin-bottom:16px;}');
   w.document.write('@media print{body{padding:0;}}');
   w.document.write('</style></head><body>');
-  w.document.write('<div style="margin-bottom:12px;"><img src="logo-full.png" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;"></div>');
+  w.document.write('<div style="margin-bottom:12px;"><img src="logo-light.svg" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;"></div>');
   w.document.write('<h1>Butler Performance Analytics — Business Forecast</h1>');
   w.document.write('<div class="sub">' + (localStorage.getItem('bp_company') || '') + ' · Generated ' + new Date().toLocaleDateString() + '</div>');
   // Clone the baseline KPIs and results (skip the sliders)
@@ -12038,7 +12038,7 @@ function buildReportHTML(tableId, title) {
 </style></head><body>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #e31837;">
   <div>
-    <img src="logo-full.png" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;">
+    <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;">
   </div>
   <div style="text-align:right;">
     ${meta.company ? '<div style="font-size:14px;font-weight:600;">'+meta.company+'</div>' : ''}

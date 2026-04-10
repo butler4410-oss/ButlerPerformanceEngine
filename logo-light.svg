@@ -1,0 +1,115 @@
+<svg width="1600" height="520" viewBox="0 0 1600 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Butler Performance Analytics Logo</title>
+  <desc>Transparent SVG logo with a minimalist butler serving a tray with analytics, plus stacked wordmark.</desc>
+
+  <!-- Transparent background by design -->
+
+  <!-- Icon group -->
+  <g id="icon" transform="translate(40,36)">
+    <!-- Head -->
+    <circle cx="170" cy="108" r="58" fill="#0f172a"/>
+
+    <!-- Jacket / torso -->
+    <path d="M40 365
+             L92 205
+             L176 176
+             L174 372
+             L84 372
+             Z" fill="#0f172a"/>
+
+    <!-- Chest / lapel cutout -->
+    <path d="M170 178
+             L248 218
+             L180 308
+             L150 210
+             Z" fill="#08204E"/>
+
+    <!-- Bowtie -->
+    <path d="M146 192
+             L168 180
+             L170 198
+             L152 208
+             Z" fill="#0f172a"/>
+    <path d="M194 192
+             L172 180
+             L170 198
+             L188 208
+             Z" fill="#0f172a"/>
+    <circle cx="170" cy="196" r="7" fill="#0f172a"/>
+
+    <!-- Buttons -->
+    <circle cx="168" cy="230" r="8" fill="#0f172a"/>
+    <circle cx="166" cy="262" r="8" fill="#0f172a"/>
+
+    <!-- Serving arm -->
+    <path d="M206 238
+             L282 282
+             L246 322
+             L182 258
+             Z" fill="#0f172a"/>
+
+    <!-- Hand under tray -->
+    <path d="M258 300
+             C284 287, 308 280, 334 278
+             C322 292, 302 304, 280 312
+             C267 313, 260 309, 258 300Z" fill="#0f172a"/>
+
+    <!-- Accent fold -->
+    <path d="M222 220
+             C244 222, 256 228, 268 242
+             C246 244, 233 238, 222 220Z" fill="#0f172a"/>
+
+    <!-- Tray -->
+    <rect x="252" y="278" width="268" height="13" rx="6.5" fill="#0f172a"/>
+    <path d="M506 291
+             C514 291, 522 288, 526 284
+             L526 291
+             Z" fill="#0f172a"/>
+
+    <!-- Chart bars -->
+    <rect x="322" y="242" width="34" height="30" rx="3" fill="#10B981"/>
+    <rect x="386" y="225" width="34" height="47" rx="3" fill="#10B981"/>
+    <rect x="450" y="198" width="34" height="74" rx="3" fill="#10B981"/>
+
+    <!-- Trend line -->
+    <path d="M286 238
+             L338 192
+             L380 214
+             L426 168
+             L472 184
+             L528 130"
+          stroke="#10B981" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+    <!-- Arrow head -->
+    <path d="M515 128
+             L548 118
+             L537 152
+             Z" fill="#10B981"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g id="wordmark" transform="translate(650,95)">
+    <text x="0" y="110"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="92"
+          font-weight="900"
+          letter-spacing="0"
+          fill="#dc2626">BUTLER</text>
+
+    <text x="0" y="232"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="92"
+          font-weight="800"
+          letter-spacing="0"
+          fill="#0f172a">PERFORMANCE</text>
+
+    <line x1="0" y1="258" x2="650" y2="258" stroke="#0f172a" stroke-opacity="0.2" stroke-width="2"/>
+
+    <text x="0" y="336"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="70"
+          font-weight="700"
+          letter-spacing="14"
+          fill="#16a34a">ANALYTICS</text>
+  </g>
+</svg>
