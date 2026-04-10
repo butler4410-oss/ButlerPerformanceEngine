@@ -5373,27 +5373,39 @@ const BPA_FIELDS = [
   { id: 'Net_Sales', label: 'Net Sales / Total' },
   { id: 'Customer_First_Name', label: 'Customer First Name' },
   { id: 'Customer_Last_Name', label: 'Customer Last Name' },
+  { id: 'Customer_Full_Name', label: 'Customer Full Name' },
   { id: 'Customer_Email_Address', label: 'Email' },
   { id: 'Customer_Phone_Number', label: 'Phone' },
   { id: 'Customer_Address', label: 'Address' },
+  { id: 'Customer_Address2', label: 'Address Line 2' },
   { id: 'City', label: 'City' },
   { id: 'Customer_State', label: 'State' },
   { id: 'ZIP_Code', label: 'ZIP Code' },
+  { id: 'Customer_ID', label: 'Customer ID / Account #' },
+  { id: 'License_Plate', label: 'License Plate / Tag' },
   { id: 'Invoice_Detail_Description', label: 'Service / Product Description' },
   { id: 'Invoice_Detail_Code', label: 'Service / Product Code' },
   { id: 'JLI_Category_Code', label: 'Service Category' },
   { id: 'Extended_Price', label: 'Line Item Price' },
   { id: 'Quantity_Sold', label: 'Quantity' },
   { id: 'Promo_Code', label: 'Promo / Coupon Code' },
+  { id: 'Promo_Description', label: 'Promo Description' },
   { id: 'Promo_Amount', label: 'Promo / Discount Amount' },
   { id: 'Business_Account_ID', label: 'Business / Fleet Account' },
   { id: 'ChekChart_Make', label: 'Vehicle Make' },
+  { id: 'Vehicle_Model', label: 'Vehicle Model' },
+  { id: 'Vehicle_Year', label: 'Vehicle Year' },
   { id: 'Vehicle_Mileage', label: 'Vehicle Mileage' },
+  { id: 'Vehicle_VIN', label: 'VIN' },
   { id: 'Bay_Start_Time', label: 'Bay Start Time' },
   { id: 'Bay_End_Time', label: 'Bay End Time' },
   { id: 'Greet_Time', label: 'Greet / Check-in Time' },
   { id: 'Ring_Out_End_Time', label: 'Checkout / Ring-out Time' },
-  { id: 'Employee_Name', label: 'Employee / Technician Name' }
+  { id: 'Employee_Name', label: 'Employee / Technician Name' },
+  { id: 'Error_Type', label: 'Error Type / Status' },
+  { id: 'Error_Code', label: 'Error Code' },
+  { id: 'Last_Reported', label: 'Last Reported / Updated Date' },
+  { id: 'Notes', label: 'Notes / Comments' }
 ];
 
 let _mappingPendingData = null; // { fileName, headers, rows }
@@ -5420,30 +5432,66 @@ function findSavedMapping(headers) {
 }
 
 function autoGuessField(header) {
-  const h = header.toLowerCase().trim();
-  if (h.includes('store') || h.includes('location') || h.includes('site')) return 'Store_Number';
-  if (h.includes('invoice') && h.includes('date') || h === 'date' || h.includes('transaction_at') || h.includes('trans date')) return 'Invoice_Date';
-  if (h.includes('invoice') || h.includes('transaction_id') || h.includes('ticket')) return 'Invoice_Number';
-  if (h.includes('total') || h.includes('net sales') || h.includes('amount') || h.includes('subtotal') || h.includes('net_sales')) return 'Net_Sales';
-  if (h.includes('first') && h.includes('name')) return 'Customer_First_Name';
-  if (h.includes('last') && h.includes('name')) return 'Customer_Last_Name';
-  if (h.includes('email')) return 'Customer_Email_Address';
-  if (h.includes('phone') || h.includes('mobile')) return 'Customer_Phone_Number';
-  if (h.includes('address') || h.includes('street')) return 'Customer_Address';
-  if (h === 'city' || h.includes('city')) return 'City';
-  if (h === 'state' || h.includes('state')) return 'Customer_State';
-  if (h.includes('zip') || h.includes('postal')) return 'ZIP_Code';
-  if (h.includes('description') || h.includes('desc') || h.includes('service') || h.includes('part')) return 'Invoice_Detail_Description';
-  if (h.includes('code') && !h.includes('zip') && !h.includes('promo')) return 'Invoice_Detail_Code';
-  if (h.includes('category') || h.includes('cat')) return 'JLI_Category_Code';
-  if (h.includes('price') || h.includes('ext') || h.includes('line_total')) return 'Extended_Price';
-  if (h.includes('qty') || h.includes('quantity')) return 'Quantity_Sold';
-  if (h.includes('promo') && h.includes('code') || h.includes('coupon')) return 'Promo_Code';
-  if (h.includes('promo') && (h.includes('amount') || h.includes('discount'))) return 'Promo_Amount';
-  if (h.includes('fleet') || h.includes('business') || h.includes('account')) return 'Business_Account_ID';
-  if (h.includes('make') || h.includes('vehicle_make')) return 'ChekChart_Make';
-  if (h.includes('mileage') || h.includes('odometer')) return 'Vehicle_Mileage';
-  if (h.includes('employee') || h.includes('tech') || h.includes('staff')) return 'Employee_Name';
+  const h = header.toLowerCase().trim().replace(/["\s]/g, '');
+
+  // EXACT BPA field name matches first (handles GROW CSVs with matching column names)
+  const exactMap = {
+    'store_number': 'Store_Number', 'invoice_number': 'Invoice_Number', 'invoice_date': 'Invoice_Date',
+    'net_sales': 'Net_Sales', 'customer_first_name': 'Customer_First_Name', 'customer_last_name': 'Customer_Last_Name',
+    'customer_email_address': 'Customer_Email_Address', 'customer_phone_number': 'Customer_Phone_Number',
+    'customer_address': 'Customer_Address', 'zip_code': 'ZIP_Code', 'promo_code': 'Promo_Code',
+    'promo_description': 'Promo_Description', 'promo_amount': 'Promo_Amount',
+    'invoice_detail_type': 'Invoice_Detail_Description', 'invoice_detail_description': 'Invoice_Detail_Description',
+    'invoice_detail_code': 'Invoice_Detail_Code', 'extended_price': 'Extended_Price',
+    'quantity_sold': 'Quantity_Sold', 'jli_category_code': 'JLI_Category_Code',
+    'inspection_status': 'Error_Type', 'bay_start_time': 'Bay_Start_Time', 'bay_end_time': 'Bay_End_Time',
+    'greet_time': 'Greet_Time', 'ring_out_end_time': 'Ring_Out_End_Time', 'vehicle_mileage': 'Vehicle_Mileage',
+    'chekchart_make': 'ChekChart_Make', 'business_account_id': 'Business_Account_ID',
+    'odi_value': 'Notes', 'total': 'Net_Sales', 'subtotal': 'Net_Sales',
+    'first_name': 'Customer_First_Name', 'last_name': 'Customer_Last_Name',
+    'transaction_id': 'Invoice_Number', 'transaction_at': 'Invoice_Date',
+    'location_name': 'Store_Number', 'location': 'Store_Number'
+  };
+  if (exactMap[h]) return exactMap[h];
+
+  // Fuzzy matching for non-standard column names
+  const orig = header.toLowerCase().trim();
+  if (orig.includes('store') || orig.includes('location') || orig.includes('site')) return 'Store_Number';
+  if ((orig.includes('invoice') && orig.includes('date')) || orig === 'date' || orig.includes('transaction_at') || orig.includes('trans date') || orig.includes('last reported')) return 'Invoice_Date';
+  if (orig.includes('invoice') && !orig.includes('date') || orig.includes('transaction_id') || orig.includes('ticket')) return 'Invoice_Number';
+  if (orig.includes('total') || orig.includes('net sales') || orig.includes('amount') && !orig.includes('promo') || orig.includes('subtotal') || orig.includes('revenue')) return 'Net_Sales';
+  if (orig.includes('first') && orig.includes('name')) return 'Customer_First_Name';
+  if (orig.includes('last') && orig.includes('name')) return 'Customer_Last_Name';
+  if (orig === 'name' || (orig.includes('name') && !orig.includes('first') && !orig.includes('last') && !orig.includes('location') && !orig.includes('file'))) return 'Customer_Full_Name';
+  if (orig.includes('email')) return 'Customer_Email_Address';
+  if (orig.includes('phone') || orig.includes('mobile') || orig.includes('cell')) return 'Customer_Phone_Number';
+  if (orig.includes('address 2') || orig.includes('address2') || orig.includes('apt') || orig.includes('suite')) return 'Customer_Address2';
+  if (orig.includes('address') || orig.includes('street')) return 'Customer_Address';
+  if (orig === 'city' || orig.includes('city')) return 'City';
+  if (orig === 'state' || (orig.includes('state') && !orig.includes('status'))) return 'Customer_State';
+  if (orig.includes('zip') || orig.includes('postal')) return 'ZIP_Code';
+  if (orig.includes('license') || orig.includes('plate') || orig.includes('tag')) return 'License_Plate';
+  if (orig.includes('customer') && (orig.includes('id') || orig.includes('#') || orig.includes('number'))) return 'Customer_ID';
+  if (orig.includes('description') || orig.includes('desc') || orig.includes('service') || orig.includes('part')) return 'Invoice_Detail_Description';
+  if (orig.includes('code') && !orig.includes('zip') && !orig.includes('promo') && !orig.includes('error')) return 'Invoice_Detail_Code';
+  if (orig.includes('category') || orig.includes('cat')) return 'JLI_Category_Code';
+  if (orig.includes('price') || orig.includes('ext') || orig.includes('line_total')) return 'Extended_Price';
+  if (orig.includes('qty') || orig.includes('quantity')) return 'Quantity_Sold';
+  if (orig.includes('promo') && orig.includes('desc')) return 'Promo_Description';
+  if (orig.includes('promo') && (orig.includes('code') || orig.includes('coupon'))) return 'Promo_Code';
+  if (orig.includes('promo') && (orig.includes('amount') || orig.includes('discount'))) return 'Promo_Amount';
+  if (orig.includes('coupon')) return 'Promo_Code';
+  if (orig.includes('discount')) return 'Promo_Amount';
+  if (orig.includes('fleet') || orig.includes('business') || orig.includes('account')) return 'Business_Account_ID';
+  if (orig.includes('make') || orig.includes('vehicle_make')) return 'ChekChart_Make';
+  if (orig.includes('model') && orig.includes('vehicle') || orig === 'model') return 'Vehicle_Model';
+  if (orig.includes('year') && orig.includes('vehicle') || orig === 'year') return 'Vehicle_Year';
+  if (orig.includes('vin')) return 'Vehicle_VIN';
+  if (orig.includes('mileage') || orig.includes('odometer')) return 'Vehicle_Mileage';
+  if (orig.includes('employee') || orig.includes('tech') || orig.includes('staff') || orig.includes('advisor')) return 'Employee_Name';
+  if (orig.includes('error') && (orig.includes('type') || orig.includes('status'))) return 'Error_Type';
+  if (orig.includes('error') && orig.includes('code')) return 'Error_Code';
+  if (orig.includes('note') || orig.includes('comment') || orig.includes('memo')) return 'Notes';
   return '_skip';
 }
 
