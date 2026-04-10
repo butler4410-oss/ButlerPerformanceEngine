@@ -2685,26 +2685,29 @@
       <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
     </div>
   </div>
-  <!-- Tier 2: Sleek filter strip -->
+  <!-- Tier 2: Clean filter bar -->
   <div class="nav-tier2">
-    <div class="nav-filters">
-      <select id="filterStore" name="store" class="cmd-select" onchange="applyFilters()" style="min-width:140px;"><option value="">All Stores</option></select>
-      <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(99,130,180,0.1);border-radius:6px;padding:0 4px;">
-        <input type="date" id="filterFrom" name="dateFrom" class="cmd-input" style="border:none;background:transparent;width:115px;" onchange="applyFilters()">
-        <span style="color:var(--text-muted);font-size:10px;">→</span>
-        <input type="date" id="filterTo" name="dateTo" class="cmd-input" style="border:none;background:transparent;width:115px;" onchange="applyFilters()">
-      </div>
+    <select id="filterStore" name="store" class="cmd-select" onchange="applyFilters()" style="min-width:150px;"><option value="">All Stores</option></select>
+    <select id="filterPeriod" class="cmd-select" onchange="applyPeriodFilter()" style="min-width:130px;">
+      <option value="mtd">This Month</option>
+      <option value="qtd">This Quarter</option>
+      <option value="ytd">Year to Date</option>
+      <option value="last30">Last 30 Days</option>
+      <option value="last90">Last 90 Days</option>
+      <option value="custom">Custom Range...</option>
+    </select>
+    <div id="customDateRange" style="display:none;align-items:center;gap:4px;">
+      <input type="date" id="filterFrom" name="dateFrom" class="cmd-input" style="width:120px;" onchange="applyFilters()">
+      <span style="color:var(--text-muted);font-size:11px;">to</span>
+      <input type="date" id="filterTo" name="dateTo" class="cmd-input" style="width:120px;" onchange="applyFilters()">
     </div>
-    <div class="nav-context">
-      <span class="client-badge" id="clientBadge" onclick="openSettings()"><span id="clientBadgeText">Set Client</span></span>
+    <div style="flex:1;"></div>
+    <span id="clientBadge" onclick="openSettings()" style="display:none;"><span id="clientBadgeText"></span></span>
+    <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Click to clear and re-upload">
+      <span class="data-saved-dot"></span> Saved
     </div>
-    <div class="nav-utils">
-      <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Click to clear and re-upload">
-        <span class="data-saved-dot"></span> Saved
-      </div>
-      <button class="nav-util-btn" onclick="openSettings()" title="Settings">&#9881;</button>
-      <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" title="Alerts">&#9888;</button>
-    </div>
+    <button class="nav-util-btn" onclick="openSettings()" title="Settings">&#9881;</button>
+    <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" title="Alerts">&#9888;</button>
   </div>
 </div>
 
@@ -4249,6 +4252,32 @@ function diffMinutes(start, end) {
 // ============================================================
 // FILTERING
 // ============================================================
+function applyPeriodFilter() {
+  const period = document.getElementById('filterPeriod').value;
+  const customDiv = document.getElementById('customDateRange');
+
+  if (period === 'custom') {
+    customDiv.style.display = 'flex';
+    return;
+  }
+  customDiv.style.display = 'none';
+
+  const today = new Date();
+  let from = new Date(today);
+
+  switch (period) {
+    case 'mtd': from = new Date(today.getFullYear(), today.getMonth(), 1); break;
+    case 'qtd': from = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1); break;
+    case 'ytd': from = new Date(today.getFullYear(), 0, 1); break;
+    case 'last30': from.setDate(today.getDate() - 30); break;
+    case 'last90': from.setDate(today.getDate() - 90); break;
+  }
+
+  document.getElementById('filterFrom').value = fmtDateISO(from);
+  document.getElementById('filterTo').value = fmtDateISO(today);
+  applyFilters();
+}
+
 function applyFilters() {
   const store = document.getElementById('filterStore').value;
   const from = document.getElementById('filterFrom').value ? new Date(document.getElementById('filterFrom').value + 'T00:00:00') : null;
