@@ -70,7 +70,7 @@
     justify-content: space-between;
     height: 52px;
     padding: 0 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.04);
   }
 
   .nav-brand {
@@ -84,7 +84,7 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 14px;
     font-weight: 700;
-    color: white;
+    color: var(--text);
   }
 
   .nav-brand-text .red { color: var(--primary); }
@@ -140,7 +140,7 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 15px;
     font-weight: 700;
-    color: white;
+    color: var(--text);
     text-transform: none;
     letter-spacing: -0.3px;
     line-height: 1;
@@ -184,8 +184,8 @@
   }
 
   .client-badge:hover {
-    background: rgba(227,24,55,0.15);
-    border-color: rgba(227,24,55,0.3);
+    background: rgba(30,64,175,0.1);
+    border-color: rgba(30,64,175,0.25);
   }
 
   .user-avatar {
@@ -206,7 +206,7 @@
 
   .user-avatar:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 0 3px rgba(227,24,55,0.2);
+    box-shadow: 0 0 0 3px rgba(30,64,175,0.2);
   }
 
   /* Tier 2 */
@@ -232,7 +232,7 @@
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: rgba(255,255,255,0.35);
+    color: var(--text-muted);
     font-weight: 600;
   }
 
@@ -261,8 +261,8 @@
     min-width: 0;
   }
 
-  .nav-context-sep { color: rgba(255,255,255,0.15); }
-  .nav-context-info { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-context-sep { color: var(--border); }
+  .nav-context-info { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .nav-utils {
     display: flex;
@@ -300,27 +300,26 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
-    color-scheme: light;
     appearance: none;
     -webkit-appearance: none;
-    color-scheme: dark;
+    color-scheme: light dark;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237878a0'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 8px center;
   }
 
   .cmd-select:hover {
-    border-color: rgba(255,255,255,0.15);
-    background-color: rgba(255,255,255,0.06);
+    border-color: var(--text-muted);
+    background-color: var(--card-hover);
   }
 
   .cmd-select:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(227,24,55,0.15);
+    box-shadow: 0 0 0 2px rgba(30,64,175,0.15);
   }
 
-  .cmd-select option { background: #0f172a; color: #e8e8f0; }
+  .cmd-select option { background: var(--card); color: var(--text); }
 
   .cmd-input {
     height: 30px;
@@ -333,18 +332,17 @@
     font-size: 11px;
     width: 130px;
     transition: all 0.15s;
-    color-scheme: light;
-    color-scheme: dark;
+    color-scheme: light dark;
   }
 
   .cmd-input:hover {
-    border-color: rgba(255,255,255,0.15);
+    border-color: var(--text-muted);
   }
 
   .cmd-input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(227,24,55,0.15);
+    box-shadow: 0 0 0 2px rgba(30,64,175,0.15);
   }
 
   .cmd-btn {
@@ -459,7 +457,7 @@
     font-size: 13px;
     font-family: inherit;
     transition: border-color 0.15s, box-shadow 0.15s;
-    color-scheme: dark;
+    color-scheme: light dark;
   }
 
   .form-group input:focus,
@@ -467,7 +465,7 @@
   .form-group textarea:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(227,24,55,0.1);
+    box-shadow: 0 0 0 3px rgba(30,64,175,0.1);
   }
 
   .form-group input::placeholder { color: var(--text-muted); opacity: 0.5; }
@@ -556,7 +554,7 @@
     transition: all 0.2s;
     cursor: pointer;
   }
-  .upload-drop.drag-over { border-color: var(--primary); background: rgba(220,38,38,0.04); }
+  .upload-drop.drag-over { border-color: var(--primary); background: rgba(30,64,175,0.04); }
 
   .upload-file-types {
     display: grid;
@@ -722,7 +720,7 @@
   .tab.active {
     color: var(--primary);
     border-bottom-color: var(--primary);
-    background: rgba(227,24,55,0.05);
+    background: rgba(30,64,175,0.05);
   }
 
   .tab-content { display: none; }
@@ -786,7 +784,7 @@
     padding: 16px 18px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     transition: all 0.2s ease;
-    cursor: grab;
+    cursor: default;
     user-select: none;
     flex: 1 1 140px;
     min-width: 120px;
@@ -799,7 +797,7 @@
     transform: translateY(-1px);
   }
 
-  .kpi-card:active { cursor: grabbing; }
+  .kpi-card:active { cursor: default; }
 
   .kpi-card.dragging {
     opacity: 0.4;
@@ -808,7 +806,7 @@
 
   .kpi-card.drag-over {
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(227,24,55,0.3);
+    box-shadow: 0 0 0 2px rgba(30,64,175,0.3);
     transform: scale(1.02);
   }
 
@@ -873,7 +871,7 @@
   }
 
   .tile-option.selected {
-    background: rgba(227,24,55,0.1);
+    background: rgba(30,64,175,0.1);
     border-color: var(--primary);
   }
 
@@ -1049,7 +1047,7 @@
 
   thead th.sortable:hover {
     color: var(--text);
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.02);
   }
 
   thead th[title] {
@@ -1060,7 +1058,7 @@
 
   tbody td {
     padding: 9px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.04);
     font-size: 13px;
     font-variant-numeric: tabular-nums;
   }
@@ -1103,7 +1101,7 @@
   .btn-export:hover {
     border-color: var(--text-muted);
     color: var(--text);
-    background: rgba(255,255,255,0.04);
+    background: rgba(0,0,0,0.02);
   }
 
   /* Customer Detail Modal */
@@ -1270,7 +1268,7 @@
   }
 
   tbody tr.clickable-row:hover {
-    background: rgba(227,24,55,0.12);
+    background: rgba(30,64,175,0.08);
     border-left-color: var(--primary);
   }
 
@@ -1279,7 +1277,7 @@
   }
 
   tbody tr.clickable-row:active {
-    background: rgba(227,24,55,0.2);
+    background: rgba(30,64,175,0.15);
   }
 
   /* ═══════════════════════════════
@@ -1305,7 +1303,7 @@
   .report-card:hover {
     border-color: var(--primary);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   }
 
   .report-card-top {
@@ -1472,6 +1470,22 @@
     .report-modal { inset: 0; border-radius: 0; }
     .ops-grid-scroll { max-height: 60vh !important; }
     .kpi-card { flex: 1 1 100%; max-width: 100%; }
+    .charts-row { grid-template-columns: 1fr; }
+    .charts-row.three { grid-template-columns: 1fr; }
+    .cust-detail-grid { grid-template-columns: 1fr; }
+    .today-snapshot-grid { grid-template-columns: repeat(2, 1fr); }
+    .zero-dollar-kpis { grid-template-columns: 1fr; }
+    .dashboard { padding: 12px; }
+    .modal { padding: 20px; }
+    .token-row { grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; }
+    .grow-kpi-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .nav-views { flex-wrap: wrap; }
+    .view-btn { flex: 1 1 auto; text-align: center; padding: 6px 10px; font-size: 11px; }
+    .today-snapshot-grid { grid-template-columns: 1fr; }
+    .upload-file-types { grid-template-columns: 1fr; }
   }
 
   /* Mapping Wizard */
@@ -1546,7 +1560,7 @@
     letter-spacing: 1.4px;
     text-transform: uppercase;
     color: var(--primary);
-    background: rgba(227,24,55,0.06);
+    background: rgba(30,64,175,0.06);
     padding: 2px 7px;
     border-radius: 10px;
     font-family: 'IBM Plex Mono', monospace;
@@ -1660,8 +1674,8 @@
 
   /* Filter Summary Pill */
   .filter-summary {
-    background: rgba(227,24,55,0.06);
-    border: 1px solid rgba(227,24,55,0.15);
+    background: rgba(30,64,175,0.06);
+    border: 1px solid rgba(30,64,175,0.15);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--text);
@@ -1759,7 +1773,7 @@
   .campaign-status.draft { background: rgba(136,136,168,0.15); color: var(--text-muted); }
   .campaign-status.ready { background: rgba(0,200,83,0.15); color: var(--green); }
   .campaign-status.sent { background: rgba(68,138,255,0.15); color: var(--blue); }
-  .campaign-status.active { background: rgba(227,24,55,0.15); color: var(--primary); }
+  .campaign-status.active { background: rgba(30,64,175,0.15); color: var(--primary); }
 
   /* Tokens System */
   .tokens-container {
@@ -1880,7 +1894,7 @@
   .token-type-badge.text { background: rgba(68,138,255,0.15); color: var(--blue); }
   .token-type-badge.url { background: rgba(0,200,83,0.15); color: var(--green); }
   .token-type-badge.date { background: rgba(255,145,0,0.15); color: var(--orange); }
-  .token-type-badge.image { background: rgba(227,24,55,0.15); color: var(--primary); }
+  .token-type-badge.image { background: rgba(30,64,175,0.15); color: var(--primary); }
   .token-type-badge.number { background: rgba(255,214,0,0.15); color: var(--yellow); }
 
   .token-value {
@@ -2139,8 +2153,8 @@
     border-radius: 6px;
   }
   .district-store-chip {
-    background: rgba(227,24,55,0.15);
-    border: 1px solid rgba(227,24,55,0.3);
+    background: rgba(30,64,175,0.1);
+    border: 1px solid rgba(30,64,175,0.25);
     border-radius: 5px;
     padding: 3px 10px;
     font-size: 11px;
@@ -2152,7 +2166,7 @@
     align-items: center;
     gap: 4px;
   }
-  .district-store-chip:hover { background: rgba(227,24,55,0.3); }
+  .district-store-chip:hover { background: rgba(30,64,175,0.2); }
   .district-store-chip .remove-store { font-size: 13px; opacity: 0.6; }
   .district-store-chip .remove-store:hover { opacity: 1; }
   .district-unassigned {
@@ -2242,7 +2256,7 @@
   .ops-grid td {
     padding: 8px 10px;
     text-align: right;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.04);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
     font-family: 'IBM Plex Mono', monospace;
@@ -2259,15 +2273,15 @@
   .ops-grid tr:hover td { background: var(--card-hover); }
   .ops-grid tr:hover td:first-child { background: var(--card-hover); }
   .ops-grid .district-row td {
-    background: rgba(227,24,55,0.06);
+    background: rgba(30,64,175,0.06);
     font-weight: 700;
     font-size: 12px;
     border-bottom: 2px solid var(--border);
     cursor: pointer;
   }
-  .ops-grid .district-row td:first-child { background: rgba(227,24,55,0.06); }
-  .ops-grid .district-row:hover td { background: rgba(227,24,55,0.12); }
-  .ops-grid .district-row:hover td:first-child { background: rgba(227,24,55,0.12); }
+  .ops-grid .district-row td:first-child { background: rgba(30,64,175,0.06); }
+  .ops-grid .district-row:hover td { background: rgba(30,64,175,0.1); }
+  .ops-grid .district-row:hover td:first-child { background: rgba(30,64,175,0.1); }
   .ops-grid .district-row td:first-child::before {
     content: '';
     display: inline-block;
@@ -2300,8 +2314,8 @@
 
   /* Today Snapshot */
   .today-snapshot {
-    background: linear-gradient(135deg, rgba(227,24,55,0.04) 0%, var(--card) 100%);
-    border: 1px solid rgba(227,24,55,0.25);
+    background: linear-gradient(135deg, rgba(30,64,175,0.04) 0%, var(--card) 100%);
+    border: 1px solid rgba(30,64,175,0.2);
     border-radius: 14px;
     padding: 18px 24px;
     margin-bottom: 20px;
@@ -2489,7 +2503,7 @@
     letter-spacing: 1px;
     padding: 3px 8px;
     border-radius: 4px;
-    background: rgba(227,24,55,0.12);
+    background: rgba(30,64,175,0.1);
     color: var(--primary);
   }
 
@@ -2511,8 +2525,8 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .grow-kpi-card:hover {
-    border-color: rgba(227,24,55,0.3);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    border-color: rgba(30,64,175,0.25);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   }
   .grow-kpi-label {
     font-size: 10px;
@@ -2578,6 +2592,273 @@
 
   /* GROW reports use CSS vars — no dark-mode overrides needed */
 
+  /* ═══════════════════════════════════════════
+     ACCESSIBILITY & UX ADDITIONS
+     ═══════════════════════════════════════════ */
+
+  /* Skip Navigation Link */
+  .skip-nav {
+    position: absolute;
+    top: -100%;
+    left: 16px;
+    z-index: 10000;
+    background: var(--primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 0 0 8px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.2s;
+  }
+  .skip-nav:focus {
+    top: 0;
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* Screen Reader Only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Focus Visible — keyboard-only focus ring */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* Toast Notification System */
+  .bpa-toast-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 20000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    max-width: 420px;
+  }
+  .bpa-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    font-size: 13px;
+    color: var(--text);
+    pointer-events: all;
+    animation: toastSlideIn 0.25s ease-out;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .bpa-toast.removing {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  .bpa-toast-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    margin-top: 1px;
+  }
+  .bpa-toast.success .bpa-toast-icon { background: var(--green); }
+  .bpa-toast.error .bpa-toast-icon { background: var(--red); }
+  .bpa-toast.warning .bpa-toast-icon { background: var(--orange); }
+  .bpa-toast.info .bpa-toast-icon { background: var(--blue); }
+  .bpa-toast-body { flex: 1; line-height: 1.4; }
+  .bpa-toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+  }
+  .bpa-toast-close:hover { color: var(--text); }
+  @keyframes toastSlideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Confirm Dialog (replaces browser confirm()) */
+  .bpa-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20001;
+    animation: fadeIn 0.15s;
+  }
+  .bpa-confirm-dialog {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    max-width: 400px;
+    width: 90vw;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+  }
+  .bpa-confirm-msg {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  .bpa-confirm-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* User Dropdown Menu */
+  .user-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    min-width: 200px;
+    z-index: 300;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 0.15s, transform 0.15s;
+    overflow: hidden;
+  }
+  .user-menu-dropdown.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+  .user-menu-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .user-menu-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .user-menu-email {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.1s;
+    text-align: left;
+  }
+  .user-menu-item:hover { background: var(--card-hover); }
+  .user-menu-item.danger { color: var(--red); }
+  .user-menu-item.danger:hover { background: rgba(220,38,38,0.06); }
+  .user-menu-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  /* Settings Modal Tabs */
+  .settings-tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .settings-tab {
+    flex: 1;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .settings-tab:last-child { border-right: none; }
+  .settings-tab:hover { color: var(--text); background: var(--card-hover); }
+  .settings-tab.active { color: white; background: var(--primary); font-weight: 600; }
+  .settings-panel { display: none; }
+  .settings-panel.active { display: block; }
+
+  /* Processing Overlay */
+  .processing-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 15000;
+    gap: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .processing-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .processing-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .processing-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
   @media print {
     .header { position: static; }
     .export-bar, .btn-apply, .btn-reset { display: none; }
@@ -2588,14 +2869,16 @@
 </head>
 <body>
 
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+
 <!-- Login Screen -->
-<div class="login-screen" id="loginScreen">
+<div class="login-screen" id="loginScreen" role="dialog" aria-label="Sign in to Butler Performance Analytics">
   <div class="login-card">
     <div style="text-align:center;margin-bottom:36px;">
-      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:110px;filter:drop-shadow(0 0 20px rgba(220,38,38,0.2));">
+      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:110px;filter:drop-shadow(0 0 20px rgba(30,64,175,0.2));">
     </div>
     <div class="login-box">
-      <h2>Sign In</h2>
+      <h1 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;text-align:center;">Sign In</h1>
       <div class="login-sub">Enterprise Analytics Platform</div>
       <form onsubmit="event.preventDefault();doLogin();" autocomplete="on">
         <div class="form-group">
@@ -2611,13 +2894,13 @@
       <div class="login-error" id="loginError"></div>
     </div>
     <div class="login-footer">
-      <a onclick="openForgotPassword()">Forgot Password</a>
+      <button type="button" onclick="openForgotPassword()" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:11px;font-family:inherit;padding:0;">Forgot Password</button>
     </div>
   </div>
 </div>
 
 <!-- Create Account Modal (over login) -->
-<div class="modal-overlay" id="createAccountModal" style="z-index:10001;">
+<div class="modal-overlay" id="createAccountModal" style="z-index:10001;" role="dialog" aria-modal="true" aria-labelledby="regTitle">
   <div class="modal" style="width:460px;">
     <h3 id="regTitle">Create Account</h3>
     <div id="regRoleNote" style="font-size:12px;color:var(--text-muted);margin-bottom:16px;"></div>
@@ -2643,7 +2926,7 @@
 </div>
 
 <!-- Audit Log Modal -->
-<div class="modal-overlay" id="auditLogModal" style="z-index:10001;">
+<div class="modal-overlay" id="auditLogModal" style="z-index:10001;" role="dialog" aria-modal="true" aria-label="Audit Log">
   <div class="modal" style="width:800px;max-height:88vh;overflow-y:auto;">
     <h3>Audit Log</h3>
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">All authentication events. Stored locally — last 500 entries.</p>
@@ -2660,35 +2943,47 @@
 </div>
 
 <!-- Loading Screen -->
-<div class="loading-screen" id="loadingScreen">
+<div class="loading-screen" id="loadingScreen" role="status" aria-label="Loading application">
   <div style="margin-bottom:24px;text-align:center;">
-    <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:100px;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(220,38,38,0.2));">
+    <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:100px;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(30,64,175,0.2));">
   </div>
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
 </div>
 
 <!-- Navigation -->
-<div class="nav-shell">
+<nav class="nav-shell" aria-label="Main navigation">
   <!-- Tier 1: Header + Views -->
   <div class="nav-tier1">
     <div class="nav-brand">
-      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:42px;filter:drop-shadow(0 0 12px rgba(220,38,38,0.25));" class="nav-logo">
+      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:42px;filter:drop-shadow(0 0 12px rgba(30,64,175,0.2));" class="nav-logo">
     </div>
-    <div class="nav-views">
-      <button class="view-btn active" data-view="business">My Business</button>
-      <button class="view-btn" data-view="stores">My Stores</button>
-      <button class="view-btn" data-view="growth">Growth</button>
-      <button class="view-btn" data-view="dataroom">Data Room</button>
+    <div class="nav-views" role="tablist" aria-label="Dashboard views">
+      <button class="view-btn active" data-view="business" role="tab" aria-selected="true" aria-controls="view-business">My Business</button>
+      <button class="view-btn" data-view="stores" role="tab" aria-selected="false" aria-controls="view-stores">My Stores</button>
+      <button class="view-btn" data-view="growth" role="tab" aria-selected="false" aria-controls="view-growth">Growth</button>
+      <button class="view-btn" data-view="dataroom" role="tab" aria-selected="false" aria-controls="view-dataroom">Data Room</button>
     </div>
-    <div class="nav-user">
-      <div class="user-avatar" id="userAvatar" onclick="doLogout()" title="Click to sign out"></div>
+    <div class="nav-user" style="position:relative;">
+      <button class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" aria-label="User menu" aria-haspopup="true" aria-expanded="false" type="button"></button>
+      <div class="user-menu-dropdown" id="userMenuDropdown" role="menu">
+        <div class="user-menu-header">
+          <div class="user-menu-name" id="userMenuName"></div>
+          <div class="user-menu-email" id="userMenuEmail"></div>
+        </div>
+        <button class="user-menu-item" role="menuitem" onclick="openSettings();closeUserMenu();">&#9881; Settings</button>
+        <button class="user-menu-item" role="menuitem" onclick="openAuditLog();closeUserMenu();">&#128203; Audit Log</button>
+        <div class="user-menu-sep" role="separator"></div>
+        <button class="user-menu-item danger" role="menuitem" onclick="doLogout()">&#10140; Sign Out</button>
+      </div>
     </div>
   </div>
   <!-- Tier 2: Clean filter bar -->
   <div class="nav-tier2">
-    <select id="filterStore" name="store" class="cmd-select" onchange="applyFilters()" style="min-width:150px;"><option value="">All Stores</option></select>
-    <select id="filterPeriod" class="cmd-select" onchange="applyPeriodFilter()" style="min-width:130px;">
+    <label for="filterStore" class="sr-only">Filter by store</label>
+    <select id="filterStore" name="store" class="cmd-select" onchange="applyFilters()" style="min-width:150px;" aria-label="Filter by store"><option value="">All Stores</option></select>
+    <label for="filterPeriod" class="sr-only">Filter by time period</label>
+    <select id="filterPeriod" class="cmd-select" onchange="applyPeriodFilter()" style="min-width:130px;" aria-label="Filter by time period">
       <option value="mtd">This Month</option>
       <option value="qtd">This Quarter</option>
       <option value="ytd">Year to Date</option>
@@ -2697,103 +2992,127 @@
       <option value="custom">Custom Range...</option>
     </select>
     <div id="customDateRange" style="display:none;align-items:center;gap:4px;">
-      <input type="date" id="filterFrom" name="dateFrom" class="cmd-input" style="width:120px;" onchange="applyFilters()">
-      <span style="color:var(--text-muted);font-size:11px;">to</span>
-      <input type="date" id="filterTo" name="dateTo" class="cmd-input" style="width:120px;" onchange="applyFilters()">
+      <label for="filterFrom" class="sr-only">Start date</label>
+      <input type="date" id="filterFrom" name="dateFrom" class="cmd-input" style="width:120px;" onchange="applyFilters()" aria-label="Start date">
+      <span style="color:var(--text-muted);font-size:11px;" aria-hidden="true">to</span>
+      <label for="filterTo" class="sr-only">End date</label>
+      <input type="date" id="filterTo" name="dateTo" class="cmd-input" style="width:120px;" onchange="applyFilters()" aria-label="End date">
     </div>
     <div style="flex:1;"></div>
     <span id="clientBadge" onclick="openSettings()" style="display:none;"><span id="clientBadgeText"></span></span>
-    <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Click to clear and re-upload">
-      <span class="data-saved-dot"></span> Saved
-    </div>
-    <button class="nav-util-btn" onclick="openSettings()" title="Settings">&#9881;</button>
-    <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" title="Alerts">&#9888;</button>
+    <button id="dataSavedBadge" class="data-saved-pill" onclick="bpaConfirm('Clear saved data and re-upload?',clearUserData)" title="Click to clear and re-upload">
+      <span class="data-saved-dot" aria-hidden="true"></span> Saved
+    </button>
+    <button class="nav-util-btn" onclick="openSettings()" aria-label="Settings"><span aria-hidden="true">&#9881;</span></button>
+    <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" aria-label="Performance Alerts"><span aria-hidden="true">&#9888;</span></button>
   </div>
+</nav>
+
+<!-- Processing Overlay -->
+<div class="processing-overlay" id="processingOverlay" role="status" aria-label="Processing data">
+  <div class="loading-spinner"></div>
+  <div class="processing-text" id="processingText">Processing files...</div>
+  <div class="processing-sub" id="processingSub"></div>
 </div>
 
-<!-- Settings Modal -->
-<div class="modal-overlay" id="settingsModal">
-  <div class="modal" style="width:480px;">
-    <h3>Dashboard Settings</h3>
-    <div class="form-group">
-      <label for="settingCompany">Company / Client Name</label>
-      <input type="text" id="settingCompany" name="company" placeholder="Company name">
-    </div>
-    <div class="form-group">
-      <label for="settingUser">User / Contact Name</label>
-      <input type="text" id="settingUser" name="user" placeholder="Contact name">
-    </div>
-    <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
-    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Gmail Integration (EmailJS)</div>
-    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect your email via <a href="https://www.emailjs.com" target="_blank" style="color:var(--primary);">emailjs.com</a> (free 200/mo). Create a template with: <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{to_email}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{from_name}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{subject}}</code> <code style="background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:3px;">{{message}}</code></p>
-    <div class="form-group">
-      <label for="settingEjsKey">EmailJS Public Key</label>
-      <input type="text" id="settingEjsKey" name="ejsKey" placeholder="e.g. abc123XYZ">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="form-group">
-        <label for="settingEjsService">Service ID</label>
-        <input type="text" id="settingEjsService" name="ejsService" placeholder="e.g. service_gmail">
-      </div>
-      <div class="form-group">
-        <label for="settingEjsTemplate">Template ID</label>
-        <input type="text" id="settingEjsTemplate" name="ejsTemplate" placeholder="e.g. template_report">
-      </div>
-    </div>
-    <div id="emailTestResult" style="font-size:12px;margin-top:4px;"></div>
+<!-- Toast Container -->
+<div class="bpa-toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
 
-    <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
-    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Data Source Connection</div>
-    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect to a POS system via API or DDS for automatic data sync. Currently using CSV file upload.</p>
-    <div class="form-group">
-      <label for="settingDataSource">Connection Type</label>
-      <select id="settingDataSource" name="dataSource" onchange="toggleDataSourceFields()">
-        <option value="csv">CSV File Upload (Current)</option>
-        <option value="api">REST API Endpoint</option>
-        <option value="dds">DDS / File Transfer</option>
-        <option value="grow_api">GROW POS Direct</option>
-      </select>
+<!-- Main Content -->
+<main id="main-content">
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-label="Dashboard Settings">
+  <div class="modal" style="width:480px;">
+    <h3 id="settingsTitle">Dashboard Settings</h3>
+    <div class="settings-tabs" role="tablist">
+      <button class="settings-tab active" onclick="switchSettingsTab('general')" role="tab" aria-selected="true">General</button>
+      <button class="settings-tab" onclick="switchSettingsTab('email')" role="tab" aria-selected="false">Email</button>
+      <button class="settings-tab" onclick="switchSettingsTab('datasource')" role="tab" aria-selected="false">Data Source</button>
+      <button class="settings-tab" onclick="switchSettingsTab('stores')" role="tab" aria-selected="false">Stores</button>
     </div>
-    <div id="dataSourceFields" style="display:none;">
+    <!-- General Tab -->
+    <div class="settings-panel active" id="settings-general">
+      <div class="form-group">
+        <label for="settingCompany">Company / Client Name</label>
+        <input type="text" id="settingCompany" name="company" placeholder="Company name">
+      </div>
+      <div class="form-group">
+        <label for="settingUser">User / Contact Name</label>
+        <input type="text" id="settingUser" name="user" placeholder="Contact name">
+      </div>
+    </div>
+    <!-- Email Tab -->
+    <div class="settings-panel" id="settings-email">
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect your email via <a href="https://www.emailjs.com" target="_blank" rel="noopener" style="color:var(--primary);">emailjs.com</a> (free 200/mo). Create a template with: <code style="background:var(--bg);padding:2px 5px;border-radius:3px;">{{to_email}}</code> <code style="background:var(--bg);padding:2px 5px;border-radius:3px;">{{from_name}}</code> <code style="background:var(--bg);padding:2px 5px;border-radius:3px;">{{subject}}</code> <code style="background:var(--bg);padding:2px 5px;border-radius:3px;">{{message}}</code></p>
+      <div class="form-group">
+        <label for="settingEjsKey">EmailJS Public Key</label>
+        <input type="text" id="settingEjsKey" name="ejsKey" placeholder="e.g. abc123XYZ">
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="form-group">
-          <label for="settingApiUrl">API / DDS Endpoint URL</label>
-          <input type="text" id="settingApiUrl" name="apiUrl" placeholder="https://api.pos-system.com/v1">
+          <label for="settingEjsService">Service ID</label>
+          <input type="text" id="settingEjsService" name="ejsService" placeholder="e.g. service_gmail">
         </div>
         <div class="form-group">
-          <label for="settingApiKey">API Key / Token</label>
-          <input type="password" id="settingApiKey" name="apiKey" placeholder="Bearer token or API key">
+          <label for="settingEjsTemplate">Template ID</label>
+          <input type="text" id="settingEjsTemplate" name="ejsTemplate" placeholder="e.g. template_report">
         </div>
       </div>
+      <div id="emailTestResult" style="font-size:12px;margin-top:4px;"></div>
+      <button class="btn-cancel" onclick="testEmailSetup()" style="border-color:var(--green);color:var(--green);margin-top:10px;">Test Email</button>
+    </div>
+    <!-- Data Source Tab -->
+    <div class="settings-panel" id="settings-datasource">
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Connect to a POS system via API or DDS for automatic data sync.</p>
       <div class="form-group">
-        <label for="settingApiSchedule">Sync Schedule</label>
-        <select id="settingApiSchedule" name="apiSchedule">
-          <option value="manual">Manual (on demand)</option>
-          <option value="daily">Daily (midnight)</option>
-          <option value="hourly">Hourly</option>
-          <option value="realtime">Real-time (webhook)</option>
+        <label for="settingDataSource">Connection Type</label>
+        <select id="settingDataSource" name="dataSource" onchange="toggleDataSourceFields()">
+          <option value="csv">CSV File Upload (Current)</option>
+          <option value="api">REST API Endpoint</option>
+          <option value="dds">DDS / File Transfer</option>
+          <option value="grow_api">GROW POS Direct</option>
         </select>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button class="btn-cancel" onclick="testDataSource()" style="border-color:var(--blue);color:var(--blue);font-size:12px;">Test Connection</button>
-        <button class="btn-cancel" onclick="syncNow()" style="border-color:var(--green);color:var(--green);font-size:12px;">Sync Now</button>
+      <div id="dataSourceFields" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group">
+            <label for="settingApiUrl">API / DDS Endpoint URL</label>
+            <input type="text" id="settingApiUrl" name="apiUrl" placeholder="https://api.pos-system.com/v1">
+          </div>
+          <div class="form-group">
+            <label for="settingApiKey">API Key / Token</label>
+            <input type="password" id="settingApiKey" name="apiKey" placeholder="Bearer token or API key">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="settingApiSchedule">Sync Schedule</label>
+          <select id="settingApiSchedule" name="apiSchedule">
+            <option value="manual">Manual (on demand)</option>
+            <option value="daily">Daily (midnight)</option>
+            <option value="hourly">Hourly</option>
+            <option value="realtime">Real-time (webhook)</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-cancel" onclick="testDataSource()" style="border-color:var(--blue);color:var(--blue);font-size:12px;">Test Connection</button>
+          <button class="btn-cancel" onclick="syncNow()" style="border-color:var(--green);color:var(--green);font-size:12px;">Sync Now</button>
+        </div>
+        <div id="dataSourceTestResult" style="font-size:12px;margin-top:8px;"></div>
       </div>
-      <div id="dataSourceTestResult" style="font-size:12px;margin-top:8px;"></div>
     </div>
-
-    <div style="border-top:1px solid var(--border);margin:18px 0 14px;"></div>
-    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Store Registry</div>
-    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Define your stores with display names and aliases. Aliases help BPA match store identifiers from different POS systems.</p>
-    <div id="storeRegistryList" style="max-height:200px;overflow-y:auto;margin-bottom:10px;"></div>
-    <div style="display:flex;gap:8px;">
-      <input type="text" id="newStoreId" placeholder="Store ID (e.g. 319)" style="width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
-      <input type="text" id="newStoreName" placeholder="Display Name" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
-      <input type="text" id="newStoreAliases" placeholder="Aliases (comma-sep)" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
-      <button class="nav-apply-btn" onclick="addStoreToRegistry()" style="padding:6px 12px;font-size:11px;">Add</button>
+    <!-- Store Registry Tab -->
+    <div class="settings-panel" id="settings-stores">
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Define your stores with display names and aliases for POS matching.</p>
+      <div id="storeRegistryList" style="max-height:200px;overflow-y:auto;margin-bottom:10px;"></div>
+      <div style="display:flex;gap:8px;">
+        <div><label for="newStoreId" class="sr-only">Store ID</label><input type="text" id="newStoreId" placeholder="Store ID (e.g. 319)" style="width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;"></div>
+        <div style="flex:1;"><label for="newStoreName" class="sr-only">Display Name</label><input type="text" id="newStoreName" placeholder="Display Name" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;"></div>
+        <div style="flex:1;"><label for="newStoreAliases" class="sr-only">Aliases</label><input type="text" id="newStoreAliases" placeholder="Aliases (comma-sep)" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;"></div>
+        <button class="nav-apply-btn" onclick="addStoreToRegistry()" style="padding:6px 12px;font-size:11px;">Add</button>
+      </div>
     </div>
-
     <div class="modal-buttons">
-      <button class="btn-cancel" onclick="testEmailSetup()" style="border-color:var(--green);color:var(--green);">Test Email</button>
       <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
       <button class="btn-save" onclick="saveSettings()">Save</button>
     </div>
@@ -2801,18 +3120,18 @@
 </div>
 
 <!-- Customer Detail Modal -->
-<div class="cust-modal-overlay" id="custDetailModal">
+<div class="cust-modal-overlay" id="custDetailModal" role="dialog" aria-modal="true" aria-labelledby="custDetailName">
   <div class="cust-modal">
     <div class="cust-modal-header">
       <h2 id="custDetailName">Customer Details</h2>
-      <button class="cust-modal-close" onclick="closeCustDetail()">&times;</button>
+      <button class="cust-modal-close" onclick="closeCustDetail()" aria-label="Close customer details">&times;</button>
     </div>
     <div class="cust-modal-body" id="custDetailBody"></div>
   </div>
 </div>
 
 <!-- Tile Picker Modal -->
-<div class="modal-overlay" id="tilePickerModal">
+<div class="modal-overlay" id="tilePickerModal" role="dialog" aria-modal="true" aria-label="Configure Dashboard Tiles">
   <div class="modal" style="width:580px;">
     <h3>Configure Dashboard Tiles</h3>
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Select the metrics you want to display. Changes save automatically.</p>
@@ -2825,7 +3144,7 @@
 </div>
 
 <!-- Scheduler Modal -->
-<div class="modal-overlay" id="schedulerModal">
+<div class="modal-overlay" id="schedulerModal" role="dialog" aria-modal="true" aria-label="Scheduled Reports">
   <div class="modal" style="width:640px;">
     <h3>Scheduled Reports</h3>
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Set up automatic report delivery. Reports are generated and emailed on schedule.</p>
@@ -2874,7 +3193,7 @@
 </div>
 
 <!-- Email Compose Modal -->
-<div class="modal-overlay" id="emailModal">
+<div class="modal-overlay" id="emailModal" role="dialog" aria-modal="true" aria-label="Email Report">
   <div class="modal" style="width:520px;">
     <h3 id="emailModalTitle">Email Report</h3>
     <div class="form-group">
@@ -2898,7 +3217,7 @@
 </div>
 
 <!-- Alerts Modal -->
-<div class="modal-overlay" id="alertsModal">
+<div class="modal-overlay" id="alertsModal" role="dialog" aria-modal="true" aria-label="Performance Alerts">
   <div class="modal" style="width:700px;max-height:88vh;overflow-y:auto;">
     <h3>Performance Alerts</h3>
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Configure store-level thresholds. When data is loaded, stores that breach these thresholds trigger alerts.</p>
@@ -2955,13 +3274,13 @@
 </div>
 
 <!-- Report Detail Modal -->
-<div class="report-modal-overlay" id="reportModal">
+<div class="report-modal-overlay" id="reportModal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
   <div class="report-modal">
     <div class="report-modal-header">
       <h2 id="reportModalTitle">Report</h2>
       <div class="report-modal-actions">
         <button class="btn-export" id="reportModalExport" style="display:none;">Export</button>
-        <button class="report-modal-close" onclick="closeReportModal()">&times;</button>
+        <button class="report-modal-close" onclick="closeReportModal()" aria-label="Close report">&times;</button>
       </div>
     </div>
     <div class="report-modal-body" id="reportModalBody"></div>
@@ -2969,7 +3288,7 @@
 </div>
 
 <!-- Mapping Wizard Modal -->
-<div class="mapping-wizard-overlay" id="mappingWizardModal">
+<div class="mapping-wizard-overlay" id="mappingWizardModal" role="dialog" aria-modal="true" aria-labelledby="mappingWizardTitle">
   <div class="mapping-wizard">
     <div class="mapping-wizard-header">
       <h2 id="mappingWizardTitle">Map Your Data</h2>
@@ -2999,7 +3318,7 @@
 <div id="uploadZone" class="upload-screen">
   <div class="upload-card">
     <div style="text-align:center;margin-bottom:28px;">
-      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:90px;filter:drop-shadow(0 0 16px rgba(220,38,38,0.2));">
+      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:90px;filter:drop-shadow(0 0 16px rgba(30,64,175,0.2));">
       <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Upload your data to get started</div>
     </div>
 
@@ -3013,8 +3332,8 @@
     </div>
 
     <div class="upload-drop" id="uploadDropInner">
-      <div style="color:var(--text-muted);opacity:0.3;margin-bottom:12px;">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div style="color:var(--text-muted);opacity:0.3;margin-bottom:12px;" aria-hidden="true">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       </div>
       <div style="font-size:15px;font-weight:600;color:var(--text);">Drop your data files here</div>
       <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">CSV and Excel files supported</div>
@@ -3049,7 +3368,7 @@
   <!-- Filters moved to header -->
 
   <!-- MY BUSINESS VIEW -->
-  <div class="view-content active" id="view-business">
+  <div class="view-content active" id="view-business" role="tabpanel" aria-labelledby="tab-business">
     <!-- Alert banner (compact) -->
     <div class="alert-banner" id="alertBanner" onclick="openAlerts()">
       <span style="color:var(--yellow);font-weight:700;" id="alertBannerCount"></span>
@@ -3150,7 +3469,7 @@
   </div>
 
   <!-- OPERATIONS TAB -->
-  <div class="view-content" id="view-stores">
+  <div class="view-content" id="view-stores" role="tabpanel" aria-labelledby="tab-stores">
     <div class="ops-quick-filters" id="opsQuickFilters">
       <span style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-right:6px;">Range:</span>
       <button class="ops-quick-btn" onclick="setOpsDateRange('YTD')">YTD</button>
@@ -3250,7 +3569,7 @@
   </div>
 
   <!-- District Builder Modal -->
-  <div class="modal-overlay" id="districtModal">
+  <div class="modal-overlay" id="districtModal" role="dialog" aria-modal="true" aria-label="District Settings">
     <div class="modal" style="width:700px;max-height:85vh;overflow-y:auto;">
       <h3>District Settings</h3>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Organize stores into districts and assign district managers. Changes are saved locally and reflected in the Operations grid.</div>
@@ -3287,7 +3606,7 @@
   </div>
 
   <!-- GROWTH VIEW -->
-  <div class="view-content" id="view-growth">
+  <div class="view-content" id="view-growth" role="tabpanel" aria-labelledby="tab-growth">
     <!-- Header row -->
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
       <select id="fcStoreSelect" class="cmd-select" style="min-width:180px;" onchange="renderForecastView()">
@@ -3351,7 +3670,7 @@
   </div>
 
   <!-- DATA ROOM VIEW -->
-  <div class="view-content" id="view-dataroom">
+  <div class="view-content" id="view-dataroom" role="tabpanel" aria-labelledby="tab-dataroom">
     <div class="kpi-grid" id="reportingKPIs"></div>
 
     <!-- Product & Service Analysis -->
@@ -3478,7 +3797,114 @@
   </div>
 </div>
 
+</main>
+
 <script>
+// ============================================================
+// TOAST NOTIFICATION SYSTEM
+// ============================================================
+function bpaToast(message, type = 'info', duration = 4000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const icons = { success: '\u2713', error: '\u2717', warning: '!', info: 'i' };
+  const toast = document.createElement('div');
+  toast.className = 'bpa-toast ' + type;
+  toast.innerHTML = '<div class="bpa-toast-icon">' + (icons[type] || 'i') + '</div>' +
+    '<div class="bpa-toast-body">' + message + '</div>' +
+    '<button class="bpa-toast-close" aria-label="Dismiss notification">&times;</button>';
+  toast.querySelector('.bpa-toast-close').onclick = () => dismissToast(toast);
+  container.appendChild(toast);
+  if (duration > 0) setTimeout(() => dismissToast(toast), duration);
+}
+function dismissToast(el) {
+  if (!el || !el.parentNode) return;
+  el.classList.add('removing');
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 200);
+}
+
+// Styled confirm dialog (replaces browser confirm())
+function bpaConfirm(message, onConfirm, onCancel) {
+  const overlay = document.createElement('div');
+  overlay.className = 'bpa-confirm-overlay';
+  overlay.innerHTML = '<div class="bpa-confirm-dialog">' +
+    '<div class="bpa-confirm-msg">' + message + '</div>' +
+    '<div class="bpa-confirm-btns">' +
+    '<button class="btn-cancel bpa-confirm-cancel">Cancel</button>' +
+    '<button class="btn-save bpa-confirm-ok">Confirm</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+  const cleanup = () => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); };
+  overlay.querySelector('.bpa-confirm-ok').onclick = () => { cleanup(); if (onConfirm) onConfirm(); };
+  overlay.querySelector('.bpa-confirm-cancel').onclick = () => { cleanup(); if (onCancel) onCancel(); };
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) { cleanup(); if (onCancel) onCancel(); } });
+  overlay.querySelector('.bpa-confirm-ok').focus();
+}
+
+// ============================================================
+// USER MENU
+// ============================================================
+function toggleUserMenu() {
+  const menu = document.getElementById('userMenuDropdown');
+  const avatar = document.getElementById('userAvatar');
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) { closeUserMenu(); return; }
+  // Populate user info
+  const cu = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (cu) {
+    document.getElementById('userMenuName').textContent = cu.name || '';
+    document.getElementById('userMenuEmail').textContent = cu.email || '';
+  }
+  menu.classList.add('open');
+  avatar.setAttribute('aria-expanded', 'true');
+}
+function closeUserMenu() {
+  const menu = document.getElementById('userMenuDropdown');
+  const avatar = document.getElementById('userAvatar');
+  if (menu) menu.classList.remove('open');
+  if (avatar) avatar.setAttribute('aria-expanded', 'false');
+}
+// Close menu on outside click
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('userMenuDropdown');
+  if (menu && menu.classList.contains('open') && !e.target.closest('.nav-user')) closeUserMenu();
+});
+
+// ============================================================
+// SETTINGS TABS
+// ============================================================
+function switchSettingsTab(tabName) {
+  document.querySelectorAll('.settings-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('settings-' + tabName);
+  if (panel) panel.classList.add('active');
+  // Activate the clicked tab button
+  document.querySelectorAll('.settings-tab').forEach(t => {
+    if (t.textContent.toLowerCase().replace(/\s/g,'') === tabName.replace(/\s/g,'') ||
+        (tabName === 'general' && t.textContent === 'General') ||
+        (tabName === 'email' && t.textContent === 'Email') ||
+        (tabName === 'datasource' && t.textContent === 'Data Source') ||
+        (tabName === 'stores' && t.textContent === 'Stores')) {
+      t.classList.add('active');
+      t.setAttribute('aria-selected', 'true');
+    }
+  });
+}
+
+// ============================================================
+// PROCESSING OVERLAY
+// ============================================================
+function showProcessing(text, sub) {
+  const el = document.getElementById('processingOverlay');
+  if (!el) return;
+  document.getElementById('processingText').textContent = text || 'Processing...';
+  document.getElementById('processingSub').textContent = sub || '';
+  el.classList.add('active');
+}
+function hideProcessing() {
+  const el = document.getElementById('processingOverlay');
+  if (el) el.classList.remove('active');
+}
+
 // ============================================================
 // DATA STORAGE
 // ============================================================
@@ -4058,7 +4484,7 @@ function openMapFiles() {
             const headers = Object.keys(allRows[0]).filter(h => h !== '_sheet');
             openMappingWizard(file.name, headers, allRows);
           }
-        } catch(err) { alert('Could not read Excel file: ' + err.message); }
+        } catch(err) { bpaToast('Could not read Excel file: ' + err.message, 'error'); }
       };
       reader.readAsArrayBuffer(file);
     } else {
@@ -4153,12 +4579,16 @@ setTimeout(() => {
 let _allUploadResults = [];
 
 async function handleFiles(files) {
-  for (const file of files) {
+  showProcessing('Processing ' + files.length + ' file' + (files.length > 1 ? 's' : '') + '...', 'Parsing and detecting formats');
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    document.getElementById('processingSub').textContent = 'File ' + (i+1) + ' of ' + files.length + ': ' + file.name;
     const r = await processFile(file);
     // Avoid duplicate entries in the list
     _allUploadResults = _allUploadResults.filter(x => x.name !== r.name);
     _allUploadResults.push(r);
   }
+  hideProcessing();
 
   fileListEl.innerHTML = _allUploadResults.map(r => `
     <div class="file-item">
@@ -4344,9 +4774,14 @@ function resetFilters() {
 // LAUNCH DASHBOARD
 // ============================================================
 function launchDashboard() {
+  showProcessing('Building dashboard...', 'Crunching your data');
   document.getElementById('loadingScreen').classList.add('hidden');
   uploadZone.style.display = 'none';
   document.getElementById('dashboard').classList.add('active');
+  // Defer rendering to allow the processing overlay to paint
+  setTimeout(() => { _launchDashboardInner(); hideProcessing(); }, 50);
+}
+function _launchDashboardInner() {
 
   // Apply role visibility after dashboard is visible
   const cu = getCurrentUser();
@@ -4555,7 +4990,7 @@ function renderReports() {
   ];
   growTypes.forEach(t => {
     if (GROW[t.key] && GROW[t.key].length) {
-      html += buildReportCard('grow-' + t.key, t.label, GROW[t.key].length + ' stores', num(GROW[t.key].length) + ' records', 'rgba(227,24,55,0.12)', 'var(--primary)', t.icon, true);
+      html += buildReportCard('grow-' + t.key, t.label, GROW[t.key].length + ' stores', num(GROW[t.key].length) + ' records', 'rgba(30,64,175,0.1)', 'var(--primary)', t.icon, true);
     }
   });
 
@@ -4985,7 +5420,7 @@ function updateStoreTarget(store, field, value) {
 
 function exportForecast() {
   const b = window._fcBaseline;
-  if (!b) { alert('No forecast data. Set targets first.'); return; }
+  if (!b) { bpaToast('No forecast data. Set targets first.', 'warning'); return; }
   const carPct = +document.getElementById('fcCarTarget').value;
   const ticketPct = +document.getElementById('fcTicketTarget').value;
   const convTarget = +document.getElementById('fcConvTarget').value;
@@ -5052,7 +5487,7 @@ function exportForecast() {
 
 function exportForecastTargets() {
   const b = window._fcBaseline;
-  if (!b) { alert('Set targets first.'); return; }
+  if (!b) { bpaToast('Set targets first.', 'warning'); return; }
   const carPct = +document.getElementById('fcCarTarget').value;
   const ticketPct = +document.getElementById('fcTicketTarget').value;
   const period = +document.getElementById('fcPeriod').value;
@@ -5470,7 +5905,7 @@ function addStoreToRegistry() {
   const id = document.getElementById('newStoreId')?.value?.trim();
   const name = document.getElementById('newStoreName')?.value?.trim();
   const aliasStr = document.getElementById('newStoreAliases')?.value?.trim();
-  if (!id) { alert('Store ID is required'); return; }
+  if (!id) { bpaToast('Store ID is required.', 'warning'); return; }
   const aliases = aliasStr ? aliasStr.split(',').map(a => a.trim()).filter(Boolean) : [];
   const registry = getStoreRegistry();
   registry.push({ id, name: name || '', aliases });
@@ -5520,14 +5955,14 @@ function applyRoute() {
   const view = viewAliases[parts[0]] || parts[0] || 'business';
   const param = parts[1] || null;
 
-  // Activate the correct view
-  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  // Activate the correct view + update ARIA
+  document.querySelectorAll('.view-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
   document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
 
   const viewBtn = document.querySelector('.view-btn[data-view="' + view + '"]');
   const viewContent = document.getElementById('view-' + view);
-  if (viewBtn) viewBtn.classList.add('active');
-  if (viewContent) viewContent.classList.add('active');
+  if (viewBtn) { viewBtn.classList.add('active'); viewBtn.setAttribute('aria-selected', 'true'); }
+  if (viewContent) { viewContent.classList.add('active'); viewContent.focus(); }
 
   // Handle sub-routes
   if (view === 'stores' && param) {
@@ -5604,7 +6039,7 @@ function bpaAlertStores(storeList, metric) {
   const recipients = getAlertRecipients();
   if (!recipients.length) {
     openAlerts();
-    alert('Add alert recipients first, then create a rule for this metric.');
+    bpaToast('Add alert recipients first, then create a rule for this metric.', 'warning');
     return;
   }
   const meta = getReportMeta();
@@ -5615,7 +6050,7 @@ function bpaAlertStores(storeList, metric) {
   body += 'Please review and take corrective action.\n\n— Butler Performance Analytics';
   const to = recipients.map(r => r.email).join(', ');
   if (isEmailConfigured()) {
-    sendViaEmailJS(to, subject, body).then(() => alert('Alert sent to ' + to)).catch(e => alert('Failed: '+(e?.text||e?.message||'Error')));
+    sendViaEmailJS(to, subject, body).then(() => bpaToast('Alert sent to ' + to)).catch(e => bpaToast('Failed: '+(e?.text||e?.message||'Error'), 'error'));
   } else {
     window.open('mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_self');
   }
@@ -5653,7 +6088,7 @@ function bpaExportInsights(panelId) {
   const recipients = getAlertRecipients();
   const to = recipients.length ? recipients.map(r => r.email).join(', ') : '';
   if (to && isEmailConfigured()) {
-    sendViaEmailJS(to, subject, body).then(() => alert('Insights sent to ' + to)).catch(e => alert('Failed: '+(e?.text||e?.message||'Error')));
+    sendViaEmailJS(to, subject, body).then(() => bpaToast('Insights sent to ' + to)).catch(e => bpaToast('Failed: '+(e?.text||e?.message||'Error'), 'error'));
   } else {
     window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
   }
@@ -5664,7 +6099,7 @@ function bpaCreateAlert(metric, operator, threshold) {
   list.push({ metric, operator, threshold: +threshold, severity: 'warning' });
   saveAlertRules(list);
   runAlertCheck();
-  alert('Alert rule created: ' + metric + ' ' + operator + ' ' + threshold);
+  bpaToast('Alert rule created: ' + metric + ' ' + operator + ' ' + threshold, 'success');
 }
 
 function bpaSwitchTab(viewOrTab) {
@@ -6258,7 +6693,7 @@ Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
 Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15,15,26,0.95)';
 Chart.defaults.plugins.tooltip.titleColor = '#e8e8f0';
 Chart.defaults.plugins.tooltip.bodyColor = '#c8c8e0';
-Chart.defaults.plugins.tooltip.borderColor = 'rgba(227,24,55,0.3)';
+Chart.defaults.plugins.tooltip.borderColor = 'rgba(30,64,175,0.25)';
 Chart.defaults.plugins.tooltip.borderWidth = 1;
 Chart.defaults.plugins.tooltip.padding = 12;
 Chart.defaults.plugins.tooltip.cornerRadius = 8;
@@ -6276,9 +6711,9 @@ Chart.defaults.elements.point.hoverBorderWidth = 2;
 Chart.defaults.elements.arc.borderWidth = 2;
 Chart.defaults.elements.arc.borderColor = '#0f0f1a';
 
-// Cohesive color palette derived from brand red #e31837
+// Cohesive color palette derived from brand red #1e40af
 const PALETTE = {
-  red: '#e31837', redLight: 'rgba(227,24,55,0.65)', redFill: 'rgba(227,24,55,0.12)',
+  red: '#1e40af', redLight: 'rgba(30,64,175,0.65)', redFill: 'rgba(30,64,175,0.1)',
   blue: '#448aff', blueLight: 'rgba(68,138,255,0.65)', blueFill: 'rgba(68,138,255,0.12)',
   green: '#00c853', greenLight: 'rgba(0,200,83,0.65)', greenFill: 'rgba(0,200,83,0.12)',
   yellow: '#ffd600', yellowLight: 'rgba(255,214,0,0.65)', yellowFill: 'rgba(255,214,0,0.12)',
@@ -6286,7 +6721,7 @@ const PALETTE = {
   purple: '#b388ff', purpleLight: 'rgba(179,136,255,0.65)',
   teal: '#26c6da', tealLight: 'rgba(38,198,218,0.65)',
   pink: '#f06292', pinkLight: 'rgba(240,98,146,0.65)',
-  multi: ['#e31837','#448aff','#00c853','#ffd600','#ff9100','#b388ff','#26c6da','#f06292','#ff6e40','#69f0ae','#40c4ff','#ffd740']
+  multi: ['#1e40af','#448aff','#00c853','#ffd600','#ff9100','#b388ff','#26c6da','#f06292','#ff6e40','#69f0ae','#40c4ff','#ffd740']
 };
 
 // Tooltip callback helpers
@@ -7288,7 +7723,7 @@ function renderInspections() {
     buildReportCard('insp-status', 'Status Distribution', 'Green / Yellow / Orange / Red breakdown', num(total) + ' inspections', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9684;', total > 0) +
     buildReportCard('insp-conversion', 'Conversion Rate', 'Items needing attention that were purchased', pct(convRate), 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9733;', needsAttention > 0) +
     buildReportCard('insp-upsell', 'Top Upsell Opportunities', 'Most common missed sales from inspections', num(upsellTop.length) + ' items', 'rgba(255,145,0,0.12)', 'var(--orange)', '&#9650;', upsellTop.length > 0) +
-    buildReportCard('insp-table', 'Inspection Summary Table', 'Full detail by service item with status counts', num(inspRows.length) + ' service items', 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9783;', inspRows.length > 0);
+    buildReportCard('insp-table', 'Inspection Summary Table', 'Full detail by service item with status counts', num(inspRows.length) + ' service items', 'rgba(30,64,175,0.1)', 'var(--primary)', '&#9783;', inspRows.length > 0);
   document.querySelectorAll('#inspCards .report-card').forEach(c => {
     c.addEventListener('click', () => openInspReport(c.dataset.report));
   });
@@ -8091,7 +8526,7 @@ function renderCustomers() {
   // Build report cards
   document.getElementById('custCards').innerHTML =
     buildReportCard('cust-geo', 'Geographic Distribution', 'Customers by state and city', uniqueStates + ' states', 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9678;', totalCust > 0) +
-    buildReportCard('cust-spend', 'Spend Distribution', 'Revenue brackets and vehicle year analysis', num(totalCust) + ' customers', 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9636;', totalCust > 0) +
+    buildReportCard('cust-spend', 'Spend Distribution', 'Revenue brackets and vehicle year analysis', num(totalCust) + ' customers', 'rgba(30,64,175,0.1)', 'var(--primary)', '&#9636;', totalCust > 0) +
     buildReportCard('cust-details', 'Customer Details', 'Full customer list with search', num(totalCust) + ' records', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9782;', totalCust > 0) +
     buildReportCard('cust-biz', 'Business Accounts', 'Fleet and corporate account summary', num(bizAccounts) + ' accounts', 'rgba(255,214,0,0.12)', 'var(--yellow)', '&#9733;', bizAccounts > 0) +
     buildReportCard('cust-vehicles', 'Vehicle Analysis', 'Vehicle year distribution', num(totalCust) + ' vehicles', 'rgba(179,136,255,0.12)', '#b388ff', '&#9881;', totalCust > 0);
@@ -8822,7 +9257,7 @@ function renderPeople() {
 
 // Export a smart segment to CSV
 function exportSmartSegment(segIndex) {
-  alert('Segment export — coming in the next release. Use the tab-level Export for now.');
+  bpaToast('Segment export coming soon. Use the tab-level Export for now.', 'info');
 }
 
 function openAdvisorDetail(idx) {
@@ -9055,7 +9490,7 @@ function previewSegment() {
 
 function saveSegment() {
   const name = document.getElementById('segName').value.trim();
-  if (!name) { alert('Enter a segment name.'); return; }
+  if (!name) { bpaToast('Enter a segment name.', 'warning'); return; }
   if (!segPreviewResults.length) previewSegment();
 
   const list = getSegments();
@@ -9071,12 +9506,12 @@ function saveSegment() {
   document.getElementById('segName').value = '';
   document.getElementById('segDesc').value = '';
   renderSavedSegments();
-  alert('Segment "' + name + '" saved with ' + num(segPreviewResults.length) + ' customers.');
+  bpaToast('Segment "' + name + '" saved with ' + num(segPreviewResults.length) + ' customers.', 'success');
 }
 
 function exportSegment() {
   if (!segPreviewResults.length) previewSegment();
-  if (!segPreviewResults.length) { alert('No customers match.'); return; }
+  if (!segPreviewResults.length) { bpaToast('No customers match.', 'warning'); return; }
   const rows = ['"First_Name","Last_Name","Email","Phone","Address","City","State","ZIP","Vehicle","Mileage","Store","Net_Sales"'];
   segPreviewResults.forEach(r => {
     rows.push([r.Customer_First_Name,r.Customer_Last_Name,r.Customer_Email_Address,r.Customer_Phone_Number,r.Customer_Address,r.City,r.Customer_State,r.ZIP_Code,[r.Vehicle_Year,r.ChekChart_Make,r.ChekChart_Model].filter(Boolean).join(' '),r.Vehicle_Mileage,r.Store_Number,r.Net_Sales].map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"').join(','));
@@ -9611,10 +10046,10 @@ function renderMarketing() {
     buildReportCard('mkt-forecast', 'Revenue Forecast', '90-day projection with trend analysis', money(totalRevenue) + ' total', 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9650;', custWithDates.length > 0) +
     buildReportCard('mkt-seasonal', 'Seasonal Pattern', 'Monthly revenue pattern analysis', storeCount + ' stores', 'rgba(179,136,255,0.12)', '#b388ff', '&#9670;', custWithDates.length > 0) +
     buildReportCard('mkt-trade', 'Trade Area Analysis', 'ZIP codes, service mix, retention signals', uniqueZIPs + ' ZIPs', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9673;', uniqueZIPs > 0) +
-    buildReportCard('mkt-scorecard', 'Store Scorecard', 'Opportunity scoring across all dimensions', storeCount + ' stores', 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9733;', storeCount > 0) +
+    buildReportCard('mkt-scorecard', 'Store Scorecard', 'Opportunity scoring across all dimensions', storeCount + ' stores', 'rgba(30,64,175,0.1)', 'var(--primary)', '&#9733;', storeCount > 0) +
     buildReportCard('mkt-fleet', 'Fleet Intelligence', 'Fleet vs retail mix and revenue comparison', pct(fleetPct) + ' fleet', 'rgba(255,214,0,0.12)', 'var(--yellow)', '&#9881;', cust.length > 0) +
     buildReportCard('mkt-tickets', 'Ticket Distribution', 'Revenue brackets and pricing analysis', num(cust.length) + ' invoices', 'rgba(255,145,0,0.12)', 'var(--orange)', '&#9636;', cust.length > 0) +
-    (hasPromoData ? buildReportCard('mkt-discounts', 'Discount Impact', 'Promotion effectiveness analysis', num(promos.length) + ' promos', 'rgba(227,24,55,0.12)', 'var(--red)', '&#9888;', true) : '');
+    (hasPromoData ? buildReportCard('mkt-discounts', 'Discount Impact', 'Promotion effectiveness analysis', num(promos.length) + ' promos', 'rgba(30,64,175,0.1)', 'var(--red)', '&#9888;', true) : '');
 
   document.querySelectorAll('#marketCards .report-card').forEach(c => {
     c.addEventListener('click', () => openMarketReport(c.dataset.report));
@@ -9932,7 +10367,7 @@ function createCampaign() {
   const storeSelect = document.getElementById('mktgStoreSelect');
   const stores = [...storeSelect.selectedOptions].map(o => o.value);
 
-  if (!name) { alert('Please enter a campaign name.'); return; }
+  if (!name) { bpaToast('Please enter a campaign name.', 'warning'); return; }
 
   const list = getCampaigns();
   list.push({ name, client, drop1, cardsPerDrop, drops, freq, pricePerCard, expDate, stores, status: 'draft', created: new Date().toISOString() });
@@ -9965,7 +10400,7 @@ function generateSuppression() {
   const selectedStores = [...storeSelect.selectedOptions].map(o => o.value);
   const cust = selectedStores.length ? FILTERED.customers.filter(r => selectedStores.includes(r.Store_Number)) : FILTERED.customers;
 
-  if (!cust.length) { alert('No customer data loaded. Load CSVs first.'); return; }
+  if (!cust.length) { bpaToast('No customer data loaded. Load CSVs first.', 'warning'); return; }
 
   // Build suppression CSV: name, address, city, state, zip
   const rows = ['"First_Name","Last_Name","Address","City","State","ZIP"'];
@@ -9984,7 +10419,7 @@ function generateSuppression() {
   a.click();
   URL.revokeObjectURL(a.href);
 
-  alert('Suppression file generated: ' + num(rows.length - 1) + ' unique addresses' + (selectedStores.length ? ' for store(s) #' + selectedStores.join(', #') : '') + '.');
+  bpaToast('Suppression file generated: ' + num(rows.length - 1) + ' unique addresses' + (selectedStores.length ? ' for store(s) #' + selectedStores.join(', #') : '') + '.', 'success');
 }
 
 // ============================================================
@@ -10060,9 +10495,9 @@ function renderOfferSlots() {
   (layout.slots || []).forEach((slot, i) => {
     const offer = saved[layout.id + '-' + i] || {};
     const hasOffer = offer.title || offer.discount;
-    previewHTML += `<div style="position:absolute;left:${slot.x}%;top:${slot.y}%;width:${slot.w}%;height:${slot.h}%;border:2px dashed ${hasOffer ? '#e31837' : '#999'};border-radius:8px;background:${hasOffer ? 'rgba(227,24,55,0.08)' : 'rgba(0,0,0,0.03)'};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;z-index:1;overflow:hidden;">
+    previewHTML += `<div style="position:absolute;left:${slot.x}%;top:${slot.y}%;width:${slot.w}%;height:${slot.h}%;border:2px dashed ${hasOffer ? '#1e40af' : '#999'};border-radius:8px;background:${hasOffer ? 'rgba(30,64,175,0.06)' : 'rgba(0,0,0,0.03)'};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;z-index:1;overflow:hidden;">
       ${hasOffer ?
-        '<div style="font-size:clamp(8px,1.5vw,13px);font-weight:800;color:#e31837;text-align:center;line-height:1.2;">' + (offer.discount || '') + '</div>' +
+        '<div style="font-size:clamp(8px,1.5vw,13px);font-weight:800;color:#1e40af;text-align:center;line-height:1.2;">' + (offer.discount || '') + '</div>' +
         '<div style="font-size:clamp(6px,1vw,9px);color:#333;text-align:center;margin-top:2px;line-height:1.2;">' + (offer.title || '') + '</div>'
         :
         '<div style="font-size:clamp(8px,1.2vw,12px);color:#aaa;font-weight:600;">CARD ' + slot.label + '</div>'
@@ -10110,9 +10545,9 @@ function onOfferInput() {
   (layout.slots || []).forEach((slot, i) => {
     const offer = saved[layout.id + '-' + i] || {};
     const hasOffer = offer.title || offer.discount;
-    previewHTML += `<div style="position:absolute;left:${slot.x}%;top:${slot.y}%;width:${slot.w}%;height:${slot.h}%;border:2px dashed ${hasOffer ? '#e31837' : '#999'};border-radius:8px;background:${hasOffer ? 'rgba(227,24,55,0.08)' : 'rgba(0,0,0,0.03)'};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;z-index:1;overflow:hidden;">
+    previewHTML += `<div style="position:absolute;left:${slot.x}%;top:${slot.y}%;width:${slot.w}%;height:${slot.h}%;border:2px dashed ${hasOffer ? '#1e40af' : '#999'};border-radius:8px;background:${hasOffer ? 'rgba(30,64,175,0.06)' : 'rgba(0,0,0,0.03)'};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;z-index:1;overflow:hidden;">
       ${hasOffer ?
-        '<div style="font-size:clamp(8px,1.5vw,13px);font-weight:800;color:#e31837;text-align:center;line-height:1.2;">' + (offer.discount || '') + '</div>' +
+        '<div style="font-size:clamp(8px,1.5vw,13px);font-weight:800;color:#1e40af;text-align:center;line-height:1.2;">' + (offer.discount || '') + '</div>' +
         '<div style="font-size:clamp(6px,1vw,9px);color:#333;text-align:center;margin-top:2px;line-height:1.2;">' + (offer.title || '') + '</div>' +
         (offer.code ? '<div style="font-size:clamp(5px,0.8vw,7px);color:#666;margin-top:2px;font-family:monospace;">' + offer.code + '</div>' : '')
         :
@@ -10229,9 +10664,9 @@ function emailHandoff() {
 
   if (isEmailConfigured()) {
     sendViaEmailJS(to, subject, body).then(() => {
-      alert('Handoff email sent!');
+      bpaToast('Handoff email sent!', 'success');
     }).catch(err => {
-      alert('Failed: ' + (err?.text || err?.message || 'Check Settings.'));
+      bpaToast('Failed: ' + (err?.text || err?.message || 'Check Settings.'), 'error');
     });
   } else {
     window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
@@ -10366,7 +10801,7 @@ function addTokenOverrideRow(location, value) {
 
 function saveToken() {
   const name = document.getElementById('tokenName').value.trim().replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
-  if (!name) { alert('Token name is required.'); return; }
+  if (!name) { bpaToast('Token name is required.', 'warning'); return; }
 
   const type = document.getElementById('tokenType').value;
   const description = document.getElementById('tokenDescription').value.trim();
@@ -10386,7 +10821,7 @@ function saveToken() {
   // Check for duplicate name (skip self if editing)
   const dupeIdx = tokens.findIndex(t => t.name === name);
   if (dupeIdx >= 0 && dupeIdx !== editIdx) {
-    alert('A token with this name already exists.');
+    bpaToast('A token with this name already exists.', 'warning');
     return;
   }
 
@@ -10409,11 +10844,12 @@ function editToken(idx) {
 }
 
 function deleteToken(idx) {
-  if (!confirm('Delete this token? Any campaigns using it will show the raw {{token}} placeholder.')) return;
-  const tokens = getTokens();
-  tokens.splice(idx, 1);
-  saveTokens(tokens);
-  renderTokens();
+  bpaConfirm('Delete this token? Any campaigns using it will show the raw {{token}} placeholder.', () => {
+    const tokens = getTokens();
+    tokens.splice(idx, 1);
+    saveTokens(tokens);
+    renderTokens();
+  });
 }
 
 function copyTokenSyntax(name) {
@@ -10554,7 +10990,7 @@ function unassignStore(distIdx, store) {
 }
 
 function showAssignMenu(event, store) {
-  if (bp_districts.length === 0) { alert('Create a district first.'); return; }
+  if (bp_districts.length === 0) { bpaToast('Create a district first.', 'warning'); return; }
   if (bp_districts.length === 1) { bp_districts[0].stores.push(store); renderDistrictModal(); return; }
   // Build a quick dropdown
   const existing = document.getElementById('assignDropdown');
@@ -11231,7 +11667,7 @@ function renderReporting() {
   document.getElementById('reportCards').innerHTML =
     buildReportCard('rpt-warranty', 'Warranty Services', 'Maintenance and warranty service breakdown', num(warrantyEntries.length) + ' types', 'rgba(68,138,255,0.12)', 'var(--blue)', '&#9881;', warrantyEntries.length > 0) +
     buildReportCard('rpt-quicksales', 'Quick Sales', 'Low-ticket invoices under $50', num(quickSales.length) + ' invoices', 'rgba(255,214,0,0.12)', 'var(--yellow)', '&#9889;', quickSales.length > 0) +
-    buildReportCard('rpt-zerodollar', 'Zero Dollar Invoices', 'Zero and negative dollar invoice tracking', num(zeroDollarCount) + ' invoices', 'rgba(227,24,55,0.12)', 'var(--primary)', '&#9888;', zeroDollarCount > 0) +
+    buildReportCard('rpt-zerodollar', 'Zero Dollar Invoices', 'Zero and negative dollar invoice tracking', num(zeroDollarCount) + ' invoices', 'rgba(30,64,175,0.1)', 'var(--primary)', '&#9888;', zeroDollarCount > 0) +
     buildReportCard('rpt-mailable', 'Mailable Customers', 'Address coverage and store mailing stats', pct(mailPct) + ' coverage', 'rgba(0,200,83,0.12)', 'var(--green)', '&#9993;', cust.length > 0) +
     buildReportCard('rpt-quality', 'Data Quality', 'Contact info completeness analysis', num(cust.length) + ' records', 'rgba(179,136,255,0.12)', '#b388ff', '&#9733;', cust.length > 0);
 
@@ -11868,7 +12304,7 @@ function buildReportHTML(tableId, title) {
   body { font-family: 'Segoe UI', system-ui, sans-serif; color: #222; margin: 0; padding: 40px; max-width: 1200px; margin: 0 auto; }
   @media print { body { padding: 0; } .no-print { display: none !important; } }
 </style></head><body>
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #e31837;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #1e40af;">
   <div>
     <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;">
   </div>
@@ -11898,7 +12334,7 @@ ${tableHTML}
 </div>
 
 <div class="no-print" style="margin-top:24px;text-align:center;">
-  <button onclick="window.print()" style="background:#e31837;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Print / Save as PDF</button>
+  <button onclick="window.print()" style="background:#1e40af;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Print / Save as PDF</button>
   <button onclick="(function(){var rows=[];document.querySelectorAll('table tr').forEach(function(tr){var cells=[];tr.querySelectorAll('th,td').forEach(function(td){cells.push(String.fromCharCode(34)+td.textContent.trim().replace(/&quot;/g,String.fromCharCode(34,34))+String.fromCharCode(34))});rows.push(cells.join(','))});var b=new Blob([rows.join(String.fromCharCode(10))],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='report.csv';a.click()})()" style="background:#1a1a2e;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-left:10px;">Download CSV</button>
 </div>
 </body></html>`;
@@ -11996,7 +12432,7 @@ function sendEmail() {
   const subject = document.getElementById('emailSubject').value.trim();
   const userMsg = document.getElementById('emailBody').value.trim();
 
-  if (!to) { alert('Please enter at least one email address.'); return; }
+  if (!to) { bpaToast('Please enter at least one email address.', 'warning'); return; }
 
   // Build full report body with table data inline
   const fullBody = buildEmailReportBody(pendingEmailReport.tableId, pendingEmailReport.title, userMsg);
@@ -12036,11 +12472,11 @@ function sendEmail() {
         btn.disabled = false;
         closeEmailModal();
       }, 1500);
-      alert('Email sent to ' + to + '.\n\nThe HTML report and CSV have also been downloaded — attach them to a follow-up if needed.');
+      bpaToast('Email sent to ' + to + '. The HTML report and CSV have been downloaded.', 'success');
     }).catch(err => {
       btn.textContent = 'Send Email';
       btn.disabled = false;
-      alert('Email failed: ' + (err?.text || err?.message || 'Check Settings.'));
+      bpaToast('Email failed: ' + (err?.text || err?.message || 'Check Settings.'), 'error');
     });
   } else {
     const mailtoBody = fullBody + '\n\n---\nReport files have been downloaded. Please attach them to this email.';
@@ -12120,7 +12556,7 @@ function addSchedule() {
   const report = document.getElementById('schedReport').value;
   const freq = document.getElementById('schedFreq').value;
 
-  if (!email) { alert('Please enter an email address.'); return; }
+  if (!email) { bpaToast('Please enter an email address.', 'warning'); return; }
 
   const list = getSchedules();
   list.push({
@@ -12180,9 +12616,9 @@ function sendScheduledReport(idx) {
   if (isEmailConfigured()) {
     sendViaEmailJS(s.email, subject, body).then(() => {
       markSent();
-      alert('Report sent to ' + s.email);
+      bpaToast('Report sent to ' + s.email, 'success');
     }).catch(err => {
-      alert('Email failed: ' + (err?.text || err?.message || 'Check Settings.'));
+      bpaToast('Email failed: ' + (err?.text || err?.message || 'Check Settings.'), 'error');
     });
   } else {
     // Fallback: download + mailto
@@ -12249,7 +12685,7 @@ function saveAlertRules(list) { localStorage.setItem('bp_alert_rules', JSON.stri
 function addAlertRecipient() {
   const name = document.getElementById('alertRecipName').value.trim();
   const email = document.getElementById('alertRecipEmail').value.trim();
-  if (!email) { alert('Please enter an email.'); return; }
+  if (!email) { bpaToast('Please enter an email.', 'warning'); return; }
   const list = getAlertRecipients();
   list.push({ name, email });
   saveAlertRecipients(list);
@@ -12277,7 +12713,7 @@ function addAlertRule() {
   const operator = document.getElementById('alertOperator').value;
   const threshold = +document.getElementById('alertThreshold').value;
   const severity = document.getElementById('alertSeverity').value;
-  if (isNaN(threshold)) { alert('Please enter a threshold value.'); return; }
+  if (isNaN(threshold)) { bpaToast('Please enter a threshold value.', 'warning'); return; }
   const list = getAlertRules();
   list.push({ metric, operator, threshold, severity });
   saveAlertRules(list);
@@ -12446,12 +12882,13 @@ function openAlerts() {
 }
 
 function clearAllAlertRules() {
-  if (!confirm('Remove all alert rules and recipients?')) return;
-  saveAlertRules([]);
-  saveAlertRecipients([]);
-  renderAlertRules();
-  renderAlertRecipients();
-  runAlertCheck();
+  bpaConfirm('Remove all alert rules and recipients?', () => {
+    saveAlertRules([]);
+    saveAlertRecipients([]);
+    renderAlertRules();
+    renderAlertRecipients();
+    runAlertCheck();
+  });
 }
 
 function closeAlerts() {
@@ -12459,9 +12896,9 @@ function closeAlerts() {
 }
 
 function sendAllAlerts() {
-  if (!currentAlerts.length) { alert('No alerts to send.'); return; }
+  if (!currentAlerts.length) { bpaToast('No alerts to send.', 'info'); return; }
   const recipients = getAlertRecipients();
-  if (!recipients.length) { alert('Add at least one recipient first.'); return; }
+  if (!recipients.length) { bpaToast('Add at least one recipient first.', 'warning'); return; }
 
   const meta = getReportMeta();
   const to = recipients.map(r => r.email).join(', ');
@@ -12495,7 +12932,7 @@ function sendAllAlerts() {
     }).catch(err => {
       btn.textContent = 'Send All Alerts';
       btn.disabled = false;
-      alert('Email failed: ' + (err?.text || err?.message || 'Check Settings.'));
+      bpaToast('Email failed: ' + (err?.text || err?.message || 'Check Settings.'), 'error');
     });
   } else {
     window.open('mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_self');
@@ -12529,7 +12966,7 @@ function isEmailConfigured() {
 
 function sendViaEmailJS(to, subject, message) {
   if (!isEmailConfigured()) {
-    alert('Gmail not configured. Go to Settings (click client badge) and add your EmailJS credentials.');
+    bpaToast('Gmail not configured. Go to Settings and add your EmailJS credentials.', 'warning');
     return Promise.reject('not configured');
   }
   const serviceId = localStorage.getItem('bp_ejs_service');
@@ -12841,16 +13278,17 @@ function emailAuditLog() {
   if (log.length > 50) body += '\n... and ' + (log.length - 50) + ' more entries (export CSV for full log)\n';
   const subject = 'BPA Audit Log — ' + (meta.company || 'Butler Performance');
   if (isEmailConfigured()) {
-    sendViaEmailJS(localStorage.getItem('bp_ejs_from') || '', subject, body).then(() => alert('Audit log emailed.')).catch(e => alert('Failed: '+(e?.text||e?.message||'Error')));
+    sendViaEmailJS(localStorage.getItem('bp_ejs_from') || '', subject, body).then(() => bpaToast('Audit log emailed.')).catch(e => bpaToast('Failed: '+(e?.text||e?.message||'Error'), 'error'));
   } else {
     window.open('mailto:' + encodeURIComponent(localStorage.getItem('bp_ejs_from') || '') + '?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_self');
   }
 }
 
 function clearAuditLog() {
-  if (!confirm('Clear all audit log entries? This cannot be undone.')) return;
-  localStorage.removeItem('bp_audit_log');
-  openAuditLog();
+  bpaConfirm('Clear all audit log entries? This cannot be undone.', () => {
+    localStorage.removeItem('bp_audit_log');
+    openAuditLog();
+  });
 }
 
 function setSession(user) {
@@ -12871,11 +13309,11 @@ function setSession(user) {
 const ROLE_LABELS = { company_admin: 'Company Admin', client_admin: 'Client Admin', client_viewer: 'Client Viewer' };
 
 const DEFAULT_ACCOUNTS = [
-  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', _pw: 'bpa2026', role: 'company_admin', stores: [] },
-  { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'client_admin', stores: [] },
-  { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', _pw: 'sbl2026', role: 'client_admin', stores: [] },
-  { name: 'Dakota McAvaney', email: 'dmcavaney.magiclube@gmail.com', company: 'Auto Center Enterprises dba Jiffy Lube', _pw: 'ace2026', role: 'client_admin', stores: [] },
-  { name: 'Erin Ham', email: 'erinham401@gmail.com', company: 'Butler Performance Analytics', _pw: 'bpa2026', role: 'client_admin', stores: [] },
+  { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', role: 'company_admin', stores: [], _salt: 'a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8', _hash: '077e7bbd56c6eed50c572bf74df5c8817e31ff93d6a5260a1cd0d7deec3b7a5b' },
+  { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', role: 'client_admin', stores: [], _salt: 'b2c3d4e5f6a7b8a9b2c3d4e5f6a7b8a9', _hash: 'c003fd11a8eb80e0ba0f3bbbf2707558e81d857d519981623be5846eabfc15b5' },
+  { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', role: 'client_admin', stores: [], _salt: 'c3d4e5f6a7b8a9b0c3d4e5f6a7b8a9b0', _hash: '6830330d2781da540920a9e1767dcad9779bce19a0c6da66de816f8ba7b516fc' },
+  { name: 'Dakota McAvaney', email: 'dmcavaney.magiclube@gmail.com', company: 'Auto Center Enterprises dba Jiffy Lube', role: 'client_admin', stores: [], _salt: 'd4e5f6a7b8a9b0c1d4e5f6a7b8a9b0c1', _hash: '077ab21a3e8dd71b3f788ed7a493ffdec15502f491ce163bf0ed646c55254017' },
+  { name: 'Erin Ham', email: 'erinham401@gmail.com', company: 'Butler Performance Analytics', role: 'client_admin', stores: [], _salt: 'e5f6a7b8a9b0c1d2e5f6a7b8a9b0c1d2', _hash: 'd88d8b0f6ea8ea849fba3b7eb0c74ff692aa1be32a0e8bfb943d88baf248d5eb' },
 ];
 
 function isCompanyAdmin() { const u = getCurrentUser(); return u && u.role === 'company_admin'; }
@@ -12896,17 +13334,12 @@ async function seedDefaultUser() {
   });
   if (roleUpdated) saveUsers(users);
 
-  // Quick check — if all defaults exist, skip entirely (no async hashing)
+  // Quick check — if all defaults exist, skip entirely
   const missing = DEFAULT_ACCOUNTS.filter(a => !users.find(u => u.email.toLowerCase() === a.email.toLowerCase()));
   if (!missing.length) return;
   let changed = false;
-  // Hash all missing passwords in parallel for speed
-  const hashed = await Promise.all(missing.map(async acct => {
-    const salt = generateSalt();
-    const hash = await hashPassword(acct._pw, salt);
-    return { ...acct, salt, hash };
-  }));
-  for (const acct of hashed) {
+  // Use pre-hashed credentials — no plaintext passwords in source
+  for (const acct of missing) {
     if (!users.find(u => u.email.toLowerCase() === acct.email.toLowerCase())) {
       users.push({
         name: acct.name,
@@ -12914,8 +13347,8 @@ async function seedDefaultUser() {
         company: acct.company,
         role: acct.role,
         stores: acct.stores || [],
-        passwordHash: acct.hash,
-        salt: acct.salt,
+        passwordHash: acct._hash,
+        salt: acct._salt,
         created: new Date().toISOString(),
         failedAttempts: 0,
         lockedUntil: null
@@ -13005,15 +13438,15 @@ async function doLogin() {
 }
 
 function doLogout() {
-  if (!confirm('Sign out?')) return;
-  const cu = getCurrentUser();
-  logAudit('LOGOUT', cu?.email || '—', cu?.name || '');
-  // Clear this user's saved data so stale/contaminated data doesn't persist
-  const dataKey = getDataStorageKey();
-  if (dataKey) localStorage.removeItem(dataKey);
-  sessionStorage.removeItem('bp_session');
-  // Full page reload
-  window.location.href = location.pathname;
+  closeUserMenu();
+  bpaConfirm('Sign out?', () => {
+    const cu = getCurrentUser();
+    logAudit('LOGOUT', cu?.email || '—', cu?.name || '');
+    const dataKey = getDataStorageKey();
+    if (dataKey) localStorage.removeItem(dataKey);
+    sessionStorage.removeItem('bp_session');
+    window.location.href = location.pathname;
+  });
 }
 
 function updateUserAvatar(user) {
@@ -13069,7 +13502,7 @@ function openCreateAccount() {
     document.getElementById('regRoleGroup').style.display = 'none';
   } else {
     // Viewers can't create accounts
-    alert('You do not have permission to create accounts.');
+    bpaToast('You do not have permission to create accounts.', 'error');
     return;
   }
 
@@ -13087,13 +13520,13 @@ function openForgotPassword() {
     if (isEmailConfigured()) {
       const resetCode = Math.random().toString(36).slice(2, 8).toUpperCase();
       sendViaEmailJS(email, 'Butler Performance Analytics — Password Reset', 'Your temporary reset code is: ' + resetCode + '\n\nPlease contact your administrator to complete the password reset.\n\n— Butler Performance Analytics')
-        .then(() => alert('Reset instructions sent to ' + email))
-        .catch(() => alert('Could not send email. Contact your administrator.'));
+        .then(() => bpaToast('Reset instructions sent to ' + email))
+        .catch(() => bpaToast('Could not send email. Contact your administrator.'));
     } else {
-      alert('Password reset requested. Contact your administrator at chase@butleranalytics.io');
+      bpaToast('Password reset requested. Contact your administrator.', 'info');
     }
   } else {
-    alert('If an account exists for ' + email + ', reset instructions will be sent.');
+    bpaToast('If an account exists for ' + email + ', reset instructions will be sent.', 'info');
   }
 }
 
@@ -13148,9 +13581,9 @@ async function doCreateAccount() {
     document.getElementById('loginEmail').value = email;
     document.getElementById('loginPassword').value = '';
     document.getElementById('loginError').textContent = '';
-    alert('Account created! Please sign in.');
+    bpaToast('Account created! Please sign in.', 'success');
   } else {
-    alert('Account created for ' + name + ' (' + ROLE_LABELS[role] + ')');
+    bpaToast('Account created for ' + name + ' (' + ROLE_LABELS[role] + ')', 'success');
   }
 }
 
@@ -13164,7 +13597,7 @@ function resetInactivityTimer() {
       logAudit('SESSION_EXPIRED', cu.email, 'Inactivity timeout');
       sessionStorage.removeItem('bp_session');
       document.getElementById('loginScreen').classList.remove('hidden');
-      alert('Session expired due to inactivity. Please sign in again.');
+      bpaToast('Session expired due to inactivity. Please sign in again.', 'warning');
     }
   }, 30 * 60 * 1000); // 30 minutes
 }
@@ -13251,7 +13684,7 @@ function hasAnyGrowData() {
 function exportGrowReport() {
   // Export whatever GROW grids are visible
   const tables = document.querySelectorAll('#growContent .ops-grid');
-  if (tables.length === 0) { alert('No GROW data to export.'); return; }
+  if (tables.length === 0) { bpaToast('No GROW data to export.', 'warning'); return; }
   let csv = '';
   tables.forEach((tbl, idx) => {
     if (idx > 0) csv += '\n\n';
@@ -13785,9 +14218,10 @@ function exportCustomReport(idx) {
 }
 
 function removeCustomReport(idx) {
-  if (!confirm('Remove this report from the viewer?')) return;
-  CUSTOM_REPORTS.splice(idx, 1);
-  renderCustomReports();
+  bpaConfirm('Remove this report from the viewer?', () => {
+    CUSTOM_REPORTS.splice(idx, 1);
+    renderCustomReports();
+  });
 }
 
 // Init auth — seed in background, don't block page
@@ -13808,6 +14242,51 @@ function removeCustomReport(idx) {
     console.error('Init auth error:', e);
   }
   document.getElementById('loadingScreen').classList.add('hidden');
+})();
+
+// ============================================================
+// ACCESSIBILITY: Focus trapping in modals & keyboard nav
+// ============================================================
+(function() {
+  // Focus trap for active modals
+  function trapFocus(e) {
+    const activeModal =
+      document.querySelector('.modal-overlay.active .modal') ||
+      document.querySelector('.report-modal-overlay.active .report-modal') ||
+      document.querySelector('.mapping-wizard-overlay.active .mapping-wizard') ||
+      document.querySelector('.cust-modal-overlay.active .cust-modal') ||
+      document.querySelector('.bpa-confirm-overlay .bpa-confirm-dialog');
+    if (!activeModal) return;
+    const focusable = activeModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.key === 'Tab') {
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+  }
+  document.addEventListener('keydown', trapFocus);
+
+  // Arrow key navigation between view tabs
+  document.addEventListener('keydown', function(e) {
+    if (e.target.classList.contains('view-btn') && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      const btns = Array.from(document.querySelectorAll('.view-btn'));
+      const idx = btns.indexOf(e.target);
+      const next = e.key === 'ArrowRight' ? (idx + 1) % btns.length : (idx - 1 + btns.length) % btns.length;
+      btns[next].focus();
+      btns[next].click();
+      e.preventDefault();
+    }
+  });
+
+  // Make view-content panels focusable for skip-nav
+  document.querySelectorAll('.view-content').forEach(v => {
+    if (!v.getAttribute('tabindex')) v.setAttribute('tabindex', '-1');
+  });
 })();
 
 // Init
