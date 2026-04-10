@@ -4322,8 +4322,16 @@ function processFile(file) {
             });
 
             Object.entries(invoiceMap).forEach(([invNum, inv]) => {
-              // Extract store name — clean sheet name
-              const storeName = inv.store.replace(/\s+/g, ' ').trim();
+              // Skip summary/combined rows
+              if (inv.store.toLowerCase().includes('combined') || inv.store.toLowerCase().includes('summary') || inv.store.toLowerCase().includes('report summary')) return;
+              if (!invNum || invNum === 'undefined') return;
+              // Clean sheet name into a readable store name
+              let storeName = inv.store.replace(/\s+/g, ' ').trim();
+              // Extract location from patterns like "Captain's Drive Thru Oil Change - Sulphur" or "Captains DriveThruOilChange-BridgeCity"
+              const dashMatch = storeName.match(/[-–]\s*(.+)$/);
+              if (dashMatch) storeName = dashMatch[1].trim();
+              // If still a long generic name, use as-is but cleaned
+              storeName = storeName.replace(/^(Captain'?s?\s*(Drive\s*Thru\s*Oil\s*Change)?)\s*[-–]?\s*/i, '').trim() || storeName;
               custRows.push({
                 Store_Number: storeName,
                 Invoice_Number: invNum,
@@ -4693,8 +4701,15 @@ async function handleFiles(files) {
 // ============================================================
 // UTILITY FUNCTIONS
 // ============================================================
-// Valid store number: digits only, no decimals, no empty, no garbage
-function validStore(s) { return s && /^\d+$/.test(String(s).replace(/["\s]/g, '')); }
+// Valid store: digits OR text names, but NOT decimals, empty, or single-char garbage
+function validStore(s) {
+  if (!s) return false;
+  const clean = String(s).replace(/["\s]/g, '').trim();
+  if (!clean || clean === 'Unknown' || clean === 'undefined') return false;
+  if (/^\d+\.\d+$/.test(clean)) return false; // Reject decimals like "76.4900"
+  if (clean.length < 2 && !/^\d$/.test(clean)) return false; // Reject single non-digit chars
+  return true;
+}
 
 function parseDate(str) {
   if (!str) return null;
@@ -4827,8 +4842,9 @@ function launchDashboard() {
   });
   const sel = document.getElementById('filterStore');
   sel.innerHTML = `<option value="">All Stores (${stores.size})</option>`;
-  [...stores].sort((a,b) => +a - +b).forEach(s => {
-    sel.innerHTML += `<option value="${s}">${s}</option>`;
+  [...stores].sort((a,b) => a.localeCompare(b, undefined, { numeric: true })).forEach(s => {
+    const display = getStoreDisplayName ? getStoreDisplayName(s) : s;
+    sel.innerHTML += `<option value="${s}">${display}</option>`;
   });
 
   // Date range — scan ALL data sources for dates
