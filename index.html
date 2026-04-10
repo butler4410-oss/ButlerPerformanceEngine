@@ -492,7 +492,7 @@
   .loading-screen {
     position: fixed;
     inset: 0;
-    background: var(--bg);
+    background: #0f172a;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -507,9 +507,9 @@
   }
 
   .loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid var(--border);
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255,255,255,0.1);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -518,18 +518,18 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .loading-text {
-    margin-top: 20px;
-    font-size: 14px;
-    color: var(--text-muted);
+    margin-top: 16px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 
   /* Upload Screen */
   .upload-screen {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 130px);
-    padding: 24px;
+    flex-direction: column;
+    min-height: calc(100vh - 82px);
   }
 
   .upload-card {
@@ -2453,34 +2453,51 @@
   .login-screen {
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, #e8ecf1 0%, #f0f2f5 50%, #f8fafc 100%);
+    background: #f8fafc;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
     z-index: 10000;
     transition: opacity 0.4s;
+    overflow-y: auto;
   }
 
   .login-screen.hidden { opacity: 0; pointer-events: none; }
 
-  .login-card {
-    width: 420px;
-    max-width: 92vw;
+  .login-hero {
+    background: #0f172a;
+    padding: 48px 24px 56px;
     text-align: center;
+    flex-shrink: 0;
   }
 
-  .login-logo {
-    margin-bottom: 40px;
+  .login-hero img { height: 90px; object-fit: contain; }
+  .login-hero-tagline {
+    margin-top: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
   }
 
-  .login-logo .logo-text { font-size: 28px; color: var(--text); }
-  .login-logo .logo-analytics { font-size: 20px; letter-spacing: 10px; color: var(--text-muted); }
-  .login-logo .logo-line { width: 240px; margin: 6px auto 5px; }
+  .login-body {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 24px 40px;
+  }
+
+  .login-card {
+    width: 400px;
+    max-width: 100%;
+    margin-top: -32px;
+  }
 
   .login-box {
     background: white;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 32px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.08);
   }
@@ -2490,12 +2507,14 @@
     font-weight: 700;
     color: var(--text);
     margin-bottom: 4px;
+    text-align: center;
   }
 
   .login-box .login-sub {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-muted);
     margin-bottom: 24px;
+    text-align: center;
   }
 
   .login-box .form-group { margin-bottom: 16px; text-align: left; }
@@ -2505,9 +2524,9 @@
     background: var(--primary);
     color: white;
     border: none;
-    padding: 14px;
-    border-radius: 10px;
-    font-size: 15px;
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.15s;
@@ -2521,12 +2540,14 @@
     font-size: 12px;
     margin-top: 8px;
     min-height: 16px;
+    text-align: center;
   }
 
   .login-footer {
-    margin-top: 20px;
+    margin-top: 16px;
     font-size: 11px;
     color: var(--text-muted);
+    text-align: center;
   }
 
   .login-footer a { color: var(--primary); cursor: pointer; text-decoration: none; }
@@ -2682,28 +2703,31 @@
 
 <!-- Login Screen -->
 <div class="login-screen" id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">
-      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:120px;object-fit:contain;margin-bottom:12px;">
-    </div>
-    <div class="login-box">
-      <h2>Sign In</h2>
-      <div class="login-sub">Enterprise Analytics Platform</div>
-      <form onsubmit="event.preventDefault();doLogin();" autocomplete="on">
-        <div class="form-group">
-          <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" name="email" autocomplete="email" placeholder="you@company.com">
-        </div>
-        <div class="form-group">
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder="Enter password">
-        </div>
-        <button type="submit" class="btn-login">Sign In</button>
-      </form>
-      <div class="login-error" id="loginError"></div>
-    </div>
-    <div class="login-footer">
-      <a onclick="openForgotPassword()">Forgot Password</a>
+  <div class="login-hero">
+    <img src="logo-full.png" alt="Butler Performance Analytics">
+    <div class="login-hero-tagline">Enterprise Analytics Platform</div>
+  </div>
+  <div class="login-body">
+    <div class="login-card">
+      <div class="login-box">
+        <h2>Sign In</h2>
+        <div class="login-sub">Enter your credentials to continue</div>
+        <form onsubmit="event.preventDefault();doLogin();" autocomplete="on">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" name="email" autocomplete="email" placeholder="you@company.com">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder="Enter password">
+          </div>
+          <button type="submit" class="btn-login">Sign In</button>
+        </form>
+        <div class="login-error" id="loginError"></div>
+      </div>
+      <div class="login-footer">
+        <a onclick="openForgotPassword()">Forgot Password</a>
+      </div>
     </div>
   </div>
 </div>
@@ -3093,55 +3117,54 @@
 </div>
 
 <!-- Upload Zone (shown when no data) -->
-<div id="uploadZone" class="upload-screen" style="position:relative;overflow:hidden;">
-  <!-- Logo watermark background -->
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.04;pointer-events:none;z-index:0;">
-    <img src="logo-full.png" alt="" style="width:700px;max-width:90vw;object-fit:contain;">
+<div id="uploadZone" class="upload-screen">
+  <!-- Dark hero with logo -->
+  <div style="background:#0f172a;padding:36px 24px 44px;text-align:center;flex-shrink:0;">
+    <img src="logo-full.png" alt="Butler Performance Analytics" style="height:72px;object-fit:contain;">
+    <div style="margin-top:12px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);">Upload your data to get started</div>
   </div>
-  <div class="upload-card" style="position:relative;z-index:1;">
-    <!-- Big centered logo -->
-    <div style="text-align:center;margin-bottom:24px;">
-      <img src="logo-full.png" alt="Butler Performance Analytics" style="height:100px;object-fit:contain;">
-    </div>
-    <div style="text-align:center;margin-bottom:24px;">
-      <div style="font-size:13px;font-weight:500;color:var(--text-muted);">Upload your data to get started</div>
-    </div>
 
-    <div id="restoreDataHint" style="display:none;margin-bottom:20px;padding:16px 20px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.15);border-radius:10px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+  <!-- Content area -->
+  <div style="flex:1;display:flex;justify-content:center;padding:0 24px 40px;overflow-y:auto;">
+  <div class="upload-card" style="margin-top:-20px;">
+
+    <div id="restoreDataHint" style="display:none;margin-bottom:16px;padding:14px 18px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.15);border-radius:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
         <div style="width:8px;height:8px;background:var(--green);border-radius:50%;"></div>
         <div style="font-size:13px;font-weight:600;color:var(--green);">Previously saved data found</div>
       </div>
-      <div id="restoreDataInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:12px;"></div>
+      <div id="restoreDataInfo" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;"></div>
       <button class="btn-save" onclick="if(loadUserData()){launchDashboard();updateDataSavedIndicator(true);}" style="width:100%;padding:10px;border-radius:8px;font-size:13px;">Restore Saved Data</button>
     </div>
 
-    <div class="upload-drop" id="uploadDropInner">
-      <div class="upload-drop-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <div class="upload-drop" id="uploadDropInner" style="background:white;border:2px dashed var(--border);border-radius:12px;padding:40px 32px;text-align:center;">
+      <div class="upload-drop-icon" style="color:var(--text-muted);opacity:0.3;">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       </div>
-      <div class="upload-drop-text">Drop your data files here</div>
-      <div class="upload-drop-sub">CSV and Excel files supported</div>
-      <button class="file-input-btn" onclick="document.getElementById('fileInput').click()" style="margin-top:16px;">Choose Files</button>
-      <button class="nav-util-btn" onclick="openMapFiles()" style="margin-top:10px;background:rgba(68,138,255,0.1);border-color:rgba(68,138,255,0.2);color:var(--blue);padding:8px 20px;">Map Custom Data</button>
+      <div class="upload-drop-text" style="font-size:15px;font-weight:600;color:var(--text);margin-top:12px;">Drop your data files here</div>
+      <div class="upload-drop-sub" style="font-size:12px;color:var(--text-muted);margin-top:4px;">CSV and Excel files supported</div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
+        <button class="file-input-btn" onclick="document.getElementById('fileInput').click()" style="padding:10px 28px;font-size:13px;border-radius:8px;">Choose Files</button>
+        <button onclick="openMapFiles()" style="padding:10px 20px;font-size:12px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;transition:all 0.15s;" onmouseenter="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">Map Custom Data</button>
+      </div>
       <input type="file" id="fileInput" multiple accept=".csv,.CSV,.xlsx,.xls,.XLSX,.XLS">
     </div>
 
-    <div class="upload-file-types">
-      <div class="upload-type-group">
-        <div class="upload-type-label">Supported Formats</div>
-        <div class="upload-type-items">CSV · Excel (.xlsx) · Any spreadsheet export</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--primary);margin-bottom:4px;">Formats</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">CSV · Excel · Any spreadsheet</div>
       </div>
-      <div class="upload-type-group">
-        <div class="upload-type-label">Compatibility</div>
-        <div class="upload-type-items">Works with any point-of-sale system export</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--primary);margin-bottom:4px;">Compatibility</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">Any point-of-sale system</div>
       </div>
     </div>
 
     <div class="file-list" id="fileList"></div>
-    <div id="launchBtnWrap" style="display:none;margin-top:20px;text-align:center;">
+    <div id="launchBtnWrap" style="display:none;margin-top:16px;text-align:center;">
       <button class="file-input-btn" onclick="launchDashboard();saveUserData();" style="width:100%;padding:14px;font-size:15px;border-radius:10px;">Launch Dashboard</button>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">You can always add more files later via "+ Add Files"</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">You can always add more files later</div>
     </div>
   </div>
 </div>
