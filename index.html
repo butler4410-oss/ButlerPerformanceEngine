@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   :root {
@@ -3219,15 +3220,15 @@
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       </div>
       <div class="upload-drop-text">Drop CSV files here</div>
-      <div class="upload-drop-sub">or click to browse</div>
+      <div class="upload-drop-sub">CSV and Excel files supported</div>
       <button class="file-input-btn" onclick="document.getElementById('fileInput').click()" style="margin-top:16px;">Choose Files</button>
-      <input type="file" id="fileInput" multiple accept=".csv,.CSV">
+      <input type="file" id="fileInput" multiple accept=".csv,.CSV,.xlsx,.xls,.XLSX,.XLS">
     </div>
 
     <div class="upload-file-types">
       <div class="upload-type-group">
         <div class="upload-type-label">POS Reports</div>
-        <div class="upload-type-items">Sales Summary · KPI Actuals · Time Analysis · System Impact · KPI Retail Comp · Any CSV</div>
+        <div class="upload-type-items">Sales Summary · KPI Actuals · Time Analysis · System Impact · Any CSV or Excel</div>
       </div>
       <div class="upload-type-group">
         <div class="upload-type-label">Transaction Data</div>
@@ -4024,7 +4025,8 @@ const fileLabels = {
   grow_time_analysis: 'Time Analysis',
   grow_system_impact: 'System Impact',
   grow_kpi_retail_comp: 'KPI Retail Comp',
-  isi_pos: 'ISI POS Transactions'
+  isi_pos: 'ISI POS Transactions',
+  excel_perf: 'Performance Report (Excel)'
 };
 
 let loadedFiles = {};
@@ -4187,6 +4189,143 @@ function updateDataSavedIndicator(saved) {
 
 function processFile(file) {
   return new Promise((resolve) => {
+    const isExcel = /\.(xlsx|xls)$/i.test(file.name);
+
+    // Excel files: use SheetJS to convert each sheet to rows
+    if (isExcel && typeof XLSX !== 'undefined') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+          let allRows = [];
+          const sheetNames = [];
+          wb.SheetNames.forEach(name => {
+            const ws = wb.Sheets[name];
+            const json = XLSX.utils.sheet_to_json(ws, { defval: '' });
+            if (json.length > 0) {
+              // Tag each row with the sheet name as a location/store identifier
+              json.forEach(r => { r._sheet = name.trim(); });
+              allRows = allRows.concat(json);
+              sheetNames.push(name.trim());
+            }
+          });
+          if (!allRows.length) { resolve({ name: file.name, type: 'unknown', rows: 0 }); return; }
+
+          // Detect what kind of Excel data this is
+          const hdrs = Object.keys(allRows[0]).join(',').toLowerCase();
+
+          // Captain's / line-item performance report pattern
+          if (hdrs.includes('invoice date') && hdrs.includes('invoice #') && hdrs.includes('part id')) {
+            const custRows = [];
+            const detRows = [];
+            // Group by invoice to build customer records
+            const invoiceMap = {};
+            allRows.forEach(r => {
+              const invNum = String(r['Invoice #'] || '').trim();
+              const dateRaw = r['Invoice Date'] || '';
+              const dateStr = dateRaw instanceof Date ? (dateRaw.getMonth()+1) + '/' + dateRaw.getDate() + '/' + dateRaw.getFullYear() : String(dateRaw);
+              const rev = parseFloat(r['Total Rev'] || r['Total Rev/Inv'] || '0') || 0;
+              const partDesc = String(r['Part ID + Desc'] || '').trim();
+              const coupon = String(r['Coupon ID'] || '').trim();
+              const store = r._sheet || 'Unknown';
+
+              if (!invoiceMap[invNum]) {
+                invoiceMap[invNum] = { date: dateStr, rev: rev, store: store, coupon: coupon, parts: [] };
+              }
+              if (partDesc) invoiceMap[invNum].parts.push(partDesc);
+            });
+
+            Object.entries(invoiceMap).forEach(([invNum, inv]) => {
+              // Extract store name — clean sheet name
+              const storeName = inv.store.replace(/\s+/g, ' ').trim();
+              custRows.push({
+                Store_Number: storeName,
+                Invoice_Number: invNum,
+                Invoice_Date: inv.date,
+                Net_Sales: String(inv.rev),
+                Customer_First_Name: '', Customer_Last_Name: '',
+                Customer_Email_Address: '', Customer_Phone_Number: '',
+                Customer_Address: '', City: '', Customer_State: '', ZIP_Code: '',
+                Business_Account_ID: '', ChekChart_Make: '',
+                Bay_Start_Time: '', Bay_End_Time: '', Greet_Time: '', Ring_Out_End_Time: '', Vehicle_Mileage: ''
+              });
+
+              inv.parts.forEach(partStr => {
+                // Parse "AF6149 - WAF6908: AIR FILTER" → code=AF6149, desc=WAF6908: AIR FILTER
+                const dashIdx = partStr.indexOf(' - ');
+                const code = dashIdx > 0 ? partStr.substring(0, dashIdx).trim() : partStr;
+                const desc = dashIdx > 0 ? partStr.substring(dashIdx + 3).trim() : partStr;
+                // Categorize by code prefix
+                let cat = 'OTHER';
+                const codeUpper = code.toUpperCase();
+                if (codeUpper.startsWith('AF') || codeUpper.includes('AIR FILTER')) cat = 'AF';
+                else if (codeUpper.startsWith('OF') || codeUpper.startsWith('CF') || codeUpper.includes('OIL FILTER')) cat = 'OF';
+                else if (codeUpper.startsWith('C3') || codeUpper.startsWith('C2') || codeUpper.includes('CABIN')) cat = 'CAF';
+                else if (codeUpper.includes('SYN') || codeUpper.includes('BULK') || codeUpper.includes('5W') || codeUpper.includes('0W') || codeUpper.includes('10W')) cat = 'OIL';
+                else if (codeUpper.includes('WIPER') || codeUpper.includes('RAINFREE')) cat = 'WB';
+                else if (codeUpper.includes('COOLANT')) cat = 'CLT';
+                else if (codeUpper.includes('TRANS') || codeUpper.includes('ATF')) cat = 'ATS';
+                else if (codeUpper.includes('FUEL') || codeUpper.includes('FD')) cat = 'FUEL';
+                else if (codeUpper.includes('BRAKE') || codeUpper.includes('BRK')) cat = 'BRK';
+                else if (codeUpper.includes('TIRE') || codeUpper.includes('ROTATE')) cat = 'TRS';
+                else if (codeUpper.includes('BATTERY') || codeUpper.includes('BAT')) cat = 'BAT';
+
+                detRows.push({
+                  Store_Number: storeName,
+                  Invoice_Number: invNum,
+                  Invoice_Date: inv.date,
+                  Invoice_Detail_Type: 'SERVICE',
+                  Invoice_Detail_Description: desc || code,
+                  Invoice_Detail_Code: code,
+                  JLI_Category_Code: cat,
+                  Extended_Price: '0', // Revenue is at invoice level, not line item
+                  Quantity_Sold: '1'
+                });
+              });
+
+              // Apply coupon as promo if present
+              if (inv.coupon && inv.coupon !== '(none)') {
+                DATA.promos.push({
+                  Store_Number: storeName,
+                  Invoice_Number: invNum,
+                  Invoice_Date: inv.date,
+                  Promo_Code: inv.coupon,
+                  Promo_Amount: '0'
+                });
+                loadedFiles['promos'] = true;
+              }
+            });
+
+            DATA.customers = DATA.customers.concat(custRows);
+            DATA.details = DATA.details.concat(detRows);
+            loadedFiles['customers'] = true;
+            loadedFiles['details'] = true;
+            loadedFiles['excel_perf'] = true;
+            resolve({ name: file.name, type: 'excel_perf', rows: custRows.length });
+            return;
+          }
+
+          // Generic Excel: store each sheet as a custom report
+          sheetNames.forEach(name => {
+            const sheetRows = allRows.filter(r => r._sheet === name);
+            if (sheetRows.length) {
+              const headers = Object.keys(sheetRows[0]).filter(h => h !== '_sheet');
+              CUSTOM_REPORTS = CUSTOM_REPORTS.filter(r => r.name !== file.name + ' - ' + name);
+              CUSTOM_REPORTS.push({ name: file.name + ' - ' + name, headers: headers, rows: sheetRows });
+              loadedFiles['custom_' + file.name + '_' + name] = true;
+            }
+          });
+          resolve({ name: file.name, type: 'custom', rows: allRows.length });
+        } catch(err) {
+          console.error('Excel parse error:', err);
+          resolve({ name: file.name, type: 'unknown', rows: 0 });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+      return;
+    }
+
+    // CSV files
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target.result;
@@ -4341,7 +4480,7 @@ const addFilesEl = document.createElement('input');
 addFilesEl.type = 'file';
 addFilesEl.id = 'addFilesInput';
 addFilesEl.multiple = true;
-addFilesEl.accept = '.csv,.CSV';
+addFilesEl.accept = '.csv,.CSV,.xlsx,.xls,.XLSX,.XLS';
 addFilesEl.style.display = 'none';
 document.body.appendChild(addFilesEl);
 addFilesEl.addEventListener('change', async () => {
