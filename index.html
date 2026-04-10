@@ -4956,6 +4956,11 @@ function renderForecastView(storeOverride) {
       if (!labor && gr) labor = parseGrowNum(gr.CY_Comp_Labor_Pct_Sales);
       let mhpv = g ? parseGrowNum(g.Labor_Hours_Per_Vehicle) : 0;
       if (!mhpv && gr) mhpv = parseGrowNum(gr.CY_Comp_Labor_Hours_Per_Vehicle);
+      // Fallback: compute from bay times if no GROW data
+      if (!mhpv && d.bayTimes && d.bayTimes.length) {
+        const avgBay = d.bayTimes.reduce((a,b) => a+b, 0) / d.bayTimes.length;
+        mhpv = avgBay / 60;
+      }
       const cpd = daySpan ? veh / daySpan : 0;
       const svc = storeSvc[s] || {};
       const afPct = veh ? ((svc['AF'] || 0) / veh * 100) : 0;
