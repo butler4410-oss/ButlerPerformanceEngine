@@ -2322,8 +2322,8 @@
   /* Alert Banner */
   .alert-banner {
     display: none;
-    background: rgba(255,145,0,0.1);
-    border: 1px solid rgba(255,145,0,0.3);
+    background: rgba(251,191,36,0.06);
+    border: 1px solid rgba(251,191,36,0.15);
     border-radius: 10px;
     padding: 14px 20px;
     margin-bottom: 20px;
@@ -2332,8 +2332,8 @@
   }
 
   .alert-banner:hover {
-    background: rgba(255,145,0,0.15);
-    border-color: var(--orange);
+    background: rgba(251,191,36,0.1);
+    border-color: rgba(251,191,36,0.3);
   }
 
   .alert-banner.has-alerts { display: flex; align-items: center; gap: 14px; }
@@ -3590,12 +3590,12 @@
         <table class="ops-grid" id="fcTargetsTable">
           <thead><tr>
             <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
-            <th>Target Net Sales</th>
-            <th>Target Cars</th>
-            <th>Target TA</th>
-            <th>Target Labor %</th>
-            <th>Daily Revenue</th>
-            <th>Weekly Cars</th>
+            <th title="Current revenue × growth % — click cells to edit">Target Net Sales</th>
+            <th title="Current cars/day × growth % × business days — editable">Target Cars</th>
+            <th title="Current ticket avg × growth % — editable">Target TA</th>
+            <th title="Target labor cost as % of sales — editable">Target Labor %</th>
+            <th title="Target net sales ÷ business days (auto-calculated)">Daily Revenue</th>
+            <th title="Target cars per day (auto-calculated)">Weekly Cars</th>
           </tr></thead>
           <tbody id="fcTargetsBody"></tbody>
         </table>
@@ -4411,12 +4411,23 @@ async function handleFiles(files) {
 // UTILITY FUNCTIONS
 // ============================================================
 // Valid store: digits OR text names, but NOT decimals, empty, or single-char garbage
+function cleanStoreNum(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/^Store\s*Id:\s*/i, '')
+    .replace(/^JiffyLube#?/i, '')
+    .replace(/^Grease\s*Monkey\s*#?\s*/i, '')
+    .replace(/^Store\s*#?\s*/i, '')
+    .replace(/\s*ISI$/i, '')
+    .replace(/["\s]/g, '')
+    .trim();
+}
+
 function validStore(s) {
-  if (!s) return false;
-  const clean = String(s).replace(/["\s]/g, '').trim();
+  const clean = cleanStoreNum(s);
   if (!clean || clean === 'Unknown' || clean === 'undefined') return false;
-  if (/^\d+\.\d+$/.test(clean)) return false; // Reject decimals like "76.4900"
-  if (clean.length < 2 && !/^\d$/.test(clean)) return false; // Reject single non-digit chars
+  if (/^\d+\.\d+$/.test(clean)) return false;
+  if (clean.length < 2 && !/^\d$/.test(clean)) return false;
   return true;
 }
 
@@ -4547,7 +4558,10 @@ function launchDashboard() {
     });
   });
   [GROW.sales_summary, GROW.kpi_actuals, GROW.time_analysis, GROW.kpi_retail_comp].forEach(arr => {
-    arr.forEach(r => { if (r.Store_Number) stores.add(r.Store_Number); });
+    arr.forEach(r => {
+      const s = cleanStoreNum(r.Store_Number);
+      if (validStore(s)) stores.add(s);
+    });
   });
   const sel = document.getElementById('filterStore');
   sel.innerHTML = `<option value="">All Stores (${stores.size})</option>`;
@@ -4931,13 +4945,13 @@ function renderForecastView(storeOverride) {
     // Also try GROW KPI Actuals — clean store numbers to match
     const growActuals = {};
     GROW.kpi_actuals.forEach(r => {
-      const s = String(r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').replace(/["\s]/g, '').trim();
+      const s = cleanStoreNum(r.Store_Number);
       if (s && validStore(s)) growActuals[s] = r;
     });
     // Also check GROW retail comp for labor data
     const growRetail = {};
     (GROW.kpi_retail_comp || []).forEach(r => {
-      const s = String(r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').replace(/["\s]/g, '').trim();
+      const s = cleanStoreNum(r.Store_Number);
       if (s && validStore(s)) growRetail[s] = r;
     });
 
@@ -5105,32 +5119,65 @@ function renderForecastResults() {
     const companyRev = Object.values(storeActuals).reduce((s, d) => s + d.rev, 0) || 1;
 
     let tHTML = '';
+    // Initialize store targets if not set
+    if (!window._fcStoreTargets) window._fcStoreTargets = {};
+
     storeNums.forEach(s => {
-      if (!/^\d+$/.test(s)) return; // Skip garbage store numbers
+      if (!/^\d+$/.test(s) && s.length < 2) return;
       const actual = storeActuals[s] || { rev: 0, inv: 0 };
       const shareOfRev = selectedStore ? 1 : (companyRev ? actual.rev / companyRev : 1 / Math.max(storeNums.length, 1));
-      const storeTargetRev = totalProjected * shareOfRev;
       const storeActualTA = actual.inv ? actual.rev / actual.inv : b.ta;
-      const storeTargetTA = storeActualTA * (1 + ticketPct / 100);
       const storeActualCPD = bizDays ? actual.inv / bizDays : 0;
-      const storeTargetCPD = storeActualCPD * (1 + carPct / 100);
-      const storeTargetCars = storeTargetCPD * bizDays;
-      const dailyRev = bizDays ? storeTargetRev / bizDays : 0;
+
+      // Default targets (calculated from sliders)
+      const defaults = {
+        netSales: totalProjected * shareOfRev,
+        cars: Math.round(storeActualCPD * (1 + carPct / 100) * bizDays),
+        ta: storeActualTA * (1 + ticketPct / 100),
+        labor: 22.5,
+        dailyRev: (totalProjected * shareOfRev) / Math.max(bizDays, 1),
+        weeklyCars: storeActualCPD * (1 + carPct / 100)
+      };
+
+      // Use overrides if set
+      const t = window._fcStoreTargets[s] || {};
+      const netSales = t.netSales !== undefined ? t.netSales : defaults.netSales;
+      const cars = t.cars !== undefined ? t.cars : defaults.cars;
+      const ta = t.ta !== undefined ? t.ta : defaults.ta;
+      const labor = t.labor !== undefined ? t.labor : defaults.labor;
+      const dailyRev = netSales / Math.max(bizDays, 1);
+      const weeklyCars = bizDays ? cars / (bizDays / (period / 7)) : 0;
+
+      const inp = (field, val, fmt) => {
+        const display = fmt === '$' ? val.toFixed(2) : fmt === '%' ? val.toFixed(1) : Math.round(val);
+        return '<input type="text" value="' + display + '" style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--green);font-family:IBM Plex Mono,monospace;font-size:12px;width:90px;text-align:right;padding:2px 4px;" onfocus="this.select()" onchange="updateStoreTarget(\'' + s + '\',\'' + field + '\',this.value)">';
+      };
 
       tHTML += '<tr>';
       tHTML += '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">#' + s + '</td>';
-      tHTML += '<td style="color:var(--green);">' + money(storeTargetRev) + '</td>';
-      tHTML += '<td>' + num(Math.round(storeTargetCars)) + '</td>';
-      tHTML += '<td>' + money(storeTargetTA) + '</td>';
-      tHTML += '<td>22.5%</td>';
-      tHTML += '<td>' + money(dailyRev) + '</td>';
-      tHTML += '<td>' + storeTargetCPD.toFixed(1) + '</td>';
+      tHTML += '<td>' + inp('netSales', netSales, '$') + '</td>';
+      tHTML += '<td>' + inp('cars', cars, '#') + '</td>';
+      tHTML += '<td>' + inp('ta', ta, '$') + '</td>';
+      tHTML += '<td>' + inp('labor', labor, '%') + '</td>';
+      tHTML += '<td style="color:var(--text-muted);">' + money(dailyRev) + '</td>';
+      tHTML += '<td style="color:var(--text-muted);">' + weeklyCars.toFixed(1) + '</td>';
       tHTML += '</tr>';
     });
     targetsBody.innerHTML = tHTML || '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:16px;">Select a store or load data</td></tr>';
   }
 
   document.getElementById('forecastResults').innerHTML = html;
+}
+
+function updateStoreTarget(store, field, value) {
+  if (!window._fcStoreTargets) window._fcStoreTargets = {};
+  if (!window._fcStoreTargets[store]) window._fcStoreTargets[store] = {};
+  const num = parseFloat(String(value).replace(/[$,%]/g, '')) || 0;
+  window._fcStoreTargets[store][field] = num;
+
+  // If net sales changed, recalculate daily rev
+  // If cars changed, recalculate weekly cars
+  // These are display-only columns so they update on next full render
 }
 
 function exportForecast() {
@@ -5216,7 +5263,7 @@ function exportForecastTargets() {
   const company = localStorage.getItem('bp_company') || 'BPA';
   const storeNums = [];
   FILTERED.customers.forEach(r => { if (r.Store_Number && !storeNums.includes(r.Store_Number)) storeNums.push(r.Store_Number); });
-  [GROW.kpi_actuals, GROW.sales_summary].forEach(arr => arr.forEach(r => { const s = (r.Store_Number||'').replace(/^Store\s*Id:\s*/i,'').trim(); if (s && !storeNums.includes(s)) storeNums.push(s); }));
+  [GROW.kpi_actuals, GROW.sales_summary].forEach(arr => arr.forEach(r => { const s = cleanStoreNum(r.Store_Number); if (s && validStore(s) && !storeNums.includes(s)) storeNums.push(s); }));
   storeNums.sort((a,b) => +a - +b);
 
   // Day-of-week weights (Mon-Sat, typical auto service distribution)
@@ -12433,40 +12480,32 @@ function updateAlertBanner() {
 
   if (currentAlerts.length > 0) {
     banner.classList.add('has-alerts');
+
+    // Group by metric for cleaner summary
+    const byMetric = {};
+    currentAlerts.forEach(a => {
+      if (!byMetric[a.metric]) byMetric[a.metric] = { label: a.metricLabel, count: 0, severity: a.severity };
+      byMetric[a.metric].count++;
+      if (a.severity === 'critical') byMetric[a.metric].severity = 'critical';
+    });
+
+    const groups = Object.values(byMetric).sort((a,b) => a.count - b.count);
     const critical = currentAlerts.filter(a => a.severity === 'critical').length;
-    const warning = currentAlerts.filter(a => a.severity === 'warning').length;
-    document.getElementById('alertBannerCount').textContent = currentAlerts.length + ' Performance Alert' + (currentAlerts.length > 1 ? 's' : '') + ' Triggered';
-    const parts = [];
-    if (critical) parts.push(critical + ' critical');
-    if (warning) parts.push(warning + ' warning');
     const storeCount = new Set(currentAlerts.map(a => a.store)).size;
-    parts.push(storeCount + ' store' + (storeCount > 1 ? 's' : '') + ' affected');
-    document.getElementById('alertBannerSummary').textContent = parts.join(' · ') + ' — Click to review';
 
-    // Update header button
+    document.getElementById('alertBannerCount').textContent = currentAlerts.length + ' Alert' + (currentAlerts.length > 1 ? 's' : '') + ' — ' + storeCount + ' store' + (storeCount > 1 ? 's' : '');
+
+    const summaryParts = groups.slice(0, 3).map(g => g.label + ' (' + g.count + ')');
+    if (groups.length > 3) summaryParts.push('+' + (groups.length - 3) + ' more');
+    document.getElementById('alertBannerSummary').textContent = summaryParts.join(' · ') + ' — Click to manage';
+
     if (btn) {
-      btn.style.background = critical > 0 ? 'var(--red)' : 'var(--orange)';
-      btn.style.color = 'white';
-      btn.style.borderColor = critical > 0 ? 'var(--red)' : 'var(--orange)';
-      btn.textContent = currentAlerts.length + ' Alert' + (currentAlerts.length > 1 ? 's' : '');
-    }
-
-    // Change banner color for critical
-    if (critical > 0) {
-      banner.style.background = 'rgba(255,23,68,0.1)';
-      banner.style.borderColor = 'rgba(255,23,68,0.3)';
-    } else {
-      banner.style.background = '';
-      banner.style.borderColor = '';
+      btn.textContent = currentAlerts.length;
+      btn.title = currentAlerts.length + ' alerts';
     }
   } else {
     banner.classList.remove('has-alerts');
-    if (btn) {
-      btn.style.background = '';
-      btn.style.color = 'var(--orange)';
-      btn.style.borderColor = 'var(--orange)';
-      btn.textContent = 'Alerts';
-    }
+    if (btn) { btn.textContent = '⚠'; btn.title = 'Alerts'; }
   }
 }
 
