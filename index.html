@@ -770,8 +770,8 @@
 
   /* KPI Cards */
   .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 12px;
     margin-bottom: 20px;
   }
@@ -780,11 +780,15 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 18px 20px;
+    padding: 14px 16px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     transition: transform 0.15s, box-shadow 0.15s;
     cursor: grab;
     user-select: none;
+    flex: 1 1 140px;
+    min-width: 120px;
+    max-width: 220px;
+    overflow: hidden;
   }
   .kpi-card:hover {
     transform: translateY(-1px);
@@ -931,12 +935,15 @@
   }
 
   .kpi-value {
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 800;
     color: var(--text);
     font-family: 'IBM Plex Mono', monospace;
     letter-spacing: -0.5px;
-    line-height: 1.1;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .kpi-sub {
@@ -2169,10 +2176,10 @@
   .ops-grid-wrap {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    margin-bottom: 24px;
+    border-radius: 10px;
+    margin-bottom: 16px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
   .ops-grid-wrap h3 {
     font-size: 14px;
@@ -2191,7 +2198,7 @@
     overflow: auto;
   }
   .ops-grid {
-    width: 100%;
+    min-width: 100%;
     border-collapse: collapse;
     font-size: 12px;
   }
@@ -4395,6 +4402,11 @@ function applyFilters() {
     return true;
   });
   FILTERED.invoices = DATA.invoices.filter(filterRow);
+
+  // Normalize store numbers across all filtered data
+  [FILTERED.customers, FILTERED.details, FILTERED.promos, FILTERED.inspections, FILTERED.invoices, FILTERED.odi].forEach(arr => {
+    arr.forEach(r => { if (r.Store_Number) r.Store_Number = cleanStoreNum(r.Store_Number); });
+  });
 
   renderDashboard();
   updateFilterSummary();
