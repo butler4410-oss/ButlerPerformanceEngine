@@ -5030,24 +5030,34 @@ function renderForecastView(storeOverride) {
       storeSvc[s][cat] += (+r.Quantity_Sold || 0);
     });
 
-    // Also try GROW KPI Actuals
+    // Also try GROW KPI Actuals — clean store numbers to match
     const growActuals = {};
     GROW.kpi_actuals.forEach(r => {
-      const s = (r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').trim();
-      if (s) growActuals[s] = r;
+      const s = String(r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').replace(/["\s]/g, '').trim();
+      if (s && validStore(s)) growActuals[s] = r;
+    });
+    // Also check GROW retail comp for labor data
+    const growRetail = {};
+    (GROW.kpi_retail_comp || []).forEach(r => {
+      const s = String(r.Store_Number || '').replace(/^Store\s*Id:\s*/i, '').replace(/["\s]/g, '').trim();
+      if (s && validStore(s)) growRetail[s] = r;
     });
 
-    const allStoreNums = [...new Set([...Object.keys(storeData), ...Object.keys(growActuals)])].filter(s => /^\d+$/.test(s)).sort((a,b) => +a - +b);
+    const allStoreNums = [...new Set([...Object.keys(storeData), ...Object.keys(growActuals), ...Object.keys(growRetail)])].filter(validStore).sort((a,b) => a.localeCompare(b, undefined, { numeric: true }));
 
     let actualsHTML = '';
     allStoreNums.forEach(s => {
       const d = storeData[s] || { rev: 0, inv: 0, bayTimes: [] };
       const g = growActuals[s];
-      const rev = g ? parseGrowNum(g.Net_Sales) || d.rev : d.rev;
-      const veh = g ? parseGrowNum(g.Vehicle_Count) || d.inv : d.inv;
-      const ta = veh ? rev / veh : 0;
-      const labor = g ? (parseGrowNum(g.Labor_PCT_Sales) || 0) : 0;
-      const mhpv = g ? (parseGrowNum(g.Labor_Hours_Per_Vehicle) || 0) : 0;
+      const gr = growRetail[s];
+      const rev = g ? (parseGrowNum(g.Net_Sales) || d.rev) : d.rev;
+      const veh = g ? (parseGrowNum(g.Vehicle_Count) || d.inv) : d.inv;
+      const ta = veh ? rev / veh : (g ? (parseGrowNum(g.Ticket_Avg) || 0) : 0);
+      // Labor: try KPI Actuals first, then Retail Comp
+      let labor = g ? parseGrowNum(g.Labor_PCT_Sales) : 0;
+      if (!labor && gr) labor = parseGrowNum(gr.CY_Comp_Labor_Pct_Sales);
+      let mhpv = g ? parseGrowNum(g.Labor_Hours_Per_Vehicle) : 0;
+      if (!mhpv && gr) mhpv = parseGrowNum(gr.CY_Comp_Labor_Hours_Per_Vehicle);
       const cpd = daySpan ? veh / daySpan : 0;
       const svc = storeSvc[s] || {};
       const afPct = veh ? ((svc['AF'] || 0) / veh * 100) : 0;
@@ -5061,7 +5071,9 @@ function renderForecastView(storeOverride) {
       actualsHTML += '<td>' + money(rev) + '</td>';
       actualsHTML += '<td>' + num(veh) + '</td>';
       actualsHTML += '<td>' + money(ta) + '</td>';
-      actualsHTML += '<td>' + (labor ? pct(typeof labor === 'number' && labor < 1 ? labor * 100 : labor) : '--') + '</td>';
+      // Labor: if value is like 0.68 it's a ratio, if like 68.1 it's already a percentage
+      const laborDisplay = labor ? (labor > 0 && labor < 1 ? labor * 100 : labor) : 0;
+      actualsHTML += '<td>' + (laborDisplay ? pct(laborDisplay) : '--') + '</td>';
       actualsHTML += '<td>' + cpd.toFixed(1) + '</td>';
       actualsHTML += '<td>' + (mhpv ? mhpv.toFixed(2) : '--') + '</td>';
       actualsHTML += '<td>' + (afPct ? pct(afPct) : '--') + '</td>';
