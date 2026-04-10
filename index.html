@@ -782,7 +782,7 @@
     border-radius: 10px;
     padding: 18px 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s, border-color 0.15s;
+    transition: transform 0.15s, box-shadow 0.15s;
     cursor: grab;
     user-select: none;
   }
@@ -991,10 +991,13 @@
   }
 
   .table-wrap h3 {
-    padding: 16px 20px;
-    font-size: 14px;
-    font-weight: 600;
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 700;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .table-scroll {
@@ -1015,19 +1018,18 @@
   }
 
   thead th {
-    background: rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.25);
     padding: 10px 14px;
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-muted);
     text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.5px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    white-space: nowrap;
     position: sticky;
     top: 0;
     z-index: 10;
     border-bottom: 2px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
 
   thead th.sortable {
@@ -1048,8 +1050,10 @@
   }
 
   tbody td {
-    padding: 8px 14px;
-    border-bottom: 1px solid var(--border);
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
   }
 
   tbody tr:hover { background: var(--card-hover); }
@@ -1077,24 +1081,20 @@
   }
 
   .btn-export {
-    background: var(--card);
-    color: var(--text);
+    background: transparent;
+    color: var(--text-muted);
     border: 1px solid var(--border);
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
     transition: all 0.15s;
   }
-
   .btn-export:hover {
-    border-color: var(--primary);
-    color: white;
-    background: rgba(227,24,55,0.15);
+    border-color: var(--text-muted);
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
   }
 
   /* Customer Detail Modal */
@@ -1495,9 +1495,8 @@
     border: 1px solid var(--border);
     border-left: 3px solid var(--primary);
     border-radius: 10px;
-    padding: 18px 22px;
-    margin-bottom: 20px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding: 16px 20px;
+    margin-bottom: 16px;
   }
 
   .bpa-header {
@@ -2176,10 +2175,10 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   .ops-grid-wrap h3 {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     margin: 0;
-    padding: 16px 20px;
+    padding: 14px 20px;
     color: var(--text);
     display: flex;
     align-items: center;
@@ -2213,11 +2212,13 @@
   .ops-grid th:first-child { text-align: left; }
   .ops-grid th[title] { cursor: help; text-decoration: underline dotted var(--text-muted); text-underline-offset: 3px; }
   .ops-grid td {
-    padding: 7px 10px;
+    padding: 8px 10px;
     text-align: right;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
   }
   .ops-grid td:first-child {
     text-align: left;
@@ -2265,9 +2266,9 @@
   .ops-grid .totals-row td:first-child { background: var(--card-hover); }
 
   /* Cell color coding */
-  .cell-green { background: rgba(52,211,153,0.12) !important; color: #34d399; }
-  .cell-yellow { background: rgba(251,191,36,0.12) !important; color: #fbbf24; }
-  .cell-red { background: rgba(248,113,113,0.12) !important; color: #f87171; }
+  .cell-green { background: rgba(52,211,153,0.15) !important; color: #34d399; }
+  .cell-yellow { background: rgba(251,191,36,0.15) !important; color: #fbbf24; }
+  .cell-red { background: rgba(248,113,113,0.15) !important; color: #f87171; }
 
   /* Today Snapshot */
   .today-snapshot {
@@ -3073,29 +3074,19 @@
 
   <!-- OVERVIEW TAB -->
   <div class="view-content active" id="view-dashboard">
-    <!-- Company KPI Strip -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;">Key Metrics</div>
-      <button class="nav-util-btn" onclick="openTilePicker()" style="font-size:10px;padding:2px 8px;">Configure</button>
-    </div>
     <div class="kpi-grid" id="dashKPIs"></div>
 
-    <!-- Forecast Tool Access -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;">Store Performance</div>
-      <button class="nav-util-btn" onclick="openForecastTool()" style="background:rgba(68,138,255,0.1);border-color:rgba(68,138,255,0.2);color:var(--blue);">Business Forecast Tool</button>
-    </div>
-
-    <!-- PRIMARY: Store Rankings Table (full width, fills viewport) -->
-    <div class="ops-grid-wrap" style="margin:0 0 16px 0;">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">
-        Top & Bottom Stores
+    <!-- Store Performance Table (HERO) -->
+    <div class="ops-grid-wrap" style="margin-bottom:16px;">
+      <h3>
+        Store Performance
         <div style="display:flex;gap:8px;align-items:center;">
-          <button class="btn-export" onclick="exportReport('dashStoreTable','Top Bottom Stores')" style="font-size:10px;padding:3px 10px;">Export</button>
-          <span style="font-size:10px;font-weight:500;color:var(--text-muted);cursor:pointer;" onclick="navigateTo('stores')">View All &rarr;</span>
+          <button class="btn-export" onclick="exportReport('dashStoreTable','Store Performance')" style="font-size:10px;padding:3px 10px;">Export</button>
+          <button class="btn-export" onclick="navigateTo('stores')" style="font-size:10px;padding:3px 10px;">All Stores &rarr;</button>
+          <button class="btn-export" onclick="navigateTo('forecast')" style="font-size:10px;padding:3px 10px;border-color:var(--blue);color:var(--blue);">Forecast Tool</button>
         </div>
       </h3>
-      <div class="ops-grid-scroll" style="max-height:calc(100vh - 340px);min-height:300px;">
+      <div class="ops-grid-scroll" style="max-height:calc(100vh - 280px);min-height:250px;">
         <table class="ops-grid" id="dashStoreTable">
           <thead><tr>
             <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
@@ -3109,186 +3100,92 @@
       </div>
     </div>
 
-    <!-- Secondary Row: Today + BPA + Charts -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-      <div>
-        <div class="today-snapshot" id="todaySnapshot">
-          <div class="today-snapshot-header">
-            <h3><div class="live-dot"></div> Today's Snapshot</h3>
-            <div id="todayDate" style="font-size:11px;color:var(--text-muted);"></div>
-          </div>
-          <div class="today-snapshot-grid" id="todayStats" style="grid-template-columns:1fr 1fr;"></div>
-        </div>
-        <div class="bpa-panel" id="bpaOverview" style="margin-top:12px;"></div>
+    <!-- Secondary row: BPA + Charts -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div class="bpa-panel" id="bpaOverview" style="margin:0;"></div>
+      <div class="chart-card" style="margin:0;"><h3>Revenue Trend</h3><div class="chart-wrap" style="height:200px;"><canvas id="chartDashRevenue"></canvas></div></div>
+      <div class="chart-card" style="margin:0;"><h3>Daily Volume</h3><div class="chart-wrap" style="height:200px;"><canvas id="chartDashVolume"></canvas></div></div>
+    </div>
+
+    <!-- Today's Snapshot (only if data) -->
+    <div class="today-snapshot" id="todaySnapshot" style="margin-top:12px;">
+      <div class="today-snapshot-header">
+        <h3><div class="live-dot"></div> Today</h3>
+        <div id="todayDate" style="font-size:11px;color:var(--text-muted);"></div>
       </div>
-      <div class="chart-card" style="margin:0;">
-        <h3>Revenue Trend</h3>
-        <div class="chart-wrap" style="height:220px;"><canvas id="chartDashRevenue"></canvas></div>
-      </div>
-      <div class="chart-card" style="margin:0;">
-        <h3>Daily Volume</h3>
-        <div class="chart-wrap" style="height:220px;"><canvas id="chartDashVolume"></canvas></div>
-      </div>
+      <div class="today-snapshot-grid" id="todayStats"></div>
     </div>
   </div>
 
   <!-- REVENUE TAB -->
   <div class="view-content" id="view-financials">
-    <!-- KPI Tiles -->
     <div class="kpi-grid" id="revenueKPIs"></div>
 
-    <!-- Product Analysis -->
-    <div class="ops-grid-wrap" style="margin-bottom:16px;">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+    <!-- Product & Service Analysis (HERO) -->
+    <div class="ops-grid-wrap" style="margin-bottom:12px;">
+      <h3>
         Product & Service Analysis
         <div style="display:flex;gap:8px;align-items:center;">
-          <select id="productCatFilter" class="cmd-select" style="min-width:140px;" onchange="renderProductAnalysis()">
+          <select id="productCatFilter" class="cmd-select" style="min-width:120px;height:26px;font-size:11px;" onchange="renderProductAnalysis()">
             <option value="">All Categories</option>
           </select>
-          <button class="btn-export" onclick="exportReport('tblProductAnalysis','Product Analysis')" style="font-size:10px;padding:3px 10px;">Export</button>
+          <button class="btn-export" onclick="exportReport('tblProductAnalysis','Product Analysis')">Export</button>
         </div>
       </h3>
-      <div class="ops-grid-scroll" style="max-height:450px;">
+      <div class="ops-grid-scroll" style="max-height:400px;">
         <table class="ops-grid" id="tblProductAnalysis">
           <thead><tr>
-            <th style="text-align:left;min-width:50px;position:sticky;left:0;z-index:3;background:var(--card);">Category</th>
+            <th style="text-align:left;min-width:50px;position:sticky;left:0;z-index:3;background:var(--card);">Cat</th>
             <th style="text-align:left;min-width:180px;">Product / Service</th>
-            <th title="Total units sold">Qty Sold</th>
-            <th title="Total revenue">Revenue</th>
-            <th title="Average price per unit">Avg Price</th>
-            <th title="Number of transactions with this product">Transactions</th>
-            <th title="Number of stores selling this">Stores</th>
-            <th title="% of all transactions that include this product">Attach Rate</th>
+            <th>Qty</th>
+            <th>Revenue</th>
+            <th>Avg Price</th>
+            <th>Txns</th>
+            <th>Stores</th>
+            <th>Attach %</th>
           </tr></thead>
           <tbody id="productAnalysisBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Recommendations (suggested but not sold) -->
-    <div class="ops-grid-wrap" style="margin-bottom:16px;">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">Recommendations <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Suggested but not purchased</span><button class="btn-export" onclick="exportReport('tblRecommendations','Recommendations')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
-      <div class="ops-grid-scroll" style="max-height:250px;">
-        <table class="ops-grid" id="tblRecommendations">
-          <thead><tr>
-            <th style="text-align:left;min-width:200px;">Recommendation</th>
-            <th>Times Suggested</th>
-            <th>Stores</th>
-            <th title="% of all transactions where this was recommended">Suggest Rate</th>
-          </tr></thead>
-          <tbody id="recommendationsBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Premium Product Expansion -->
-    <div class="ops-grid-wrap" style="margin-bottom:16px;">
-      <h3 style="display:flex;align-items:center;justify-content:space-between;">
-        Premium Product Opportunity
-        <button class="btn-export" onclick="exportReport('tblBrandExpansion','Premium Product Expansion')" style="font-size:10px;padding:3px 10px;">Export</button>
-      </h3>
-      <div style="font-size:11px;color:var(--text-muted);padding:0 20px 12px;">
-        Shows premium product penetration by store. Identifies stores where premium attach rate is below network average — the biggest growth opportunities.
-      </div>
-      <div class="ops-grid-scroll" style="max-height:350px;">
-        <table class="ops-grid" id="tblBrandExpansion">
-          <thead><tr>
-            <th style="text-align:left;position:sticky;left:0;z-index:3;background:var(--card);">Store</th>
-            <th>Total Txns</th>
-            <th title="Transactions with any premium product">Premium Txns</th>
-            <th title="% of transactions that included a premium product">Premium Rate</th>
-            <th title="Revenue from premium products">Premium Rev</th>
-            <th title="Average premium ticket vs average standard ticket">Avg Premium Ticket</th>
-            <th title="Average standard (non-premium) ticket">Avg Standard Ticket</th>
-            <th title="Dollar difference per car when premium is sold">Uplift / Car</th>
-            <th title="Estimated additional revenue if store reached network best rate">Revenue Opportunity</th>
-          </tr></thead>
-          <tbody id="brandExpansionBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- PRIMARY: Data Tables (2-column) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <!-- Two tables side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <div class="table-wrap" style="margin:0;">
-        <h3 style="display:flex;align-items:center;justify-content:space-between;">Service & Product Breakdown <button class="btn-export" onclick="exportReport('tblServices','Service & Product Breakdown')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
-        <div class="table-scroll" style="max-height:340px;">
+        <h3>Services & Products <button class="btn-export" onclick="exportReport('tblServices','Services')">Export</button></h3>
+        <div class="table-scroll" style="max-height:300px;">
           <table id="tblServices"><thead><tr>
-            <th class="sortable" data-col="0">Category</th>
-            <th class="sortable" data-col="1">Description</th>
-            <th class="sortable" data-col="2">Type</th>
-            <th class="sortable" data-col="3">Qty Sold</th>
-            <th class="sortable" data-col="4">Revenue</th>
-            <th class="sortable" data-col="5">Avg Price</th>
+            <th class="sortable" data-col="0">Category</th><th class="sortable" data-col="1">Description</th><th class="sortable" data-col="2">Type</th><th class="sortable" data-col="3">Qty</th><th class="sortable" data-col="4">Revenue</th><th class="sortable" data-col="5">Avg Price</th>
           </tr></thead><tbody></tbody></table>
         </div>
       </div>
       <div class="table-wrap" style="margin:0;">
-        <h3 style="display:flex;align-items:center;justify-content:space-between;">Promotion Details <button class="btn-export" onclick="exportReport('tblPromos','Promotion Details')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
-        <div class="table-scroll" style="max-height:340px;">
+        <h3>Promotions <button class="btn-export" onclick="exportReport('tblPromos','Promotions')">Export</button></h3>
+        <div class="table-scroll" style="max-height:300px;">
           <table id="tblPromos"><thead><tr>
-            <th class="sortable" data-col="0">Promo Code</th>
-            <th class="sortable" data-col="1">Uses</th>
-            <th class="sortable" data-col="2">Total Discount</th>
-            <th class="sortable" data-col="3">Avg Discount</th>
-            <th class="sortable" data-col="4">Stores</th>
-            <th class="sortable" data-col="5">Avg Invoice</th>
+            <th class="sortable" data-col="0">Code</th><th class="sortable" data-col="1">Uses</th><th class="sortable" data-col="2">Total</th><th class="sortable" data-col="3">Avg</th><th class="sortable" data-col="4">Stores</th><th class="sortable" data-col="5">Avg Invoice</th>
           </tr></thead><tbody></tbody></table>
         </div>
       </div>
     </div>
 
-    <!-- Store Scorecard + Fleet (data first) -->
-    <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:16px;">
-      <div class="ops-grid-wrap" style="margin:0;">
-        <h3>Store Opportunity Scorecard</h3>
-        <div class="ops-grid-scroll" style="max-height:300px;">
-          <table class="ops-grid" id="tblOpportunity"><thead><tr>
-            <th style="text-align:left;">Store</th><th>Rev/Vehicle</th><th>Ancillary %</th><th>Data Quality</th><th>Efficiency</th><th>Upsell Rate</th><th>Score</th>
-          </tr></thead><tbody id="opportunityBody"></tbody></table>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;">
-          <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Fleet vs Retail</div>
-          <div id="fleetAnalysis"></div>
-        </div>
-        <div class="chart-card" style="margin:0;"><div class="chart-wrap" style="height:180px;"><canvas id="chartFleetMix"></canvas></div></div>
-      </div>
-    </div>
-
-    <!-- BPA Insights -->
+    <!-- BPA + Charts -->
     <div class="bpa-panel" id="bpaRevenue"></div>
-
-    <!-- SUPPORTING: Charts (2x2 grid) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <div class="chart-card"><h3>Revenue by Category</h3><div class="chart-wrap"><canvas id="chartRevByCat"></canvas></div></div>
       <div class="chart-card"><h3>Discount Impact</h3><div class="chart-wrap"><canvas id="chartDiscountImpact"></canvas></div></div>
-      <div class="chart-card"><h3>Revenue Forecast</h3><div class="chart-wrap"><canvas id="chartRevForecast"></canvas></div></div>
-      <div class="chart-card"><h3>Ticket Distribution</h3><div class="chart-wrap"><canvas id="chartTicketDist"></canvas></div></div>
     </div>
 
-    <!-- Market Intelligence panels -->
-    <div class="bpa-panel" id="bpaMarket"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;">
-        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">ZIP Code Analysis</div>
-        <div id="zipAnalysis" style="max-height:250px;overflow-y:auto;"></div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;">
-        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Service Mix</div>
-        <div id="serviceMixAnalysis" style="max-height:250px;overflow-y:auto;"></div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;">
-        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Customer Retention</div>
-        <div id="retentionAnalysis" style="max-height:250px;overflow-y:auto;"></div>
-      </div>
-    </div>
-
-    <!-- Hidden: canvases for render functions that need them -->
+    <!-- Hidden elements for render functions -->
     <div style="display:none;">
-      <canvas id="chartRevByType"></canvas>
-      <canvas id="chartSeasonal"></canvas>
+      <canvas id="chartRevForecast"></canvas><canvas id="chartSeasonal"></canvas>
+      <canvas id="chartRevByType"></canvas><canvas id="chartTicketDist"></canvas>
+      <canvas id="chartFleetMix"></canvas>
+      <div id="zipAnalysis"></div><div id="serviceMixAnalysis"></div><div id="retentionAnalysis"></div>
+      <div id="fleetAnalysis"></div><div id="bpaMarket"></div>
+      <table id="tblOpportunity"><tbody id="opportunityBody"></tbody></table>
+      <table id="tblRecommendations"><tbody id="recommendationsBody"></tbody></table>
+      <table id="tblBrandExpansion"><tbody id="brandExpansionBody"></tbody></table>
     </div>
   </div>
 
@@ -3334,75 +3231,70 @@
 
   <!-- OPERATIONS TAB -->
   <div class="view-content" id="view-stores">
-    <!-- Quick Filters -->
     <div class="ops-quick-filters" id="opsQuickFilters">
-      <span style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Range:</span>
+      <span style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-right:6px;">Range:</span>
       <button class="ops-quick-btn" onclick="setOpsDateRange('YTD')">YTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('QTD')">QTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('MTD')">MTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('WTD')">WTD</button>
       <button class="ops-quick-btn" onclick="setOpsDateRange('DTD')">DTD</button>
-      <button class="nav-util-btn" onclick="openForecastTool()" style="margin-left:8px;background:rgba(68,138,255,0.1);border-color:rgba(68,138,255,0.2);color:var(--blue);">Forecast</button>
       <div style="flex:1;"></div>
-      <button class="nav-util-btn" id="storeBackBtn" style="display:none;" onclick="navigateTo('stores')">&#8592; All Stores</button>
+      <button class="btn-export" id="storeBackBtn" style="display:none;" onclick="navigateTo('stores')">&#8592; All Stores</button>
+      <button class="btn-export" onclick="navigateTo('forecast')" style="border-color:var(--blue);color:var(--blue);">Forecast</button>
     </div>
 
-    <!-- KPI Tiles -->
-    <div class="kpi-grid" id="opsKPIs"></div>
-
-    <!-- All Stores Mode: Command Grid (always visible when no store selected) -->
+    <!-- All Stores Mode -->
     <div id="allStoresView">
-      <div class="ops-grid-wrap">
-        <h3 style="display:flex;align-items:center;justify-content:space-between;">Store Performance <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Click a store to drill in</span> <button class="btn-export" onclick="exportReport('opsCommandGrid','Store Performance')" style="font-size:10px;padding:3px 10px;">Export</button></h3>
-        <div class="ops-grid-scroll">
+      <div class="ops-grid-wrap" style="margin-bottom:12px;">
+        <h3>
+          Store Performance
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-size:10px;font-weight:500;color:var(--text-muted);">Click a store to drill in</span>
+            <button class="btn-export" onclick="exportReport('opsCommandGrid','Store Performance')">Export</button>
+          </div>
+        </h3>
+        <div class="ops-grid-scroll" style="max-height:calc(100vh - 220px);">
           <table class="ops-grid" id="opsCommandGrid">
-            <thead>
-              <tr>
-                <th style="min-width:140px;position:sticky;left:0;z-index:3;background:var(--card);">Store / District</th>
-                <th title="Guest Count">GC</th>
-                <th title="Cars Per Day">CPD</th>
-                <th title="Net Sales">Net Sales</th>
-                <th title="Ticket Average">TA</th>
-                <th title="Average Bay Time (min)">Avg Bay</th>
-                <th title="Average Wait Time (min)">Avg Wait</th>
-                <th title="Man Hours Per Vehicle">MHPV</th>
-                <th title="Promos Used">Promos</th>
-                <th title="Promo Dollars">Promo $</th>
-                <th title="Inspections">Insp</th>
-                <th title="Yellow/Red %">Y/R %</th>
-              </tr>
-            </thead>
+            <thead><tr>
+              <th style="min-width:140px;position:sticky;left:0;z-index:3;background:var(--card);">Store / District</th>
+              <th title="Guest Count">GC</th>
+              <th title="Cars Per Day">CPD</th>
+              <th title="Net Sales">Net Sales</th>
+              <th title="Ticket Average">TA</th>
+              <th title="Average Bay Time (min)">Avg Bay</th>
+              <th title="Average Wait Time (min)">Avg Wait</th>
+              <th title="Man Hours Per Vehicle">MHPV</th>
+              <th title="Promotions">Promos</th>
+              <th title="Promo Dollars">Promo $</th>
+              <th title="Inspections">Insp</th>
+              <th title="Yellow/Red %">Y/R %</th>
+            </tr></thead>
             <tbody id="opsGridBody"></tbody>
           </table>
         </div>
       </div>
-      <div class="bpa-panel" id="bpaOps" style="margin-top:16px;"></div>
+      <div class="bpa-panel" id="bpaOps"></div>
     </div>
 
-    <!-- Single Store Mode: Store Detail Profile (hidden by default) -->
+    <!-- Single Store Mode -->
     <div id="storeDetailView" style="display:none;">
+      <div class="kpi-grid" id="opsKPIs"></div>
       <div class="kpi-grid" id="storeDetailKPIs"></div>
       <div id="storeDetailTables"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
-        <div class="chart-card">
-          <h3 id="storeDetailChartTitle1">Service Times</h3>
-          <div class="chart-wrap" style="height:240px;"><canvas id="chartStoreDetail1"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3 id="storeDetailChartTitle2">Inspections</h3>
-          <div class="chart-wrap" style="height:240px;"><canvas id="chartStoreDetail2"></canvas></div>
-        </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+        <div class="chart-card"><h3 id="storeDetailChartTitle1">Service Times</h3><div class="chart-wrap" style="height:220px;"><canvas id="chartStoreDetail1"></canvas></div></div>
+        <div class="chart-card"><h3 id="storeDetailChartTitle2">Inspections</h3><div class="chart-wrap" style="height:220px;"><canvas id="chartStoreDetail2"></canvas></div></div>
       </div>
     </div>
 
     <!-- Hidden render targets -->
     <div style="display:none;">
       <table id="tblStoreOps"><thead><tr>
-        <th class="sortable" data-col="0">Store #</th><th class="sortable" data-col="1">Invoices</th><th class="sortable" data-col="2">Avg Bay Time</th><th class="sortable" data-col="3">Avg Wait Time</th><th class="sortable" data-col="4">Avg Total Time</th><th class="sortable" data-col="5">Revenue</th><th class="sortable" data-col="6">Avg Ticket</th>
+        <th>Store #</th><th>Invoices</th><th>Avg Bay Time</th><th>Avg Wait Time</th><th>Avg Total Time</th><th>Revenue</th><th>Avg Ticket</th>
       </tr></thead><tbody></tbody></table>
       <canvas id="chartSvcTime"></canvas><canvas id="chartTimeHist"></canvas><canvas id="chartMakes"></canvas><canvas id="chartByHour"></canvas>
       <div id="csaKPIs"></div>
-      <table class="ops-grid" id="csaGrid"><thead><tr><th>Advisor</th><th>Store</th><th>Vehicles</th><th>Green</th><th>Yellow</th><th>Red</th><th>Sold</th><th>Conv %</th></tr></thead><tbody id="csaGridBody"></tbody></table>
+      <table id="csaGrid"><tbody id="csaGridBody"></tbody></table>
       <div id="opsGrowContent"></div>
       <div id="opsCustomContent"></div>
     </div>
