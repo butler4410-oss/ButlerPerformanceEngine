@@ -2986,7 +2986,8 @@
       <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Click to clear and re-upload">
         <span class="data-saved-dot"></span> Saved
       </div>
-      <button class="nav-util-btn" onclick="openAddFiles()" title="Add more CSV files">+ Add Files</button>
+      <button class="nav-util-btn" onclick="openAddFiles()" title="Add more data files">+ Add Files</button>
+      <button class="nav-util-btn" onclick="openMapFiles()" title="Upload and map columns manually" style="background:rgba(68,138,255,0.1);border-color:rgba(68,138,255,0.2);color:var(--blue);">Map Data</button>
       <button class="nav-util-btn" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">&#9790;</button>
       <button class="nav-util-btn" onclick="openSettings()" title="Settings">&#9881;</button>
       <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" title="Alerts">&#9888;</button>
@@ -3306,6 +3307,7 @@
       <div class="upload-drop-text">Drop your data files here</div>
       <div class="upload-drop-sub">CSV and Excel files supported</div>
       <button class="file-input-btn" onclick="document.getElementById('fileInput').click()" style="margin-top:16px;">Choose Files</button>
+      <button class="nav-util-btn" onclick="openMapFiles()" style="margin-top:10px;background:rgba(68,138,255,0.1);border-color:rgba(68,138,255,0.2);color:var(--blue);padding:8px 20px;">Map Custom Data</button>
       <input type="file" id="fileInput" multiple accept=".csv,.CSV,.xlsx,.xls,.XLSX,.XLS">
     </div>
 
@@ -4539,6 +4541,52 @@ function processFile(file) {
 function openAddFiles() {
   const input = document.getElementById('addFilesInput');
   if (input) input.click();
+}
+
+// Map Data — upload a file and force the mapping wizard open
+function openMapFiles() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.multiple = false;
+  input.accept = '.csv,.CSV,.xlsx,.xls,.XLSX,.XLS';
+  input.onchange = async () => {
+    if (!input.files.length) return;
+    const file = input.files[0];
+    const isExcel = /\.(xlsx|xls)$/i.test(file.name);
+
+    if (isExcel && typeof XLSX !== 'undefined') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+          let allRows = [];
+          wb.SheetNames.forEach(name => {
+            const json = XLSX.utils.sheet_to_json(wb.Sheets[name], { defval: '' });
+            json.forEach(r => { r._sheet = name.trim(); });
+            allRows = allRows.concat(json);
+          });
+          if (allRows.length) {
+            const headers = Object.keys(allRows[0]).filter(h => h !== '_sheet');
+            openMappingWizard(file.name, headers, allRows);
+          }
+        } catch(err) { alert('Could not read Excel file: ' + err.message); }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const lines = text.split('\n');
+        const headers = parseCSVLine(lines[0]);
+        const rows = parseCSV(text);
+        if (rows.length) {
+          openMappingWizard(file.name, headers.filter(h => h.trim()), rows);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+  input.click();
 }
 
 const uploadZone = document.getElementById('uploadZone');
