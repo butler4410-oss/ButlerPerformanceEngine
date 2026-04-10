@@ -21,7 +21,7 @@
     --card: #1e293b;
     --card-hover: #334155;
     --text: #f1f5f9;
-    --text-muted: #94a3b8;
+    --text-muted: #a8b8d0;
     --border: #334155;
     --green: #34d399;
     --yellow: #fbbf24;
@@ -41,6 +41,7 @@
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   ::selection { background: rgba(220,38,38,0.3); color: white; }
@@ -791,8 +792,8 @@
     overflow: hidden;
   }
   .kpi-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary), 0 4px 16px rgba(0,0,0,0.3);
   }
 
   .kpi-card:active { cursor: grabbing; }
@@ -926,7 +927,7 @@
   }
 
   .kpi-label {
-    font-size: 9px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: var(--text-muted);
@@ -977,8 +978,6 @@
     font-weight: 700;
     margin-bottom: 12px;
     color: var(--text);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
   }
 
   .chart-wrap {
@@ -1063,7 +1062,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  tbody tr:hover { background: var(--card-hover); }
+  tbody tr:hover { background: rgba(255,255,255,0.04); }
   tbody tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
 
   .status-dot {
@@ -1348,7 +1347,7 @@
     position: absolute;
     top: 14px;
     right: 14px;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1449,9 +1448,27 @@
 
   /* report cards use CSS vars — no dark-mode overrides needed */
 
+  @media (max-width: 1200px) {
+    .nav-views { gap: 1px; }
+    .view-btn { padding: 5px 12px; font-size: 11px; }
+    .kpi-card { max-width: none; }
+  }
+
+  @media (max-width: 900px) {
+    .nav-tier1 { height: auto; flex-wrap: wrap; padding: 8px 16px; gap: 8px; }
+    .nav-tier2 { height: auto; flex-wrap: wrap; padding: 8px 16px; gap: 8px; }
+    .nav-filters { width: 100%; }
+    .nav-context { width: 100%; justify-content: center; }
+    .nav-utils { width: 100%; justify-content: flex-end; }
+    .kpi-grid { gap: 8px; }
+    .kpi-card { flex: 1 1 45%; max-width: 48%; }
+  }
+
   @media (max-width: 768px) {
     .report-cards { grid-template-columns: 1fr; }
     .report-modal { inset: 0; border-radius: 0; }
+    .ops-grid-scroll { max-height: 60vh !important; }
+    .kpi-card { flex: 1 1 100%; max-width: 100%; }
   }
 
   /* Mapping Wizard */
@@ -1520,7 +1537,7 @@
   }
 
   .bpa-logo {
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 1.4px;
     text-transform: uppercase;
@@ -2345,53 +2362,16 @@
   }
 
   /* Alert Banner */
-  .alert-banner {
-    display: none;
-    background: rgba(251,191,36,0.06);
-    border: 1px solid rgba(251,191,36,0.15);
-    border-radius: 10px;
-    padding: 14px 20px;
-    margin-bottom: 20px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+  .alert-banner { display: none; }
+  .alert-banner.has-alerts { display: flex; }
 
-  .alert-banner:hover {
-    background: rgba(251,191,36,0.1);
-    border-color: rgba(251,191,36,0.3);
-  }
-
-  .alert-banner.has-alerts { display: flex; align-items: center; gap: 14px; }
-
-  .alert-banner .alert-icon {
-    font-size: 20px;
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,145,0,0.2);
-    border-radius: 8px;
-    color: var(--orange);
-    font-weight: 700;
-  }
-
-  .alert-banner .alert-text {
-    flex: 1;
-  }
-
-  .alert-banner .alert-count {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--orange);
-  }
-
-  .alert-banner .alert-summary {
-    font-size: 12px;
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
     color: var(--text-muted);
-    margin-top: 2px;
   }
+  .empty-state-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .empty-state-sub { font-size: 12px; }
 
   .alert-item {
     display: flex;
@@ -2499,7 +2479,7 @@
     gap: 10px;
   }
   .grow-section-title .grow-badge {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -2717,16 +2697,13 @@
     <div class="nav-context">
       <span class="client-badge" id="clientBadge" onclick="openSettings()"><span id="clientBadgeText">Set Client</span></span>
       <span class="nav-context-sep">&middot;</span>
-      <span id="filterSummary" class="nav-context-info"></span>
     </div>
     <div class="nav-utils">
       <div id="dataSavedBadge" class="data-saved-pill" onclick="if(confirm('Clear saved data and re-upload?')) clearUserData();" title="Click to clear and re-upload">
         <span class="data-saved-dot"></span> Saved
       </div>
-      <button class="nav-util-btn" onclick="openAddFiles()" title="Add more data files">+ Add Files</button>
       <button class="nav-util-btn" onclick="openSettings()" title="Settings">&#9881;</button>
       <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" title="Alerts">&#9888;</button>
-      <button class="nav-util-btn" id="auditLogBtn" onclick="openAuditLog()" title="Audit Log" style="display:none;">&#9776;</button>
     </div>
   </div>
 </div>
@@ -3047,11 +3024,11 @@
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--primary);margin-bottom:4px;">Formats</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--primary);margin-bottom:4px;">Formats</div>
         <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">CSV · Excel · Any spreadsheet</div>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--primary);margin-bottom:4px;">Compatibility</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--primary);margin-bottom:4px;">Compatibility</div>
         <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">Any point-of-sale system</div>
       </div>
     </div>
@@ -3069,12 +3046,10 @@
   <!-- Filters moved to header -->
 
   <!-- Alert Banner -->
-  <div class="alert-banner" id="alertBanner" onclick="openAlerts()">
-    <div class="alert-icon">!</div>
-    <div class="alert-text">
-      <div class="alert-count" id="alertBannerCount"></div>
-      <div class="alert-summary" id="alertBannerSummary"></div>
-    </div>
+  <div class="alert-banner" id="alertBanner" style="display:flex;align-items:center;gap:10px;padding:8px 16px;margin-bottom:12px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.12);border-radius:8px;font-size:12px;cursor:pointer;" onclick="openAlerts()">
+    <span style="color:var(--yellow);font-weight:700;" id="alertBannerCount"></span>
+    <span style="color:var(--text-muted);flex:1;" id="alertBannerSummary"></span>
+    <button onclick="event.stopPropagation();this.parentElement.style.display='none';" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:0 4px;">&times;</button>
   </div>
 
   <!-- Tabs moved to nav-shell above -->
@@ -3438,42 +3413,42 @@
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:700;margin-bottom:12px;">Growth Targets</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:14px;">
         <div>
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Car Count</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Car Count</div>
           <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcCarTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
             <span id="fcCarLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Ticket Avg</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Ticket Avg</div>
           <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcTicketTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
             <span id="fcTicketLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Upsell Conv</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Upsell Conv</div>
           <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcConvTarget" min="-30" max="30" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
             <span id="fcConvLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);min-width:40px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">New Stores</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">New Stores</div>
           <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcNewStores" min="0" max="20" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
             <span id="fcNewStoresLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text);min-width:40px;text-align:right;">0</span>
           </div>
         </div>
         <div>
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Promo Cut</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Promo Cut</div>
           <div style="display:flex;align-items:center;gap:6px;">
             <input type="range" id="fcPromoReduction" min="0" max="50" value="0" style="flex:1;accent-color:var(--primary);" oninput="renderForecastResults()">
             <span id="fcPromoLabel" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--orange);min-width:40px;text-align:right;">0%</span>
           </div>
         </div>
         <div>
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Period</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;">Period</div>
           <select id="fcPeriod" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:11px;" onchange="renderForecastResults()">
             <option value="30">30 Days</option>
             <option value="90" selected>Quarter</option>
@@ -3528,15 +3503,15 @@
     <!-- Data quality row -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Mailable Customers</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Mailable Customers</div>
         <div id="mailableStats"></div>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Data Quality</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Data Quality</div>
         <div id="dataQualityStats"></div>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Store Coverage</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Store Coverage</div>
         <div id="storeMailStats" style="max-height:120px;overflow-y:auto;"></div>
       </div>
     </div>
@@ -4455,7 +4430,7 @@ function launchDashboard() {
   const stores = new Set();
   [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(arr => {
     arr.forEach(r => {
-      const s = String(r.Store_Number || '').replace(/["\s]/g, '');
+      const s = cleanStoreNum(r.Store_Number);
       if (validStore(s)) stores.add(s);
     });
   });
@@ -6241,6 +6216,104 @@ function runBPAInsights() {
   }
 
   bpaHTML('bpaCustomers', 'Customer Insights', custInsights);
+
+  addPrescriptions();
+}
+
+function addPrescriptions() {
+  // Enhance BPA insight messages with actionable dollar-amount prescriptions
+  const cust = FILTERED.customers;
+  const det = FILTERED.details;
+  if (!cust.length) return;
+
+  const totalRev = cust.reduce((s,r) => s+(+r.Net_Sales||0), 0);
+  const totalInv = cust.length;
+  const avgTicket = totalInv ? totalRev / totalInv : 0;
+  const stores = [...new Set(cust.map(r => r.Store_Number))];
+
+  // Per-store metrics
+  const storeMetrics = {};
+  cust.forEach(r => {
+    const s = r.Store_Number;
+    if (!storeMetrics[s]) storeMetrics[s] = { rev: 0, inv: 0 };
+    storeMetrics[s].rev += (+r.Net_Sales || 0);
+    storeMetrics[s].inv++;
+  });
+
+  // Service category attach rates
+  const catAttach = {};
+  det.forEach(r => {
+    const cat = r.JLI_Category_Code || '';
+    if (!catAttach[cat]) catAttach[cat] = { txns: new Set(), revenue: 0 };
+    catAttach[cat].txns.add(r.Invoice_Number);
+    catAttach[cat].revenue += parseFloat(r.Extended_Price) || 0;
+  });
+
+  // Find underperforming stores and generate prescriptions
+  const avgStoreRev = stores.length ? totalRev / stores.length : 0;
+  const prescriptions = [];
+
+  stores.forEach(s => {
+    const m = storeMetrics[s];
+    if (!m || !m.inv) return;
+    const storeTA = m.rev / m.inv;
+    const gap = avgTicket - storeTA;
+
+    if (gap > 10) { // Store is $10+ below average
+      // Find top 3 service categories this store could push
+      const storeDetails = det.filter(r => r.Store_Number === s);
+      const storeCats = {};
+      storeDetails.forEach(r => { const c = r.JLI_Category_Code; if (c) storeCats[c] = (storeCats[c]||0)+1; });
+
+      // Find categories with low attach rate at this store vs network
+      const actions = [];
+      Object.entries(catAttach).forEach(([cat, data]) => {
+        if (!cat || cat === 'OTHER' || cat === 'OF' || cat === 'OIL') return;
+        const networkRate = totalInv ? data.txns.size / totalInv : 0;
+        const storeRate = m.inv ? (storeCats[cat]||0) / m.inv : 0;
+        const rateGap = networkRate - storeRate;
+        if (rateGap > 0.02) { // Store is 2%+ below network attach rate
+          const avgCatPrice = data.txns.size ? data.revenue / data.txns.size : 0;
+          const uplift = rateGap * m.inv * avgCatPrice;
+          if (uplift > 100) { // Only show if >$100 opportunity
+            actions.push({ cat, rateGap, avgPrice: avgCatPrice, uplift, annualized: uplift * 12 });
+          }
+        }
+      });
+
+      actions.sort((a,b) => b.uplift - a.uplift);
+      if (actions.length > 0) {
+        const top3 = actions.slice(0, 3);
+        const totalUplift = top3.reduce((s,a) => s + a.uplift, 0);
+        const detail = top3.map(a => a.cat + ' (+' + money(a.avgPrice) + '/car)').join(', ');
+        prescriptions.push({
+          store: s,
+          gap: gap,
+          actions: top3,
+          totalUplift: totalUplift,
+          msg: 'Store #' + s + ' TA is ' + money(storeTA) + ' — <strong>' + money(gap) + ' below avg</strong>. Push ' + detail + ' = <strong>+' + money(totalUplift) + '/period</strong>'
+        });
+      }
+    }
+  });
+
+  // Inject prescriptions into the overview BPA panel
+  if (prescriptions.length > 0) {
+    const panel = document.getElementById('bpaOverview');
+    if (panel) {
+      let html = panel.innerHTML;
+      const rxHtml = prescriptions.slice(0, 3).map(p =>
+        '<div class="bpa-insight warning" style="border-left-color:var(--blue);">' +
+        '<div class="bpa-insight-top"><div class="bpa-icon" style="background:var(--blue);"></div>' +
+        '<div class="bpa-msg">' + p.msg + '</div></div></div>'
+      ).join('');
+      // Append prescriptions after existing insights
+      if (html.includes('bpa-insights')) {
+        html = html.replace('</div>\n  </div>', rxHtml + '</div>\n  </div>');
+      }
+      panel.innerHTML = html;
+    }
+  }
 }
 
 // ============================================================
@@ -6570,6 +6643,13 @@ function renderOverview() {
     const r = GROW.system_impact.find(x => x.Measure && x.Measure.trim() === name);
     return r ? parseGrowNum(r.Prior_Comp) : null;
   };
+
+  if (!cust.length && !hasGROW) {
+    document.getElementById('dashKPIs').innerHTML = '';
+    const storeTable = document.getElementById('dashStoreBody');
+    if (storeTable) storeTable.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-state-title">No data loaded</div><div class="empty-state-sub">Upload your data files to see analytics</div></td></tr>';
+    return;
+  }
 
   // ── KPI Strip — use configurable tiles if available, otherwise fixed ──
   const kpiEl = document.getElementById('dashKPIs');
