@@ -4308,8 +4308,8 @@
       <div id="bpaMarket"></div>
       <table id="tblWarranty"><tbody id="warrantyTableBody"></tbody></table>
       <table id="tblZeroDollar"><tbody id="zeroDollarBody"></tbody></table>
-      <table id="tblServices"><thead><tr><th>Category</th><th>Description</th><th>Type</th><th>Qty</th><th>Revenue</th><th>Avg Price</th></tr></thead><tbody></tbody></table>
-      <table id="tblPromos"><thead><tr><th>Code</th><th>Uses</th><th>Total</th><th>Avg</th><th>Stores</th><th>Avg Invoice</th></tr></thead><tbody></tbody></table>
+      <table id="tblServices"><thead><tr><th style="text-align:left;">Category</th><th style="text-align:left;">Description</th><th style="text-align:left;width:80px;">Type</th><th style="text-align:right;width:70px;">Qty</th><th style="text-align:right;width:110px;">Revenue</th><th style="text-align:right;width:100px;">Avg Price</th></tr></thead><tbody></tbody></table>
+      <table id="tblPromos"><thead><tr><th style="text-align:left;">Code</th><th style="text-align:right;width:70px;">Uses</th><th style="text-align:right;width:100px;">Total</th><th style="text-align:right;width:90px;">Avg</th><th style="text-align:right;width:70px;">Stores</th><th style="text-align:right;width:100px;">Avg Invoice</th></tr></thead><tbody></tbody></table>
       <table id="tblRecommendations"><tbody id="recommendationsBody"></tbody></table>
       <table id="tblBrandExpansion"><tbody id="brandExpansionBody"></tbody></table>
       <canvas id="chartRevByCat"></canvas><canvas id="chartDiscountImpact"></canvas>
@@ -7849,7 +7849,7 @@ function renderRevenue() {
   });
   const svcRows = Object.values(svcMap).sort((a,b) => b.rev - a.rev).slice(0, 100);
   document.querySelector('#tblServices tbody').innerHTML = svcRows.map(r => `
-    <tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(r.desc||'').replace(/'/g,"\\'")}','${(r.type||'').replace(/'/g,"\\'")}')"><td>${r.cat}</td><td>${r.desc}</td><td>${r.type}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${money(r.count ? r.rev / r.count : 0)}</td></tr>
+    <tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(r.desc||'').replace(/'/g,"\\'")}','${(r.type||'').replace(/'/g,"\\'")}')"><td style="text-align:left;">${r.cat}</td><td style="text-align:left;">${r.desc}</td><td style="text-align:left;">${r.type}</td><td style="text-align:right;">${num(Math.round(r.qty))}</td><td style="text-align:right;">${money(r.rev)}</td><td style="text-align:right;">${money(r.count ? r.rev / r.count : 0)}</td></tr>
   `).join('');
 
   // Ticket Distribution histogram
@@ -8122,19 +8122,19 @@ function drillProduct(cat, desc) {
     // Per-store table
     const storeArr = Object.entries(storeMap).sort((a,b) => b[1].rev - a[1].rev);
     if (storeArr.length) {
-      html += '<div class="table-wrap" style="margin-bottom:16px;"><h3>By Store</h3><div class="table-scroll" style="max-height:250px;"><table><thead><tr><th style="text-align:left;">Store</th><th>Qty</th><th>Revenue</th><th>Transactions</th></tr></thead><tbody>';
+      html += '<div class="table-wrap" style="margin-bottom:16px;"><h3>By Store</h3><div class="table-scroll" style="max-height:250px;"><table><thead><tr><th style="text-align:left;">Store</th><th style="text-align:right;width:80px;">Qty</th><th style="text-align:right;width:110px;">Revenue</th><th style="text-align:right;width:110px;">Transactions</th></tr></thead><tbody>';
       storeArr.forEach(([s, d]) => {
-        html += '<tr><td style="text-align:left;font-weight:600;">#' + s + '</td><td>' + num(Math.round(d.qty)) + '</td><td>' + money(d.rev) + '</td><td>' + num(d.txns) + '</td></tr>';
+        html += '<tr><td style="text-align:left;font-weight:600;">#' + s + '</td><td style="text-align:right;">' + num(Math.round(d.qty)) + '</td><td style="text-align:right;">' + money(d.rev) + '</td><td style="text-align:right;">' + num(d.txns) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
     }
 
     // Customer list (who bought this)
     if (buyers.length) {
-      html += '<div class="table-wrap"><h3>Customers Who Purchased (' + num(buyers.length) + ')</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th style="text-align:left;">Name</th><th>Email</th><th>Phone</th><th>City</th><th>Store</th><th>Date</th><th>Total</th></tr></thead><tbody>';
+      html += '<div class="table-wrap"><h3>Customers Who Purchased (' + num(buyers.length) + ')</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th style="text-align:left;">Name</th><th style="text-align:left;">Email</th><th style="text-align:left;width:110px;">Phone</th><th style="text-align:left;width:90px;">City</th><th style="text-align:center;width:60px;">Store</th><th style="text-align:left;width:90px;">Date</th><th style="text-align:right;width:90px;">Total</th></tr></thead><tbody>';
       buyers.sort((a,b) => (+b.Net_Sales||0) - (+a.Net_Sales||0)).slice(0, 200).forEach(r => {
         const name = ((r.Customer_First_Name||'') + ' ' + (r.Customer_Last_Name||'')).trim() || 'Unknown';
-        html += '<tr><td style="text-align:left;">' + name + '</td><td style="font-size:11px;">' + (r.Customer_Email_Address||'—') + '</td><td style="font-size:11px;">' + (r.Customer_Phone_Number||'—') + '</td><td>' + (r.City||'') + '</td><td>#' + (r.Store_Number||'') + '</td><td>' + (r.Invoice_Date||'').split(' ')[0] + '</td><td>' + money(+r.Net_Sales||0) + '</td></tr>';
+        html += '<tr><td style="text-align:left;">' + name + '</td><td style="text-align:left;font-size:11px;">' + (r.Customer_Email_Address||'\u2014') + '</td><td style="text-align:left;font-size:11px;">' + (r.Customer_Phone_Number||'\u2014') + '</td><td style="text-align:left;">' + (r.City||'') + '</td><td style="text-align:center;">#' + (r.Store_Number||'') + '</td><td style="text-align:left;">' + (r.Invoice_Date||'').split(' ')[0] + '</td><td style="text-align:right;">' + money(+r.Net_Sales||0) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
     }
@@ -8415,7 +8415,7 @@ function renderPromos() {
   const promoRows = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total);
   const promoTbody = document.querySelector('#tblPromos tbody');
   if (promoTbody) promoTbody.innerHTML = promoRows.map(([code, r]) => `
-    <tr class="clickable-row" onclick="openPromoDetail('${code.replace(/'/g,"\\'")}')"><td>${code}</td><td>${num(r.uses)}</td><td>${money(r.total)}</td><td>${money(r.uses ? r.total / r.uses : 0)}</td><td>${r.stores.size}</td><td>${money(r.uses ? r.invTotal / r.uses : 0)}</td></tr>
+    <tr class="clickable-row" onclick="openPromoDetail('${code.replace(/'/g,"\\'")}')"><td style="text-align:left;">${code}</td><td style="text-align:right;">${num(r.uses)}</td><td style="text-align:right;">${money(r.total)}</td><td style="text-align:right;">${money(r.uses ? r.total / r.uses : 0)}</td><td style="text-align:right;">${r.stores.size}</td><td style="text-align:right;">${money(r.uses ? r.invTotal / r.uses : 0)}</td></tr>
   `).join('');
 }
 
@@ -11913,9 +11913,9 @@ function openStoreDetail(storeNum) {
   });
   const topSvc = Object.entries(svcMap).sort((a, b) => b[1].rev - a[1].rev).slice(0, 15);
   if (topSvc.length) {
-    tablesHTML += '<div class="table-wrap" style="margin-bottom:16px;"><h3>Top Services \u2014 Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th>Service</th><th>Qty</th><th>Revenue</th><th>Avg Price</th></tr></thead><tbody>';
+    tablesHTML += '<div class="table-wrap" style="margin-bottom:16px;"><h3>Top Services \u2014 Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th style="text-align:left;">Service</th><th style="text-align:right;width:80px;">Qty</th><th style="text-align:right;width:120px;">Revenue</th><th style="text-align:right;width:110px;">Avg Price</th></tr></thead><tbody>';
     topSvc.forEach(([name, d]) => {
-      tablesHTML += '<tr><td>' + name + '</td><td>' + num(Math.round(d.qty)) + '</td><td>' + money(d.rev) + '</td><td>' + money(d.qty ? d.rev / d.qty : 0) + '</td></tr>';
+      tablesHTML += '<tr><td style="text-align:left;">' + name + '</td><td style="text-align:right;">' + num(Math.round(d.qty)) + '</td><td style="text-align:right;">' + money(d.rev) + '</td><td style="text-align:right;">' + money(d.qty ? d.rev / d.qty : 0) + '</td></tr>';
     });
     tablesHTML += '</tbody></table></div></div>';
   }
@@ -11926,12 +11926,12 @@ function openStoreDetail(storeNum) {
     return (db || 0) - (da || 0);
   }).slice(0, 50);
   if (recentCust.length) {
-    tablesHTML += '<div class="table-wrap"><h3>Recent Customers \u2014 Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th>Name</th><th>Date</th><th>Net Sales</th><th>Vehicle</th><th>Email</th></tr></thead><tbody>';
+    tablesHTML += '<div class="table-wrap"><h3>Recent Customers \u2014 Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th style="text-align:left;">Name</th><th style="text-align:left;width:100px;">Date</th><th style="text-align:right;width:100px;">Net Sales</th><th style="text-align:left;width:100px;">Vehicle</th><th style="text-align:left;">Email</th></tr></thead><tbody>';
     recentCust.forEach(r => {
       const name = ((r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '')).trim() || 'Unknown';
       const date = r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '';
       const make = r.ChekChart_Make ? decodeMake(r.ChekChart_Make) : '';
-      tablesHTML += '<tr><td>' + name + '</td><td>' + date + '</td><td>' + money(+r.Net_Sales || 0) + '</td><td>' + make + '</td><td style="font-size:11px;color:var(--text-muted);">' + (r.Customer_Email_Address || '\u2014') + '</td></tr>';
+      tablesHTML += '<tr><td style="text-align:left;">' + name + '</td><td style="text-align:left;">' + date + '</td><td style="text-align:right;">' + money(+r.Net_Sales || 0) + '</td><td style="text-align:left;">' + make + '</td><td style="text-align:left;font-size:11px;color:var(--text-muted);">' + (r.Customer_Email_Address || '\u2014') + '</td></tr>';
     });
     tablesHTML += '</tbody></table></div></div>';
   }
@@ -11940,7 +11940,7 @@ function openStoreDetail(storeNum) {
 
   // Promo usage at this store
   if (promo.length) {
-    let promoHTML = '<div class="table-wrap" style="margin-top:16px;"><h3>Promotions — Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:250px;"><table><thead><tr><th>Promo Code</th><th>Uses</th><th>Total Discount</th><th>Avg Discount</th></tr></thead><tbody>';
+    let promoHTML = '<div class="table-wrap" style="margin-top:16px;"><h3>Promotions \u2014 Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:250px;"><table><thead><tr><th style="text-align:left;">Promo Code</th><th style="text-align:right;width:80px;">Uses</th><th style="text-align:right;width:130px;">Total Discount</th><th style="text-align:right;width:120px;">Avg Discount</th></tr></thead><tbody>';
     const promoMap = {};
     promo.forEach(r => {
       const code = r.Promo_Code || 'Unknown';
@@ -11949,7 +11949,7 @@ function openStoreDetail(storeNum) {
       promoMap[code].total += Math.abs(+r.Promo_Amount || 0);
     });
     Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total).slice(0, 15).forEach(([code, d]) => {
-      promoHTML += '<tr><td>' + code + '</td><td>' + num(d.uses) + '</td><td>' + money(d.total) + '</td><td>' + money(d.uses ? d.total / d.uses : 0) + '</td></tr>';
+      promoHTML += '<tr><td style="text-align:left;">' + code + '</td><td style="text-align:right;">' + num(d.uses) + '</td><td style="text-align:right;">' + money(d.total) + '</td><td style="text-align:right;">' + money(d.uses ? d.total / d.uses : 0) + '</td></tr>';
     });
     promoHTML += '</tbody></table></div></div>';
     document.getElementById('storeDetailTables').innerHTML += promoHTML;
@@ -12322,10 +12322,10 @@ function drillServiceCategory(cat) {
     // Individual services table
     html += '<div class="table-wrap" style="margin:0;"><h3>Services in ' + cat + '</h3>';
     html += '<div class="table-scroll" style="max-height:calc(100vh - 240px);"><table>';
-    html += '<thead><tr><th style="text-align:left;">Service Description</th><th>Revenue</th><th>Qty Sold</th><th>Avg Price</th><th>Stores</th></tr></thead><tbody>';
+    html += '<thead><tr><th style="text-align:left;">Service Description</th><th style="text-align:right;width:110px;">Revenue</th><th style="text-align:right;width:80px;">Qty Sold</th><th style="text-align:right;width:100px;">Avg Price</th><th style="text-align:right;width:70px;">Stores</th></tr></thead><tbody>';
     items.forEach(([name, s]) => {
       const sAvg = s.qty ? s.revenue / s.qty : 0;
-      html += '<tr><td style="text-align:left;">' + name + '</td><td>' + money(s.revenue) + '</td><td>' + num(Math.round(s.qty)) + '</td><td>' + money(sAvg) + '</td><td>' + s.stores.size + '</td></tr>';
+      html += '<tr><td style="text-align:left;">' + name + '</td><td style="text-align:right;">' + money(s.revenue) + '</td><td style="text-align:right;">' + num(Math.round(s.qty)) + '</td><td style="text-align:right;">' + money(sAvg) + '</td><td style="text-align:right;">' + s.stores.size + '</td></tr>';
     });
     html += '</tbody></table></div></div>';
 
@@ -12342,10 +12342,10 @@ function drillServiceCategory(cat) {
     if (storeArr.length) {
       html += '<div class="table-wrap" style="margin-top:16px;"><h3>By Store</h3>';
       html += '<div class="table-scroll" style="max-height:300px;"><table>';
-      html += '<thead><tr><th style="text-align:left;">Store</th><th>Revenue</th><th>Qty Sold</th><th>Avg Price</th></tr></thead><tbody>';
+      html += '<thead><tr><th style="text-align:left;">Store</th><th style="text-align:right;width:110px;">Revenue</th><th style="text-align:right;width:80px;">Qty Sold</th><th style="text-align:right;width:100px;">Avg Price</th></tr></thead><tbody>';
       storeArr.forEach(([store, s]) => {
         const sAvg = s.qty ? s.revenue / s.qty : 0;
-        html += '<tr style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + store + '\')"><td style="text-align:left;font-weight:600;">#' + store + '</td><td>' + money(s.revenue) + '</td><td>' + num(Math.round(s.qty)) + '</td><td>' + money(sAvg) + '</td></tr>';
+        html += '<tr style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + store + '\')"><td style="text-align:left;font-weight:600;">#' + store + '</td><td style="text-align:right;">' + money(s.revenue) + '</td><td style="text-align:right;">' + num(Math.round(s.qty)) + '</td><td style="text-align:right;">' + money(sAvg) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
     }
@@ -13613,6 +13613,12 @@ function toggleDataSourceFields() {
   if (fields) fields.style.display = src === 'csv' ? 'none' : 'block';
 }
 
+function buildApiHeaders(key) {
+  const h = { 'Accept': 'application/json' };
+  if (key) { h['x-api-key'] = key; h['Authorization'] = 'Bearer ' + key; }
+  return h;
+}
+
 function testDataSource() {
   const url = document.getElementById('settingApiUrl')?.value?.trim();
   const key = document.getElementById('settingApiKey')?.value?.trim();
@@ -13620,37 +13626,61 @@ function testDataSource() {
   if (!url) { resultEl.innerHTML = '<span style="color:var(--red);">Enter an endpoint URL first.</span>'; return; }
 
   resultEl.innerHTML = '<span style="color:var(--blue);">Testing connection...</span>';
-  fetch(url, {
-    method: 'GET',
-    headers: key ? { 'Authorization': 'Bearer ' + key, 'Accept': 'application/json' } : { 'Accept': 'application/json' },
-    mode: 'cors'
-  }).then(r => {
-    if (r.ok) resultEl.innerHTML = '<span style="color:var(--green);">Connected! Status: ' + r.status + '</span>';
-    else resultEl.innerHTML = '<span style="color:var(--orange);">Responded with status ' + r.status + '</span>';
-  }).catch(e => {
+
+  // Test the base URL (strip /api/data if present) for health check
+  const baseUrl = url.replace(/\/api\/data\/?$/, '');
+  fetch(baseUrl, { method: 'GET', headers: { 'Accept': 'application/json' }, mode: 'cors' })
+  .then(r => r.json())
+  .then(json => {
+    let msg = '<span style="color:var(--green);">Connected!</span>';
+    if (json.service) msg += ' ' + json.service + ' v' + (json.version || '?');
+    if (json.lastSync) msg += ' · Last sync: ' + new Date(json.lastSync).toLocaleString();
+    if (json.agentLastSeen) msg += ' · Agent seen: ' + new Date(json.agentLastSeen).toLocaleString();
+    else if (json.status === 'idle') msg += ' · Waiting for data agent';
+    resultEl.innerHTML = msg;
+  })
+  .catch(e => {
     resultEl.innerHTML = '<span style="color:var(--red);">Connection failed: ' + (e.message || 'Network error') + '</span>';
   });
 }
 
 function syncNow() {
-  const src = document.getElementById('settingDataSource')?.value;
   const url = document.getElementById('settingApiUrl')?.value?.trim();
   const key = document.getElementById('settingApiKey')?.value?.trim();
   const resultEl = document.getElementById('dataSourceTestResult');
 
   if (!url) { resultEl.innerHTML = '<span style="color:var(--red);">Configure endpoint URL first.</span>'; return; }
 
-  resultEl.innerHTML = '<span style="color:var(--blue);">Syncing data...</span>';
+  resultEl.innerHTML = '<span style="color:var(--blue);">Syncing data from proxy...</span>';
 
-  // API adapter: fetch JSON data and convert to internal format
-  fetch(url, {
-    headers: key ? { 'Authorization': 'Bearer ' + key, 'Accept': 'application/json' } : { 'Accept': 'application/json' },
-    mode: 'cors'
-  }).then(r => r.json()).then(json => {
-    // The API adapter pattern: normalize external JSON to BPA's internal format
-    // Different POS systems return different shapes — the adapter handles the mapping
+  // Ensure URL points to /api/data
+  const dataUrl = url.includes('/api/data') ? url : url.replace(/\/?$/, '/api/data');
+
+  fetch(dataUrl, { headers: buildApiHeaders(key), mode: 'cors' })
+  .then(r => { if (!r.ok) throw new Error('Server returned ' + r.status); return r.json(); })
+  .then(json => {
+    let totalRows = 0;
+
+    // BPA Proxy format: { data: { customers: [...], details: [...], ... } }
+    if (json.data && typeof json.data === 'object' && !Array.isArray(json.data)) {
+      const typeMap = {
+        customers: 'customers', details: 'details', promos: 'promos',
+        inspections: 'inspections', invoices: 'invoices', odi: 'odi'
+      };
+      for (const [key, rows] of Object.entries(json.data)) {
+        if (!Array.isArray(rows) || rows.length === 0) continue;
+        const bpaType = typeMap[key] || key;
+        DATA[bpaType] = rows;
+        loadedFiles[bpaType] = true;
+        totalRows += rows.length;
+      }
+      resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + totalRows.toLocaleString() + ' records across ' + Object.keys(json.data).length + ' tables. Refreshing...</span>';
+      setTimeout(() => { applyFilters(); saveUserData(); }, 500);
+      return;
+    }
+
+    // Flat array format (generic API)
     if (Array.isArray(json)) {
-      // Flat array of records — try to detect type and store
       const headers = json.length ? Object.keys(json[0]) : [];
       const h = headers.join(',').toLowerCase();
       let type = 'unknown';
@@ -13660,8 +13690,7 @@ function syncNow() {
       else if (h.includes('store_number') && h.includes('net_sales')) type = 'customers';
 
       if (type.startsWith('grow_')) {
-        const growKey = type.replace('grow_', '');
-        GROW[growKey] = json;
+        GROW[type.replace('grow_', '')] = json;
         loadedFiles[type] = true;
       } else if (type !== 'unknown') {
         DATA[type] = json;
@@ -13669,17 +13698,21 @@ function syncNow() {
       }
       resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + json.length + ' records (' + type + '). Refreshing...</span>';
       setTimeout(() => { applyFilters(); saveUserData(); }, 500);
-    } else if (json.data && Array.isArray(json.data)) {
-      // Wrapper format: { data: [...], meta: {...} }
-      resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + json.data.length + ' records. Refreshing...</span>';
-      // Store as custom report
+      return;
+    }
+
+    // Wrapper array format: { data: [...] }
+    if (json.data && Array.isArray(json.data)) {
       CUSTOM_REPORTS.push({ name: 'API Sync ' + new Date().toLocaleDateString(), headers: Object.keys(json.data[0] || {}), rows: json.data });
       loadedFiles['custom_api_sync'] = true;
+      resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + json.data.length + ' records. Refreshing...</span>';
       setTimeout(() => { applyFilters(); saveUserData(); }, 500);
-    } else {
-      resultEl.innerHTML = '<span style="color:var(--orange);">Received data but format not recognized. Expected JSON array.</span>';
+      return;
     }
-  }).catch(e => {
+
+    resultEl.innerHTML = '<span style="color:var(--orange);">Received data but format not recognized.</span>';
+  })
+  .catch(e => {
     resultEl.innerHTML = '<span style="color:var(--red);">Sync failed: ' + (e.message || 'Error') + '</span>';
   });
 }
