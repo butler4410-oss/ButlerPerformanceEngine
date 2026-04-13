@@ -13707,8 +13707,37 @@ function syncNow() {
         loadedFiles[bpaType] = true;
         totalRows += rows.length;
       }
-      resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + totalRows.toLocaleString() + ' records across ' + Object.keys(json.data).length + ' tables. Refreshing...</span>';
-      setTimeout(() => { applyFilters(); saveUserData(); }, 500);
+      resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + totalRows.toLocaleString() + ' records across ' + Object.keys(json.data).length + ' tables. Launching dashboard...</span>';
+      setTimeout(() => {
+        try { saveUserData(); } catch(e) { console.warn('Save failed:', e.message); }
+        // Repopulate store filter + date range from synced data, then render
+        const stores = new Set();
+        [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(arr => {
+          arr.forEach(r => { const s = cleanStoreNum(r.Store_Number); if (validStore(s)) stores.add(s); });
+        });
+        const sel = document.getElementById('filterStore');
+        if (sel) {
+          sel.innerHTML = '<option value="">All Stores (' + stores.size + ')</option>';
+          [...stores].sort((a,b) => a.localeCompare(b, undefined, { numeric: true })).forEach(s => {
+            sel.innerHTML += '<option value="' + s + '">' + (typeof getStoreDisplayName === 'function' ? getStoreDisplayName(s) : '#' + s) + '</option>';
+          });
+        }
+        // Auto-detect date range from synced data
+        let minD = null, maxD = null;
+        [DATA.customers, DATA.details, DATA.promos].forEach(arr => {
+          arr.forEach(r => {
+            const d = parseDate(r.Invoice_Date || r.Update_Date || '');
+            if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; }
+          });
+        });
+        if (minD && maxD) {
+          document.getElementById('filterFrom').value = fmtDateISO(minD);
+          document.getElementById('filterTo').value = fmtDateISO(maxD);
+        }
+        applyFilters();
+        closeSettings();
+        console.info('API Sync complete:', totalRows, 'rows,', stores.size, 'stores, date range:', minD ? fmtDateISO(minD) : 'none', '→', maxD ? fmtDateISO(maxD) : 'none');
+      }, 300);
       return;
     }
 
