@@ -984,7 +984,11 @@
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     position: relative;
+    border-top: 3px solid var(--primary);
   }
+  .chart-card:nth-child(2n) { border-top-color: var(--green); }
+  .chart-card:nth-child(3n) { border-top-color: #7c3aed; }
+  .chart-card:nth-child(4n) { border-top-color: var(--orange); }
   .chart-card h3 {
     font-size: 12px;
     font-weight: 700;
@@ -1615,10 +1619,10 @@
 
   .bpa-insight:hover { background: var(--card-hover); }
 
-  .bpa-insight.critical { border-left-color: var(--red); }
-  .bpa-insight.warning { border-left-color: var(--orange); }
-  .bpa-insight.suggestion { border-left-color: var(--blue); }
-  .bpa-insight.positive { border-left-color: var(--green); }
+  .bpa-insight.critical { border-left-color: var(--red); background: linear-gradient(135deg, rgba(220,38,38,0.04) 0%, var(--card) 100%); }
+  .bpa-insight.warning { border-left-color: var(--orange); background: linear-gradient(135deg, rgba(234,88,12,0.04) 0%, var(--card) 100%); }
+  .bpa-insight.suggestion { border-left-color: var(--blue); background: linear-gradient(135deg, rgba(37,99,235,0.04) 0%, var(--card) 100%); }
+  .bpa-insight.positive { border-left-color: var(--green); background: linear-gradient(135deg, rgba(5,150,105,0.04) 0%, var(--card) 100%); }
 
   .bpa-insight-top {
     display: flex;
@@ -2318,10 +2322,25 @@
   }
   .ops-grid .totals-row td:first-child { background: var(--card-hover); }
 
-  /* Cell color coding */
-  .cell-green { background: rgba(5,150,105,0.06) !important; color: #059669; }
-  .cell-yellow { background: rgba(217,119,6,0.06) !important; color: #d97706; }
-  .cell-red { background: rgba(220,38,38,0.06) !important; color: #dc2626; }
+  /* Cell color coding — punched up from 6% to 12% for visibility */
+  .cell-green { background: rgba(5,150,105,0.12) !important; color: #059669; font-weight: 600; }
+  .cell-yellow { background: rgba(217,119,6,0.12) !important; color: #d97706; font-weight: 600; }
+  .cell-red { background: rgba(220,38,38,0.12) !important; color: #dc2626; font-weight: 600; }
+  .cell-blue { background: rgba(37,99,235,0.10) !important; color: #2563eb; font-weight: 600; }
+
+  /* KPI card accent variants — colored left border + subtle tint */
+  .kpi-card.kpi-revenue { border-left: 4px solid var(--primary); background: linear-gradient(135deg, rgba(30,64,175,0.04) 0%, var(--card) 100%); }
+  .kpi-card.kpi-green { border-left: 4px solid var(--green); background: linear-gradient(135deg, rgba(5,150,105,0.04) 0%, var(--card) 100%); }
+  .kpi-card.kpi-red { border-left: 4px solid var(--red); background: linear-gradient(135deg, rgba(220,38,38,0.03) 0%, var(--card) 100%); }
+  .kpi-card.kpi-blue { border-left: 4px solid var(--blue); background: linear-gradient(135deg, rgba(37,99,235,0.04) 0%, var(--card) 100%); }
+  .kpi-card.kpi-yellow { border-left: 4px solid var(--yellow); background: linear-gradient(135deg, rgba(217,119,6,0.04) 0%, var(--card) 100%); }
+  .kpi-card.kpi-orange { border-left: 4px solid var(--orange); background: linear-gradient(135deg, rgba(234,88,12,0.04) 0%, var(--card) 100%); }
+  .kpi-card.kpi-purple { border-left: 4px solid #7c3aed; background: linear-gradient(135deg, rgba(124,58,237,0.04) 0%, var(--card) 100%); }
+
+  /* KPI value color variants */
+  .kpi-value.val-green { color: var(--green); }
+  .kpi-value.val-red { color: var(--red); }
+  .kpi-value.val-blue { color: var(--blue); }
 
   /* Today Snapshot */
   .today-snapshot {
@@ -7623,20 +7642,20 @@ function renderOverview() {
     }
     // Build KPI array and only show tiles with actual data
     const kpis = [];
-    kpis.push({ label: 'Net Sales', value: money(totalRev), sub: hasTransactions ? 'transaction total' : 'GROW adjusted', show: totalRev > 0 });
-    kpis.push({ label: 'Cars / Day', value: carsPerDay ? carsPerDay.toFixed(1) : '--', sub: storeSet.size > 1 ? 'per store avg' : 'daily avg', show: carsPerDay > 0 });
-    kpis.push({ label: 'Ticket Average', value: money(avgTicket), sub: 'net sales / car', show: avgTicket > 0 });
-    kpis.push({ label: 'Vehicles Serviced', value: totalInv ? num(totalInv) : '--', sub: 'total invoices', show: totalInv > 0 });
-    kpis.push({ label: 'Active Stores', value: storeSet.size || '--', sub: 'reporting', show: storeSet.size > 0 });
+    kpis.push({ label: 'Net Sales', value: money(totalRev), sub: hasTransactions ? 'transaction total' : 'GROW adjusted', show: totalRev > 0, accent: 'kpi-revenue' });
+    kpis.push({ label: 'Cars / Day', value: carsPerDay ? carsPerDay.toFixed(1) : '--', sub: storeSet.size > 1 ? 'per store avg' : 'daily avg', show: carsPerDay > 0, accent: 'kpi-blue' });
+    kpis.push({ label: 'Ticket Average', value: money(avgTicket), sub: 'net sales / car', show: avgTicket > 0, accent: 'kpi-green' });
+    kpis.push({ label: 'Vehicles Serviced', value: totalInv ? num(totalInv) : '--', sub: 'total invoices', show: totalInv > 0, accent: 'kpi-purple' });
+    kpis.push({ label: 'Active Stores', value: storeSet.size || '--', sub: 'reporting', show: storeSet.size > 0, accent: 'kpi-orange' });
     if (yoyChange != null) {
       const color = yoyChange >= 0 ? 'var(--green)' : 'var(--red)';
       const arrow = yoyChange >= 0 ? '&#9650;' : '&#9660;';
-      kpis.push({ label: 'YoY Change', value: `<span style="color:${color};">${arrow} ${pct(Math.abs(yoyChange))}</span>`, sub: 'vs prior comp', show: true });
+      kpis.push({ label: 'YoY Change', value: `<span style="color:${color};">${arrow} ${pct(Math.abs(yoyChange))}</span>`, sub: 'vs prior comp', show: true, accent: yoyChange >= 0 ? 'kpi-green' : 'kpi-red' });
     } else if (repeatPct != null) {
-      kpis.push({ label: 'Repeat Customers', value: pct(repeatPct), sub: 'multi-visit', show: repeatPct > 0 });
+      kpis.push({ label: 'Repeat Customers', value: pct(repeatPct), sub: 'multi-visit', show: repeatPct > 0, accent: 'kpi-yellow' });
     }
     kpiEl.innerHTML = kpis.filter(k => k.show).map(k =>
-      `<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`
+      `<div class="kpi-card ${k.accent || ''}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`
     ).join('');
   }
 
@@ -11872,13 +11891,15 @@ function openStoreDetail(storeNum) {
   const inspPurchased = inspBad.filter(r => r.Purchased_This_Visit === 'True');
   const convRate = inspBad.length ? (inspPurchased.length / inspBad.length * 100) : 0;
 
+  const emailClass = emailPct >= 50 ? 'kpi-green' : emailPct >= 30 ? 'kpi-yellow' : 'kpi-red';
+  const convClass = convRate >= 40 ? 'kpi-green' : convRate >= 20 ? 'kpi-yellow' : 'kpi-orange';
   document.getElementById('storeDetailKPIs').innerHTML = `
-    <div class="kpi-card"><div class="kpi-label">Store #${storeNum}</div><div class="kpi-value">${money(totalRev)}</div><div class="kpi-sub">net revenue</div></div>
-    <div class="kpi-card"><div class="kpi-label">Vehicles</div><div class="kpi-value">${num(cust.length)}</div><div class="kpi-sub">${money(avgTicket)} avg ticket</div></div>
-    <div class="kpi-card"><div class="kpi-label">Avg Bay Time</div><div class="kpi-value">${avgBay.toFixed(1)} min</div><div class="kpi-sub">${avgWait.toFixed(1)} min wait</div></div>
-    <div class="kpi-card"><div class="kpi-label">Email Capture</div><div class="kpi-value">${pct(emailPct)}</div><div class="kpi-sub">${num(withEmail)} of ${num(cust.length)}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Inspections</div><div class="kpi-value">${num(inspChecked.length)}</div><div class="kpi-sub">${pct(convRate)} upsell conv.</div></div>
-    <div class="kpi-card"><div class="kpi-label">Promos</div><div class="kpi-value">${num(promo.length)}</div><div class="kpi-sub">${money(promo.reduce((s,r) => s+(+r.Promo_Amount||0), 0))} total</div></div>
+    <div class="kpi-card kpi-revenue"><div class="kpi-label">Store #${storeNum}</div><div class="kpi-value">${money(totalRev)}</div><div class="kpi-sub">net revenue</div></div>
+    <div class="kpi-card kpi-purple"><div class="kpi-label">Vehicles</div><div class="kpi-value">${num(cust.length)}</div><div class="kpi-sub">${money(avgTicket)} avg ticket</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Avg Bay Time</div><div class="kpi-value">${avgBay.toFixed(1)} min</div><div class="kpi-sub">${avgWait.toFixed(1)} min wait</div></div>
+    <div class="kpi-card ${emailClass}"><div class="kpi-label">Email Capture</div><div class="kpi-value">${pct(emailPct)}</div><div class="kpi-sub">${num(withEmail)} of ${num(cust.length)}</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Inspections</div><div class="kpi-value">${num(inspChecked.length)}</div><div class="kpi-sub">${pct(convRate)} upsell conv.</div></div>
+    <div class="kpi-card ${convClass}"><div class="kpi-label">Promos</div><div class="kpi-value">${num(promo.length)}</div><div class="kpi-sub">${money(promo.reduce((s,r) => s+(+r.Promo_Amount||0), 0))} total</div></div>
   `;
 
   document.getElementById('storeDetailChartTitle1').textContent = 'Service Time Distribution \u2014 Store #' + storeNum;
@@ -12392,20 +12413,31 @@ function renderStores() {
   });
 
   const rows = Object.entries(storeMap).sort((a,b) => b[1].rev - a[1].rev);
+  // Calculate averages for conditional coloring
+  const allTickets = rows.map(([,r]) => r.inv ? r.rev / r.inv : 0).filter(v => v > 0);
+  const avgTicketAll = allTickets.length ? allTickets.reduce((a,b) => a+b, 0) / allTickets.length : 0;
+  const allTimes = rows.map(([,r]) => r.times.length ? r.times.reduce((a,b) => a+b, 0) / r.times.length : 0).filter(v => v > 0);
+  const avgTimeAll = allTimes.length ? allTimes.reduce((a,b) => a+b, 0) / allTimes.length : 0;
+
   document.querySelector('#tblStores tbody').innerHTML = rows.map(([store, r]) => {
     const avgTicket = r.inv ? r.rev / r.inv : 0;
-    const avgTime = r.times.length ? (r.times.reduce((a,b) => a+b, 0) / r.times.length).toFixed(1) + ' min' : '—';
+    const avgTimeVal = r.times.length ? r.times.reduce((a,b) => a+b, 0) / r.times.length : 0;
+    const avgTime = avgTimeVal > 0 ? avgTimeVal.toFixed(1) + ' min' : '\u2014';
     const yrPct = r.inspTotal ? (r.inspBad / r.inspTotal * 100) : 0;
+    // Color-code: ticket vs average, time (lower=better), yellow/red inspection %
+    const ticketClass = avgTicket >= avgTicketAll * 1.1 ? 'cell-green' : avgTicket < avgTicketAll * 0.9 ? 'cell-red' : '';
+    const timeClass = avgTimeVal > 0 ? (avgTimeVal <= avgTimeAll * 0.9 ? 'cell-green' : avgTimeVal >= avgTimeAll * 1.2 ? 'cell-yellow' : '') : '';
+    const yrClass = yrPct > 30 ? 'cell-red' : yrPct > 20 ? 'cell-yellow' : yrPct > 0 ? 'cell-green' : '';
     return `<tr class="clickable-row" onclick="openStoreRankDetail('${store}')">
       <td><strong>#${store}</strong></td>
       <td>${num(r.inv)}</td>
-      <td>${money(r.rev)}</td>
-      <td>${money(avgTicket)}</td>
-      <td>${avgTime}</td>
+      <td style="font-weight:600;">${money(r.rev)}</td>
+      <td class="${ticketClass}">${money(avgTicket)}</td>
+      <td class="${timeClass}">${avgTime}</td>
       <td>${num(r.promoUses)}</td>
       <td>${money(r.promoDisc)}</td>
       <td>${num(r.inspTotal)}</td>
-      <td>${pct(yrPct)}</td>
+      <td class="${yrClass}">${pct(yrPct)}</td>
     </tr>`;
   }).join('');
 }
