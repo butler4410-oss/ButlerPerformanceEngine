@@ -6,7 +6,7 @@
 <title>Butler Performance Analytics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@300;400;600&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -30,6 +30,17 @@
     --blue: #2563eb;
     --nav-height: 0px;
     --surface-glass: rgba(255,255,255,0.9);
+    /* Masters-inspired additions */
+    --flash: #fce300;
+    --flash-bg: rgba(252,227,0,0.12);
+    --depth-1: 0 1px 2px rgba(0,0,0,0.06);
+    --depth-2: 0 2px 8px rgba(0,0,0,0.05);
+    --depth-3: 0 4px 12px rgba(0,0,0,0.08);
+    --depth-4: 0 8px 24px rgba(0,0,0,0.1);
+    --font-display: 'Oswald', sans-serif;
+    --font-serif: 'IBM Plex Serif', Georgia, serif;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -2593,6 +2604,529 @@
   /* GROW reports use CSS vars — no dark-mode overrides needed */
 
   /* ═══════════════════════════════════════════
+     MASTERS-INSPIRED BROADCAST DESIGN SYSTEM
+     ═══════════════════════════════════════════ */
+
+  /* ── Keyframe Animations ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeAndScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slideInFromLeft {
+    from { opacity: 0; transform: translateX(-24px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideInFromRight {
+    from { opacity: 0; transform: translateX(24px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes growBar {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  @keyframes growVerticalBar {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+  @keyframes colorFlash {
+    0% { background-color: var(--flash-bg); }
+    100% { background-color: transparent; }
+  }
+  @keyframes valueFlash {
+    0% { color: var(--flash); text-shadow: 0 0 8px rgba(252,227,0,0.4); }
+    100% { color: inherit; text-shadow: none; }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes bannerSlideIn {
+    from { opacity: 0; transform: translateY(-100%); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseRing {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Scroll-Reveal Sections ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Staggered children — cinematic cascade */
+  .reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
+  }
+  .reveal-stagger.visible > *:nth-child(1) { transition-delay: 0.05s; }
+  .reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.12s; }
+  .reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.19s; }
+  .reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.26s; }
+  .reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.33s; }
+  .reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.40s; }
+  .reveal-stagger.visible > *:nth-child(7) { transition-delay: 0.47s; }
+  .reveal-stagger.visible > *:nth-child(8) { transition-delay: 0.54s; }
+  .reveal-stagger.visible > *:nth-child(9) { transition-delay: 0.61s; }
+  .reveal-stagger.visible > *:nth-child(10) { transition-delay: 0.68s; }
+  .reveal-stagger.visible > *:nth-child(n+11) { transition-delay: 0.75s; }
+  .reveal-stagger.visible > * {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── View Transitions (cinematic crossfade) ── */
+  .view-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-out-expo);
+  }
+  .view-content.active {
+    display: block;
+    animation: fadeInUp 0.4s var(--ease-out-expo) forwards;
+  }
+  .view-content.exiting {
+    display: block;
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+  }
+
+  /* ── Typography: Display Numbers (Oswald) ── */
+  .kpi-value {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+  .grow-kpi-value {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+  }
+  .report-card-metric {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+  }
+  .today-stat-value {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+  }
+
+  /* ── Typography: Editorial Serif ── */
+  .bpa-insight .bpa-msg {
+    font-family: var(--font-serif);
+    font-size: 13.5px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+  .bpa-insight .bpa-msg strong {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+  }
+  .bpa-insight .bpa-msg .bpa-detail {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+  }
+
+  /* ── Value Flash Animation ── */
+  .kpi-value.flash {
+    animation: valueFlash 1.2s ease-out;
+  }
+  .ops-grid td.flash {
+    animation: colorFlash 1.5s ease-out;
+  }
+  .cell-flash {
+    animation: colorFlash 1.5s ease-out;
+  }
+
+  /* ── Live Pulse Indicator ── */
+  .live-pulse {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--green);
+  }
+  .live-pulse::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    position: relative;
+  }
+  .live-pulse::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulseRing 2s ease-out infinite;
+    left: 0;
+  }
+  .live-dot-inline {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    animation: breathe 2s ease-in-out infinite;
+    margin-right: 4px;
+  }
+
+  /* ── Skeleton Loading ── */
+  .skeleton {
+    background: linear-gradient(90deg, var(--border) 25%, rgba(255,255,255,0.5) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+    border-radius: 6px;
+    color: transparent !important;
+    pointer-events: none;
+    user-select: none;
+  }
+  .skeleton * { visibility: hidden; }
+  .skeleton-line {
+    height: 12px;
+    background: linear-gradient(90deg, var(--border) 25%, rgba(255,255,255,0.5) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .skeleton-line.short { width: 60%; }
+  .skeleton-line.medium { width: 80%; }
+  .skeleton-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, var(--border) 25%, rgba(255,255,255,0.5) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  /* ── View Heroes ── */
+  .view-hero {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .view-hero-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    animation: fadeInUp 0.5s var(--ease-out-expo) forwards;
+  }
+  .view-hero-sub {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    animation: fadeInUp 0.6s var(--ease-out-expo) 0.1s both;
+  }
+  .view-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+    animation: fadeInUp 0.7s var(--ease-out-expo) 0.2s both;
+  }
+  .view-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    background: rgba(30,64,175,0.06);
+    border: 1px solid rgba(30,64,175,0.12);
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary);
+  }
+
+  /* ── SVG Icon System ── */
+  .ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+  }
+  .ico svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── Refined Shadows (Masters-grade subtle depth) ── */
+  .kpi-card {
+    box-shadow: var(--depth-1);
+  }
+  .kpi-card:hover {
+    box-shadow: var(--depth-3);
+  }
+  .chart-card {
+    box-shadow: var(--depth-1);
+  }
+  .table-wrap {
+    box-shadow: var(--depth-1);
+  }
+  .ops-grid-wrap {
+    box-shadow: var(--depth-1);
+  }
+  .report-card {
+    box-shadow: var(--depth-2);
+  }
+  .report-card:hover {
+    box-shadow: var(--depth-4);
+  }
+  .modal {
+    box-shadow: var(--depth-4);
+  }
+  .bpa-panel {
+    box-shadow: var(--depth-1);
+  }
+
+  /* ── KPI Card Entrance Animation ── */
+  .kpi-grid {
+    perspective: 800px;
+  }
+  .kpi-card {
+    animation: cardFadeIn 0.4s var(--ease-out-expo) both;
+  }
+  .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.2s; }
+  .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+  .kpi-card:nth-child(6) { animation-delay: 0.3s; }
+  .kpi-card:nth-child(7) { animation-delay: 0.35s; }
+  .kpi-card:nth-child(8) { animation-delay: 0.4s; }
+
+  /* ── Ops Grid Row Entrance ── */
+  .ops-grid tbody tr {
+    animation: fadeInUp 0.3s var(--ease-out-expo) both;
+  }
+  .ops-grid tbody tr:nth-child(1) { animation-delay: 0.02s; }
+  .ops-grid tbody tr:nth-child(2) { animation-delay: 0.04s; }
+  .ops-grid tbody tr:nth-child(3) { animation-delay: 0.06s; }
+  .ops-grid tbody tr:nth-child(4) { animation-delay: 0.08s; }
+  .ops-grid tbody tr:nth-child(5) { animation-delay: 0.10s; }
+  .ops-grid tbody tr:nth-child(6) { animation-delay: 0.12s; }
+  .ops-grid tbody tr:nth-child(7) { animation-delay: 0.14s; }
+  .ops-grid tbody tr:nth-child(8) { animation-delay: 0.16s; }
+  .ops-grid tbody tr:nth-child(9) { animation-delay: 0.18s; }
+  .ops-grid tbody tr:nth-child(10) { animation-delay: 0.20s; }
+  .ops-grid tbody tr:nth-child(n+11) { animation-delay: 0.22s; }
+
+  /* ── Chart Card Entrance ── */
+  .chart-card {
+    animation: fadeAndScale 0.5s var(--ease-out-expo) 0.3s both;
+  }
+
+  /* ── BPA Insight Entrance ── */
+  .bpa-insight {
+    animation: slideInFromLeft 0.4s var(--ease-out-expo) both;
+  }
+  .bpa-insight:nth-child(1) { animation-delay: 0.1s; }
+  .bpa-insight:nth-child(2) { animation-delay: 0.2s; }
+  .bpa-insight:nth-child(3) { animation-delay: 0.3s; }
+  .bpa-insight:nth-child(4) { animation-delay: 0.4s; }
+  .bpa-insight:nth-child(5) { animation-delay: 0.5s; }
+
+  /* ── Section Title Styling (Masters-style) ── */
+  .ops-grid-wrap > h3 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── Report Card Animation ── */
+  .report-card {
+    animation: cardFadeIn 0.4s var(--ease-out-expo) both;
+  }
+  .report-cards .report-card:nth-child(1) { animation-delay: 0.05s; }
+  .report-cards .report-card:nth-child(2) { animation-delay: 0.12s; }
+  .report-cards .report-card:nth-child(3) { animation-delay: 0.19s; }
+  .report-cards .report-card:nth-child(4) { animation-delay: 0.26s; }
+  .report-cards .report-card:nth-child(5) { animation-delay: 0.33s; }
+  .report-cards .report-card:nth-child(6) { animation-delay: 0.40s; }
+
+  /* ── BPA Panel: Broadcast-style left accent ── */
+  .bpa-panel {
+    border-left: 3px solid var(--primary);
+    position: relative;
+    overflow: hidden;
+  }
+  .bpa-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(30,64,175,0.02) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ── "Built with" AI badge (Masters watsonx style) ── */
+  .bpa-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-left: auto;
+  }
+
+  /* ── Nav View Button: Broadcast-style active underline ── */
+  .view-btn.active {
+    position: relative;
+  }
+  .view-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background: white;
+    border-radius: 1px;
+    animation: fadeInUp 0.3s var(--ease-out-expo);
+  }
+
+  /* ── Granular Em-Based Responsive Breakpoints ── */
+  @media only screen and (max-width: 89.9375em) {
+    .view-hero-title { font-size: 24px; }
+    .kpi-value { font-size: 22px; }
+  }
+  @media only screen and (max-width: 74.9375em) {
+    .charts-row { gap: 14px; }
+    .ops-grid td { padding: 7px 8px; font-size: 11px; }
+    .ops-grid th { padding: 8px 8px; }
+  }
+  @media only screen and (max-width: 63.9375em) {
+    .view-hero-title { font-size: 22px; }
+    .view-hero-sub { font-size: 13px; }
+    .kpi-card { padding: 14px 16px; }
+    .bpa-insight { padding: 12px 14px; font-size: 12.5px; }
+    .chart-wrap { height: 260px; }
+  }
+  @media only screen and (max-width: 47.9375em) {
+    .view-hero-title { font-size: 20px; }
+    .kpi-value { font-size: 20px; }
+    .grow-kpi-value { font-size: 22px; }
+    .ops-grid td { font-size: 11px; padding: 6px 6px; }
+    .ops-grid th { font-size: 9px; padding: 6px 6px; }
+    .dashboard { padding: 16px; }
+    .chart-wrap { height: 200px; }
+    .bpa-panel { padding: 14px 16px; }
+    .report-card { padding: 16px; }
+    .report-card-metric { font-size: 20px; }
+    .modal { padding: 20px 24px; border-radius: 12px; }
+    .nav-tier1 { padding: 0 12px; }
+    .nav-tier2 { padding: 0 12px; }
+  }
+  @media only screen and (max-width: 41.6875em) {
+    .view-hero { margin-bottom: 14px; padding-bottom: 12px; }
+    .kpi-grid { gap: 8px; }
+    .ops-grid-wrap > h3 { font-size: 14px; padding: 12px 16px; }
+    .table-scroll { max-height: 350px; }
+  }
+  @media only screen and (max-width: 30em) {
+    .view-hero-title { font-size: 18px; }
+    .kpi-value { font-size: 18px; }
+    .report-card-icon { width: 36px; height: 36px; font-size: 15px; }
+    .bpa-insight { font-size: 12px; }
+    .chart-wrap { height: 180px; }
+  }
+  @media only screen and (max-width: 23.4375em) {
+    .dashboard { padding: 10px; }
+    .kpi-card { padding: 10px 12px; min-width: 100px; }
+    .kpi-label { font-size: 9px; }
+    .nav-views { gap: 0; padding: 2px; }
+    .view-btn { padding: 5px 8px; font-size: 10px; }
+  }
+  /* Height-aware: landscape phones */
+  @media only screen and (max-height: 37.5em) and (max-width: 63.9375em) {
+    .chart-wrap { height: 160px; }
+    .ops-grid-scroll { max-height: 40vh; }
+    .kpi-card { padding: 10px 14px; }
+  }
+  /* Large displays: breathe */
+  @media only screen and (min-width: 90em) {
+    .dashboard { padding: 32px 40px; }
+    .kpi-value { font-size: 28px; }
+    .view-hero-title { font-size: 32px; }
+    .ops-grid td { padding: 10px 14px; }
+  }
+  @media only screen and (min-width: 120em) {
+    .dashboard { padding: 40px 56px; }
+    .kpi-card { padding: 20px 24px; }
+    .chart-wrap { height: 400px; }
+  }
+
+  /* Reduced motion: respect user preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal { opacity: 1; transform: none; }
+    .reveal-stagger > * { opacity: 1; transform: none; }
+  }
+
+  /* ═══════════════════════════════════════════
      ACCESSIBILITY & UX ADDITIONS
      ═══════════════════════════════════════════ */
 
@@ -2971,10 +3505,10 @@
           <div class="user-menu-name" id="userMenuName"></div>
           <div class="user-menu-email" id="userMenuEmail"></div>
         </div>
-        <button class="user-menu-item" role="menuitem" onclick="openSettings();closeUserMenu();">&#9881; Settings</button>
-        <button class="user-menu-item" role="menuitem" onclick="openAuditLog();closeUserMenu();">&#128203; Audit Log</button>
+        <button class="user-menu-item" role="menuitem" onclick="openSettings();closeUserMenu();"><span class="ico" style="font-size:15px;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg></span> Settings</button>
+        <button class="user-menu-item" role="menuitem" onclick="openAuditLog();closeUserMenu();"><span class="ico" style="font-size:15px;"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Audit Log</button>
         <div class="user-menu-sep" role="separator"></div>
-        <button class="user-menu-item danger" role="menuitem" onclick="doLogout()">&#10140; Sign Out</button>
+        <button class="user-menu-item danger" role="menuitem" onclick="doLogout()"><span class="ico" style="font-size:15px;"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Sign Out</button>
       </div>
     </div>
   </div>
@@ -3003,8 +3537,8 @@
     <button id="dataSavedBadge" class="data-saved-pill" onclick="bpaConfirm('Clear saved data and re-upload?',clearUserData)" title="Click to clear and re-upload">
       <span class="data-saved-dot" aria-hidden="true"></span> Saved
     </button>
-    <button class="nav-util-btn" onclick="openSettings()" aria-label="Settings"><span aria-hidden="true">&#9881;</span></button>
-    <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" aria-label="Performance Alerts"><span aria-hidden="true">&#9888;</span></button>
+    <button class="nav-util-btn" onclick="openSettings()" aria-label="Settings"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span></button>
+    <button class="nav-util-btn admin-only" id="alertsBtn" onclick="openAlerts()" aria-label="Performance Alerts"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span></button>
   </div>
 </nav>
 
@@ -3369,17 +3903,27 @@
 
   <!-- MY BUSINESS VIEW -->
   <div class="view-content active" id="view-business" role="tabpanel" aria-labelledby="tab-business">
+    <!-- View Hero -->
+    <div class="view-hero">
+      <div class="view-hero-title">My Business</div>
+      <div class="view-hero-sub">Performance overview across all locations</div>
+      <div class="view-hero-meta">
+        <span class="view-hero-badge"><span class="live-dot-inline"></span> Live Data</span>
+        <span class="bpa-ai-badge">Insights by BPA Engine</span>
+      </div>
+    </div>
+
     <!-- Alert banner (compact) -->
     <div class="alert-banner" id="alertBanner" onclick="openAlerts()">
       <span style="color:var(--yellow);font-weight:700;" id="alertBannerCount"></span>
       <span style="color:var(--text-muted);flex:1;" id="alertBannerSummary"></span>
-      <button onclick="event.stopPropagation();this.parentElement.style.display='none';" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:0 4px;">&times;</button>
+      <button onclick="event.stopPropagation();this.parentElement.style.display='none';" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:0 4px;" aria-label="Dismiss alert">&times;</button>
     </div>
 
     <!-- Split: KPIs left + Insights right -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
       <div>
-        <div class="kpi-grid" id="dashKPIs" style="margin-bottom:0;"></div>
+        <div class="kpi-grid reveal-stagger" id="dashKPIs" style="margin-bottom:0;"></div>
       </div>
       <div>
         <div class="bpa-panel" id="bpaOverview" style="margin:0;max-height:220px;overflow-y:auto;"></div>
@@ -3387,7 +3931,7 @@
     </div>
 
     <!-- Store Rankings (HERO — fills viewport) -->
-    <div class="ops-grid-wrap" style="margin-bottom:12px;">
+    <div class="ops-grid-wrap reveal" style="margin-bottom:12px;">
       <h3>
         Store Performance
         <div style="display:flex;gap:8px;align-items:center;">
@@ -3411,7 +3955,7 @@
     </div>
 
     <!-- Charts row (compact) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div class="chart-card"><h3>Revenue Trend</h3><div class="chart-wrap" style="height:180px;"><canvas id="chartDashRevenue"></canvas></div></div>
       <div class="chart-card"><h3>Daily Volume</h3><div class="chart-wrap" style="height:180px;"><canvas id="chartDashVolume"></canvas></div></div>
     </div>
@@ -3470,6 +4014,10 @@
 
   <!-- OPERATIONS TAB -->
   <div class="view-content" id="view-stores" role="tabpanel" aria-labelledby="tab-stores">
+    <div class="view-hero">
+      <div class="view-hero-title">My Stores</div>
+      <div class="view-hero-sub">Operational intelligence by location</div>
+    </div>
     <div class="ops-quick-filters" id="opsQuickFilters">
       <span style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-right:6px;">Range:</span>
       <button class="ops-quick-btn" onclick="setOpsDateRange('YTD')">YTD</button>
@@ -3607,8 +4155,12 @@
 
   <!-- GROWTH VIEW -->
   <div class="view-content" id="view-growth" role="tabpanel" aria-labelledby="tab-growth">
+    <div class="view-hero">
+      <div class="view-hero-title">Growth</div>
+      <div class="view-hero-sub">Forecast, targets, and growth prescriptions</div>
+    </div>
     <!-- Header row -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+    <div class="reveal" style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
       <select id="fcStoreSelect" class="cmd-select" style="min-width:180px;" onchange="renderForecastView()">
         <option value="">All Stores (Company-Wide)</option>
       </select>
@@ -3671,7 +4223,11 @@
 
   <!-- DATA ROOM VIEW -->
   <div class="view-content" id="view-dataroom" role="tabpanel" aria-labelledby="tab-dataroom">
-    <div class="kpi-grid" id="reportingKPIs"></div>
+    <div class="view-hero">
+      <div class="view-hero-title">Data Room</div>
+      <div class="view-hero-sub">Products, services, and deep-dive analytics</div>
+    </div>
+    <div class="kpi-grid reveal-stagger" id="reportingKPIs"></div>
 
     <!-- Product & Service Analysis -->
     <div class="ops-grid-wrap" style="margin-bottom:12px;">
@@ -14242,6 +14798,108 @@ function removeCustomReport(idx) {
     console.error('Init auth error:', e);
   }
   document.getElementById('loadingScreen').classList.add('hidden');
+})();
+
+// ============================================================
+// MASTERS-INSPIRED: Scroll Reveal (IntersectionObserver)
+// ============================================================
+(function() {
+  const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
+  if (!revealEls.length) return;
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  revealEls.forEach(function(el) { observer.observe(el); });
+  // Re-observe when views switch (new content appears)
+  window._bpaRevealObserver = observer;
+})();
+
+function bpaObserveReveals() {
+  if (!window._bpaRevealObserver) return;
+  document.querySelectorAll('.reveal:not(.visible), .reveal-stagger:not(.visible)').forEach(function(el) {
+    window._bpaRevealObserver.observe(el);
+  });
+}
+
+// ============================================================
+// MASTERS-INSPIRED: View Transition (cinematic crossfade)
+// ============================================================
+(function() {
+  // Override view button clicks for smooth transitions
+  document.querySelectorAll('.view-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const target = this.dataset.view;
+      if (!target) return;
+      // Find currently active view
+      const current = document.querySelector('.view-content.active');
+      const next = document.getElementById('view-' + target);
+      if (!next || current === next) return;
+      // Crossfade
+      if (current) {
+        current.style.opacity = '0';
+        current.style.transition = 'opacity 0.15s ease-out';
+        setTimeout(function() {
+          current.classList.remove('active');
+          current.style.opacity = '';
+          current.style.transition = '';
+          next.classList.add('active');
+          // Re-observe reveals in new view
+          setTimeout(bpaObserveReveals, 50);
+        }, 150);
+      } else {
+        next.classList.add('active');
+        setTimeout(bpaObserveReveals, 50);
+      }
+    });
+  });
+})();
+
+// ============================================================
+// MASTERS-INSPIRED: KPI Value Flash
+// ============================================================
+function flashKPIValue(el) {
+  if (!el) return;
+  el.classList.remove('flash');
+  void el.offsetWidth; // force reflow
+  el.classList.add('flash');
+}
+
+function flashCell(td) {
+  if (!td) return;
+  td.classList.remove('cell-flash');
+  void td.offsetWidth;
+  td.classList.add('cell-flash');
+}
+
+// Hook into KPI rendering — flash values when they change
+(function() {
+  const _origInner = HTMLElement.prototype.insertAdjacentHTML;
+  // Monitor KPI grids for content changes
+  const kpiGrids = ['dashKPIs', 'opsKPIs', 'storeDetailKPIs', 'fcBaselineKPIs', 'reportingKPIs'];
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList' && m.addedNodes.length) {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) {
+            var vals = node.querySelectorAll ? node.querySelectorAll('.kpi-value') : [];
+            vals.forEach(function(v) { flashKPIValue(v); });
+          }
+        });
+      }
+    });
+  });
+  // Observe after DOM is ready
+  setTimeout(function() {
+    kpiGrids.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) observer.observe(el, { childList: true, subtree: true });
+    });
+  }, 500);
 })();
 
 // ============================================================
