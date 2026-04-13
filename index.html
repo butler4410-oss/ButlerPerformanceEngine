@@ -13686,7 +13686,8 @@ function syncNow() {
   resultEl.innerHTML = '<span style="color:var(--blue);">Syncing data from proxy...</span>';
 
   // Ensure URL points to /api/data
-  const dataUrl = url.includes('/api/data') ? url : url.replace(/\/?$/, '/api/data');
+  let dataUrl = url.includes('/api/data') ? url : url.replace(/\/?$/, '/api/data');
+  if (!dataUrl.includes('limit=')) dataUrl += (dataUrl.includes('?') ? '&' : '?') + 'limit=10000';
 
   fetch(dataUrl, { headers: buildApiHeaders(key), mode: 'cors' })
   .then(r => { if (!r.ok) throw new Error('Server returned ' + r.status); return r.json(); })
