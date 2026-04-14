@@ -14173,52 +14173,63 @@ async function seedDefaultUser() {
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 5 * 60 * 1000;
 
+const AUTH_URL = 'https://dds.butleranalytics.io';
+
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const password = document.getElementById('loginPassword').value;
   const errorEl = document.getElementById('loginError');
 
   if (!email || !password) { errorEl.textContent = 'Please enter email and password.'; return; }
+  errorEl.textContent = '';
 
-  const users = getUsers();
-  const user = users.find(u => u.email.toLowerCase() === email);
+  try {
+    // Server-side authentication via JWT
+    const resp = await fetch(AUTH_URL + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await resp.json();
 
-  if (!user) { logAudit('LOGIN_FAILED', email, 'Unknown email'); errorEl.textContent = 'Invalid email or password.'; return; }
-
-  // Check lockout
-  if (user.lockedUntil && Date.now() < user.lockedUntil) {
-    const mins = Math.ceil((user.lockedUntil - Date.now()) / 60000);
-    logAudit('LOGIN_BLOCKED', email, 'Account locked');
-    errorEl.textContent = 'Account locked. Try again in ' + mins + ' minute' + (mins > 1 ? 's' : '') + '.';
-    return;
-  }
-
-  // Hash and compare
-  const hash = await hashPassword(password, user.salt);
-  if (hash !== user.passwordHash) {
-    user.failedAttempts = (user.failedAttempts || 0) + 1;
-    if (user.failedAttempts >= MAX_ATTEMPTS) {
-      user.lockedUntil = Date.now() + LOCKOUT_MS;
-      user.failedAttempts = 0;
-      logAudit('ACCOUNT_LOCKED', email, 'Too many failed attempts');
-      errorEl.textContent = 'Too many failed attempts. Account locked for 5 minutes.';
-    } else {
-      logAudit('LOGIN_FAILED', email, 'Wrong password (' + user.failedAttempts + '/' + MAX_ATTEMPTS + ')');
-      errorEl.textContent = 'Invalid email or password. (' + (MAX_ATTEMPTS - user.failedAttempts) + ' attempts remaining)';
+    if (!resp.ok) {
+      errorEl.textContent = data.error || 'Invalid email or password.';
+      logAudit('LOGIN_FAILED', email, data.error || 'Server rejected');
+      return;
     }
+
+    // Store JWT token + user profile
+    const user = data.user;
+    sessionStorage.setItem('bp_session', JSON.stringify({
+      token: data.token,
+      user: user,
+      expires: Date.now() + (8 * 60 * 60 * 1000),
+      created: Date.now()
+    }));
+    logAudit('LOGIN_SUCCESS', email, user.name + ' (' + user.role + ')');
+    document.getElementById('loginScreen').classList.add('hidden');
+  } catch (e) {
+    // Fallback to localStorage auth if server unreachable
+    console.warn('Server auth failed, trying local fallback:', e.message);
+    const users = getUsers();
+    const user = users.find(u => u.email.toLowerCase() === email);
+    if (!user) { errorEl.textContent = 'Server unavailable and no local account found.'; return; }
+    if (user.lockedUntil && Date.now() < user.lockedUntil) {
+      errorEl.textContent = 'Account locked. Try again later.'; return;
+    }
+    const hash = await hashPassword(password, user.salt);
+    if (hash !== user.passwordHash) {
+      user.failedAttempts = (user.failedAttempts || 0) + 1;
+      if (user.failedAttempts >= MAX_ATTEMPTS) { user.lockedUntil = Date.now() + LOCKOUT_MS; user.failedAttempts = 0; }
+      saveUsers(users);
+      errorEl.textContent = 'Invalid email or password.'; return;
+    }
+    user.failedAttempts = 0; user.lockedUntil = null; user.lastLogin = new Date().toISOString();
     saveUsers(users);
-    return;
+    setSession(user);
+    logAudit('LOGIN_SUCCESS', email, user.name + ' (local fallback)');
+    document.getElementById('loginScreen').classList.add('hidden');
   }
-
-  // Success — reset failed attempts
-  user.failedAttempts = 0;
-  user.lockedUntil = null;
-  user.lastLogin = new Date().toISOString();
-  saveUsers(users);
-  logAudit('LOGIN_SUCCESS', email, user.name + ' (' + user.role + ')');
-
-  setSession(user);
-  document.getElementById('loginScreen').classList.add('hidden');
 
   if (user.company) {
     localStorage.setItem('bp_company', user.company);
@@ -14377,14 +14388,30 @@ async function doCreateAccount() {
     stores = [...document.getElementById('regStores').selectedOptions].map(o => o.value);
   }
 
+  // Try server-side account creation first
+  const token = (JSON.parse(sessionStorage.getItem('bp_session') || '{}')).token;
+  if (token && typeof AUTH_URL !== 'undefined') {
+    try {
+      const resp = await fetch(AUTH_URL + '/api/auth/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ name, email, password, company, role, stores })
+      });
+      const data = await resp.json();
+      if (!resp.ok) { errorEl.textContent = data.error || 'Failed to create account.'; return; }
+    } catch(e) {
+      console.warn('Server account creation failed, saving locally:', e.message);
+    }
+  }
+
+  // Also save locally as fallback
   const salt = generateSalt();
   const hash = await hashPassword(password, salt);
-
   users.push({ name, email, company, role, stores, passwordHash: hash, salt, created: new Date().toISOString(), failedAttempts: 0, lockedUntil: null });
   saveUsers(users);
 
   document.getElementById('createAccountModal').classList.remove('active');
-  logAudit('ACCOUNT_CREATED', email, name + ' (' + ROLE_LABELS[role] + ') — ' + company + (cu ? ' by ' + cu.email : ''));
+  logAudit('ACCOUNT_CREATED', email, name + ' (' + ROLE_LABELS[role] + ') \u2014 ' + company + (cu ? ' by ' + cu.email : ''));
 
   if (!cu) {
     // From login screen
@@ -15035,19 +15062,44 @@ function removeCustomReport(idx) {
   });
 }
 
-// Init auth — seed in background, don't block page
+// Init auth — validate JWT with server, fallback to local session
 (async function initAuth() {
   try {
-    await seedDefaultUser();
-    const currentUser = getCurrentUser();
-    if (currentUser) {
+    const session = getCurrentUser();
+    if (session) {
+      // Try to validate JWT with server
+      const token = JSON.parse(sessionStorage.getItem('bp_session') || '{}').token;
+      if (token && typeof AUTH_URL !== 'undefined') {
+        try {
+          const resp = await fetch(AUTH_URL + '/api/auth/session', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            // Update session with server-validated user data
+            const s = JSON.parse(sessionStorage.getItem('bp_session'));
+            s.user = data.user;
+            sessionStorage.setItem('bp_session', JSON.stringify(s));
+          } else {
+            // Token expired or invalid — force re-login
+            sessionStorage.removeItem('bp_session');
+            document.getElementById('loadingScreen').classList.add('hidden');
+            return;
+          }
+        } catch(e) {
+          // Server unreachable — trust local session
+          console.warn('Auth server unreachable, using local session');
+        }
+      }
       document.getElementById('loginScreen').classList.add('hidden');
-      updateUserAvatar(currentUser);
-      // Auto-restore saved data if available
+      updateUserAvatar(getCurrentUser());
       if (loadUserData()) {
         launchDashboard();
         updateDataSavedIndicator(true);
       }
+    } else {
+      // No session — seed local defaults as fallback
+      await seedDefaultUser();
     }
   } catch(e) {
     console.error('Init auth error:', e);
