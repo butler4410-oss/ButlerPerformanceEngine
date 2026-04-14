@@ -15311,6 +15311,15 @@ async function doLogin() {
     }
     updateUserAvatar(loggedIn);
 
+    // Auto-configure data source for known companies on first login
+    if (!localStorage.getItem('bp_api_url')) {
+      localStorage.setItem('bp_data_source', 'api');
+      localStorage.setItem('bp_api_url', 'https://dds.butleranalytics.io/api/data');
+      localStorage.setItem('bp_api_key', '***REDACTED-API-KEY-ROTATED-2026-04-28***');
+      localStorage.setItem('bp_api_schedule', 'manual');
+      console.log('[Auth] Auto-configured DDS data source for', loggedIn.company);
+    }
+
     // Try to restore saved data
     if (loadUserData()) {
       const info = getUserDataInfo();
@@ -15321,9 +15330,23 @@ async function doLogin() {
       launchDashboard();
       updateDataSavedIndicator(true);
     } else {
-      // No local data — show upload zone but also offer API sync
-      document.getElementById('uploadZone').style.display = '';
-      document.getElementById('dashboard').classList.remove('active');
+      // No local data — auto-sync from DDS if configured
+      const apiUrl = localStorage.getItem('bp_api_url');
+      const apiKey = localStorage.getItem('bp_api_key');
+      if (apiUrl && apiKey) {
+        bpaToast('Syncing data from DDS...', 'info', 8000);
+        document.getElementById('uploadZone').style.display = '';
+        // Auto-trigger sync in background
+        setTimeout(function() {
+          document.getElementById('settingApiUrl') && (document.getElementById('settingApiUrl').value = apiUrl);
+          document.getElementById('settingApiKey') && (document.getElementById('settingApiKey').value = apiKey);
+          document.getElementById('settingDataSource') && (document.getElementById('settingDataSource').value = 'api');
+          if (typeof syncNow === 'function') syncNow();
+        }, 500);
+      } else {
+        document.getElementById('uploadZone').style.display = '';
+        document.getElementById('dashboard').classList.remove('active');
+      }
     }
   }
 }
