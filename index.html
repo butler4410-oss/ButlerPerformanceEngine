@@ -2726,11 +2726,14 @@
   .login-box .login-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; text-align: center; }
   .login-box .form-group { margin-bottom: 16px; text-align: left; }
   .login-box .btn-login {
-    width: 100%; background: var(--primary); color: white; border: none;
-    padding: 13px; border-radius: 8px; font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: background 0.15s; margin-top: 8px;
+    width: 100%; background: linear-gradient(135deg, #dc2626, #ef4444); color: white; border: none;
+    padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; margin-top: 12px;
+    box-shadow: 0 4px 16px rgba(220,38,38,0.3);
+    letter-spacing: 0.5px;
   }
-  .login-box .btn-login:hover { background: var(--primary-dark); }
+  .login-box .btn-login:hover { background: linear-gradient(135deg, #b91c1c, #dc2626); box-shadow: 0 6px 24px rgba(220,38,38,0.4); transform: translateY(-1px); }
+  .login-box .btn-login:active { transform: translateY(0); }
   .login-error { color: var(--red); font-size: 12px; margin-top: 8px; min-height: 16px; text-align: center; }
   .login-footer { margin-top: 16px; font-size: 11px; color: var(--text-muted); text-align: center; }
   .login-footer a { color: var(--primary); cursor: pointer; text-decoration: none; }
@@ -4014,8 +4017,14 @@
   .pipeline-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
   .pipeline-count { font-size: 12px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; min-width: 50px; text-align: right; }
 </style>
+<script>
+// Apply dark mode BEFORE body renders to prevent flash of light theme
+document.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('bp_theme') !== 'light') document.body.classList.add('dark-mode');
+});
+</script>
 </head>
-<body>
+<body class="dark-mode">
 
 <a href="#main-content" class="skip-nav">Skip to main content</a>
 
@@ -5249,6 +5258,9 @@ function switchSettingsTab(tabName) {
 // PROCESSING OVERLAY
 // ============================================================
 function showProcessing(text, sub) {
+  // Don't show processing overlay if login screen is still visible
+  const login = document.getElementById('loginScreen');
+  if (login && !login.classList.contains('hidden')) return;
   const el = document.getElementById('processingOverlay');
   if (!el) return;
   document.getElementById('processingText').textContent = text || 'Processing...';
@@ -16125,6 +16137,451 @@ function flashCell(td) {
     if (!v.getAttribute('tabindex')) v.setAttribute('tabindex', '-1');
   });
 })();
+
+// ============================================================
+// FEATURE: STORE COMPARISON TOOL
+// ============================================================
+function openStoreCompareSelector() {
+  var allStores = new Set();
+  FILTERED.customers.forEach(function(r) {
+    if (r.Store_Number && /^\d+$/.test(r.Store_Number)) allStores.add(r.Store_Number);
+  });
+  var storeList = Array.from(allStores).sort(function(a, b) { return +a - +b; });
+  if (storeList.length < 2) {
+    bpaToast('Need at least 2 stores with data to compare.', 'warning');
+    return;
+  }
+  openReportModal('Compare Stores', function(body) {
+    var html = '<div style="margin-bottom:16px;">';
+    html += '<p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Select 2-3 stores to compare side by side.</p>';
+    html += '<div class="compare-select-grid" id="compareStoreGrid">';
+    storeList.forEach(function(s) {
+      var custCount = FILTERED.customers.filter(function(r) { return r.Store_Number === s; }).length;
+      html += '<label class="compare-store-check" data-store="' + escapeHTML(s) + '">';
+      html += '<input type="checkbox" value="' + escapeHTML(s) + '" onchange="updateCompareSelection()">';
+      html += '#' + escapeHTML(s) + ' <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(' + custCount + ')</span>';
+      html += '</label>';
+    });
+    html += '</div>';
+    html += '<div style="display:flex;align-items:center;gap:12px;">';
+    html += '<span id="compareCount" style="font-size:12px;color:var(--text-muted);">0 selected</span>';
+    html += '<button class="btn-save" id="compareRunBtn" onclick="runStoreComparison()" disabled style="opacity:0.5;">Compare Selected</button>';
+    html += '</div></div>';
+    html += '<div id="compareResultArea"></div>';
+    body.innerHTML = html;
+  });
+}
+
+function updateCompareSelection() {
+  var checks = document.querySelectorAll('#compareStoreGrid input[type="checkbox"]');
+  var selected = [];
+  checks.forEach(function(cb) { if (cb.checked) selected.push(cb.value); });
+  if (selected.length > 3) {
+    checks.forEach(function(cb) {
+      if (cb.checked && selected.indexOf(cb.value) >= 3) cb.checked = false;
+    });
+    selected = selected.slice(0, 3);
+    bpaToast('Maximum 3 stores for comparison.', 'warning');
+  }
+  document.querySelectorAll('.compare-store-check').forEach(function(el) {
+    el.classList.toggle('selected', el.querySelector('input').checked);
+  });
+  var countEl = document.getElementById('compareCount');
+  var btn = document.getElementById('compareRunBtn');
+  if (countEl) countEl.textContent = selected.length + ' selected';
+  if (btn) { btn.disabled = selected.length < 2; btn.style.opacity = selected.length < 2 ? '0.5' : '1'; }
+}
+
+function runStoreComparison() {
+  var checks = document.querySelectorAll('#compareStoreGrid input[type="checkbox"]:checked');
+  var stores = [];
+  checks.forEach(function(cb) { stores.push(cb.value); });
+  if (stores.length < 2) return;
+  var area = document.getElementById('compareResultArea');
+  if (!area) return;
+
+  var storeData = {};
+  var storeColors = ['#1e40af', '#059669', '#7c3aed'];
+  stores.forEach(function(s, idx) {
+    var cust = FILTERED.customers.filter(function(r) { return r.Store_Number === s; });
+    var insp = FILTERED.inspections.filter(function(r) { return r.Store_Number === s; });
+    var promo = FILTERED.promos.filter(function(r) { return r.Store_Number === s; });
+    var totalRev = cust.reduce(function(sum, r) { return sum + (+r.Net_Sales || 0); }, 0);
+    var avgTicket = cust.length ? totalRev / cust.length : 0;
+    var bayTimes = [];
+    cust.forEach(function(r) { var m = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time); if (m !== null && m > 0 && m < 180) bayTimes.push(m); });
+    var avgBay = bayTimes.length ? bayTimes.reduce(function(a, b) { return a + b; }, 0) / bayTimes.length : 0;
+    var dates = cust.map(function(r) { return parseDate(r.Invoice_Date); }).filter(Boolean);
+    var minD = dates.length ? dates.reduce(function(a, b) { return a < b ? a : b; }) : new Date();
+    var maxD = dates.length ? dates.reduce(function(a, b) { return a > b ? a : b; }) : new Date();
+    var daySpan = Math.max(1, Math.ceil((maxD - minD) / 86400000));
+    var carsPerDay = cust.length / daySpan;
+    var withEmail = cust.filter(function(r) { return r.Customer_Email_Address && r.Customer_Email_Address.trim(); }).length;
+    var emailPct = cust.length ? (withEmail / cust.length * 100) : 0;
+    var inspBad = insp.filter(function(r) { return ['Yellow','Orange','Red'].indexOf(r.Inspection_Status) >= 0; });
+    var inspSold = inspBad.filter(function(r) { return r.Purchased_This_Visit === 'True'; });
+    var upsellRate = inspBad.length ? (inspSold.length / inspBad.length * 100) : 0;
+    var promoEff = cust.length ? (promo.length / cust.length * 100) : 0;
+    var dailyRev = {};
+    cust.forEach(function(r) {
+      var d = parseDate(r.Invoice_Date);
+      if (d) { var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); dailyRev[key] = (dailyRev[key]||0) + (+r.Net_Sales||0); }
+    });
+    storeData[s] = { color: storeColors[idx], revenue: totalRev, avgTicket: avgTicket, avgBay: avgBay, carsPerDay: carsPerDay, emailPct: emailPct, upsellRate: upsellRate, promoEff: promoEff, invoices: cust.length, dailyRev: dailyRev };
+  });
+
+  // KPI cards
+  var kpis = [
+    { label: 'Revenue', key: 'revenue', fmt: function(v) { return money(v); }, higher: true },
+    { label: 'Avg Ticket', key: 'avgTicket', fmt: function(v) { return money(v); }, higher: true },
+    { label: 'Avg Bay Time', key: 'avgBay', fmt: function(v) { return v.toFixed(1) + ' min'; }, higher: false },
+    { label: 'Cars / Day', key: 'carsPerDay', fmt: function(v) { return v.toFixed(1); }, higher: true }
+  ];
+  var html = '<div class="compare-kpi-row">';
+  kpis.forEach(function(kpi) {
+    var vals = stores.map(function(s) { return { store: s, val: storeData[s][kpi.key] }; });
+    vals.sort(function(a, b) { return kpi.higher ? b.val - a.val : a.val - b.val; });
+    var bestStore = vals[0].store, worstStore = vals[vals.length-1].store;
+    html += '<div class="compare-kpi-card"><div class="compare-kpi-title">' + escapeHTML(kpi.label) + '</div>';
+    stores.forEach(function(s) {
+      var isBest = s === bestStore, isWorst = s === worstStore;
+      var cls = isBest ? 'is-best' : (isWorst ? 'is-worst' : '');
+      html += '<div class="compare-kpi-store ' + cls + '"><span class="store-label" style="color:' + storeData[s].color + ';">#' + escapeHTML(s) + '</span>';
+      html += '<span class="store-val">' + kpi.fmt(storeData[s][kpi.key]) + (isBest ? ' &#9733;' : '') + '</span></div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">';
+  html += '<div class="chart-card"><h3>Daily Revenue Overlay</h3><div class="chart-wrap" style="height:260px;"><canvas id="compareRevChart"></canvas></div></div>';
+  html += '<div class="chart-card"><h3>Performance Radar</h3><div class="chart-wrap" style="height:260px;"><canvas id="compareRadarChart"></canvas></div></div>';
+  html += '</div>';
+  area.innerHTML = html;
+
+  // Revenue line chart
+  var allDates = new Set();
+  stores.forEach(function(s) { Object.keys(storeData[s].dailyRev).forEach(function(d) { allDates.add(d); }); });
+  var sortedDates = Array.from(allDates).sort();
+  var lineDatasets = stores.map(function(s) {
+    return { label: 'Store #' + s, data: sortedDates.map(function(d) { return storeData[s].dailyRev[d] || 0; }), borderColor: storeData[s].color, backgroundColor: storeData[s].color + '20', fill: false, tension: 0.3, pointRadius: 2, borderWidth: 2 };
+  });
+  reportModalCharts.push('compareRevChart');
+  makeChart('compareRevChart', {
+    type: 'line',
+    data: { labels: sortedDates, datasets: lineDatasets },
+    options: { scales: { y: { ticks: { callback: function(v) { return '$' + (v>=1000?(v/1000).toFixed(0)+'K':v); } } }, x: { ticks: { maxTicksLimit: 12, font: { size: 10 } } } }, plugins: { legend: { position: 'top' } }, interaction: { mode: 'index', intersect: false } }
+  });
+
+  // Radar chart
+  function normalize(val, arr, higher) { var mn=Math.min.apply(null,arr), mx=Math.max.apply(null,arr); if(mx===mn) return 50; var n=(val-mn)/(mx-mn)*100; return higher?n:(100-n); }
+  var radarLabels = ['Revenue', 'Volume', 'Speed', 'Email Capture', 'Upsell Rate', 'Promo Efficiency'];
+  var radarDatasets = stores.map(function(s) {
+    var d = storeData[s];
+    return {
+      label: 'Store #' + s,
+      data: [
+        normalize(d.revenue, stores.map(function(x){return storeData[x].revenue;}), true),
+        normalize(d.carsPerDay, stores.map(function(x){return storeData[x].carsPerDay;}), true),
+        normalize(d.avgBay, stores.map(function(x){return storeData[x].avgBay;}), false),
+        normalize(d.emailPct, stores.map(function(x){return storeData[x].emailPct;}), true),
+        normalize(d.upsellRate, stores.map(function(x){return storeData[x].upsellRate;}), true),
+        normalize(d.promoEff, stores.map(function(x){return storeData[x].promoEff;}), true)
+      ],
+      borderColor: storeData[s].color, backgroundColor: storeData[s].color + '25', borderWidth: 2, pointBackgroundColor: storeData[s].color, pointRadius: 3
+    };
+  });
+  reportModalCharts.push('compareRadarChart');
+  makeChart('compareRadarChart', {
+    type: 'radar',
+    data: { labels: radarLabels, datasets: radarDatasets },
+    options: { scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 25, display: false }, grid: { color: 'rgba(0,0,0,0.06)' }, pointLabels: { font: { size: 11, weight: '600' }, color: '#64748b' }, angleLines: { color: 'rgba(0,0,0,0.06)' } } }, plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw.toFixed(0) + '/100'; } } } } }
+  });
+}
+
+// ============================================================
+// FEATURE: NETWORK BENCHMARKING
+// ============================================================
+function calcNetworkBenchmarks() {
+  var storeMap = {};
+  FILTERED.customers.forEach(function(r) {
+    var s = r.Store_Number; if (!s) return;
+    if (!storeMap[s]) storeMap[s] = { rev: 0, inv: 0, bayTimes: [], emails: 0, total: 0 };
+    storeMap[s].rev += (+r.Net_Sales||0); storeMap[s].inv++; storeMap[s].total++;
+    if (r.Customer_Email_Address && r.Customer_Email_Address.trim()) storeMap[s].emails++;
+    var m = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
+    if (m !== null && m > 0 && m < 180) storeMap[s].bayTimes.push(m);
+  });
+  var inspMap = {};
+  FILTERED.inspections.forEach(function(r) {
+    var s = r.Store_Number; if (!s) return;
+    if (!inspMap[s]) inspMap[s] = { bad: 0, sold: 0 };
+    if (['Yellow','Orange','Red'].indexOf(r.Inspection_Status) >= 0) { inspMap[s].bad++; if (r.Purchased_This_Visit === 'True') inspMap[s].sold++; }
+  });
+  var storeArr = Object.keys(storeMap);
+  var dates = FILTERED.customers.map(function(r) { return parseDate(r.Invoice_Date); }).filter(Boolean);
+  var minD = dates.length ? dates.reduce(function(a,b){return a<b?a:b;}) : new Date();
+  var maxD = dates.length ? dates.reduce(function(a,b){return a>b?a:b;}) : new Date();
+  var daySpan = Math.max(1, Math.ceil((maxD - minD) / 86400000));
+  var metrics = {};
+  storeArr.forEach(function(s) {
+    var d = storeMap[s], iData = inspMap[s] || { bad: 0, sold: 0 };
+    metrics[s] = { revenue: d.rev, avgTicket: d.inv ? d.rev/d.inv : 0, carsPerDay: d.inv/daySpan, avgBay: d.bayTimes.length ? d.bayTimes.reduce(function(a,b){return a+b;},0)/d.bayTimes.length : 0, emailPct: d.total ? (d.emails/d.total*100) : 0, upsellRate: iData.bad ? (iData.sold/iData.bad*100) : 0 };
+  });
+  function getPercentile(val, arr) { var sorted = arr.slice().sort(function(a,b){return a-b;}); var count = sorted.filter(function(v){return v<=val;}).length; return Math.round((count/sorted.length)*100); }
+  var benchmarks = {};
+  ['revenue','avgTicket','carsPerDay','avgBay','emailPct','upsellRate'].forEach(function(key) {
+    var vals = storeArr.map(function(s){return metrics[s][key];}).filter(function(v){return v>0;});
+    var avg = vals.length ? vals.reduce(function(a,b){return a+b;},0)/vals.length : 0;
+    var mn = vals.length ? Math.min.apply(null,vals) : 0, mx = vals.length ? Math.max.apply(null,vals) : 0;
+    benchmarks[key] = { avg: avg, min: mn, max: mx, vals: vals };
+  });
+  return { metrics: metrics, benchmarks: benchmarks, getPercentile: getPercentile };
+}
+
+function buildBenchmarkBadge(val, avg, higher) {
+  if (avg === 0) return '';
+  var diff = ((val - avg) / avg * 100);
+  var cls, label;
+  if (Math.abs(diff) < 2) { cls = 'at-avg'; label = 'At avg'; }
+  else if ((higher && diff > 0) || (!higher && diff < 0)) { cls = 'above'; label = (diff>0?'+':'') + diff.toFixed(1) + '% vs avg'; }
+  else { cls = 'below'; label = (diff>0?'+':'') + diff.toFixed(1) + '% vs avg'; }
+  return '<span class="bench-badge ' + cls + '">' + escapeHTML(label) + '</span>';
+}
+
+function buildBenchmarkGauge(val, minVal, maxVal, avg) {
+  if (maxVal === minVal) return '';
+  var pctVal = Math.max(0, Math.min(100, ((val-minVal)/(maxVal-minVal))*100));
+  var avgPct = Math.max(0, Math.min(100, ((avg-minVal)/(maxVal-minVal))*100));
+  var gradColor = pctVal > 60 ? 'linear-gradient(90deg,#059669,#34d399)' : pctVal > 30 ? 'linear-gradient(90deg,#d97706,#fbbf24)' : 'linear-gradient(90deg,#dc2626,#f87171)';
+  return '<div class="bench-gauge"><div class="bench-gauge-fill" style="width:'+pctVal.toFixed(1)+'%;background:'+gradColor+';"></div><div class="bench-gauge-avg" style="left:'+avgPct.toFixed(1)+'%;" title="Network Avg"></div><div class="bench-gauge-marker" style="left:'+pctVal.toFixed(1)+'%;" title="This Store"></div></div>';
+}
+
+function ordinal(n) { var s=['th','st','nd','rd']; var v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+
+// Patch openStoreRankDetail to inject benchmarking
+(function() {
+  var origOpenStoreRankDetail = openStoreRankDetail;
+  openStoreRankDetail = function(storeNum) {
+    origOpenStoreRankDetail(storeNum);
+    setTimeout(function() {
+      try {
+        var bench = calcNetworkBenchmarks();
+        var sm = bench.metrics[storeNum];
+        if (!sm) return;
+        var perfSection = document.querySelector('#custDetailBody .cust-detail-section:first-child');
+        if (!perfSection) return;
+        var fields = perfSection.querySelectorAll('.cust-field');
+        var metricMap = [
+          { idx: 0, key: 'revenue', higher: true },
+          { idx: 2, key: 'avgTicket', higher: true },
+          { idx: 3, key: 'avgBay', higher: false },
+          { idx: 4, key: 'emailPct', higher: true }
+        ];
+        metricMap.forEach(function(m) {
+          var field = fields[m.idx]; if (!field) return;
+          var bm = bench.benchmarks[m.key];
+          var val = sm[m.key];
+          var ptile = bench.getPercentile(val, bm.vals);
+          var valueEl = field.querySelector('.value'); if (!valueEl) return;
+          var badgeHTML = buildBenchmarkBadge(val, bm.avg, m.higher);
+          var ptileHTML = '<div class="bench-percentile">' + ordinal(ptile) + ' percentile across network</div>';
+          var gaugeHTML = buildBenchmarkGauge(val, bm.min, bm.max, bm.avg);
+          valueEl.insertAdjacentHTML('afterend', badgeHTML + ptileHTML + gaugeHTML);
+        });
+      } catch (e) { console.error('Benchmarking inject error:', e); }
+    }, 100);
+  };
+})();
+
+// ============================================================
+// FEATURE: TIME-BASED TREND ANALYSIS
+// ============================================================
+function renderTrendAnalysis() {
+  var cust = FILTERED.customers;
+  var sec = document.getElementById('trendSection');
+  var content = document.getElementById('trendContent');
+  if (!sec || !content) return;
+  if (cust.length < 5) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+
+  var dated = [];
+  cust.forEach(function(r) { var d = parseDate(r.Invoice_Date); if (d) dated.push({ date: d, sales: +r.Net_Sales||0, r: r }); });
+  dated.sort(function(a,b) { return a.date - b.date; });
+  if (dated.length < 2) { sec.style.display = 'none'; return; }
+
+  var maxDate = dated[dated.length-1].date;
+  var today = new Date(maxDate);
+
+  // Week-over-Week
+  var thisWeekStart = new Date(today); thisWeekStart.setDate(today.getDate()-6);
+  var lastWeekStart = new Date(thisWeekStart); lastWeekStart.setDate(lastWeekStart.getDate()-7);
+  var lastWeekEnd = new Date(thisWeekStart); lastWeekEnd.setDate(lastWeekEnd.getDate()-1);
+  var thisWeek = dated.filter(function(d){return d.date>=thisWeekStart && d.date<=today;});
+  var lastWeek = dated.filter(function(d){return d.date>=lastWeekStart && d.date<=lastWeekEnd;});
+  var twRev = thisWeek.reduce(function(s,d){return s+d.sales;},0);
+  var lwRev = lastWeek.reduce(function(s,d){return s+d.sales;},0);
+  var twInv = thisWeek.length, lwInv = lastWeek.length;
+  var twAvg = twInv ? twRev/twInv : 0, lwAvg = lwInv ? lwRev/lwInv : 0;
+
+  function changePct(c,p){return p>0?((c-p)/p*100):0;}
+  function changeClass(v){return v>1?'up':v<-1?'down':'flat';}
+  function changeArrow(v){return v>1?'&#9650;':v<-1?'&#9660;':'&#9679;';}
+  function changeLabel(v){return (v>0?'+':'')+v.toFixed(1)+'%';}
+
+  var revChange = changePct(twRev,lwRev), invChange = changePct(twInv,lwInv), avgChange = changePct(twAvg,lwAvg);
+  var html = '<div style="margin-bottom:24px;"><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Week over Week</div><div class="trend-grid">';
+  html += '<div class="trend-card"><div class="trend-card-label">Revenue</div><div class="trend-card-value">'+money(twRev)+'</div><div class="trend-card-change '+changeClass(revChange)+'">'+changeArrow(revChange)+' '+changeLabel(revChange)+'</div><div class="trend-card-sub">Prior week: '+money(lwRev)+'</div></div>';
+  html += '<div class="trend-card"><div class="trend-card-label">Invoices</div><div class="trend-card-value">'+num(twInv)+'</div><div class="trend-card-change '+changeClass(invChange)+'">'+changeArrow(invChange)+' '+changeLabel(invChange)+'</div><div class="trend-card-sub">Prior week: '+num(lwInv)+'</div></div>';
+  html += '<div class="trend-card"><div class="trend-card-label">Avg Ticket</div><div class="trend-card-value">'+money(twAvg)+'</div><div class="trend-card-change '+changeClass(avgChange)+'">'+changeArrow(avgChange)+' '+changeLabel(avgChange)+'</div><div class="trend-card-sub">Prior week: '+money(lwAvg)+'</div></div>';
+  html += '</div></div>';
+
+  // Month-over-Month
+  var monthMap = {};
+  dated.forEach(function(d){ var key = d.date.getFullYear()+'-'+String(d.date.getMonth()+1).padStart(2,'0'); if(!monthMap[key]) monthMap[key]={rev:0,count:0}; monthMap[key].rev+=d.sales; monthMap[key].count++; });
+  var months = Object.keys(monthMap).sort();
+  var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  if (months.length >= 2) {
+    var currMonth=months[months.length-1], prevMonth=months[months.length-2];
+    var cmRev=monthMap[currMonth].rev, pmRev=monthMap[prevMonth].rev;
+    var momChange=changePct(cmRev,pmRev);
+    var cmLabel=monthNames[parseInt(currMonth.split('-')[1])-1]+' '+currMonth.split('-')[0];
+    var pmLabel=monthNames[parseInt(prevMonth.split('-')[1])-1]+' '+prevMonth.split('-')[0];
+    html += '<div style="margin-bottom:24px;"><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Month over Month Revenue</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+    html += '<div class="chart-card"><h3>Monthly Revenue Trend</h3><div class="chart-wrap" style="height:200px;"><canvas id="trendMonthlyChart"></canvas></div></div>';
+    html += '<div class="trend-card" style="display:flex;flex-direction:column;justify-content:center;"><div class="trend-card-label">'+escapeHTML(cmLabel)+' vs '+escapeHTML(pmLabel)+'</div>';
+    html += '<div class="trend-card-value">'+money(cmRev)+'</div>';
+    html += '<div class="trend-card-change '+changeClass(momChange)+'">'+changeArrow(momChange)+' '+changeLabel(momChange)+' vs prior month</div>';
+    html += '<div class="trend-card-sub">'+escapeHTML(pmLabel)+': '+money(pmRev)+' ('+num(monthMap[prevMonth].count)+' invoices)</div></div>';
+    html += '</div></div>';
+  }
+
+  // Day-of-Week
+  var dowMap = {0:{rev:0,cnt:0,label:'Sun'},1:{rev:0,cnt:0,label:'Mon'},2:{rev:0,cnt:0,label:'Tue'},3:{rev:0,cnt:0,label:'Wed'},4:{rev:0,cnt:0,label:'Thu'},5:{rev:0,cnt:0,label:'Fri'},6:{rev:0,cnt:0,label:'Sat'}};
+  dated.forEach(function(d){ var dow=d.date.getDay(); dowMap[dow].rev+=d.sales; dowMap[dow].cnt++; });
+  var dowArr=[1,2,3,4,5,6,0];
+  var dowAvgs=dowArr.map(function(i){return dowMap[i].cnt?dowMap[i].rev/dowMap[i].cnt:0;});
+  var posAvgs=dowAvgs.filter(function(v){return v>0;});
+  var maxDowAvg=posAvgs.length?Math.max.apply(null,posAvgs):0;
+  var minDowAvg=posAvgs.length?Math.min.apply(null,posAvgs):0;
+
+  html += '<div style="margin-bottom:24px;"><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Day of Week Performance</div><div class="dow-grid">';
+  dowArr.forEach(function(i){
+    var d=dowMap[i], avg=d.cnt?d.rev/d.cnt:0;
+    var cls=(avg===maxDowAvg&&avg>0)?'best':(avg===minDowAvg&&avg>0)?'worst':'';
+    html += '<div class="dow-cell '+cls+'"><div class="dow-cell-day">'+escapeHTML(d.label)+'</div><div class="dow-cell-val">'+(avg>0?money(avg):'--')+'</div><div class="dow-cell-sub">'+num(d.cnt)+' inv</div></div>';
+  });
+  html += '</div></div>';
+
+  // Peak Hours
+  var hourMap = {};
+  cust.forEach(function(r) {
+    var gm = (r.Greet_Time||'').match(/(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)/i);
+    if (!gm) return;
+    var h = parseInt(gm[1]), ampm = gm[4].toUpperCase();
+    if (ampm==='PM'&&h<12) h+=12; if (ampm==='AM'&&h===12) h=0;
+    if (!hourMap[h]) hourMap[h]={count:0,rev:0}; hourMap[h].count++; hourMap[h].rev+=(+r.Net_Sales||0);
+  });
+  if (Object.keys(hourMap).length > 0) {
+    html += '<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Peak Hours</div>';
+    html += '<div class="chart-card"><h3>Customer Volume by Hour</h3><div class="chart-wrap" style="height:200px;"><canvas id="trendPeakHoursChart"></canvas></div></div></div>';
+  }
+
+  content.innerHTML = html;
+
+  // Render monthly chart
+  if (months.length >= 2) {
+    makeChart('trendMonthlyChart', {
+      type: 'bar',
+      data: { labels: months.map(function(m){var p=m.split('-');return monthNames[parseInt(p[1])-1]+' '+p[0].slice(2);}), datasets: [{ label:'Revenue', data: months.map(function(m){return monthMap[m].rev;}), backgroundColor:'rgba(30,64,175,0.7)', borderRadius:4, borderSkipped:false }] },
+      options: { scales: { y:{ticks:{callback:function(v){return '$'+(v>=1000?(v/1000).toFixed(0)+'K':v);}}}, x:{ticks:{font:{size:10}}} }, plugins:{legend:{display:false}} }
+    });
+  }
+
+  // Render peak hours chart
+  if (Object.keys(hourMap).length > 0) {
+    var hourLabels=[],hourData=[];
+    for (var h=6;h<=21;h++) { var ap=h>=12?'PM':'AM'; var dh=h>12?h-12:(h===0?12:h); hourLabels.push(dh+ap); hourData.push(hourMap[h]?hourMap[h].count:0); }
+    var maxHV=Math.max.apply(null,hourData);
+    var hourColors=hourData.map(function(v){var i=maxHV?v/maxHV:0;if(i>0.75)return'rgba(220,38,38,0.8)';if(i>0.5)return'rgba(217,119,6,0.8)';if(i>0.25)return'rgba(30,64,175,0.6)';return'rgba(100,116,139,0.4)';});
+    makeChart('trendPeakHoursChart', {
+      type: 'bar',
+      data: { labels:hourLabels, datasets:[{label:'Customers',data:hourData,backgroundColor:hourColors,borderRadius:3,borderSkipped:false}] },
+      options: { scales:{y:{ticks:{stepSize:1}},x:{ticks:{font:{size:10}}}}, plugins:{legend:{display:false}} }
+    });
+  }
+}
+
+// ============================================================
+// FEATURE: PREDICTIVE INDICATORS
+// ============================================================
+function renderPredictiveIndicators() {
+  var cust = FILTERED.customers;
+  var sec = document.getElementById('predictiveSection');
+  var content = document.getElementById('predictiveContent');
+  if (!sec || !content) return;
+  if (cust.length < 10) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+
+  var dailyRev = {};
+  cust.forEach(function(r) {
+    var d = parseDate(r.Invoice_Date);
+    if (d) { var key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); if(!dailyRev[key])dailyRev[key]=0; dailyRev[key]+=(+r.Net_Sales||0); }
+  });
+  var sortedDays = Object.keys(dailyRev).sort();
+  if (sortedDays.length < 14) { sec.style.display = 'none'; return; }
+
+  var recent7=sortedDays.slice(-7), prior7=sortedDays.slice(-14,-7);
+  function calcSlope(days) {
+    var n=days.length; if(n<2) return 0;
+    var sumX=0,sumY=0,sumXY=0,sumX2=0;
+    days.forEach(function(d,i){sumX+=i;sumY+=dailyRev[d];sumXY+=i*dailyRev[d];sumX2+=i*i;});
+    return (n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
+  }
+  var recentSlope=calcSlope(recent7), priorSlope=calcSlope(prior7);
+  var recentAvg=recent7.reduce(function(s,d){return s+dailyRev[d];},0)/recent7.length;
+  var priorAvg=prior7.reduce(function(s,d){return s+dailyRev[d];},0)/prior7.length;
+  var velocityChange=priorAvg>0?((recentAvg-priorAvg)/priorAvg*100):0;
+
+  var velocityClass,velocityArrow,velocityLabel;
+  if (recentSlope>priorSlope*1.1&&velocityChange>3){velocityClass='accel';velocityArrow='&#9650;&#9650;';velocityLabel='Accelerating';}
+  else if(recentSlope<priorSlope*0.9&&velocityChange<-3){velocityClass='decel';velocityArrow='&#9660;&#9660;';velocityLabel='Decelerating';}
+  else{velocityClass='steady';velocityArrow='&#9654;';velocityLabel='Steady';}
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">';
+  html += '<div class="predict-card '+velocityClass+'"><div class="predict-card-label">Revenue Velocity</div>';
+  html += '<div class="predict-card-value">'+escapeHTML(velocityLabel)+' <span class="predict-card-arrow">'+velocityArrow+'</span></div>';
+  html += '<div class="predict-card-sub">7-day avg: '+money(recentAvg)+'/day vs prior '+money(priorAvg)+'/day ('+(velocityChange>0?'+':'')+velocityChange.toFixed(1)+'%)</div></div>';
+
+  // Customer Pipeline
+  var pipeline30=0,pipeline60=0,pipeline90=0;
+  var maxDate=sortedDays.length?new Date(sortedDays[sortedDays.length-1]):new Date();
+  var custVisits={};
+  cust.forEach(function(r){
+    var cn=((r.Customer_First_Name||'')+' '+(r.Customer_Last_Name||'')).trim();
+    if(!cn||cn==='Unknown')return;
+    var d=parseDate(r.Invoice_Date); if(!d)return;
+    if(!custVisits[cn]||d>custVisits[cn].date) custVisits[cn]={date:d};
+  });
+  Object.keys(custVisits).forEach(function(n){
+    var v=custVisits[n]; var daysSince=Math.floor((maxDate-v.date)/86400000); var daysUntil=90-daysSince;
+    if(daysUntil<=30) pipeline30++; else if(daysUntil<=60) pipeline60++; else if(daysUntil<=90) pipeline90++;
+  });
+  var totalPipeline=pipeline30+pipeline60+pipeline90;
+  var maxPipe=Math.max(pipeline30,pipeline60,pipeline90,1);
+
+  html += '<div class="predict-card steady"><div class="predict-card-label">Customer Pipeline (Est. Return Window)</div>';
+  html += '<div class="predict-card-value">'+num(totalPipeline)+' <span style="font-size:14px;font-weight:400;color:var(--text-muted);">customers tracked</span></div>';
+  html += '<div style="margin-top:12px;">';
+  html += '<div class="pipeline-row"><span class="pipeline-label" style="color:var(--red);">Due &lt;30d</span><div class="pipeline-bar-bg"><div class="pipeline-bar-fill" style="width:'+(pipeline30/maxPipe*100).toFixed(0)+'%;background:linear-gradient(90deg,#dc2626,#f87171);"></div></div><span class="pipeline-count">'+num(pipeline30)+'</span></div>';
+  html += '<div class="pipeline-row"><span class="pipeline-label" style="color:var(--yellow);">30-60d</span><div class="pipeline-bar-bg"><div class="pipeline-bar-fill" style="width:'+(pipeline60/maxPipe*100).toFixed(0)+'%;background:linear-gradient(90deg,#d97706,#fbbf24);"></div></div><span class="pipeline-count">'+num(pipeline60)+'</span></div>';
+  html += '<div class="pipeline-row"><span class="pipeline-label" style="color:var(--green);">60-90d</span><div class="pipeline-bar-bg"><div class="pipeline-bar-fill" style="width:'+(pipeline90/maxPipe*100).toFixed(0)+'%;background:linear-gradient(90deg,#059669,#34d399);"></div></div><span class="pipeline-count">'+num(pipeline90)+'</span></div>';
+  html += '</div></div></div>';
+
+  content.innerHTML = html;
+}
 
 // Init
 loadSettings();
