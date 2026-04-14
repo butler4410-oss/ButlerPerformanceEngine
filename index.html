@@ -2854,6 +2854,129 @@
   body.dark-mode .logo-swap { content: url('logo.svg'); }
   body:not(.dark-mode) .logo-swap { content: url('logo-light.svg'); }
 
+  /* ── ALL MODALS dark mode ── */
+  body.dark-mode .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); }
+  body.dark-mode .modal { background: #0c1222; border: 1px solid rgba(77,166,255,0.12); box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 40px rgba(77,166,255,0.04); }
+  body.dark-mode .modal h3 { color: #e8ecf4; border-bottom: 1px solid rgba(77,166,255,0.1); padding-bottom: 12px; }
+  body.dark-mode .modal-buttons .btn-cancel { background: rgba(77,166,255,0.06); border-color: rgba(77,166,255,0.15); color: #7b8ba5; }
+  body.dark-mode .modal-buttons .btn-cancel:hover { background: rgba(77,166,255,0.12); color: #e8ecf4; }
+  body.dark-mode .modal-buttons .btn-save { background: linear-gradient(135deg, #1e40af, #2563eb); box-shadow: 0 4px 16px rgba(37,99,235,0.3); }
+  body.dark-mode .cust-modal-overlay { background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); }
+  body.dark-mode .cust-modal { background: #0c1222; border: 1px solid rgba(77,166,255,0.12); }
+  body.dark-mode .cust-modal-header { border-bottom-color: rgba(77,166,255,0.1); }
+  body.dark-mode .cust-modal-close { background: rgba(77,166,255,0.08); border-color: rgba(77,166,255,0.15); color: #7b8ba5; }
+  body.dark-mode .cust-modal-close:hover { background: #dc2626; border-color: #dc2626; color: #fff; }
+  body.dark-mode .bpa-confirm-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); }
+  body.dark-mode .bpa-confirm-dialog { background: #0c1222; border: 1px solid rgba(77,166,255,0.12); box-shadow: 0 16px 48px rgba(0,0,0,0.5); }
+  body.dark-mode .settings-tab { background: rgba(77,166,255,0.06); border-color: rgba(77,166,255,0.1); color: #7b8ba5; }
+  body.dark-mode .settings-tab.active { background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+  body.dark-mode .settings-panel { border-color: rgba(77,166,255,0.08); }
+  body.dark-mode .tile-picker-grid label { background: rgba(77,166,255,0.04); border-color: rgba(77,166,255,0.1); color: #c8d4e4; }
+  body.dark-mode .tile-picker-grid label:hover { background: rgba(77,166,255,0.08); }
+  body.dark-mode .tile-picker-grid input:checked + span { color: #4da6ff; }
+  body.dark-mode .mapping-wizard-overlay { background: rgba(0,0,0,0.85); }
+  body.dark-mode .mapping-wizard { background: #0c1222; border: 1px solid rgba(77,166,255,0.12); }
+  body.dark-mode .processing-overlay { background: rgba(6,10,19,0.95); }
+
+  /* ── Upload screen command center ── */
+  body.dark-mode .upload-screen { background: radial-gradient(ellipse at 50% 20%, rgba(14,24,48,0.95) 0%, #060a13 60%); }
+  body.dark-mode .upload-screen::before { content: ""; position: fixed; inset: 0; background: radial-gradient(circle at 30% 40%, rgba(77,166,255,0.03) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(0,230,138,0.02) 0%, transparent 50%); pointer-events: none; }
+  body.dark-mode .upload-card { background: rgba(12,18,34,0.95); border: 1px solid rgba(77,166,255,0.08); box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 60px rgba(77,166,255,0.03); border-radius: 16px; }
+  body.dark-mode .upload-drop { border: 2px dashed rgba(77,166,255,0.25); background: rgba(77,166,255,0.02); position: relative; }
+  body.dark-mode .upload-drop::after { content: ""; position: absolute; inset: -2px; border-radius: 12px; background: linear-gradient(135deg, rgba(77,166,255,0.08), rgba(0,230,138,0.06), rgba(77,166,255,0.08)); opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: -1; }
+  body.dark-mode .upload-drop:hover { border-color: rgba(77,166,255,0.5); background: rgba(77,166,255,0.05); box-shadow: 0 0 30px rgba(77,166,255,0.08); }
+  body.dark-mode .upload-drop:hover::after { opacity: 1; }
+  body.dark-mode .upload-drop.drag-over { border-color: #4da6ff; background: rgba(77,166,255,0.08); box-shadow: 0 0 40px rgba(77,166,255,0.15), inset 0 0 30px rgba(77,166,255,0.05); }
+  body.dark-mode .file-input-btn { background: linear-gradient(135deg, #1e40af, #2563eb) !important; box-shadow: 0 4px 16px rgba(37,99,235,0.3); color: #fff !important; }
+  body.dark-mode .file-input-btn:hover { box-shadow: 0 6px 24px rgba(37,99,235,0.5); }
+
+  /* ── Enhanced section headers with accent bars ── */
+  body.dark-mode .ops-grid-wrap > h3 { background: linear-gradient(135deg, rgba(77,166,255,0.06) 0%, transparent 100%); border-bottom: 1px solid rgba(77,166,255,0.1); border-left: 4px solid #4da6ff; color: #e8ecf4; padding: 12px 16px; }
+  body.dark-mode .chart-card > h3 { border-bottom: 1px solid rgba(77,166,255,0.1); border-left: 4px solid #4da6ff; color: #e8ecf4; padding: 10px 14px; margin: -14px -14px 14px; }
+  body.dark-mode .view-hero { border-bottom: 1px solid rgba(77,166,255,0.08); padding-bottom: 16px; margin-bottom: 20px; }
+  body.dark-mode .view-hero-title { background: linear-gradient(135deg, #e8ecf4, #4da6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  body.dark-mode .view-hero-sub { color: #7b8ba5; }
+  body.dark-mode .view-hero-badge { background: rgba(77,166,255,0.1); border: 1px solid rgba(77,166,255,0.15); color: #4da6ff; }
+  body.dark-mode .bpa-ai-badge { background: linear-gradient(135deg, rgba(167,139,250,0.12), rgba(77,166,255,0.12)); border: 1px solid rgba(167,139,250,0.2); color: #a78bfa; }
+
+  /* ── Enhanced KPI tile styling - more color, more badass ── */
+  body.dark-mode .kpi-card { position: relative; overflow: hidden; }
+  body.dark-mode .kpi-card::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 0.8; }
+  body.dark-mode .kpi-card.kpi-revenue::after { background: linear-gradient(90deg, #2563eb, #4da6ff); }
+  body.dark-mode .kpi-card.kpi-green::after { background: linear-gradient(90deg, #059669, #00e68a); }
+  body.dark-mode .kpi-card.kpi-blue::after { background: linear-gradient(90deg, #1e40af, #4da6ff); }
+  body.dark-mode .kpi-card.kpi-purple::after { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+  body.dark-mode .kpi-card.kpi-orange::after { background: linear-gradient(90deg, #ea580c, #ff8c42); }
+  body.dark-mode .kpi-card.kpi-red::after { background: linear-gradient(90deg, #dc2626, #ff4d6a); }
+  body.dark-mode .kpi-card.kpi-yellow::after { background: linear-gradient(90deg, #d97706, #ffb830); }
+  body.dark-mode .kpi-card.kpi-teal::after { background: linear-gradient(90deg, #0d9488, #5eead4); }
+  body.dark-mode .kpi-card.kpi-pink::after { background: linear-gradient(90deg, #db2777, #f472b6); }
+  body.dark-mode .kpi-card .kpi-label { color: #7b8ba5; letter-spacing: 0.5px; }
+  body.dark-mode .kpi-card .kpi-value { font-weight: 800; }
+  body.dark-mode .kpi-card.kpi-revenue .kpi-value { color: #4da6ff; }
+  body.dark-mode .kpi-card.kpi-green .kpi-value { color: #00e68a; }
+  body.dark-mode .kpi-card.kpi-blue .kpi-value { color: #4da6ff; }
+  body.dark-mode .kpi-card.kpi-purple .kpi-value { color: #a78bfa; }
+  body.dark-mode .kpi-card.kpi-orange .kpi-value { color: #ff8c42; }
+  body.dark-mode .kpi-card.kpi-red .kpi-value { color: #ff4d6a; }
+  body.dark-mode .kpi-card.kpi-yellow .kpi-value { color: #ffb830; }
+  body.dark-mode .kpi-card.kpi-teal .kpi-value { color: #5eead4; }
+  body.dark-mode .kpi-card .kpi-icon { background: rgba(77,166,255,0.08); border: 1px solid rgba(77,166,255,0.1); }
+  body.dark-mode .kpi-card.clickable:hover { transform: translateY(-2px); transition: transform 0.2s, box-shadow 0.2s; }
+
+  /* ── BPA Insight panel premium dark styling ── */
+  body.dark-mode .bpa-panel { border-radius: 12px; border: 1px solid rgba(77,166,255,0.1); border-left: 4px solid #4da6ff; overflow: hidden; }
+  body.dark-mode .bpa-header { background: linear-gradient(135deg, rgba(77,166,255,0.08), rgba(77,166,255,0.02)) !important; border-bottom: 1px solid rgba(77,166,255,0.08); }
+  body.dark-mode .bpa-logo { background: linear-gradient(135deg, #1e40af, #2563eb); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+  body.dark-mode .bpa-action-btn { border: 1px solid rgba(77,166,255,0.2); color: #4da6ff; background: rgba(77,166,255,0.06); }
+  body.dark-mode .bpa-action-btn:hover { background: rgba(77,166,255,0.15); box-shadow: 0 0 12px rgba(77,166,255,0.1); }
+  body.dark-mode .bpa-action-btn.orange { border-color: rgba(255,140,66,0.3); color: #ff8c42; background: rgba(255,140,66,0.08); }
+  body.dark-mode .bpa-action-btn.orange:hover { background: rgba(255,140,66,0.18); }
+  body.dark-mode .bpa-action-btn.blue { border-color: rgba(77,166,255,0.3); color: #4da6ff; background: rgba(77,166,255,0.08); }
+  body.dark-mode .bpa-action-btn.green { border-color: rgba(0,230,138,0.3); color: #00e68a; background: rgba(0,230,138,0.08); }
+  body.dark-mode .bpa-action-btn.green:hover { background: rgba(0,230,138,0.18); }
+
+  /* ── Empty state ── */
+  body.dark-mode .empty-state { color: #7b8ba5; }
+  body.dark-mode .empty-state-title { color: #c8d4e4; }
+  .empty-state-action { display: inline-block; margin-top: 12px; padding: 8px 18px; background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .empty-state-action:hover { box-shadow: 0 4px 16px rgba(37,99,235,0.4); transform: translateY(-1px); }
+
+  /* ── Table row clickable glow ── */
+  body.dark-mode .ops-grid tbody tr { cursor: pointer; transition: background 0.15s, box-shadow 0.15s; }
+  body.dark-mode .ops-grid tbody tr:hover td { background: rgba(77,166,255,0.06); }
+  body.dark-mode .ops-grid tbody tr:active td { background: rgba(77,166,255,0.12); }
+
+  /* ── View All button ── */
+  .view-all-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 14px; font-size: 11px; font-weight: 600; color: #4da6ff; background: rgba(77,166,255,0.06); border: 1px solid rgba(77,166,255,0.15); border-radius: 6px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .view-all-btn:hover { background: rgba(77,166,255,0.12); box-shadow: 0 0 12px rgba(77,166,255,0.08); }
+
+  /* ── Chart cards dark mode ── */
+  body.dark-mode .chart-card { position: relative; overflow: hidden; }
+  body.dark-mode .chart-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #2563eb, #4da6ff); }
+  body.dark-mode .inline-chart-card { background: #0c1222; border-color: rgba(77,166,255,0.1); }
+  body.dark-mode .inline-chart-card h4 { color: #c8d4e4; }
+
+  /* ── District row dark mode ── */
+  body.dark-mode .district-row td { background: rgba(77,166,255,0.04) !important; border-top: 2px solid rgba(77,166,255,0.1); }
+
+  /* ── Grow section dark mode ── */
+  body.dark-mode .grow-section-title { color: #e8ecf4; border-bottom-color: rgba(77,166,255,0.1); }
+
+  /* ── Forecast slider dark mode ── */
+  body.dark-mode input[type="range"] { accent-color: #4da6ff; }
+  body.dark-mode input[type="range"]::-webkit-slider-runnable-track { background: rgba(77,166,255,0.15); }
+
+  /* ── Enhanced BPA Alert Modal ── */
+  .bpa-alert-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 20000; animation: fadeIn 0.2s; }
+  .bpa-alert-modal { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; width: 540px; max-width: 92vw; max-height: 85vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(0,0,0,0.5); }
+  body.dark-mode .bpa-alert-modal { background: #0c1222; border-color: rgba(77,166,255,0.12); box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 40px rgba(77,166,255,0.04); }
+  .bpa-alert-modal h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .bpa-alert-modal .form-group { margin-bottom: 14px; }
+  .bpa-alert-modal textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 8px; font-size: 13px; font-family: inherit; min-height: 120px; resize: vertical; }
+  body.dark-mode .bpa-alert-modal textarea { background: #060a13; border-color: rgba(77,166,255,0.15); }
+  .bpa-alert-modal .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
   /* Theme toggle button */
   .theme-toggle {
     width: 32px; height: 32px; border-radius: 8px; border: none;
@@ -6584,7 +6707,7 @@ function renderReports() {
   }
 
   if (!html) {
-    html = '<div style="text-align:center;color:var(--text-muted);padding:40px;">No data loaded yet. Upload CSV files to see reports here.</div>';
+    html = '<div class="empty-state" style="padding:48px 24px;"><div class="empty-state-title">No data loaded</div><div class="empty-state-sub">Upload files or sync from your DDS connection to see reports here.</div><button class="empty-state-action" onclick="openSettings();switchSettingsTab(\'datasource\');">Sync Data</button></div>';
   }
 
   cards.innerHTML = html;
@@ -7621,34 +7744,57 @@ function bpaHTML(panelId, title, insights) {
 
 // BPA Action Handlers
 function bpaAlertStores(storeList, metric) {
-  // Pre-fill alert rule for these stores
   const recipients = getAlertRecipients();
-  if (!recipients.length) {
-    openAlerts();
-    bpaToast('Add alert recipients first, then create a rule for this metric.', 'warning');
-    return;
-  }
   const meta = getReportMeta();
-  const subject = '[BPA ACTION] Store Performance Alert — ' + metric;
-  let body = 'Hi Team,\n\nButler Performance Analytics has identified the following stores needing attention for: ' + metric + '\n\n';
-  body += 'Stores: ' + storeList + '\n';
-  body += 'Period: ' + (meta.dateFrom||'Start') + ' to ' + (meta.dateTo||'End') + '\n\n';
-  body += 'Please review and take corrective action.\n\n— Butler Performance Analytics';
-  const to = recipients.map(r => r.email).join(', ');
+  const defaultSubject = '[BPA ACTION] Store Performance Alert — ' + metric;
+  let defaultBody = 'Hi Team,\n\nButler Performance Analytics has identified the following stores needing attention for: ' + metric + '\n\n';
+  defaultBody += 'Stores: ' + storeList + '\n';
+  defaultBody += 'Period: ' + (meta.dateFrom||'Start') + ' to ' + (meta.dateTo||'End') + '\n\n';
+  defaultBody += 'Please review and take corrective action.\n\n— Butler Performance Analytics';
+  const toDefault = recipients.length ? recipients.map(function(r){return r.email;}).join(', ') : '';
+  // Build and show a real email modal
+  var overlay = document.createElement('div');
+  overlay.className = 'bpa-alert-modal-overlay';
+  overlay.id = 'bpaAlertEmailModal';
+  overlay.innerHTML = '<div class="bpa-alert-modal">'
+    + '<h3><span style="color:var(--orange);">&#9888;</span> Alert Managers — ' + escapeHTML(metric) + '</h3>'
+    + '<div class="form-group"><label>To (comma-separated emails)</label>'
+    + '<input type="text" id="bpaAlertTo" value="' + escapeHTML(toDefault) + '" placeholder="manager@company.com" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;font-family:inherit;"></div>'
+    + '<div class="form-group"><label>Subject</label>'
+    + '<input type="text" id="bpaAlertSubject" value="' + escapeHTML(defaultSubject) + '" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;font-family:inherit;"></div>'
+    + '<div class="form-group"><label>Message</label>'
+    + '<textarea id="bpaAlertBody">' + escapeHTML(defaultBody) + '</textarea></div>'
+    + '<div class="modal-buttons">'
+    + '<button class="btn-cancel" onclick="document.getElementById(\'bpaAlertEmailModal\').remove()">Cancel</button>'
+    + '<button class="btn-save" onclick="bpaSendAlertEmail()" style="background:linear-gradient(135deg,#ea580c,#fb923c);">Send Alert</button>'
+    + '</div></div>';
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+  setTimeout(function(){ var inp = document.getElementById('bpaAlertTo'); if(inp) inp.focus(); }, 100);
+}
+
+function bpaSendAlertEmail() {
+  var to = (document.getElementById('bpaAlertTo') || {}).value || '';
+  var subject = (document.getElementById('bpaAlertSubject') || {}).value || '';
+  var body = (document.getElementById('bpaAlertBody') || {}).value || '';
+  if (!to.trim()) { bpaToast('Enter at least one recipient email.', 'warning'); return; }
   if (isEmailConfigured()) {
-    sendViaEmailJS(to, subject, body).then(() => bpaToast('Alert sent to ' + to)).catch(e => bpaToast('Failed: '+(e?.text||e?.message||'Error'), 'error'));
+    sendViaEmailJS(to, subject, body).then(function(){ bpaToast('Alert sent to ' + to, 'success'); document.getElementById('bpaAlertEmailModal').remove(); }).catch(function(e){ bpaToast('Failed: '+(e&&e.text||e&&e.message||'Error'), 'error'); });
   } else {
     window.open('mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_self');
+    document.getElementById('bpaAlertEmailModal').remove();
   }
 }
 
 function bpaDrillStore(storeNum) {
-  // Switch to Store Rankings tab and open detail
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelector('[data-tab="stores"]').classList.add('active');
-  document.getElementById('tab-stores').classList.add('active');
-  setTimeout(() => openStoreRankDetail(storeNum), 100);
+  // Navigate to My Stores view and drill into the specific store
+  navigateTo('stores');
+  setTimeout(function() {
+    if (typeof openStoreRankDetail === 'function') {
+      openStoreRankDetail(storeNum);
+    }
+    bpaToast('Viewing Store #' + escapeHTML(String(storeNum)), 'success');
+  }, 200);
 }
 
 function bpaFilterStore(storeNum) {
@@ -7681,11 +7827,57 @@ function bpaExportInsights(panelId) {
 }
 
 function bpaCreateAlert(metric, operator, threshold) {
-  const list = getAlertRules();
-  list.push({ metric, operator, threshold: +threshold, severity: 'warning' });
+  var opLabels = { lt: 'Less than', gt: 'Greater than', eq: 'Equal to', lte: 'Less or equal', gte: 'Greater or equal' };
+  var overlay = document.createElement('div');
+  overlay.className = 'bpa-alert-modal-overlay';
+  overlay.id = 'bpaCreateAlertModal';
+  overlay.innerHTML = '<div class="bpa-alert-modal">'
+    + '<h3><span style="color:var(--blue);">&#9881;</span> Create Alert Rule</h3>'
+    + '<div class="form-group"><label>Metric</label>'
+    + '<select id="bpaAlertMetric" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;">'
+    + '<option value="revenue"' + (metric==='revenue'?' selected':'') + '>Revenue</option>'
+    + '<option value="avg_ticket"' + (metric==='avg_ticket'?' selected':'') + '>Average Ticket</option>'
+    + '<option value="cars_per_day"' + (metric==='cars_per_day'?' selected':'') + '>Cars Per Day</option>'
+    + '<option value="bay_time"' + (metric==='bay_time'?' selected':'') + '>Bay Time (min)</option>'
+    + '<option value="wait_time"' + (metric==='wait_time'?' selected':'') + '>Wait Time (min)</option>'
+    + '<option value="promo_pct"' + (metric==='promo_pct'?' selected':'') + '>Promo %</option>'
+    + '</select></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
+    + '<div class="form-group"><label>Condition</label>'
+    + '<select id="bpaAlertOp" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;">'
+    + '<option value="lt"' + (operator==='lt'?' selected':'') + '>Less than</option>'
+    + '<option value="gt"' + (operator==='gt'?' selected':'') + '>Greater than</option>'
+    + '<option value="lte">Less or equal</option>'
+    + '<option value="gte">Greater or equal</option>'
+    + '</select></div>'
+    + '<div class="form-group"><label>Threshold</label>'
+    + '<input type="number" id="bpaAlertThreshold" value="' + (+threshold||0) + '" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;font-family:inherit;"></div>'
+    + '</div>'
+    + '<div class="form-group"><label>Severity</label>'
+    + '<select id="bpaAlertSeverity" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;">'
+    + '<option value="info">Info</option>'
+    + '<option value="warning" selected>Warning</option>'
+    + '<option value="critical">Critical</option>'
+    + '</select></div>'
+    + '<div class="modal-buttons">'
+    + '<button class="btn-cancel" onclick="document.getElementById(\'bpaCreateAlertModal\').remove()">Cancel</button>'
+    + '<button class="btn-save" onclick="bpaSaveAlertRule()">Create Rule</button>'
+    + '</div></div>';
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function bpaSaveAlertRule() {
+  var m = (document.getElementById('bpaAlertMetric')||{}).value || 'revenue';
+  var op = (document.getElementById('bpaAlertOp')||{}).value || 'lt';
+  var th = +(document.getElementById('bpaAlertThreshold')||{}).value || 0;
+  var sev = (document.getElementById('bpaAlertSeverity')||{}).value || 'warning';
+  var list = getAlertRules();
+  list.push({ metric: m, operator: op, threshold: th, severity: sev });
   saveAlertRules(list);
   runAlertCheck();
-  bpaToast('Alert rule created: ' + metric + ' ' + operator + ' ' + threshold, 'success');
+  document.getElementById('bpaCreateAlertModal').remove();
+  bpaToast('Alert rule created: ' + m + ' ' + op + ' ' + th, 'success');
 }
 
 function bpaSwitchTab(viewOrTab) {
@@ -8614,9 +8806,9 @@ function renderOverview() {
   };
 
   if (!cust.length && !hasGROW) {
-    document.getElementById('dashKPIs').innerHTML = '';
+    document.getElementById('dashKPIs').innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:40px 24px;"><div class="empty-state-title">No data loaded</div><div class="empty-state-sub">Upload files or sync from your DDS connection to see analytics.</div><button class="empty-state-action" onclick="openSettings();switchSettingsTab(\'datasource\');">Sync Data</button></div>';
     const storeTable = document.getElementById('dashStoreBody');
-    if (storeTable) storeTable.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-state-title">No data loaded</div><div class="empty-state-sub">Upload your data files to see analytics</div></td></tr>';
+    if (storeTable) storeTable.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-state-title">No store data available</div><div class="empty-state-sub">Upload files or sync from your DDS connection.</div><button class="empty-state-action" onclick="openSettings();switchSettingsTab(\'datasource\');">Sync Data</button></td></tr>';
     return;
   }
 
@@ -11197,7 +11389,7 @@ function renderMarketing() {
   if (!cust.length) {
     const kpiEl = document.getElementById('marketKPIs');
     if (kpiEl) kpiEl.innerHTML = '<div class="kpi-card" style="grid-column:1/-1;text-align:center;"><div class="kpi-label">Market Analysis</div><div class="kpi-value" style="font-size:16px;color:var(--text-muted);">Load transaction data to see analysis</div></div>';
-    ['zipAnalysis','serviceMixAnalysis','retentionAnalysis','fleetAnalysis','opportunityBody'].forEach(id => { const e = document.getElementById(id); if (e) e.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:20px;text-align:center;">No data loaded</div>'; });
+    ['zipAnalysis','serviceMixAnalysis','retentionAnalysis','fleetAnalysis','opportunityBody'].forEach(id => { const e = document.getElementById(id); if (e) e.innerHTML = '<div class="empty-state" style="padding:24px;"><div class="empty-state-title">No data loaded</div><div class="empty-state-sub">Upload files or sync from your DDS connection.</div><button class="empty-state-action" onclick="openSettings();switchSettingsTab(\'datasource\');">Sync Data</button></div>'; });
     return;
   }
 
@@ -16582,6 +16774,7 @@ loadSettings();
 checkDueReports();
 /* BPA-VIBRANT-ANCHOR */
 </script>
+<script src="bpa-advanced.js"></script>
 <script src="bpa-vibrant.js"></script>
 </body>
 </html>

@@ -283,5 +283,286 @@ renderStores = function() {
   });
 };
 
+// 8) Enhanced renderOverview — visible charts alongside store table
+var _oo2 = renderOverview;
+renderOverview = function() {
+  _oo2.apply(this, arguments);
+  var cu = FILTERED.customers;
+
+  // Empty state for My Business when no data
+  var biz = document.getElementById('view-business');
+  if (biz && (!cu || !cu.length)) {
+    var existingEmpty = document.getElementById('bpaBusinessEmptyState');
+    if (!existingEmpty) {
+      // Add empty state messages to charts area
+      var chartArea = biz.querySelectorAll('.chart-card');
+      chartArea.forEach(function(c) {
+        if (!c.querySelector('.bpa-empty-chart')) {
+          var wrap = c.querySelector('.chart-wrap');
+          if (wrap) {
+            var msg = document.createElement('div');
+            msg.className = 'bpa-empty-chart';
+            msg.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;z-index:2;';
+            msg.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-weight:600;">No data loaded</div><button class="empty-state-action" onclick="openSettings();switchSettingsTab(\'datasource\');" style="font-size:11px;padding:6px 14px;">Sync Data</button>';
+            wrap.style.position = 'relative';
+            wrap.appendChild(msg);
+          }
+        }
+      });
+    }
+    return;
+  }
+
+  // Remove empty chart messages if data is loaded
+  var empties = document.querySelectorAll('.bpa-empty-chart');
+  empties.forEach(function(e) { e.remove(); });
+
+  if (!cu || !cu.length) return;
+
+  // ── Revenue vs Prior Period line chart (visible in My Business) ──
+  var businessChartsRow = document.getElementById('bpaBusinessCharts');
+  if (!businessChartsRow && biz) {
+    businessChartsRow = document.createElement('div');
+    businessChartsRow.id = 'bpaBusinessCharts';
+    businessChartsRow.className = 'inline-chart-row';
+    businessChartsRow.style.marginBottom = '12px';
+    businessChartsRow.innerHTML = '<div class="inline-chart-card accent-blue"><h4><span class="chart-dot" style="background:#2563eb"></span> Revenue vs Prior Period</h4><div style="height:200px"><canvas id="chartBizRevVsPrior"></canvas></div></div>'
+      + '<div class="inline-chart-card accent-teal"><h4><span class="chart-dot" style="background:#0d9488"></span> Cars Per Day Trend</h4><div style="height:200px"><canvas id="chartBizCPDTrend"></canvas></div></div>';
+    // Insert after BPA Insights but before store table
+    var bpaOv = document.getElementById('bpaOverview');
+    if (bpaOv && bpaOv.parentNode && bpaOv.parentNode.nextSibling) {
+      bpaOv.parentNode.parentNode.insertBefore(businessChartsRow, bpaOv.parentNode.nextSibling);
+    } else {
+      var storeWrap = biz.querySelector('.ops-grid-wrap');
+      if (storeWrap) biz.insertBefore(businessChartsRow, storeWrap);
+    }
+  }
+
+  // Build revenue by date data
+  var revByDate = {};
+  var invByDate2 = {};
+  cu.forEach(function(r) {
+    var d = parseDate(r.Invoice_Date);
+    if (!d) return;
+    var k = d.toISOString().split('T')[0];
+    revByDate[k] = (revByDate[k] || 0) + (+r.Net_Sales || 0);
+    invByDate2[k] = (invByDate2[k] || 0) + 1;
+  });
+
+  var allDates = Object.keys(revByDate).sort();
+  var storeCount2 = new Set(cu.map(function(r) { return r.Store_Number; })).size || 1;
+
+  if (allDates.length >= 2) {
+    // Split into two halves for "prior period" comparison
+    var mid = Math.floor(allDates.length / 2);
+    var currentDates = allDates.slice(mid);
+    var priorDates = allDates.slice(0, mid);
+    var currentRev = currentDates.map(function(d) { return revByDate[d]; });
+    var priorRev = priorDates.map(function(d) { return revByDate[d]; });
+    // Pad shorter array
+    while (priorRev.length < currentRev.length) priorRev.push(0);
+    while (currentRev.length < priorRev.length) currentRev.push(0);
+    var labels = [];
+    for (var i = 0; i < currentDates.length; i++) labels.push('Day ' + (i + 1));
+
+    makeChart('chartBizRevVsPrior', {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Current Period', data: currentRev, borderColor: '#4da6ff', backgroundColor: 'rgba(77,166,255,0.1)', fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2.5 },
+          { label: 'Prior Period', data: priorRev, borderColor: '#7b8ba5', backgroundColor: 'rgba(123,139,165,0.05)', fill: true, tension: 0.4, pointRadius: 1, borderWidth: 1.5, borderDash: [5, 3] }
+        ]
+      },
+      options: {
+        scales: {
+          x: { ticks: { font: { size: 10 }, maxTicksLimit: 10, color: '#7b8ba5' }, grid: { color: 'rgba(77,166,255,0.05)' } },
+          y: { beginAtZero: true, ticks: { callback: function(v) { return '$' + (v / 1e3).toFixed(0) + 'K'; }, font: { size: 10 }, color: '#7b8ba5' }, grid: { color: 'rgba(77,166,255,0.05)' } }
+        },
+        plugins: { legend: { display: true, labels: { font: { size: 10 }, color: '#7b8ba5', usePointStyle: true, pointStyleWidth: 10, boxWidth: 8 } } }
+      }
+    });
+
+    // CPD trend sparkline (detailed)
+    var cpdData = allDates.map(function(d) { return (invByDate2[d] || 0) / storeCount2; });
+    var avgCPD2 = cpdData.reduce(function(a, b) { return a + b; }, 0) / cpdData.length;
+    var cpdColors = cpdData.map(function(v) { return v >= avgCPD2 * 1.2 ? '#00e68a' : v >= avgCPD2 * 0.8 ? '#4da6ff' : '#ff8c42'; });
+
+    makeChart('chartBizCPDTrend', {
+      type: 'bar',
+      data: {
+        labels: allDates.map(function(d) { return d.substring(5); }),
+        datasets: [{
+          label: 'Cars/Day', data: cpdData, backgroundColor: cpdColors,
+          borderRadius: 3, maxBarThickness: 12
+        }, {
+          label: 'Average', data: allDates.map(function() { return avgCPD2; }),
+          type: 'line', borderColor: '#ff4d6a', borderWidth: 1.5, borderDash: [4, 3],
+          pointRadius: 0, fill: false
+        }]
+      },
+      options: {
+        scales: {
+          x: { ticks: { font: { size: 9 }, maxTicksLimit: 15, maxRotation: 45, color: '#7b8ba5' }, grid: { display: false } },
+          y: { beginAtZero: true, ticks: { font: { size: 10 }, color: '#7b8ba5' }, grid: { color: 'rgba(77,166,255,0.05)' } }
+        },
+        plugins: { legend: { display: true, labels: { font: { size: 10 }, color: '#7b8ba5', usePointStyle: true, pointStyleWidth: 10, boxWidth: 8 } } }
+      }
+    });
+  }
+};
+
+// 9) Enhanced renderStores — empty state + View All
+var _os2 = renderStores;
+renderStores = function() {
+  _os2.apply(this, arguments);
+  var cu = FILTERED.customers;
+  var storeView = document.getElementById('allStoresView');
+  if (storeView && (!cu || !cu.length)) {
+    var gridBody = document.getElementById('opsGridBody');
+    if (gridBody && !gridBody.innerHTML.trim()) {
+      gridBody.innerHTML = '<tr><td colspan="12" class="empty-state"><div class="empty-state-title">No store data loaded</div><div class="empty-state-sub">Upload files or sync from your DDS connection.</div><button class="empty-state-action" onclick="openSettings();switchSettingsTab(\'datasource\');">Sync Data</button></td></tr>';
+    }
+  }
+  // Gold/silver/bronze on ops grid
+  var tb = document.querySelector('#opsGridBody');
+  if (tb) {
+    var si = 0;
+    tb.querySelectorAll('tr:not(.district-row):not(.totals-row):not(.store-child)').forEach(function(r) {
+      r.classList.remove('rank-gold', 'rank-silver', 'rank-bronze');
+      if (si === 0) r.classList.add('rank-gold');
+      else if (si === 1) r.classList.add('rank-silver');
+      else if (si === 2) r.classList.add('rank-bronze');
+      si++;
+    });
+  }
+};
+
+// 10) Enhanced renderReporting — empty state for Data Room
+var _or2 = renderReporting;
+renderReporting = function() {
+  _or2.apply(this, arguments);
+  var cu = FILTERED.customers;
+  var dr = document.getElementById('view-dataroom');
+  if (dr && (!cu || !cu.length)) {
+    var pab = document.getElementById('productAnalysisBody');
+    if (pab && !pab.innerHTML.trim()) {
+      pab.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="empty-state-title">No data loaded</div><div class="empty-state-sub">Upload files or sync from your DDS connection.</div><button class="empty-state-action" onclick="openSettings();switchSettingsTab(\'datasource\');">Sync Data</button></td></tr>';
+    }
+  }
+};
+
+// 11) Enhanced renderGrow — empty state for Growth
+var _og2 = renderGrow;
+renderGrow = function() {
+  _og2.apply(this, arguments);
+  var cu = FILTERED.customers;
+  var gv = document.getElementById('view-growth');
+  if (gv && (!cu || !cu.length)) {
+    var ab = document.getElementById('fcActualsBody');
+    if (ab && !ab.innerHTML.trim()) {
+      ab.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="empty-state-title">No baseline data</div><div class="empty-state-sub">Upload data to generate growth forecasts.</div><button class="empty-state-action" onclick="openSettings();switchSettingsTab(\'datasource\');">Sync Data</button></td></tr>';
+    }
+  }
+};
+
+// 12) Add View All buttons to truncated tables
+function addViewAllButtons() {
+  // Dashboard store table — View All to My Stores
+  var dashWrap = document.querySelector('#view-business .ops-grid-wrap h3');
+  if (dashWrap && !dashWrap.querySelector('.view-all-btn')) {
+    var btns = dashWrap.querySelector('div');
+    if (btns) {
+      var va = document.createElement('button');
+      va.className = 'view-all-btn';
+      va.innerHTML = 'View All &#8594;';
+      va.onclick = function() { navigateTo('stores'); };
+      btns.insertBefore(va, btns.firstChild);
+    }
+  }
+  // Product Analysis — if more than 15 rows, show View All
+  var pab = document.getElementById('productAnalysisBody');
+  if (pab && pab.querySelectorAll('tr').length > 15) {
+    var paWrap = pab.closest('.ops-grid-wrap');
+    if (paWrap) {
+      var h3 = paWrap.querySelector('h3');
+      if (h3 && !h3.querySelector('.view-all-btn')) {
+        var btns = h3.querySelector('div');
+        if (btns) {
+          var va = document.createElement('button');
+          va.className = 'view-all-btn';
+          va.innerHTML = 'View All &#8594;';
+          va.onclick = function() {
+            var scroll = paWrap.querySelector('.ops-grid-scroll');
+            if (scroll) scroll.style.maxHeight = 'none';
+            va.style.display = 'none';
+          };
+          btns.insertBefore(va, btns.firstChild);
+        }
+      }
+    }
+  }
+  // Service Mix — View All
+  var smb = document.getElementById('serviceMixBody');
+  if (smb && smb.querySelectorAll('tr').length > 10) {
+    var smWrap = smb.closest('.ops-grid-wrap');
+    if (smWrap) {
+      var h3 = smWrap.querySelector('h3');
+      if (h3 && !h3.querySelector('.view-all-btn')) {
+        var va = document.createElement('button');
+        va.className = 'view-all-btn';
+        va.innerHTML = 'View All &#8594;';
+        va.onclick = function() {
+          var scroll = smWrap.querySelector('.ops-grid-scroll');
+          if (scroll) scroll.style.maxHeight = 'none';
+          va.style.display = 'none';
+        };
+        h3.appendChild(va);
+      }
+    }
+  }
+}
+
+// 13) Dark theme chart defaults
+function applyDarkChartDefaults() {
+  if (typeof Chart === 'undefined') return;
+  var isDark = document.body.classList.contains('dark-mode');
+  if (!isDark) return;
+  Chart.defaults.color = '#7b8ba5';
+  Chart.defaults.borderColor = 'rgba(77,166,255,0.08)';
+  Chart.defaults.plugins.legend.labels.color = '#7b8ba5';
+  Chart.defaults.scale.grid = Chart.defaults.scale.grid || {};
+  Chart.defaults.scale.grid.color = 'rgba(77,166,255,0.06)';
+  Chart.defaults.scale.ticks = Chart.defaults.scale.ticks || {};
+  Chart.defaults.scale.ticks.color = '#7b8ba5';
+}
+
+// 14) Apply section header accent bars to all views
+function applySectionAccentBars() {
+  var headers = document.querySelectorAll('.ops-grid-wrap > h3, .chart-card > h3, .trend-section-title');
+  headers.forEach(function(h) {
+    if (h.getAttribute('data-accent-applied')) return;
+    h.setAttribute('data-accent-applied', '1');
+  });
+}
+
+// 15) Watch for view changes and reapply
+var _origNav = navigateTo;
+navigateTo = function() {
+  _origNav.apply(this, arguments);
+  setTimeout(function() {
+    addViewAllButtons();
+    applySectionAccentBars();
+  }, 300);
+};
+
+// Initialize on load
+applyDarkChartDefaults();
+setTimeout(function() {
+  addViewAllButtons();
+  applySectionAccentBars();
+}, 500);
+
 console.log('[BPA] Vibrant color & chart system loaded');
+console.log('[BPA] Premium polish pass applied — full badassery');
 })();
