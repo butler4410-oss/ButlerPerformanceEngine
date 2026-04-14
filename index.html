@@ -4670,6 +4670,7 @@
       <div class="view-hero-sub">Performance overview across all locations</div>
       <div class="view-hero-meta">
         <span class="view-hero-badge"><span class="live-dot-inline"></span> Live Data</span>
+        <span class="view-hero-badge" id="dataDateRange" style="background:rgba(0,230,138,0.1);border-color:rgba(0,230,138,0.15);color:#00e68a;"></span>
         <span class="bpa-ai-badge">Insights by BPA Engine</span>
       </div>
     </div>
@@ -6228,34 +6229,41 @@ function applyFilters() {
   const from = document.getElementById('filterFrom').value ? new Date(document.getElementById('filterFrom').value + 'T00:00:00') : null;
   const to = document.getElementById('filterTo').value ? new Date(document.getElementById('filterTo').value + 'T23:59:59') : null;
 
-  const filterRow = (row) => {
-    if (store && row.Store_Number !== store) return false;
-    const d = row._d;
-    if (from && d && d < from) return false;
-    if (to && d && d > to) return false;
-    return true;
-  };
+  // Show loading for large datasets
+  const totalRows = DATA.customers.length + DATA.details.length + DATA.inspections.length;
+  if (totalRows > 50000) showProcessing('Recalculating...', 'Filtering ' + totalRows.toLocaleString() + ' records');
 
-  FILTERED.customers = DATA.customers.filter(filterRow);
-  FILTERED.details = DATA.details.filter(filterRow);
-  FILTERED.promos = DATA.promos.filter(filterRow);
-  FILTERED.odi = DATA.odi.filter(filterRow);
-  FILTERED.inspections = DATA.inspections.filter(r => {
-    if (store && r.Store_Number !== store) return false;
-    const d = r._d;
-    if (from && d && d < from) return false;
-    if (to && d && d > to) return false;
-    return true;
-  });
-  FILTERED.invoices = DATA.invoices.filter(filterRow);
+  setTimeout(function() {
+    const filterRow = (row) => {
+      if (store && row.Store_Number !== store) return false;
+      const d = row._d;
+      if (from && d && d < from) return false;
+      if (to && d && d > to) return false;
+      return true;
+    };
 
-  // Normalize store numbers across all filtered data
-  [FILTERED.customers, FILTERED.details, FILTERED.promos, FILTERED.inspections, FILTERED.invoices, FILTERED.odi].forEach(arr => {
-    arr.forEach(r => { if (r.Store_Number) r.Store_Number = cleanStoreNum(r.Store_Number); });
-  });
+    FILTERED.customers = DATA.customers.filter(filterRow);
+    FILTERED.details = DATA.details.filter(filterRow);
+    FILTERED.promos = DATA.promos.filter(filterRow);
+    FILTERED.odi = DATA.odi.filter(filterRow);
+    FILTERED.inspections = DATA.inspections.filter(r => {
+      if (store && r.Store_Number !== store) return false;
+      const d = r._d;
+      if (from && d && d < from) return false;
+      if (to && d && d > to) return false;
+      return true;
+    });
+    FILTERED.invoices = DATA.invoices.filter(filterRow);
 
-  renderDashboard();
-  updateFilterSummary();
+    // Normalize store numbers
+    [FILTERED.customers, FILTERED.details, FILTERED.promos, FILTERED.inspections, FILTERED.invoices, FILTERED.odi].forEach(arr => {
+      arr.forEach(r => { if (r.Store_Number) r.Store_Number = cleanStoreNum(r.Store_Number); });
+    });
+
+    try { renderDashboard(); } catch(e) { console.error('Render error:', e); }
+    updateFilterSummary();
+    hideProcessing();
+  }, totalRows > 50000 ? 50 : 0);
 }
 
 function updateFilterSummary() {
@@ -6275,7 +6283,21 @@ function updateFilterSummary() {
   if (fromVal && toVal) txt += ' \u00B7 ' + niceDate(fromVal) + ' \u2013 ' + niceDate(toVal);
   else if (fromVal) txt += ' \u00B7 From ' + niceDate(fromVal);
   else if (toVal) txt += ' \u00B7 To ' + niceDate(toVal);
+  // Add record count
+  const totalFiltered = FILTERED.customers.length + FILTERED.details.length + FILTERED.promos.length + FILTERED.inspections.length;
+  if (totalFiltered > 0) txt += ' \u00B7 ' + totalFiltered.toLocaleString() + ' records';
   el.textContent = txt;
+
+  // Update data date range badge
+  const dateEl = document.getElementById('dataDateRange');
+  if (dateEl) {
+    if (fromVal && toVal) {
+      dateEl.textContent = niceDate(fromVal) + ' \u2013 ' + niceDate(toVal);
+      dateEl.style.display = '';
+    } else {
+      dateEl.style.display = 'none';
+    }
+  }
 }
 
 function resetFilters() {
