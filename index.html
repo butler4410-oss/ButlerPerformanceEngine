@@ -15348,8 +15348,6 @@ const DEFAULT_ACCOUNTS = [
   { name: 'Chase Butler', email: 'chase@butleranalytics.io', company: 'Butler Performance Analytics', role: 'company_admin', stores: [], _salt: 'a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8', _hash: '077e7bbd56c6eed50c572bf74df5c8817e31ff93d6a5260a1cd0d7deec3b7a5b' },
   { name: 'Andrew Gimenes', email: 'agimenes@southbaylube.com', company: 'South Bay Lube Inc.', role: 'client_admin', stores: [], _salt: 'b2c3d4e5f6a7b8a9b2c3d4e5f6a7b8a9', _hash: 'c003fd11a8eb80e0ba0f3bbbf2707558e81d857d519981623be5846eabfc15b5' },
   { name: 'Jason Thomas', email: 'jthomas@southbaylube.com', company: 'South Bay Lube Inc.', role: 'client_admin', stores: [], _salt: 'c3d4e5f6a7b8a9b0c3d4e5f6a7b8a9b0', _hash: '6830330d2781da540920a9e1767dcad9779bce19a0c6da66de816f8ba7b516fc' },
-  { name: 'Dakota McAvaney', email: 'dmcavaney.magiclube@gmail.com', company: 'Auto Center Enterprises dba Jiffy Lube', role: 'client_admin', stores: [], _salt: 'd4e5f6a7b8a9b0c1d4e5f6a7b8a9b0c1', _hash: '077ab21a3e8dd71b3f788ed7a493ffdec15502f491ce163bf0ed646c55254017' },
-  { name: 'Erin Ham', email: 'erinham401@gmail.com', company: 'Butler Performance Analytics', role: 'client_admin', stores: [], _salt: 'e5f6a7b8a9b0c1d2e5f6a7b8a9b0c1d2', _hash: 'd88d8b0f6ea8ea849fba3b7eb0c74ff692aa1be32a0e8bfb943d88baf248d5eb' },
 ];
 
 function isCompanyAdmin() { const u = getCurrentUser(); return u && u.role === 'company_admin'; }
@@ -17097,6 +17095,7 @@ checkDueReports();
 /* BPA-VIBRANT-ANCHOR */
 </script>
 <script src="bpa-advanced.js"></script>
+<script src="bpa-dds-views.js"></script>
 <script src="bpa-vibrant.js"></script>
 </body>
 </html>
