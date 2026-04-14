@@ -15391,15 +15391,65 @@ async function doLogin() {
       const apiUrl = localStorage.getItem('bp_api_url');
       const apiKey = localStorage.getItem('bp_api_key');
       if (apiUrl && apiKey) {
-        bpaToast('Syncing data from DDS...', 'info', 8000);
-        document.getElementById('uploadZone').style.display = '';
-        // Auto-trigger sync in background
-        setTimeout(function() {
-          document.getElementById('settingApiUrl') && (document.getElementById('settingApiUrl').value = apiUrl);
-          document.getElementById('settingApiKey') && (document.getElementById('settingApiKey').value = apiKey);
-          document.getElementById('settingDataSource') && (document.getElementById('settingDataSource').value = 'api');
-          if (typeof syncNow === 'function') syncNow();
-        }, 500);
+        // Hide upload zone, show dashboard with loading state
+        document.getElementById('uploadZone').style.display = 'none';
+        document.getElementById('dashboard').classList.add('active');
+        showProcessing('Loading your data...', 'Connecting to DDS');
+
+        // Fetch data directly (don't use syncNow which needs settings modal open)
+        const dataUrl = apiUrl + (apiUrl.includes('?') ? '&' : '?') + 'limit=10000';
+        fetch(dataUrl, { headers: { 'x-api-key': apiKey, 'Authorization': 'Bearer ' + apiKey, 'Accept': 'application/json' }, mode: 'cors' })
+        .then(function(r) { if (!r.ok) throw new Error('Server returned ' + r.status); return r.json(); })
+        .then(function(json) {
+          if (json.data && typeof json.data === 'object') {
+            let totalRows = 0;
+            for (var key in json.data) {
+              if (Array.isArray(json.data[key]) && json.data[key].length > 0) {
+                DATA[key] = json.data[key];
+                loadedFiles[key] = true;
+                totalRows += json.data[key].length;
+              }
+            }
+            console.log('[AutoSync] Loaded ' + totalRows + ' rows from DDS proxy');
+            try { saveUserData(); } catch(e) { console.warn('Save failed:', e.message); }
+            // Populate store filter + date range
+            var stores = new Set();
+            [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(function(arr) {
+              arr.forEach(function(r) { var s = cleanStoreNum(r.Store_Number); if (validStore(s)) stores.add(s); });
+            });
+            var sel = document.getElementById('filterStore');
+            if (sel) {
+              sel.innerHTML = '<option value="">All Stores (' + stores.size + ')</option>';
+              Array.from(stores).sort(function(a,b) { return a.localeCompare(b, undefined, { numeric: true }); }).forEach(function(s) {
+                sel.innerHTML += '<option value="' + s + '">' + (typeof getStoreDisplayName === 'function' ? getStoreDisplayName(s) : '#' + s) + '</option>';
+              });
+            }
+            var minD = null, maxD = null;
+            [DATA.customers, DATA.details, DATA.promos].forEach(function(arr) {
+              arr.forEach(function(r) {
+                var d = parseDate(r.Invoice_Date || r.Update_Date || '');
+                if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; }
+              });
+            });
+            if (minD && maxD) {
+              document.getElementById('filterFrom').value = fmtDateISO(minD);
+              document.getElementById('filterTo').value = fmtDateISO(maxD);
+            }
+            hideProcessing();
+            applyFilters();
+            bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
+          } else {
+            hideProcessing();
+            bpaToast('No data received from server', 'warning');
+          }
+        })
+        .catch(function(e) {
+          hideProcessing();
+          console.error('[AutoSync] Failed:', e.message);
+          bpaToast('Could not load data: ' + e.message, 'error');
+          // Fall back to upload zone
+          document.getElementById('uploadZone').style.display = '';
+        });
       } else {
         document.getElementById('uploadZone').style.display = '';
         document.getElementById('dashboard').classList.remove('active');
