@@ -84,8 +84,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 52px;
-    padding: 0 20px;
+    height: 60px;
+    padding: 0 24px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
 
@@ -2620,6 +2620,10 @@
   body.dark-mode ::selection { background: rgba(96,165,250,0.3); }
   body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
 
+  /* Logo: swap for dark/light mode */
+  body.dark-mode .logo-swap { content: url('logo.svg'); }
+  body:not(.dark-mode) .logo-swap { content: url('logo-light.svg'); }
+
   /* Theme toggle button */
   .theme-toggle {
     width: 32px; height: 32px; border-radius: 8px; border: none;
@@ -3543,7 +3547,7 @@
 <div class="login-screen" id="loginScreen" role="dialog" aria-label="Sign in to Butler Performance Analytics">
   <div class="login-card">
     <div style="text-align:center;margin-bottom:36px;">
-      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:110px;filter:drop-shadow(0 0 20px rgba(30,64,175,0.2));">
+      <img src="logo.svg" alt="Butler Performance Analytics" style="height:140px;filter:drop-shadow(0 0 24px rgba(30,64,175,0.3));" class="logo-swap">
     </div>
     <div class="login-box">
       <h1 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;text-align:center;">Sign In</h1>
@@ -3613,7 +3617,7 @@
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen" role="status" aria-label="Loading application">
   <div style="margin-bottom:24px;text-align:center;">
-    <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:100px;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(30,64,175,0.2));">
+    <img src="logo.svg" alt="Butler Performance Analytics" style="height:130px;margin-bottom:16px;filter:drop-shadow(0 0 24px rgba(30,64,175,0.3));" class="logo-swap">
   </div>
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loadingText">Initializing Engine...</div>
@@ -3624,7 +3628,7 @@
   <!-- Tier 1: Header + Views -->
   <div class="nav-tier1">
     <div class="nav-brand">
-      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:42px;filter:drop-shadow(0 0 12px rgba(30,64,175,0.2));" class="nav-logo">
+      <img src="logo.svg" alt="Butler Performance Analytics" style="height:52px;filter:drop-shadow(0 0 12px rgba(30,64,175,0.3));" class="nav-logo logo-swap">
     </div>
     <div class="nav-views" role="tablist" aria-label="Dashboard views">
       <button class="view-btn active" data-view="business" role="tab" aria-selected="true" aria-controls="view-business">My Business</button>
@@ -3987,7 +3991,7 @@
 <div id="uploadZone" class="upload-screen">
   <div class="upload-card">
     <div style="text-align:center;margin-bottom:28px;">
-      <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:90px;filter:drop-shadow(0 0 16px rgba(30,64,175,0.2));">
+      <img src="logo.svg" alt="Butler Performance Analytics" style="height:110px;filter:drop-shadow(0 0 20px rgba(30,64,175,0.3));" class="logo-swap">
       <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Upload your data to get started</div>
     </div>
 
@@ -4552,6 +4556,10 @@ function toggleTheme() {
   localStorage.setItem('bp_theme', isDark ? 'dark' : 'light');
   const btn = document.getElementById('themeToggle');
   if (btn) btn.innerHTML = isDark ? '&#9788;' : '&#9790;';
+  // Swap logos
+  document.querySelectorAll('.logo-swap').forEach(function(img) {
+    img.src = isDark ? 'logo.svg' : 'logo-light.svg';
+  });
   // Update Chart.js colors for dark mode
   if (typeof Chart !== 'undefined') {
     Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
@@ -4561,11 +4569,16 @@ function toggleTheme() {
 // Restore saved theme on load — default to dark
 (function() {
   const saved = localStorage.getItem('bp_theme');
-  if (saved !== 'light') {
+  const isDark = saved !== 'light';
+  if (isDark) {
     document.body.classList.add('dark-mode');
     var btn = document.getElementById('themeToggle');
     if (btn) btn.innerHTML = '&#9788;';
   }
+  // Ensure logos match theme
+  document.querySelectorAll('.logo-swap').forEach(function(img) {
+    img.src = isDark ? 'logo.svg' : 'logo-light.svg';
+  });
 })();
 
 function toggleUserMenu() {
@@ -6349,7 +6362,7 @@ function printForecast() {
   w.document.write('h1{font-size:18px;margin-bottom:4px;} .sub{font-size:12px;color:#666;margin-bottom:16px;}');
   w.document.write('@media print{body{padding:0;}}');
   w.document.write('</style></head><body>');
-  w.document.write('<div style="margin-bottom:12px;"><img src="logo-light.svg" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;"></div>');
+  w.document.write('<div style="margin-bottom:12px;"><img src="logo-light.svg" alt="Butler Performance Analytics" style="height:60px;object-fit:contain;"></div>');
   w.document.write('<h1>Butler Performance Analytics — Business Forecast</h1>');
   w.document.write('<div class="sub">' + (localStorage.getItem('bp_company') || '') + ' · Generated ' + new Date().toLocaleDateString() + '</div>');
   // Clone the baseline KPIs and results (skip the sliders)
@@ -13139,7 +13152,7 @@ function buildReportHTML(tableId, title) {
 </style></head><body>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #1e40af;">
   <div>
-    <img src="logo-light.svg" alt="Butler Performance Analytics" style="height:48px;object-fit:contain;">
+    <img src="logo.svg" alt="Butler Performance Analytics" style="height:60px;object-fit:contain;" class="logo-swap">
   </div>
   <div style="text-align:right;">
     ${meta.company ? '<div style="font-size:14px;font-weight:600;">'+meta.company+'</div>' : ''}
