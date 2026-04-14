@@ -50,7 +50,9 @@
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
+    background: linear-gradient(165deg, #e8edf5 0%, #f1f5f9 30%, #eef2f7 60%, #f0f4fa 100%);
+    /* bpa-vibrant-marker-applied */
+    background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -4428,6 +4430,14 @@
 
 <script>
 // ============================================================
+// XSS PREVENTION — escape all user/database data before rendering
+// ============================================================
+function escapeHTML(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ============================================================
 // TOAST NOTIFICATION SYSTEM
 // ============================================================
 function bpaToast(message, type = 'info', duration = 4000) {
@@ -5724,7 +5734,8 @@ function openReportDetail(reportId) {
       headers.slice(0, 15).forEach(h => { html += '<th>' + h + '</th>'; });
       html += '</tr></thead><tbody>';
       rows.slice(0, 500).forEach(r => {
-        html += '<tr>';
+        const _sn = r.Store_Number || r.store_number || '';
+        html += _sn ? '<tr class="clickable-row" style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + _sn + '\')">' : '<tr class="clickable-row">';
         headers.slice(0, 15).forEach(h => { html += '<td style="font-size:11px;white-space:nowrap;">' + (r[h] || '') + '</td>'; });
         html += '</tr>';
       });
@@ -5742,7 +5753,8 @@ function openReportDetail(reportId) {
       headers.slice(0, 20).forEach(h => { html += '<th style="font-size:10px;white-space:nowrap;" title="' + h + '">' + (h.length > 20 ? h.slice(0, 18) + '..' : h) + '</th>'; });
       html += '</tr></thead><tbody>';
       rows.forEach(r => {
-        html += '<tr>';
+        const _sn = r.Store_Number || r.store_number || '';
+        html += _sn ? '<tr class="clickable-row" style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + _sn + '\')">' : '<tr class="clickable-row">';
         headers.slice(0, 20).forEach(h => {
           let v = r[h] || '';
           v = v.replace(/^Store\s*Id:\s*/i, '#');
@@ -5763,7 +5775,8 @@ function openReportDetail(reportId) {
       report.headers.forEach(h => { html += '<th style="font-size:10px;white-space:nowrap;" title="' + h + '">' + (h.length > 18 ? h.slice(0, 16) + '..' : h) + '</th>'; });
       html += '</tr></thead><tbody>';
       report.rows.slice(0, 500).forEach(r => {
-        html += '<tr>';
+        const _sn = r.Store_Number || r['Store Number'] || '';
+        html += _sn ? '<tr class="clickable-row" style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + _sn.replace(/[^0-9]/g, '') + '\')">' : '<tr class="clickable-row">';
         report.headers.forEach(h => {
           let v = r[h] || '';
           v = v.replace(/^Store\s*Id:\s*/i, '#').replace(/^Employee\s*:\s*/i, '').replace(/^User\s*Name\s*:\s*/i, '');
@@ -5920,7 +5933,7 @@ function renderForecastView(storeOverride) {
       const trPct = veh ? ((svc['TRA'] || svc['TR'] || 0) / veh * 100) : 0;
       const brakes = svc['BRK'] || svc['BRAKE'] || 0;
 
-      actualsHTML += '<tr style="cursor:pointer;" onclick="document.getElementById(\'fcStoreSelect\').value=\'' + s + '\';renderForecastView()">';
+      actualsHTML += '<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById(\'fcStoreSelect\').value=\'' + s + '\';renderForecastView()">';
       actualsHTML += '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">#' + s + '</td>';
       actualsHTML += '<td>' + money(rev) + '</td>';
       actualsHTML += '<td>' + num(veh) + '</td>';
@@ -6592,9 +6605,9 @@ function renderStoreRegistry() {
   }
   el.innerHTML = registry.map((s, i) => {
     return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">' +
-      '<strong style="min-width:60px;color:var(--text);">' + s.id + '</strong>' +
-      '<span style="flex:1;color:var(--text-muted);">' + (s.name || '—') + '</span>' +
-      '<span style="font-size:10px;color:var(--text-muted);">' + (s.aliases || []).join(', ') + '</span>' +
+      '<strong style="min-width:60px;color:var(--text);">' + escapeHTML(s.id) + '</strong>' +
+      '<span style="flex:1;color:var(--text-muted);">' + escapeHTML(s.name || '—') + '</span>' +
+      '<span style="font-size:10px;color:var(--text-muted);">' + escapeHTML((s.aliases || []).join(', ')) + '</span>' +
       '<button onclick="removeStoreFromRegistry(' + i + ')" style="background:none;border:1px solid var(--border);color:var(--red);width:22px;height:22px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button>' +
     '</div>';
   }).join('');
@@ -8009,7 +8022,7 @@ function renderRevenue() {
   });
   const svcRows = Object.values(svcMap).sort((a,b) => b.rev - a.rev).slice(0, 100);
   document.querySelector('#tblServices tbody').innerHTML = svcRows.map(r => `
-    <tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(r.desc||'').replace(/'/g,"\\'")}','${(r.type||'').replace(/'/g,"\\'")}')"><td style="text-align:left;">${r.cat}</td><td style="text-align:left;">${r.desc}</td><td style="text-align:left;">${r.type}</td><td style="text-align:right;">${num(Math.round(r.qty))}</td><td style="text-align:right;">${money(r.rev)}</td><td style="text-align:right;">${money(r.count ? r.rev / r.count : 0)}</td></tr>
+    <tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(r.desc||'').replace(/'/g,"\\'")}','${(r.type||'').replace(/'/g,"\\'")}')"><td style="text-align:left;">${escapeHTML(r.cat)}</td><td style="text-align:left;">${escapeHTML(r.desc)}</td><td style="text-align:left;">${escapeHTML(r.type)}</td><td style="text-align:right;">${num(Math.round(r.qty))}</td><td style="text-align:right;">${money(r.rev)}</td><td style="text-align:right;">${money(r.count ? r.rev / r.count : 0)}</td></tr>
   `).join('');
 
   // Ticket Distribution histogram
@@ -8091,7 +8104,7 @@ function renderProductAnalysis() {
   // Populate category filter if empty
   if (catFilter && catFilter.options.length <= 1) {
     [...categories].sort().forEach(c => {
-      catFilter.innerHTML += '<option value="' + c + '">' + c + '</option>';
+      catFilter.innerHTML += '<option value="' + escapeHTML(c) + '">' + escapeHTML(c) + '</option>';
     });
   }
 
@@ -8104,9 +8117,9 @@ function renderProductAnalysis() {
     // Color code by category type
     const catColors = { 'FS': 'var(--primary)', 'OIL': 'var(--blue)', 'OF': 'var(--text-muted)', 'AF': 'var(--green)', 'CAF': 'var(--green)', 'TRS': 'var(--yellow)', 'ATS': 'var(--orange)', 'BKS': 'var(--red)', 'FIS': 'var(--orange)', 'ADD': 'var(--blue)', 'REC': 'var(--text-muted)' };
     const catColor = catColors[p.cat] || 'var(--text-muted)';
-    return '<tr style="cursor:pointer;" onclick="drillProduct(\'' + p.cat.replace(/'/g,"\\'") + '\',\'' + p.desc.replace(/'/g,"\\'") + '\')">' +
-      '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);"><span style="color:' + catColor + ';font-weight:700;">' + p.cat + '</span></td>' +
-      '<td style="text-align:left;">' + p.desc + '</td>' +
+    return '<tr class="clickable-row" style="cursor:pointer;" onclick="drillProduct(\'' + p.cat.replace(/'/g,"\\'") + '\',\'' + p.desc.replace(/'/g,"\\'") + '\')">' +
+      '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);"><span style="color:' + catColor + ';font-weight:700;">' + escapeHTML(p.cat) + '</span></td>' +
+      '<td style="text-align:left;">' + escapeHTML(p.desc) + '</td>' +
       '<td>' + num(Math.round(p.qty)) + '</td>' +
       '<td>' + money(p.revenue) + '</td>' +
       '<td>' + money(avgPrice) + '</td>' +
@@ -8129,7 +8142,7 @@ function renderProductAnalysis() {
     const recArr = Object.entries(recs).sort((a,b) => b[1].count - a[1].count);
     recBody.innerHTML = recArr.length ? recArr.map(([desc, d]) => {
       const suggestRate = totalTransactions ? (d.count / totalTransactions * 100) : 0;
-      return '<tr><td style="text-align:left;">' + desc + '</td><td>' + num(d.count) + '</td><td>' + d.stores.size + '</td><td>' + pct(suggestRate) + '</td></tr>';
+      return '<tr class="clickable-row" style="cursor:pointer;" onclick="openServiceDetail(\'\',\'' + desc.replace(/'/g, "\\'") + '\',\'RECOMMENDATION\')"><td style="text-align:left;">' + escapeHTML(desc) + '</td><td>' + num(d.count) + '</td><td>' + d.stores.size + '</td><td>' + pct(suggestRate) + '</td></tr>';
     }).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No recommendations found</td></tr>';
   }
 
@@ -8212,7 +8225,7 @@ function renderBrandExpansion() {
     const isBelow = premRate < avgRate;
     const rateColor = premRate >= bestRate ? 'var(--green)' : premRate >= avgRate ? 'var(--text)' : 'var(--red)';
 
-    return '<tr>' +
+    return '<tr class="clickable-row" style="cursor:pointer;" onclick="navigateTo(\'stores/' + s + '\')">' +
       '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">#' + s + '</td>' +
       '<td>' + num(totalTxns) + '</td>' +
       '<td>' + num(premTxns) + '</td>' +
@@ -8284,7 +8297,7 @@ function drillProduct(cat, desc) {
     if (storeArr.length) {
       html += '<div class="table-wrap" style="margin-bottom:16px;"><h3>By Store</h3><div class="table-scroll" style="max-height:250px;"><table><thead><tr><th style="text-align:left;">Store</th><th style="text-align:right;width:80px;">Qty</th><th style="text-align:right;width:110px;">Revenue</th><th style="text-align:right;width:110px;">Transactions</th></tr></thead><tbody>';
       storeArr.forEach(([s, d]) => {
-        html += '<tr><td style="text-align:left;font-weight:600;">#' + s + '</td><td style="text-align:right;">' + num(Math.round(d.qty)) + '</td><td style="text-align:right;">' + money(d.rev) + '</td><td style="text-align:right;">' + num(d.txns) + '</td></tr>';
+        html += '<tr class="clickable-row" style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + s + '\')">' + '<td style="text-align:left;font-weight:600;">#' + s + '</td><td style="text-align:right;">' + num(Math.round(d.qty)) + '</td><td style="text-align:right;">' + money(d.rev) + '</td><td style="text-align:right;">' + num(d.txns) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
     }
@@ -8294,7 +8307,7 @@ function drillProduct(cat, desc) {
       html += '<div class="table-wrap"><h3>Customers Who Purchased (' + num(buyers.length) + ')</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th style="text-align:left;">Name</th><th style="text-align:left;">Email</th><th style="text-align:left;width:110px;">Phone</th><th style="text-align:left;width:90px;">City</th><th style="text-align:center;width:60px;">Store</th><th style="text-align:left;width:90px;">Date</th><th style="text-align:right;width:90px;">Total</th></tr></thead><tbody>';
       buyers.sort((a,b) => (+b.Net_Sales||0) - (+a.Net_Sales||0)).slice(0, 200).forEach(r => {
         const name = ((r.Customer_First_Name||'') + ' ' + (r.Customer_Last_Name||'')).trim() || 'Unknown';
-        html += '<tr><td style="text-align:left;">' + name + '</td><td style="text-align:left;font-size:11px;">' + (r.Customer_Email_Address||'\u2014') + '</td><td style="text-align:left;font-size:11px;">' + (r.Customer_Phone_Number||'\u2014') + '</td><td style="text-align:left;">' + (r.City||'') + '</td><td style="text-align:center;">#' + (r.Store_Number||'') + '</td><td style="text-align:left;">' + (r.Invoice_Date||'').split(' ')[0] + '</td><td style="text-align:right;">' + money(+r.Net_Sales||0) + '</td></tr>';
+        html += '<tr class="clickable-row" style="cursor:pointer;" onclick="closeReportModal();openCustDetail(' + FILTERED.customers.indexOf(r) + ')"><td style="text-align:left;">' + escapeHTML(name) + '</td><td style="text-align:left;font-size:11px;">' + escapeHTML(r.Customer_Email_Address||'\u2014') + '</td><td style="text-align:left;font-size:11px;">' + escapeHTML(r.Customer_Phone_Number||'\u2014') + '</td><td style="text-align:left;">' + escapeHTML(r.City||'') + '</td><td style="text-align:center;">#' + escapeHTML(r.Store_Number||'') + '</td><td style="text-align:left;">' + escapeHTML((r.Invoice_Date||'').split(' ')[0]) + '</td><td style="text-align:right;">' + money(+r.Net_Sales||0) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
     }
@@ -8431,7 +8444,7 @@ function renderInspections() {
   document.querySelector('#tblInsp tbody').innerHTML = inspRows.map(([name, r]) => {
     const needs = r.yellow + r.orange + r.red;
     const conv = needs ? (r.purchased / needs * 100) : 0;
-    return `<tr class="clickable-row" onclick="openInspDetail('${name.replace(/'/g,"\\'")}')"><td>${name}</td><td>${num(r.green)}</td><td>${num(r.yellow)}</td><td>${num(r.orange)}</td><td>${num(r.red)}</td><td>${num(r.purchased)}</td><td>${pct(conv)}</td></tr>`;
+    return `<tr class="clickable-row" onclick="openInspDetail('${name.replace(/'/g,"\\'")}')"><td>${escapeHTML(name)}</td><td>${num(r.green)}</td><td>${num(r.yellow)}</td><td>${num(r.orange)}</td><td>${num(r.red)}</td><td>${num(r.purchased)}</td><td>${pct(conv)}</td></tr>`;
   }).join('');
 
   // Build report cards
@@ -8575,7 +8588,7 @@ function renderPromos() {
   const promoRows = Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total);
   const promoTbody = document.querySelector('#tblPromos tbody');
   if (promoTbody) promoTbody.innerHTML = promoRows.map(([code, r]) => `
-    <tr class="clickable-row" onclick="openPromoDetail('${code.replace(/'/g,"\\'")}')"><td style="text-align:left;">${code}</td><td style="text-align:right;">${num(r.uses)}</td><td style="text-align:right;">${money(r.total)}</td><td style="text-align:right;">${money(r.uses ? r.total / r.uses : 0)}</td><td style="text-align:right;">${r.stores.size}</td><td style="text-align:right;">${money(r.uses ? r.invTotal / r.uses : 0)}</td></tr>
+    <tr class="clickable-row" onclick="openPromoDetail('${code.replace(/'/g,"\\'")}')"><td style="text-align:left;">${escapeHTML(code)}</td><td style="text-align:right;">${num(r.uses)}</td><td style="text-align:right;">${money(r.total)}</td><td style="text-align:right;">${money(r.uses ? r.total / r.uses : 0)}</td><td style="text-align:right;">${r.stores.size}</td><td style="text-align:right;">${money(r.uses ? r.invTotal / r.uses : 0)}</td></tr>
   `).join('');
 }
 
@@ -9063,9 +9076,9 @@ function renderCSA() {
   body.innerHTML = advisorList.length ? advisorList.map(a => {
     const opportunities = a.yellow + a.red;
     const convRate = opportunities ? (a.sold / opportunities * 100) : 0;
-    return `<tr>
-      <td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>${a.name}</strong></td>
-      <td>#${a.store}</td>
+    return `<tr class="clickable-row" style="cursor:pointer;" onclick="navigateTo('stores/${a.store}')">
+      <td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>${escapeHTML(a.name)}</strong></td>
+      <td>#${escapeHTML(a.store)}</td>
       <td>${num(a.vehicles)}</td>
       <td style="color:var(--green);">${num(a.green)}</td>
       <td style="color:var(--yellow);">${num(a.yellow)}</td>
@@ -9236,7 +9249,7 @@ function renderCustomers() {
   });
   const bizRows = Object.entries(bizMap).sort((a,b) => b[1].rev - a[1].rev);
   document.querySelector('#tblBizAccounts tbody').innerHTML = bizRows.map(([id, r]) => `
-    <tr class="clickable-row" onclick="openBizAcctDetail('${id.replace(/'/g,"\\'")}')"><td>${id}</td><td>${r.processor || ''}</td><td>${num(r.inv)}</td><td>${money(r.rev)}</td><td>${money(r.inv ? r.rev / r.inv : 0)}</td><td>${[...r.stores].join(', ')}</td></tr>
+    <tr class="clickable-row" onclick="openBizAcctDetail('${id.replace(/'/g,"\\'")}')"><td>${escapeHTML(id)}</td><td>${escapeHTML(r.processor || '')}</td><td>${num(r.inv)}</td><td>${money(r.rev)}</td><td>${money(r.inv ? r.rev / r.inv : 0)}</td><td>${escapeHTML([...r.stores].join(', '))}</td></tr>
   `).join('');
 
   // Build report cards
@@ -9369,16 +9382,16 @@ function renderCustomerTable(rows) {
   document.getElementById('custCount').textContent = rows.length > maxRows ? `Showing ${maxRows} of ${num(rows.length)}` : `${num(rows.length)} records`;
   document.querySelector('#tblCustomers tbody').innerHTML = display.map(r => `
     <tr class="clickable-row" onclick="openCustDetail(${r.idx})">
-      <td>${r.name}</td>
-      <td>${r.phone}</td>
-      <td style="font-size:12px;">${r.email}</td>
-      <td>${r.city}</td>
-      <td>${r.state}</td>
-      <td>${r.zip}</td>
-      <td>${r.veh}</td>
-      <td>${r.mileage}</td>
-      <td>${r.store}</td>
-      <td>${r.date}</td>
+      <td>${escapeHTML(r.name)}</td>
+      <td>${escapeHTML(r.phone)}</td>
+      <td style="font-size:12px;">${escapeHTML(r.email)}</td>
+      <td>${escapeHTML(r.city)}</td>
+      <td>${escapeHTML(r.state)}</td>
+      <td>${escapeHTML(r.zip)}</td>
+      <td>${escapeHTML(r.veh)}</td>
+      <td>${escapeHTML(r.mileage)}</td>
+      <td>${escapeHTML(r.store)}</td>
+      <td>${escapeHTML(r.date)}</td>
       <td>${money(r.sales)}</td>
     </tr>
   `).join('');
@@ -9431,7 +9444,7 @@ function openCustDetail(idx) {
   if (relatedDetails.length) {
     detailsHTML = `<table style="width:100%;font-size:12px;">
       <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">TYPE</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">DESCRIPTION</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">QTY</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">PRICE</th></tr></thead>
-      <tbody>${relatedDetails.map(d => `<tr><td style="padding:4px 8px;color:var(--text-muted);">${d.Invoice_Detail_Type}</td><td style="padding:4px 8px;">${d.Invoice_Detail_Description}</td><td style="text-align:right;padding:4px 8px;">${d.Quantity_Sold}</td><td style="text-align:right;padding:4px 8px;">${money(+d.Extended_Price || 0)}</td></tr>`).join('')}</tbody>
+      <tbody>${relatedDetails.map(d => `<tr class="clickable-row" style="cursor:pointer;" onclick="openServiceDetail('${(d.JLI_Category_Code||'').replace(/'/g,"\\'")}','${(d.Invoice_Detail_Description||'').replace(/'/g,"\\'")}','${(d.Invoice_Detail_Type||'').replace(/'/g,"\\'")}')"><td style="padding:4px 8px;color:var(--text-muted);">${escapeHTML(d.Invoice_Detail_Type)}</td><td style="padding:4px 8px;">${escapeHTML(d.Invoice_Detail_Description)}</td><td style="text-align:right;padding:4px 8px;">${escapeHTML(d.Quantity_Sold)}</td><td style="text-align:right;padding:4px 8px;">${money(+d.Extended_Price || 0)}</td></tr>`).join('')}</tbody>
     </table>`;
   } else {
     detailsHTML = '<div style="color:var(--text-muted);font-size:13px;">No line item details found for this invoice.</div>';
@@ -9440,38 +9453,38 @@ function openCustDetail(idx) {
   let inspHTML = '';
   if (relatedInsp.length) {
     const statusColor = { Green: 'var(--green)', Yellow: 'var(--yellow)', Orange: 'var(--orange)', Red: 'var(--red)' };
-    inspHTML = `<div style="display:flex;flex-wrap:wrap;gap:6px;">${relatedInsp.filter(i => i.Inspection_Status && i.Inspection_Status !== 'NotCheck' && i.Inspection_Status !== 'NotEquip').map(i => `<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:11px;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${statusColor[i.Inspection_Status] || 'var(--text-muted)'};display:inline-block;"></span>${i.Service_Title}${i.Purchased_This_Visit === 'True' ? ' <span style="color:var(--green);font-weight:600;">SOLD</span>' : ''}</div>`).join('')}</div>`;
+    inspHTML = `<div style="display:flex;flex-wrap:wrap;gap:6px;">${relatedInsp.filter(i => i.Inspection_Status && i.Inspection_Status !== 'NotCheck' && i.Inspection_Status !== 'NotEquip').map(i => `<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:11px;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${statusColor[i.Inspection_Status] || 'var(--text-muted)'};display:inline-block;"></span>${escapeHTML(i.Service_Title)}${i.Purchased_This_Visit === 'True' ? ' <span style="color:var(--green);font-weight:600;">SOLD</span>' : ''}</div>`).join('')}</div>`;
   }
 
   let promoHTML = '';
   if (relatedPromos.length) {
-    promoHTML = relatedPromos.map(p => `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;"><span>${p.Promo_Code} - ${p.Promo_Description}</span><span style="color:var(--green);font-weight:600;">-${money(+p.Promo_Amount || 0)}</span></div>`).join('');
+    promoHTML = relatedPromos.map(p => `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;"><span>${escapeHTML(p.Promo_Code)} - ${escapeHTML(p.Promo_Description)}</span><span style="color:var(--green);font-weight:600;">-${money(+p.Promo_Amount || 0)}</span></div>`).join('');
   }
 
   document.getElementById('custDetailBody').innerHTML = `
     <div class="cust-detail-grid">
       <div class="cust-detail-section">
         <h4>Contact Information</h4>
-        <div class="cust-field"><span class="label">Name</span><span class="value">${name}</span></div>
-        <div class="cust-field"><span class="label">Phone</span><span class="value">${r.Customer_Phone_Number || '--'}</span></div>
-        <div class="cust-field"><span class="label">Email</span><span class="value" style="font-size:12px;">${r.Customer_Email_Address || '--'}</span></div>
-        <div class="cust-field"><span class="label">Address</span><span class="value">${r.Customer_Address || '--'}</span></div>
-        <div class="cust-field"><span class="label">City / State / ZIP</span><span class="value">${[r.City, r.Customer_State, r.ZIP_Code].filter(Boolean).join(', ') || '--'}</span></div>
-        ${r.Business_Account_ID ? `<div class="cust-field"><span class="label">Business Acct</span><span class="value">${r.Business_Account_ID} (${r.BA_Processor_Code || ''})</span></div>` : ''}
+        <div class="cust-field"><span class="label">Name</span><span class="value">${escapeHTML(name)}</span></div>
+        <div class="cust-field"><span class="label">Phone</span><span class="value">${escapeHTML(r.Customer_Phone_Number || '--')}</span></div>
+        <div class="cust-field"><span class="label">Email</span><span class="value" style="font-size:12px;">${escapeHTML(r.Customer_Email_Address || '--')}</span></div>
+        <div class="cust-field"><span class="label">Address</span><span class="value">${escapeHTML(r.Customer_Address || '--')}</span></div>
+        <div class="cust-field"><span class="label">City / State / ZIP</span><span class="value">${escapeHTML([r.City, r.Customer_State, r.ZIP_Code].filter(Boolean).join(', ') || '--')}</span></div>
+        ${r.Business_Account_ID ? `<div class="cust-field"><span class="label">Business Acct</span><span class="value">${escapeHTML(r.Business_Account_ID)} (${escapeHTML(r.BA_Processor_Code || '')})</span></div>` : ''}
       </div>
       <div class="cust-detail-section">
         <h4>Vehicle Information</h4>
-        <div class="cust-field"><span class="label">Year / Make / Model</span><span class="value">${[r.Vehicle_Year, r.ChekChart_Make, r.ChekChart_Model].filter(Boolean).join(' ') || '--'}</span></div>
-        <div class="cust-field"><span class="label">Engine</span><span class="value">${r.ChekChart_Engine || '--'}</span></div>
+        <div class="cust-field"><span class="label">Year / Make / Model</span><span class="value">${escapeHTML([r.Vehicle_Year, r.ChekChart_Make, r.ChekChart_Model].filter(Boolean).join(' ') || '--')}</span></div>
+        <div class="cust-field"><span class="label">Engine</span><span class="value">${escapeHTML(r.ChekChart_Engine || '--')}</span></div>
         <div class="cust-field"><span class="label">Mileage</span><span class="value">${r.Vehicle_Mileage ? num(+r.Vehicle_Mileage) : '--'}</span></div>
-        <div class="cust-field"><span class="label">VIN</span><span class="value" style="font-size:11px;font-family:monospace;">${r.VIN || '--'}</span></div>
-        <div class="cust-field"><span class="label">Tag</span><span class="value">${[r.Vehicle_Tag_State, r.Vehicle_Tag].filter(Boolean).join(' ') || '--'}</span></div>
+        <div class="cust-field"><span class="label">VIN</span><span class="value" style="font-size:11px;font-family:monospace;">${escapeHTML(r.VIN || '--')}</span></div>
+        <div class="cust-field"><span class="label">Tag</span><span class="value">${escapeHTML([r.Vehicle_Tag_State, r.Vehicle_Tag].filter(Boolean).join(' ') || '--')}</span></div>
       </div>
       <div class="cust-detail-section">
         <h4>Visit Summary</h4>
-        <div class="cust-field"><span class="label">Store</span><span class="value">#${r.Store_Number}</span></div>
-        <div class="cust-field"><span class="label">Invoice</span><span class="value">#${r.Invoice_Number}</span></div>
-        <div class="cust-field"><span class="label">Date</span><span class="value">${r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '--'}</span></div>
+        <div class="cust-field"><span class="label">Store</span><span class="value">#${escapeHTML(r.Store_Number)}</span></div>
+        <div class="cust-field"><span class="label">Invoice</span><span class="value">#${escapeHTML(r.Invoice_Number)}</span></div>
+        <div class="cust-field"><span class="label">Date</span><span class="value">${r.Invoice_Date ? escapeHTML(r.Invoice_Date.split(' ')[0]) : '--'}</span></div>
         <div class="cust-field"><span class="label">Net Sales</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(+r.Net_Sales || 0)}</span></div>
         <div class="cust-field"><span class="label">Bay Time</span><span class="value">${svcMins !== null ? svcMins.toFixed(0) + ' min' : '--'}</span></div>
         <div class="cust-field"><span class="label">Total Time</span><span class="value">${totalMins !== null ? totalMins.toFixed(0) + ' min' : '--'}</span></div>
@@ -9558,9 +9571,9 @@ function openServiceDetail(cat, desc, type) {
     <div class="cust-detail-grid">
       <div class="cust-detail-section">
         <h4>Service Summary</h4>
-        <div class="cust-field"><span class="label">Category</span><span class="value">${cat}</span></div>
-        <div class="cust-field"><span class="label">Description</span><span class="value">${desc}</span></div>
-        <div class="cust-field"><span class="label">Type</span><span class="value">${type}</span></div>
+        <div class="cust-field"><span class="label">Category</span><span class="value">${escapeHTML(cat)}</span></div>
+        <div class="cust-field"><span class="label">Description</span><span class="value">${escapeHTML(desc)}</span></div>
+        <div class="cust-field"><span class="label">Type</span><span class="value">${escapeHTML(type)}</span></div>
         <div class="cust-field"><span class="label">Total Revenue</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(totalRev)}</span></div>
       </div>
       <div class="cust-detail-section">
@@ -9574,14 +9587,14 @@ function openServiceDetail(cat, desc, type) {
         <h4>Revenue by Store</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">QTY</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">INVOICES</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">REVENUE</th></tr></thead>
-          <tbody>${storeRows.map(([s, r]) => `<tr><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(Math.round(r.qty))}</td><td style="text-align:right;padding:4px 8px;">${num(r.count)}</td><td style="text-align:right;padding:4px 8px;">${money(r.rev)}</td></tr>`).join('')}</tbody>
+          <tbody>${storeRows.map(([s, r]) => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');navigateTo('stores/${s}')"><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(Math.round(r.qty))}</td><td style="text-align:right;padding:4px 8px;">${num(r.count)}</td><td style="text-align:right;padding:4px 8px;">${money(r.rev)}</td></tr>`).join('')}</tbody>
         </table>
       </div>
       ${displayCust.length ? `<div class="cust-detail-section full-width">
         <h4>Customers Who Purchased (${custRows.length > 50 ? 'Top 50 of ' + num(custRows.length) : num(custRows.length)})</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">CUSTOMER</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">VEHICLE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th></tr></thead>
-          <tbody>${displayCust.map(c => `<tr><td style="padding:4px 8px;">${c.name}</td><td style="padding:4px 8px;font-size:11px;">${c.vehicle}</td><td style="text-align:center;padding:4px 8px;">#${c.store}</td><td style="text-align:center;padding:4px 8px;">${c.date}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
+          <tbody>${displayCust.map(c => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');navigateTo('stores/${c.store}')"><td style="padding:4px 8px;">${escapeHTML(c.name)}</td><td style="padding:4px 8px;font-size:11px;">${escapeHTML(c.vehicle)}</td><td style="text-align:center;padding:4px 8px;">#${escapeHTML(c.store)}</td><td style="text-align:center;padding:4px 8px;">${escapeHTML(c.date)}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
         </table>
       </div>` : ''}
     </div>
@@ -9665,7 +9678,8 @@ function openStoreOpsDetail(storeNum) {
       vehicle: [r.Vehicle_Year, r.ChekChart_Make, r.ChekChart_Model].filter(Boolean).join(' '),
       bayMin: bay !== null && bay > 0 ? bay.toFixed(0) : '--',
       totalMin: total !== null && total > 0 ? total.toFixed(0) : '--',
-      sales: +r.Net_Sales || 0
+      sales: +r.Net_Sales || 0,
+      idx: FILTERED.customers.indexOf(r)
     };
   }).sort((a,b) => b.sales - a.sales).slice(0, 50);
 
@@ -9691,7 +9705,7 @@ function openStoreOpsDetail(storeNum) {
       </div>
       <div class="cust-detail-section">
         <h4>Top Services</h4>
-        ${topSvc.map(([name, r]) => `<div class="cust-field"><span class="label">${name}</span><span class="value">${money(r.rev)}</span></div>`).join('')}
+        ${topSvc.map(([name, r]) => `<div class="cust-field"><span class="label">${escapeHTML(name)}</span><span class="value">${money(r.rev)}</span></div>`).join('')}
       </div>
       <div class="cust-detail-section full-width">
         <h4>Recent Invoices (${invoiceRows.length < cust.length ? 'Top 50 of ' + num(cust.length) : num(cust.length)})</h4>
@@ -9704,12 +9718,12 @@ function openStoreOpsDetail(storeNum) {
             <th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">TOTAL</th>
             <th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th>
           </tr></thead>
-          <tbody>${invoiceRows.map(r => `<tr>
-            <td style="padding:4px 8px;">${r.name}</td>
-            <td style="padding:4px 8px;font-size:11px;">${r.vehicle}</td>
-            <td style="text-align:center;padding:4px 8px;">${r.date}</td>
-            <td style="text-align:right;padding:4px 8px;">${r.bayMin} min</td>
-            <td style="text-align:right;padding:4px 8px;">${r.totalMin} min</td>
+          <tbody>${invoiceRows.map(r => `<tr class="clickable-row" style="cursor:pointer;" onclick="openCustDetail(${r.idx})">
+            <td style="padding:4px 8px;">${escapeHTML(r.name)}</td>
+            <td style="padding:4px 8px;font-size:11px;">${escapeHTML(r.vehicle)}</td>
+            <td style="text-align:center;padding:4px 8px;">${escapeHTML(r.date)}</td>
+            <td style="text-align:right;padding:4px 8px;">${escapeHTML(r.bayMin)} min</td>
+            <td style="text-align:right;padding:4px 8px;">${escapeHTML(r.totalMin)} min</td>
             <td style="text-align:right;padding:4px 8px;">${money(r.sales)}</td>
           </tr>`).join('')}</tbody>
         </table>
@@ -9825,7 +9839,7 @@ function renderPeople() {
     csaBody.innerHTML = advisorList.map((a, idx) => {
       const total = a.green + a.yellow + a.red;
       const needsAttnPct = total ? ((a.yellow + a.red) / total * 100) : 0;
-      return '<tr style="cursor:pointer;" onclick="openAdvisorDetail(' + idx + ')"><td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>' + a.name + '</strong></td><td>#' + a.store + '</td><td>' + num(a.vehicles) + '</td><td style="color:var(--green);">' + num(a.green) + '</td><td style="color:var(--yellow);">' + num(a.yellow) + '</td><td style="color:var(--red);">' + num(a.red) + '</td><td>' + num(total) + '</td><td class="' + (needsAttnPct > 40 ? 'cell-red' : needsAttnPct > 20 ? 'cell-yellow' : 'cell-green') + '">' + pct(needsAttnPct) + '</td></tr>';
+      return '<tr style="cursor:pointer;" class="clickable-row" onclick="openAdvisorDetail(' + idx + ')"><td style="position:sticky;left:0;z-index:1;background:var(--card);"><strong>' + escapeHTML(a.name) + '</strong></td><td>#' + escapeHTML(a.store) + '</td><td>' + num(a.vehicles) + '</td><td style="color:var(--green);">' + num(a.green) + '</td><td style="color:var(--yellow);">' + num(a.yellow) + '</td><td style="color:var(--red);">' + num(a.red) + '</td><td>' + num(total) + '</td><td class="' + (needsAttnPct > 40 ? 'cell-red' : needsAttnPct > 20 ? 'cell-yellow' : 'cell-green') + '">' + pct(needsAttnPct) + '</td></tr>';
     }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">No advisor data found</td></tr>';
   } else {
     if (csaBody) csaBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Upload SR_Productivity CSV via "+ Add Files" to see advisor performance</td></tr>';
@@ -9956,7 +9970,7 @@ function renderPeople() {
       </div>
       <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Top Customers</div>
       <div style="max-height:120px;overflow-y:auto;">
-        ${seg.customers.map(c => '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:var(--text);">'+c.name.trim()+'</span><span style="color:var(--text-muted);font-family:IBM Plex Mono,monospace;font-size:10px;">'+money(c.revenue)+' ('+c.visits+'x)</span></div>').join('')}
+        ${seg.customers.map(c => '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="color:var(--text);">'+escapeHTML(c.name.trim())+'</span><span style="color:var(--text-muted);font-family:IBM Plex Mono,monospace;font-size:10px;">'+money(c.revenue)+' ('+c.visits+'x)</span></div>').join('')}
       </div>
     </div>`;
   });
@@ -10022,7 +10036,7 @@ function openAdvisorDetail(idx) {
     html += '<div class="table-wrap" style="margin:0;"><h3>Inspection Item Detail</h3><div class="table-scroll" style="max-height:380px;"><table><thead><tr><th style="text-align:left;">Item</th><th style="color:var(--green);">Green</th><th style="color:var(--yellow);">Yellow</th><th style="color:var(--red);">Red</th><th>Total</th></tr></thead><tbody>';
     itemList.forEach(([name, d]) => {
       const total = d.green + d.yellow + d.red;
-      html += '<tr><td>' + name + '</td><td style="color:var(--green);">' + num(d.green) + '</td><td style="color:var(--yellow);">' + num(d.yellow) + '</td><td style="color:var(--red);">' + num(d.red) + '</td><td>' + num(total) + '</td></tr>';
+      html += '<tr class="clickable-row" style="cursor:pointer;" onclick="closeReportModal();openInspDetail(\'' + name.replace(/'/g, "\\'") + '\')">' + '<td>' + escapeHTML(name) + '</td><td style="color:var(--green);">' + num(d.green) + '</td><td style="color:var(--yellow);">' + num(d.yellow) + '</td><td style="color:var(--red);">' + num(d.red) + '</td><td>' + num(total) + '</td></tr>';
     });
     html += '</tbody></table></div></div>';
     html += '</div>';
@@ -10192,8 +10206,8 @@ function previewSegment() {
         <th style="text-align:right;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);">MILEAGE</th>
         <th style="text-align:right;padding:6px 10px;color:var(--text-muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--card);">NET SALES</th>
       </tr></thead>
-      <tbody>${display.map(r => `<tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
-        <td style="padding:6px 10px;">${((r.Customer_First_Name||'')+' '+(r.Customer_Last_Name||'')).trim()||'Unknown'}</td>
+      <tbody>${display.map(r => `<tr class="clickable-row" style="cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);" onclick="openCustDetail(${FILTERED.customers.indexOf(r)})">
+        <td style="padding:6px 10px;">${escapeHTML(((r.Customer_First_Name||'')+' '+(r.Customer_Last_Name||'')).trim()||'Unknown')}</td>
         <td style="padding:6px 10px;font-size:11px;">${[r.Vehicle_Year,r.ChekChart_Make,r.ChekChart_Model].filter(Boolean).join(' ')}</td>
         <td style="text-align:center;padding:6px 10px;">#${r.Store_Number}</td>
         <td style="text-align:right;padding:6px 10px;">${r.Vehicle_Mileage ? num(+r.Vehicle_Mileage) : '—'}</td>
@@ -10248,7 +10262,7 @@ function renderSavedSegments() {
       return (ct ? ct.label : c.type) + ' ' + c.comp + ' ' + (c.value||'');
     }).join(' AND ')).join(' OR ');
     return `<tr class="clickable-row" onclick="loadSegment(${i})">
-      <td><strong>${s.name}</strong><div style="font-size:11px;color:var(--text-muted);">${s.desc||''}</div></td>
+      <td><strong>${escapeHTML(s.name)}</strong><div style="font-size:11px;color:var(--text-muted);">${escapeHTML(s.desc||'')}</div></td>
       <td><span class="campaign-status ${s.type==='dynamic'?'active':'draft'}">${s.type}</span></td>
       <td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${critSummary}</td>
       <td>${num(s.count)}</td>
@@ -10505,7 +10519,7 @@ function renderMarketing() {
       const barW = Math.round(d.count / maxCount * 100);
       return `<div style="margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text);">${zip}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text);">${escapeHTML(zip)}</span>
           <span style="font-size:11px;color:var(--text-muted);">${num(d.count)} customers · ${money(d.revenue)} · Avg ${money(avgTicket)} · ${pct(pctOfTotal)}</span>
         </div>
         <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
@@ -10536,7 +10550,7 @@ function renderMarketing() {
       const penColor = penetration < 50 ? 'var(--orange)' : 'var(--green)';
       return `<div style="margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;">
-          <span style="font-size:12px;font-weight:600;color:var(--text);">${cat}</span>
+          <span style="font-size:12px;font-weight:600;color:var(--text);">${escapeHTML(cat)}</span>
           <span style="font-size:10px;color:${penColor};font-weight:700;">${d.stores.size}/${storeCount} stores</span>
         </div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">${money(d.revenue)} · ${num(d.qty)} sold · Avg ${money(avgPrice)}</div>
@@ -10581,7 +10595,7 @@ function renderMarketing() {
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px;">Top 5 Most Frequent</div>
       ${top5.map((c, i) => `<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;${i < 4 ? 'border-bottom:1px solid var(--border);' : ''}">
-        <span style="color:var(--text);">${c.name.trim() || 'Unknown'}</span>
+        <span style="color:var(--text);">${escapeHTML(c.name.trim() || 'Unknown')}</span>
         <span style="color:var(--text-muted);font-family:'IBM Plex Mono',monospace;">${c.count}x · ${money(c.revenue)}</span>
       </div>`).join('')}
     `;
@@ -10646,7 +10660,7 @@ function renderMarketing() {
 
     oppBody.innerHTML = storeMetrics.map(s => {
       const scoreColor = s.score > 70 ? 'var(--green)' : s.score >= 40 ? 'var(--yellow)' : 'var(--red)';
-      return `<tr>
+      return `<tr class="clickable-row" style="cursor:pointer;" onclick="navigateTo('stores/${s.store}')">
         <td style="position:sticky;left:0;z-index:2;background:var(--card);font-weight:700;">#${s.store}</td>
         <td>${money(s.revPerVehicle)}</td>
         <td>${pct(s.ancillaryPct)}</td>
@@ -11047,9 +11061,9 @@ function renderCampaignTable() {
     const annualCards = (+c.cardsPerDrop || 0) * (+c.drops || 0);
     const budgetPerDrop = (+c.cardsPerDrop || 0) * (+c.pricePerCard || 0);
     const annualBudget = budgetPerDrop * (+c.drops || 0);
-    return `<tr>
-      <td><strong>${c.name}</strong></td>
-      <td>${c.client}</td>
+    return `<tr class="clickable-row">
+      <td><strong>${escapeHTML(c.name)}</strong></td>
+      <td>${escapeHTML(c.client)}</td>
       <td>${(c.stores || []).length}</td>
       <td>${num(+c.cardsPerDrop || 0)}</td>
       <td>${c.drops}</td>
@@ -11670,12 +11684,12 @@ function renderDistrictModal() {
   bp_districts.forEach((d, idx) => {
     html += `<div class="district-item" data-idx="${idx}">
       <div class="district-item-header">
-        <input type="text" value="${d.name}" onchange="bp_districts[${idx}].name=this.value" placeholder="District Name" style="flex:1;">
+        <input type="text" value="${escapeHTML(d.name)}" onchange="bp_districts[${idx}].name=this.value" placeholder="District Name" style="flex:1;">
         <button class="btn-cancel" onclick="removeDistrict(${idx})" style="padding:3px 10px;font-size:11px;">Delete</button>
       </div>
       <div style="display:flex;gap:8px;margin:8px 0 10px 0;">
-        <input type="text" value="${d.manager||''}" onchange="bp_districts[${idx}].manager=this.value" placeholder="Manager Name" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;">
-        <input type="email" value="${d.managerEmail||''}" onchange="bp_districts[${idx}].managerEmail=this.value" placeholder="Manager Email" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;">
+        <input type="text" value="${escapeHTML(d.manager||'')}" onchange="bp_districts[${idx}].manager=this.value" placeholder="Manager Name" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;">
+        <input type="email" value="${escapeHTML(d.managerEmail||'')}" onchange="bp_districts[${idx}].managerEmail=this.value" placeholder="Manager Email" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;">
       </div>
       <div class="district-stores-wrap">
         ${d.stores.map(s => `<div class="district-store-chip" onclick="unassignStore(${idx},'${s}')">#${s} <span class="remove-store">x</span></div>`).join('')}
@@ -11885,7 +11899,7 @@ function renderOpsGrid() {
     const mhpv = avgBay !== null ? (avgBay / 60).toFixed(2) : '--';
     const yrPct = d.inspTotal ? (d.inspBad / d.inspTotal * 100) : 0;
 
-    const cls = isChild ? 'store-child' : '';
+    const cls = isChild ? 'store-child clickable-row' : 'clickable-row';
     return `<tr class="${cls}" data-district="${isChild || ''}" style="cursor:pointer;" onclick="navigateTo('stores/${store}')">
       <td>${isChild ? '' : ''}<strong>#${store}</strong></td>
       <td>${num(d.gc)}</td>
@@ -12077,7 +12091,7 @@ function openStoreDetail(storeNum) {
   if (topSvc.length) {
     tablesHTML += '<div class="table-wrap" style="margin-bottom:16px;"><h3>Top Services \u2014 Store #' + storeNum + '</h3><div class="table-scroll" style="max-height:300px;"><table><thead><tr><th style="text-align:left;">Service</th><th style="text-align:right;width:80px;">Qty</th><th style="text-align:right;width:120px;">Revenue</th><th style="text-align:right;width:110px;">Avg Price</th></tr></thead><tbody>';
     topSvc.forEach(([name, d]) => {
-      tablesHTML += '<tr><td style="text-align:left;">' + name + '</td><td style="text-align:right;">' + num(Math.round(d.qty)) + '</td><td style="text-align:right;">' + money(d.rev) + '</td><td style="text-align:right;">' + money(d.qty ? d.rev / d.qty : 0) + '</td></tr>';
+      tablesHTML += '<tr class="clickable-row" style="cursor:pointer;" onclick="openServiceDetail(\'\',\'' + name.replace(/'/g, "\\'") + '\',\'SERVICE\')"><td style="text-align:left;">' + escapeHTML(name) + '</td><td style="text-align:right;">' + num(Math.round(d.qty)) + '</td><td style="text-align:right;">' + money(d.rev) + '</td><td style="text-align:right;">' + money(d.qty ? d.rev / d.qty : 0) + '</td></tr>';
     });
     tablesHTML += '</tbody></table></div></div>';
   }
@@ -12093,7 +12107,7 @@ function openStoreDetail(storeNum) {
       const name = ((r.Customer_First_Name || '') + ' ' + (r.Customer_Last_Name || '')).trim() || 'Unknown';
       const date = r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '';
       const make = r.ChekChart_Make ? decodeMake(r.ChekChart_Make) : '';
-      tablesHTML += '<tr><td style="text-align:left;">' + name + '</td><td style="text-align:left;">' + date + '</td><td style="text-align:right;">' + money(+r.Net_Sales || 0) + '</td><td style="text-align:left;">' + make + '</td><td style="text-align:left;font-size:11px;color:var(--text-muted);">' + (r.Customer_Email_Address || '\u2014') + '</td></tr>';
+      tablesHTML += '<tr class="clickable-row" style="cursor:pointer;" onclick="openCustDetail(' + FILTERED.customers.indexOf(r) + ')"><td style="text-align:left;">' + escapeHTML(name) + '</td><td style="text-align:left;">' + escapeHTML(date) + '</td><td style="text-align:right;">' + money(+r.Net_Sales || 0) + '</td><td style="text-align:left;">' + escapeHTML(make) + '</td><td style="text-align:left;font-size:11px;color:var(--text-muted);">' + escapeHTML(r.Customer_Email_Address || '\u2014') + '</td></tr>';
     });
     tablesHTML += '</tbody></table></div></div>';
   }
@@ -12111,7 +12125,7 @@ function openStoreDetail(storeNum) {
       promoMap[code].total += Math.abs(+r.Promo_Amount || 0);
     });
     Object.entries(promoMap).sort((a,b) => b[1].total - a[1].total).slice(0, 15).forEach(([code, d]) => {
-      promoHTML += '<tr><td style="text-align:left;">' + code + '</td><td style="text-align:right;">' + num(d.uses) + '</td><td style="text-align:right;">' + money(d.total) + '</td><td style="text-align:right;">' + money(d.uses ? d.total / d.uses : 0) + '</td></tr>';
+      promoHTML += '<tr class="clickable-row" style="cursor:pointer;" onclick="openPromoDetail(\'' + code.replace(/'/g, "\\'") + '\')">' + '<td style="text-align:left;">' + escapeHTML(code) + '</td><td style="text-align:right;">' + num(d.uses) + '</td><td style="text-align:right;">' + money(d.total) + '</td><td style="text-align:right;">' + money(d.uses ? d.total / d.uses : 0) + '</td></tr>';
     });
     promoHTML += '</tbody></table></div></div>';
     document.getElementById('storeDetailTables').innerHTML += promoHTML;
@@ -12201,13 +12215,13 @@ function renderZeroDollarReport() {
     const services = det.filter(d => d.Invoice_Number === r.Invoice_Number && d.Invoice_Detail_Type === 'SERVICE').map(d => d.Invoice_Detail_Description).join(', ') || '--';
     const bay = diffMinutes(r.Bay_Start_Time, r.Bay_End_Time);
     const dateStr = r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '';
-    return `<tr>
+    return `<tr class="clickable-row" style="cursor:pointer;" onclick="openCustDetail(${FILTERED.customers.indexOf(r)})">
       <td>#${r.Store_Number}</td>
-      <td>${dateStr}</td>
-      <td>${r.Invoice_Number}</td>
-      <td>${name}</td>
+      <td>${escapeHTML(dateStr)}</td>
+      <td>${escapeHTML(r.Invoice_Number)}</td>
+      <td>${escapeHTML(name)}</td>
       <td style="color:${(+r.Net_Sales||0) < 0 ? 'var(--red)' : 'var(--text-muted)'};">${money(+r.Net_Sales || 0)}</td>
-      <td style="font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${services}</td>
+      <td style="font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHTML(services)}</td>
       <td>${bay !== null && bay > 0 ? bay.toFixed(0) + ' min' : '--'}</td>
     </tr>`;
   }).join('');
@@ -12253,8 +12267,8 @@ function renderReporting() {
       const avgPrice = d.qty ? d.revenue / d.qty : 0;
       const pen = storeCount ? (d.stores.size / storeCount * 100) : 0;
       const share = totalRev ? (d.revenue / totalRev * 100) : 0;
-      return '<tr style="cursor:pointer;" onclick="drillServiceCategory(\'' + cat.replace(/'/g, "\\'") + '\')">' +
-        '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">' + cat + '</td>' +
+      return '<tr class="clickable-row" style="cursor:pointer;" onclick="drillServiceCategory(\'' + cat.replace(/'/g, "\\'") + '\')">' +
+        '<td style="text-align:left;position:sticky;left:0;z-index:1;background:var(--card);font-weight:600;">' + escapeHTML(cat) + '</td>' +
         '<td>' + money(d.revenue) + '</td>' +
         '<td>' + num(Math.round(d.qty)) + '</td>' +
         '<td>' + money(avgPrice) + '</td>' +
@@ -12300,7 +12314,7 @@ function renderReporting() {
 
   // Warranty table
   document.getElementById('warrantyTableBody').innerHTML = warrantyEntries.length ? warrantyEntries.slice(0, 80).map(([name, r]) =>
-    `<tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(name||'').replace(/'/g,"\\'")}','SERVICE')"><td>${name}</td><td>${r.cat}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${num(r.invoices.size)}</td><td>${num(r.stores.size)}</td><td>${money(r.invoices.size ? r.rev / r.invoices.size : 0)}</td></tr>`
+    `<tr class="clickable-row" onclick="openServiceDetail('${(r.cat||'').replace(/'/g,"\\'")}','${(name||'').replace(/'/g,"\\'")}','SERVICE')"><td>${escapeHTML(name)}</td><td>${escapeHTML(r.cat)}</td><td>${num(Math.round(r.qty))}</td><td>${money(r.rev)}</td><td>${num(r.invoices.size)}</td><td>${num(r.stores.size)}</td><td>${money(r.invoices.size ? r.rev / r.invoices.size : 0)}</td></tr>`
   ).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:20px;">No warranty services found.</td></tr>';
 
   // Quick sales table
@@ -12312,7 +12326,7 @@ function renderReporting() {
   }).sort((a, b) => a.sales - b.sales).slice(0, 100);
 
   document.getElementById('quickSalesTableBody').innerHTML = qsRows.length ? qsRows.map(r =>
-    `<tr class="clickable-row" onclick="openCustDetail(${r.idx})"><td>${r.name}</td><td>#${r.store}</td><td>${r.date}</td><td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.services}</td><td>${money(r.sales)}</td><td>${r.bay}</td></tr>`
+    `<tr class="clickable-row" onclick="openCustDetail(${r.idx})"><td>${escapeHTML(r.name)}</td><td>#${escapeHTML(r.store)}</td><td>${escapeHTML(r.date)}</td><td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHTML(r.services)}</td><td>${money(r.sales)}</td><td>${escapeHTML(r.bay)}</td></tr>`
   ).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">No quick sales found.</td></tr>';
 
   // Mailable stats sidebar
@@ -12487,7 +12501,7 @@ function drillServiceCategory(cat) {
     html += '<thead><tr><th style="text-align:left;">Service Description</th><th style="text-align:right;width:110px;">Revenue</th><th style="text-align:right;width:80px;">Qty Sold</th><th style="text-align:right;width:100px;">Avg Price</th><th style="text-align:right;width:70px;">Stores</th></tr></thead><tbody>';
     items.forEach(([name, s]) => {
       const sAvg = s.qty ? s.revenue / s.qty : 0;
-      html += '<tr><td style="text-align:left;">' + name + '</td><td style="text-align:right;">' + money(s.revenue) + '</td><td style="text-align:right;">' + num(Math.round(s.qty)) + '</td><td style="text-align:right;">' + money(sAvg) + '</td><td style="text-align:right;">' + s.stores.size + '</td></tr>';
+      html += '<tr class="clickable-row" style="cursor:pointer;" onclick="closeReportModal();openServiceDetail(\'' + cat.replace(/'/g, "\\'") + '\',\'' + name.replace(/'/g, "\\'") + '\',\'SERVICE\')"><td style="text-align:left;">' + escapeHTML(name) + '</td><td style="text-align:right;">' + money(s.revenue) + '</td><td style="text-align:right;">' + num(Math.round(s.qty)) + '</td><td style="text-align:right;">' + money(sAvg) + '</td><td style="text-align:right;">' + s.stores.size + '</td></tr>';
     });
     html += '</tbody></table></div></div>';
 
@@ -12507,7 +12521,7 @@ function drillServiceCategory(cat) {
       html += '<thead><tr><th style="text-align:left;">Store</th><th style="text-align:right;width:110px;">Revenue</th><th style="text-align:right;width:80px;">Qty Sold</th><th style="text-align:right;width:100px;">Avg Price</th></tr></thead><tbody>';
       storeArr.forEach(([store, s]) => {
         const sAvg = s.qty ? s.revenue / s.qty : 0;
-        html += '<tr style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + store + '\')"><td style="text-align:left;font-weight:600;">#' + store + '</td><td style="text-align:right;">' + money(s.revenue) + '</td><td style="text-align:right;">' + num(Math.round(s.qty)) + '</td><td style="text-align:right;">' + money(sAvg) + '</td></tr>';
+        html += '<tr class="clickable-row" style="cursor:pointer;" onclick="closeReportModal();navigateTo(\'stores/' + store + '\')"><td style="text-align:left;font-weight:600;">#' + store + '</td><td style="text-align:right;">' + money(s.revenue) + '</td><td style="text-align:right;">' + num(Math.round(s.qty)) + '</td><td style="text-align:right;">' + money(sAvg) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
     }
@@ -12644,14 +12658,14 @@ function openInspDetail(serviceName) {
         <h4>Breakdown by Store</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">CHECKED</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NEEDS ATTN</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">PURCHASED</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">CONV %</th></tr></thead>
-          <tbody>${storeRows.map(([s,d]) => `<tr><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.total)}</td><td style="text-align:right;padding:4px 8px;">${num(d.bad)}</td><td style="text-align:right;padding:4px 8px;">${num(d.purchased)}</td><td style="text-align:right;padding:4px 8px;">${pct(d.bad?(d.purchased/d.bad*100):0)}</td></tr>`).join('')}</tbody>
+          <tbody>${storeRows.map(([s,d]) => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');navigateTo('stores/${s}')"><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.total)}</td><td style="text-align:right;padding:4px 8px;">${num(d.bad)}</td><td style="text-align:right;padding:4px 8px;">${num(d.purchased)}</td><td style="text-align:right;padding:4px 8px;">${pct(d.bad?(d.purchased/d.bad*100):0)}</td></tr>`).join('')}</tbody>
         </table>
       </div>
       ${custRows.length ? `<div class="cust-detail-section full-width">
         <h4>Customers Who Purchased (${Math.min(custRows.length,30)})</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">CUSTOMER</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th></tr></thead>
-          <tbody>${custRows.slice(0,30).map(c => `<tr><td style="padding:4px 8px;">${c.name}</td><td style="text-align:center;padding:4px 8px;">#${c.store}</td><td style="text-align:center;padding:4px 8px;">${c.date}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
+          <tbody>${custRows.slice(0,30).map(c => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');navigateTo('stores/${c.store}')"><td style="padding:4px 8px;">${escapeHTML(c.name)}</td><td style="text-align:center;padding:4px 8px;">#${escapeHTML(c.store)}</td><td style="text-align:center;padding:4px 8px;">${escapeHTML(c.date)}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
         </table>
       </div>` : ''}
     </div>`;
@@ -12692,8 +12706,8 @@ function openPromoDetail(promoCode) {
     <div class="cust-detail-grid">
       <div class="cust-detail-section">
         <h4>Promo Summary</h4>
-        <div class="cust-field"><span class="label">Code</span><span class="value" style="font-family:monospace;">${promoCode}</span></div>
-        <div class="cust-field"><span class="label">Description</span><span class="value">${promoRows[0].Promo_Description || '—'}</span></div>
+        <div class="cust-field"><span class="label">Code</span><span class="value" style="font-family:monospace;">${escapeHTML(promoCode)}</span></div>
+        <div class="cust-field"><span class="label">Description</span><span class="value">${escapeHTML(promoRows[0].Promo_Description || '—')}</span></div>
         <div class="cust-field"><span class="label">Total Uses</span><span class="value">${num(promoRows.length)}</span></div>
         <div class="cust-field"><span class="label">Total Discount</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(totalDisc)}</span></div>
       </div>
@@ -12707,14 +12721,14 @@ function openPromoDetail(promoCode) {
         <h4>Usage by Store</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">USES</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">TOTAL DISCOUNT</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">AVG DISCOUNT</th></tr></thead>
-          <tbody>${storeEntries.map(([s,d]) => `<tr><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.uses)}</td><td style="text-align:right;padding:4px 8px;">${money(d.total)}</td><td style="text-align:right;padding:4px 8px;">${money(d.uses?d.total/d.uses:0)}</td></tr>`).join('')}</tbody>
+          <tbody>${storeEntries.map(([s,d]) => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');navigateTo('stores/${s}')"><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.uses)}</td><td style="text-align:right;padding:4px 8px;">${money(d.total)}</td><td style="text-align:right;padding:4px 8px;">${money(d.uses?d.total/d.uses:0)}</td></tr>`).join('')}</tbody>
         </table>
       </div>
       ${custRows.length ? `<div class="cust-detail-section full-width">
         <h4>Customers Who Used This Promo (${Math.min(custRows.length,50)})</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">CUSTOMER</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">DISCOUNT</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th></tr></thead>
-          <tbody>${custRows.slice(0,50).map(c => `<tr><td style="padding:4px 8px;">${c.name}</td><td style="text-align:center;padding:4px 8px;">#${c.store}</td><td style="text-align:center;padding:4px 8px;">${c.date}</td><td style="text-align:right;padding:4px 8px;color:var(--green);">-${money(c.disc)}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
+          <tbody>${custRows.slice(0,50).map(c => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');navigateTo('stores/${c.store}')"><td style="padding:4px 8px;">${escapeHTML(c.name)}</td><td style="text-align:center;padding:4px 8px;">#${escapeHTML(c.store)}</td><td style="text-align:center;padding:4px 8px;">${escapeHTML(c.date)}</td><td style="text-align:right;padding:4px 8px;color:var(--green);">-${money(c.disc)}</td><td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td></tr>`).join('')}</tbody>
         </table>
       </div>` : ''}
     </div>`;
@@ -12762,8 +12776,8 @@ function openBizAcctDetail(acctId) {
     <div class="cust-detail-grid">
       <div class="cust-detail-section">
         <h4>Account Summary</h4>
-        <div class="cust-field"><span class="label">Account ID</span><span class="value">${acctId}</span></div>
-        <div class="cust-field"><span class="label">Processor</span><span class="value">${cust[0].BA_Processor_Code || '—'}</span></div>
+        <div class="cust-field"><span class="label">Account ID</span><span class="value">${escapeHTML(acctId)}</span></div>
+        <div class="cust-field"><span class="label">Processor</span><span class="value">${escapeHTML(cust[0].BA_Processor_Code || '—')}</span></div>
         <div class="cust-field"><span class="label">Total Revenue</span><span class="value" style="color:var(--green);font-weight:700;font-size:16px;">${money(totalRev)}</span></div>
         <div class="cust-field"><span class="label">Invoices</span><span class="value">${num(cust.length)}</span></div>
         <div class="cust-field"><span class="label">Avg Ticket</span><span class="value">${money(avgTicket)}</span></div>
@@ -12771,20 +12785,20 @@ function openBizAcctDetail(acctId) {
       </div>
       <div class="cust-detail-section">
         <h4>Top Vehicles</h4>
-        ${topVehicles.map(([v,c]) => `<div class="cust-field"><span class="label">${v}</span><span class="value">${c}x</span></div>`).join('')}
+        ${topVehicles.map(([v,c]) => `<div class="cust-field"><span class="label">${escapeHTML(v)}</span><span class="value">${c}x</span></div>`).join('')}
       </div>
       <div class="cust-detail-section full-width">
         <h4>Revenue by Store</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">INVOICES</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">REVENUE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">AVG TICKET</th></tr></thead>
-          <tbody>${storeEntries.map(([s,d]) => `<tr><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.inv)}</td><td style="text-align:right;padding:4px 8px;">${money(d.rev)}</td><td style="text-align:right;padding:4px 8px;">${money(d.inv?d.rev/d.inv:0)}</td></tr>`).join('')}</tbody>
+          <tbody>${storeEntries.map(([s,d]) => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');navigateTo('stores/${s}')"><td style="padding:4px 8px;">#${s}</td><td style="text-align:right;padding:4px 8px;">${num(d.inv)}</td><td style="text-align:right;padding:4px 8px;">${money(d.rev)}</td><td style="text-align:right;padding:4px 8px;">${money(d.inv?d.rev/d.inv:0)}</td></tr>`).join('')}</tbody>
         </table>
       </div>
       <div class="cust-detail-section full-width">
         <h4>Invoices (${Math.min(invoiceRows.length,50)})</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">NAME</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">VEHICLE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">STORE</th><th style="text-align:center;padding:4px 8px;color:var(--text-muted);font-size:10px;">DATE</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th></tr></thead>
-          <tbody>${invoiceRows.slice(0,50).map(r => `<tr><td style="padding:4px 8px;">${r.name}</td><td style="padding:4px 8px;font-size:11px;">${r.vehicle}</td><td style="text-align:center;padding:4px 8px;">#${r.store}</td><td style="text-align:center;padding:4px 8px;">${r.date}</td><td style="text-align:right;padding:4px 8px;">${money(r.sales)}</td></tr>`).join('')}</tbody>
+          <tbody>${invoiceRows.slice(0,50).map(r => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');navigateTo('stores/${r.store}')"><td style="padding:4px 8px;">${escapeHTML(r.name)}</td><td style="padding:4px 8px;font-size:11px;">${escapeHTML(r.vehicle)}</td><td style="text-align:center;padding:4px 8px;">#${escapeHTML(r.store)}</td><td style="text-align:center;padding:4px 8px;">${escapeHTML(r.date)}</td><td style="text-align:right;padding:4px 8px;">${money(r.sales)}</td></tr>`).join('')}</tbody>
         </table>
       </div>
     </div>`;
@@ -12872,7 +12886,9 @@ function openStoreRankDetail(storeNum) {
     date: r.Invoice_Date ? r.Invoice_Date.split(' ')[0] : '',
     vehicle: [r.Vehicle_Year, r.ChekChart_Make, r.ChekChart_Model].filter(Boolean).join(' '),
     sales: +r.Net_Sales || 0,
-    email: r.Customer_Email_Address || ''
+    email: r.Customer_Email_Address || '',
+    store: r.Store_Number || '',
+    idx: FILTERED.customers.indexOf(r)
   })).sort((a,b) => b.sales - a.sales).slice(0, 30);
 
   // --- Email capture ---
@@ -12902,22 +12918,22 @@ function openStoreRankDetail(storeNum) {
       </div>
       <div class="cust-detail-section">
         <h4>Top Services</h4>
-        ${topSvc.length ? topSvc.map(([name, r]) => `<div class="cust-field"><span class="label" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span><span class="value">${money(r.rev)}</span></div>`).join('') : '<div style="color:var(--text-muted);font-size:13px;">No service data</div>'}
+        ${topSvc.length ? topSvc.map(([name, r]) => `<div class="cust-field"><span class="label" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHTML(name)}</span><span class="value">${money(r.rev)}</span></div>`).join('') : '<div style="color:var(--text-muted);font-size:13px;">No service data</div>'}
       </div>
       <div class="cust-detail-section">
         <h4>Top Products</h4>
-        ${topProd.length ? topProd.map(([name, r]) => `<div class="cust-field"><span class="label" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span><span class="value">${money(r.rev)}</span></div>`).join('') : '<div style="color:var(--text-muted);font-size:13px;">No product data</div>'}
+        ${topProd.length ? topProd.map(([name, r]) => `<div class="cust-field"><span class="label" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHTML(name)}</span><span class="value">${money(r.rev)}</span></div>`).join('') : '<div style="color:var(--text-muted);font-size:13px;">No product data</div>'}
       </div>
       ${topPromos.length ? `<div class="cust-detail-section full-width">
         <h4>Promotions Used (${money(totalPromoDisc)} total discounts)</h4>
         <table style="width:100%;font-size:12px;">
           <thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">CODE</th><th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">DESCRIPTION</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">USES</th><th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">TOTAL DISC</th></tr></thead>
-          <tbody>${topPromos.map(([code, r]) => `<tr><td style="padding:4px 8px;font-weight:600;">${code}</td><td style="padding:4px 8px;">${r.desc}</td><td style="text-align:right;padding:4px 8px;">${num(r.uses)}</td><td style="text-align:right;padding:4px 8px;color:var(--green);">-${money(r.total)}</td></tr>`).join('')}</tbody>
+          <tbody>${topPromos.map(([code, r]) => `<tr class="clickable-row" style="cursor:pointer;" onclick="document.getElementById('custDetailModal').classList.remove('active');openPromoDetail('${code.replace(/'/g,"\\'")})"><td style="padding:4px 8px;font-weight:600;">${escapeHTML(code)}</td><td style="padding:4px 8px;">${escapeHTML(r.desc)}</td><td style="text-align:right;padding:4px 8px;">${num(r.uses)}</td><td style="text-align:right;padding:4px 8px;color:var(--green);">-${money(r.total)}</td></tr>`).join('')}</tbody>
         </table>
       </div>` : ''}
       ${topUpsell.length ? `<div class="cust-detail-section full-width">
         <h4>Top Upsell Opportunities (Not Purchased)</h4>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">${topUpsell.map(([name, count]) => `<div style="background:rgba(255,23,68,0.1);border:1px solid rgba(255,23,68,0.25);border-radius:6px;padding:8px 12px;font-size:12px;"><span style="color:var(--red);font-weight:600;">${count}x</span> ${name}</div>`).join('')}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">${topUpsell.map(([name, count]) => `<div style="background:rgba(255,23,68,0.1);border:1px solid rgba(255,23,68,0.25);border-radius:6px;padding:8px 12px;font-size:12px;"><span style="color:var(--red);font-weight:600;">${count}x</span> ${escapeHTML(name)}</div>`).join('')}</div>
       </div>` : ''}
       <div class="cust-detail-section full-width">
         <h4>Top Customers by Spend (${topCust.length < cust.length ? 'Top 30 of ' + num(cust.length) : num(cust.length)})</h4>
@@ -12929,11 +12945,11 @@ function openStoreRankDetail(storeNum) {
             <th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-size:10px;">EMAIL</th>
             <th style="text-align:right;padding:4px 8px;color:var(--text-muted);font-size:10px;">NET SALES</th>
           </tr></thead>
-          <tbody>${topCust.map(c => `<tr>
-            <td style="padding:4px 8px;">${c.name}</td>
-            <td style="padding:4px 8px;font-size:11px;">${c.vehicle}</td>
-            <td style="text-align:center;padding:4px 8px;">${c.date}</td>
-            <td style="padding:4px 8px;font-size:11px;">${c.email || '--'}</td>
+          <tbody>${topCust.map(c => `<tr class="clickable-row" style="cursor:pointer;" onclick="openCustDetail(${c.idx})">
+            <td style="padding:4px 8px;">${escapeHTML(c.name)}</td>
+            <td style="padding:4px 8px;font-size:11px;">${escapeHTML(c.vehicle)}</td>
+            <td style="text-align:center;padding:4px 8px;">${escapeHTML(c.date)}</td>
+            <td style="padding:4px 8px;font-size:11px;">${escapeHTML(c.email || '--')}</td>
             <td style="text-align:right;padding:4px 8px;">${money(c.sales)}</td>
           </tr>`).join('')}</tbody>
         </table>
@@ -13263,8 +13279,8 @@ function renderScheduleList() {
     const overdue = nextDue && new Date() > nextDue;
     return `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;${overdue?'border-color:var(--primary);':''}">
       <div style="flex:1;">
-        <div style="font-size:14px;font-weight:600;color:white;">${s.name || s.email}</div>
-        <div style="font-size:12px;color:var(--text-muted);">${s.email}</div>
+        <div style="font-size:14px;font-weight:600;color:white;">${escapeHTML(s.name || s.email)}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${escapeHTML(s.email)}</div>
       </div>
       <div style="text-align:center;min-width:140px;">
         <div style="font-size:12px;font-weight:500;">${REPORT_NAMES[s.report] || s.report}</div>
@@ -13433,7 +13449,7 @@ function removeAlertRecipient(idx) {
 function renderAlertRecipients() {
   const list = getAlertRecipients();
   document.getElementById('alertRecipientsList').innerHTML = list.length ? list.map((r, i) =>
-    `<div class="alert-rule-row"><div class="rule-text"><strong>${r.name || 'Manager'}</strong> — ${r.email}</div><button onclick="removeAlertRecipient(${i})" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button></div>`
+    `<div class="alert-rule-row"><div class="rule-text"><strong>${escapeHTML(r.name || 'Manager')}</strong> — ${escapeHTML(r.email)}</div><button onclick="removeAlertRecipient(${i})" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:12px;">&times;</button></div>`
   ).join('') : '<div style="color:var(--text-muted);font-size:12px;padding:8px;">No recipients yet.</div>';
 }
 
@@ -13596,7 +13612,7 @@ function renderTriggeredAlerts() {
     return `<div class="alert-item severity-${a.severity}">
       <div class="alert-severity ${a.severity}"></div>
       <div style="flex:1;">
-        <div style="font-size:13px;"><strong>Store #${a.store}</strong> — ${a.metricLabel} is <strong>${a.valueFmt}</strong> (${opLabel} ${a.thresholdFmt} threshold)</div>
+        <div style="font-size:13px;"><strong>Store #${escapeHTML(a.store)}</strong> — ${escapeHTML(a.metricLabel)} is <strong>${escapeHTML(a.valueFmt)}</strong> (${opLabel} ${a.thresholdFmt} threshold)</div>
       </div>
       <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">${a.severity}</span>
     </div>`;
@@ -14036,7 +14052,7 @@ function openAuditLog() {
         const d = new Date(e.timestamp);
         const time = (d.getMonth()+1)+'/'+d.getDate()+' '+d.toLocaleTimeString();
         const color = actionColors[e.action] || 'var(--text)';
-        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.03);">' +
+        return '<tr class="clickable-row" style="cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);" onclick="bpaToast(this.cells[3].textContent,\'info\')">' +
           '<td style="padding:5px 10px;white-space:nowrap;">'+time+'</td>' +
           '<td style="padding:5px 10px;"><span style="color:'+color+';font-weight:600;">'+e.action+'</span></td>' +
           '<td style="padding:5px 10px;">'+e.email+'</td>' +
@@ -14674,7 +14690,7 @@ function renderGrow() {
         totalVehPY += parseGrowNum(r.PY_Comp_Total_Vehicles) || 0;
         storeCount++;
 
-        html += '<tr class="store-child ' + distId + '">';
+        html += '<tr class="store-child clickable-row ' + distId + '" style="cursor:pointer;" onclick="navigateTo(\'stores/' + (r.Store_Number || '') + '\')">';
         html += '<td>' + (r.Store_Number || '—') + '</td>';
         html += '<td>' + fmtGrowDollar(gccy) + '</td>';
         html += '<td>' + fmtGrowDollar(gcpy) + '</td>';
@@ -14782,7 +14798,7 @@ function renderGrow() {
     GROW.kpi_actuals.forEach(r => {
       const laborPct = parseGrowNum(r.Labor_PCT_Sales);
       const laborClass = laborPct != null ? (laborPct > 30 ? 'pct-down' : (laborPct < 20 ? 'pct-up' : 'pct-flat')) : '';
-      html += '<tr>';
+      html += '<tr class="clickable-row" style="cursor:pointer;" onclick="navigateTo(\'stores/' + (r.Store_Number || '') + '\')">';
       html += '<td>' + (r.Store_Number || '—') + '</td>';
       html += '<td>' + fmtGrowDollar(parseGrowNum(r.Net_Sales)) + '</td>';
       html += '<td>' + fmtGrowNum(parseGrowNum(r.Vehicle_Count), 0) + '</td>';
@@ -14884,7 +14900,7 @@ function renderGrow() {
         const ringPY = parseGrowNum(r.PY_Comp_Ring_Start_To_End);
         const ringPctV = (ringCY != null && ringPY != null && ringPY !== 0) ? ((ringCY - ringPY) / Math.abs(ringPY)) * 100 : null;
 
-        html += '<tr class="store-child ' + tdId + '">';
+        html += '<tr class="store-child clickable-row ' + tdId + '" style="cursor:pointer;" onclick="navigateTo(\'stores/' + (r.Store_Number || '') + '\')">';
         html += '<td>' + (r.Store_Number || '—') + '</td>';
         html += '<td>' + fmtGrowNum(s2fCY, 1) + '</td>';
         html += '<td>' + fmtGrowNum(s2fPY, 1) + '</td>';
@@ -14968,7 +14984,8 @@ function renderCustomReports() {
     });
     html += '</tr></thead><tbody>';
     displayRows.forEach(row => {
-      html += '<tr>';
+      const _sn = row.Store_Number || row['Store Number'] || '';
+      html += _sn ? '<tr class="clickable-row" style="cursor:pointer;" onclick="navigateTo(\'stores/' + _sn.replace(/[^0-9]/g, '') + '\')">' : '<tr class="clickable-row">';
       report.headers.forEach(h => {
         let val = row[h] || '';
         // Clean up common GROW prefixes in values
@@ -15186,6 +15203,7 @@ function flashCell(td) {
 // Init
 loadSettings();
 checkDueReports();
+/* BPA-VIBRANT-ANCHOR */
 </script>
 </body>
 </html>
