@@ -15426,12 +15426,13 @@ async function doLogin() {
           result.push(current.trim());
           return result;
         }
-        function parseCSVText(text) {
+        function parseCSVText(text, maxRows) {
+          var limit = maxRows || 100000;
           var lines = text.split('\n');
           if (lines.length < 2) return [];
           var headers = parseCSVLine(lines[0]);
           var rows = [];
-          for (var i = 1; i < lines.length; i++) {
+          for (var i = 1; i < lines.length && rows.length < limit; i++) {
             var line = lines[i].trim();
             if (!line) continue;
             var vals = parseCSVLine(line);
@@ -15445,7 +15446,7 @@ async function doLogin() {
         function loadNextCSV() {
           if (loaded >= csvTypes.length) {
             // All files loaded — populate filters and render
-            try { saveUserData(); } catch(e) { console.warn('Save failed:', e.message); }
+            try { saveUserData(); } catch(e) { console.warn('Save failed (data too large for localStorage):', e.message); }
             var stores = new Set();
             [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(function(arr) {
               arr.forEach(function(r) { var s = cleanStoreNum(r.Store_Number); if (validStore(s)) stores.add(s); });
@@ -15478,15 +15479,18 @@ async function doLogin() {
           fetch(baseUrl + '/api/csv/' + type, { headers: hdrs, mode: 'cors' })
           .then(function(r) { if (!r.ok) throw new Error(r.status); return r.text(); })
           .then(function(text) {
-            var rows = parseCSVText(text);
+            // Limit large tables to prevent browser freeze
+            var limits = { customers: 50000, details: 50000, inspections: 50000, promos: 50000, odi: 50000 };
+            var maxR = limits[type] || 100000;
+            var rows = parseCSVText(text, maxR);
             if (rows.length > 0) {
               DATA[type] = rows;
               loadedFiles[type] = true;
               totalRows += rows.length;
-              console.log('[AutoSync] ' + type + ': ' + rows.length.toLocaleString() + ' rows');
+              console.log('[AutoSync] ' + type + ': ' + rows.length.toLocaleString() + ' rows' + (text.split('\n').length > maxR + 1 ? ' (capped from ' + (text.split('\n').length - 1).toLocaleString() + ')' : ''));
             }
             loaded++;
-            loadNextCSV();
+            setTimeout(loadNextCSV, 10); // yield to UI thread
           })
           .catch(function(e) {
             console.warn('[AutoSync] ' + type + ' failed:', e.message);
