@@ -6290,7 +6290,7 @@ function launchDashboard() {
   uploadZone.style.display = 'none';
   document.getElementById('dashboard').classList.add('active');
   // Defer rendering to allow the processing overlay to paint
-  setTimeout(() => { try { preParseDates(); } catch(e) {} try { _launchDashboardInner(); } catch(e) { console.error('Dashboard render error:', e); } hideProcessing(); }, 50);
+  setTimeout(() => { /* dates pre-parsed during stream */ try { _launchDashboardInner(); } catch(e) { console.error('Dashboard render error:', e); } hideProcessing(); }, 50);
 }
 function _launchDashboardInner() {
 
@@ -15012,10 +15012,10 @@ function syncNow() {
       var reader = r.body.getReader(), decoder = new TextDecoder(), csvH = null, rows = [], buf = '', bytes = 0;
       function pump() {
         return reader.read().then(function(res) {
-          if (res.done) { if (buf.trim() && csvH) { var v = parseOneLine(buf.trim()), o = {}; for (var h = 0; h < csvH.length; h++) o[csvH[h]] = v[h] || ''; rows.push(o); } onDone(rows); return; }
+          if (res.done) { if (buf.trim() && csvH) { var v = parseOneLine(buf.trim()), o = {}; for (var h = 0; h < csvH.length; h++) o[csvH[h]] = v[h] || ''; var dk = o.Invoice_Date || o.Update_Date || o.Operations_Day; if (dk) o._d = new Date(dk); rows.push(o); } onDone(rows); return; }
           bytes += res.value.length; buf += decoder.decode(res.value, { stream: true });
           var lines = buf.split('\n'); buf = lines.pop();
-          for (var i = 0; i < lines.length; i++) { var ln = lines[i].trim(); if (!ln) continue; if (!csvH) { csvH = parseOneLine(ln); continue; } var v = parseOneLine(ln), o = {}; for (var h = 0; h < csvH.length; h++) o[csvH[h]] = v[h] || ''; rows.push(o); }
+          for (var i = 0; i < lines.length; i++) { var ln = lines[i].trim(); if (!ln) continue; if (!csvH) { csvH = parseOneLine(ln); continue; } var v = parseOneLine(ln), o = {}; for (var h = 0; h < csvH.length; h++) o[csvH[h]] = v[h] || ''; var dk = o.Invoice_Date || o.Update_Date || o.Operations_Day; if (dk) o._d = new Date(dk); rows.push(o); }
           document.getElementById('processingSub').textContent = rows.length.toLocaleString() + ' rows (' + (bytes/1048576).toFixed(1) + ' MB)';
           return pump();
         });
@@ -15035,7 +15035,7 @@ function syncNow() {
       [DATA.customers, DATA.details, DATA.promos].forEach(function(a) { a.forEach(function(r) { var d = parseDate(r.Invoice_Date || r.Update_Date || ''); if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; } }); });
       if (minD && maxD) { document.getElementById('filterFrom').value = fmtDateISO(minD); document.getElementById('filterTo').value = fmtDateISO(maxD); }
       document.getElementById('processingText').textContent = 'Building dashboard...';
-      document.getElementById('processingSub').textContent = 'Pre-processing ' + totalRows.toLocaleString() + ' records...';
+      document.getElementById('processingSub').textContent = 'Rendering ' + totalRows.toLocaleString() + ' records...';
       setTimeout(function() {
         try { preParseDates(); } catch(e) { console.warn('preParse:', e); }
         try { applyFilters(); } catch(e) { console.error(e); }
@@ -15516,6 +15516,7 @@ async function doLogin() {
                     var vals = parseOneLine(buffer.trim());
                     var obj = {};
                     for (var h = 0; h < csvHeaders.length; h++) obj[csvHeaders[h]] = vals[h] || '';
+                    var dk = obj.Invoice_Date || obj.Update_Date || obj.Operations_Day; if (dk) obj._d = new Date(dk);
                     rows.push(obj);
                   }
                   onDone(rows);
@@ -15533,6 +15534,7 @@ async function doLogin() {
                   var vals = parseOneLine(line);
                   var obj = {};
                   for (var h = 0; h < csvHeaders.length; h++) obj[csvHeaders[h]] = vals[h] || '';
+                  var dk = obj.Invoice_Date || obj.Update_Date || obj.Operations_Day; if (dk) obj._d = new Date(dk);
                   rows.push(obj);
                 }
                 // Update progress
@@ -15571,9 +15573,8 @@ async function doLogin() {
               document.getElementById('filterTo').value = fmtDateISO(maxD);
             }
             document.getElementById('processingText').textContent = 'Building dashboard...';
-            document.getElementById('processingSub').textContent = 'Pre-processing ' + totalRows.toLocaleString() + ' records...';
+            document.getElementById('processingSub').textContent = 'Rendering ' + totalRows.toLocaleString() + ' records...';
             setTimeout(function() {
-              try { preParseDates(); } catch(e) { console.warn('preParse:', e); }
               try { applyFilters(); } catch(e) { console.error('Filter error:', e); }
               hideProcessing();
               bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
