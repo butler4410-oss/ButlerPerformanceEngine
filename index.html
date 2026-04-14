@@ -14976,11 +14976,71 @@ function syncNow() {
 
   if (!url) { resultEl.innerHTML = '<span style="color:var(--red);">Configure endpoint URL first.</span>'; return; }
 
-  resultEl.innerHTML = '<span style="color:var(--blue);">Syncing data from proxy...</span>';
+  // Use streaming CSV sync — same as auto-sync on login
+  const baseUrl = url.replace(/\/api\/data\/?$/, '').replace(/\/$/, '');
+  const csvTypes = ['customers', 'details', 'promos', 'inspections', 'odi', 'stores', 'employees', 'daily_sales', 'categories', 'services'];
+  const hdrs = { 'x-api-key': key, 'Authorization': 'Bearer ' + key };
+  let totalRows = 0, loaded = 0;
 
-  // Ensure URL points to /api/data
+  closeSettings();
+  showProcessing('Syncing from DDS proxy...', 'Connecting...');
+
+  function parseOneLine(line) {
+    var result = [], current = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (inQ) { if (c === '"') { if (i+1 < line.length && line[i+1] === '"') { current += '"'; i++; } else inQ = false; } else current += c; }
+      else { if (c === '"') inQ = true; else if (c === ',') { result.push(current.trim()); current = ''; } else current += c; }
+    }
+    result.push(current.trim());
+    return result;
+  }
+
+  function streamCSV(csvUrl, onDone) {
+    fetch(csvUrl, { headers: hdrs, mode: 'cors' }).then(function(r) {
+      if (!r.ok) throw new Error(r.status);
+      var reader = r.body.getReader(), decoder = new TextDecoder(), csvH = null, rows = [], buf = '', bytes = 0;
+      function pump() {
+        return reader.read().then(function(res) {
+          if (res.done) { if (buf.trim() && csvH) { var v = parseOneLine(buf.trim()), o = {}; for (var h = 0; h < csvH.length; h++) o[csvH[h]] = v[h] || ''; rows.push(o); } onDone(rows); return; }
+          bytes += res.value.length; buf += decoder.decode(res.value, { stream: true });
+          var lines = buf.split('\n'); buf = lines.pop();
+          for (var i = 0; i < lines.length; i++) { var ln = lines[i].trim(); if (!ln) continue; if (!csvH) { csvH = parseOneLine(ln); continue; } var v = parseOneLine(ln), o = {}; for (var h = 0; h < csvH.length; h++) o[csvH[h]] = v[h] || ''; rows.push(o); }
+          document.getElementById('processingSub').textContent = rows.length.toLocaleString() + ' rows (' + (bytes/1048576).toFixed(1) + ' MB)';
+          return pump();
+        });
+      }
+      return pump();
+    }).catch(function() { onDone([]); });
+  }
+
+  function loadNext() {
+    if (loaded >= csvTypes.length) {
+      try { saveUserData(); } catch(e) {}
+      var stores = new Set();
+      [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(function(a) { a.forEach(function(r) { var s = cleanStoreNum(r.Store_Number); if (validStore(s)) stores.add(s); }); });
+      var sel = document.getElementById('filterStore');
+      if (sel) { sel.innerHTML = '<option value="">All Stores (' + stores.size + ')</option>'; Array.from(stores).sort(function(a,b) { return a.localeCompare(b, undefined, {numeric:true}); }).forEach(function(s) { sel.innerHTML += '<option value="' + s + '">#' + s + '</option>'; }); }
+      var minD = null, maxD = null;
+      [DATA.customers, DATA.details, DATA.promos].forEach(function(a) { a.forEach(function(r) { var d = parseDate(r.Invoice_Date || r.Update_Date || ''); if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; } }); });
+      if (minD && maxD) { document.getElementById('filterFrom').value = fmtDateISO(minD); document.getElementById('filterTo').value = fmtDateISO(maxD); }
+      document.getElementById('processingText').textContent = 'Building dashboard...';
+      setTimeout(function() { try { applyFilters(); } catch(e) { console.error(e); } hideProcessing(); bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success'); }, 200);
+      return;
+    }
+    var type = csvTypes[loaded];
+    document.getElementById('processingText').textContent = 'Loading ' + type + '... (' + (loaded+1) + '/' + csvTypes.length + ')';
+    document.getElementById('processingSub').textContent = 'Connecting...';
+    streamCSV(baseUrl + '/api/csv/' + type, function(rows) {
+      if (rows.length > 0) { DATA[type] = rows; loadedFiles[type] = true; totalRows += rows.length; console.log('[Sync] ' + type + ': ' + rows.length.toLocaleString() + ' rows'); }
+      loaded++;
+      setTimeout(loadNext, 100);
+    });
+  }
+  loadNext();
+  return; // skip the old JSON-based sync below
+  // --- Legacy JSON sync (kept for non-proxy APIs) ---
   let dataUrl = url.includes('/api/data') ? url : url.replace(/\/?$/, '/api/data');
-  if (!dataUrl.includes('limit=')) dataUrl += (dataUrl.includes('?') ? '&' : '?') + 'limit=10000';
 
   fetch(dataUrl, { headers: buildApiHeaders(key), mode: 'cors' })
   .then(r => { if (!r.ok) throw new Error('Server returned ' + r.status); return r.json(); })
