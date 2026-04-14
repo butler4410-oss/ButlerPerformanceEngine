@@ -4017,12 +4017,6 @@
   .pipeline-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
   .pipeline-count { font-size: 12px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; min-width: 50px; text-align: right; }
 </style>
-<script>
-// Apply dark mode BEFORE body renders to prevent flash of light theme
-document.addEventListener('DOMContentLoaded', function() {
-  if (localStorage.getItem('bp_theme') !== 'light') document.body.classList.add('dark-mode');
-});
-</script>
 </head>
 <body class="dark-mode">
 
@@ -6146,7 +6140,7 @@ function launchDashboard() {
   uploadZone.style.display = 'none';
   document.getElementById('dashboard').classList.add('active');
   // Defer rendering to allow the processing overlay to paint
-  setTimeout(() => { _launchDashboardInner(); hideProcessing(); }, 50);
+  setTimeout(() => { try { _launchDashboardInner(); } catch(e) { console.error('Dashboard render error:', e); } hideProcessing(); }, 50);
 }
 function _launchDashboardInner() {
 
