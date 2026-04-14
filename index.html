@@ -2566,7 +2566,68 @@
   }
 
   /* Print */
-  /* Unified dark navy theme — no light/dark toggle */
+  /* ═══════════════════════════════════════════
+     DARK THEME
+     ═══════════════════════════════════════════ */
+  body.dark-mode {
+    --bg: #0a0f1a;
+    --card: #111827;
+    --card-hover: #1a2234;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border: #1e293b;
+    --surface-glass: rgba(17,24,39,0.95);
+  }
+  body.dark-mode { background: #0a0f1a; color: #e2e8f0; }
+  body.dark-mode .nav-shell { background: linear-gradient(135deg, #050a14 0%, #0f1a2e 50%, #162040 100%); }
+  body.dark-mode .nav-tier2 { background: rgba(5,10,20,0.95); }
+  body.dark-mode thead th { background: linear-gradient(180deg, #111827 0%, #0f1520 100%); color: #94a3b8; border-bottom-color: var(--primary); }
+  body.dark-mode .table-wrap { background: var(--card); border-color: var(--border); }
+  body.dark-mode .table-wrap h3 { background: linear-gradient(135deg, rgba(30,64,175,0.08) 0%, transparent 100%); border-bottom-color: var(--border); }
+  body.dark-mode tbody td { border-bottom-color: rgba(255,255,255,0.04); }
+  body.dark-mode tbody tr:nth-child(even) td { background: rgba(30,64,175,0.04); }
+  body.dark-mode tbody tr:hover td { background: rgba(30,64,175,0.1); }
+  body.dark-mode .chart-card { background: var(--card); border-color: var(--border); }
+  body.dark-mode .kpi-card { background: var(--card); box-shadow: 0 2px 8px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.04); }
+  body.dark-mode .kpi-card.kpi-revenue { background: linear-gradient(160deg, rgba(30,64,175,0.15) 0%, var(--card) 60%); }
+  body.dark-mode .kpi-card.kpi-green { background: linear-gradient(160deg, rgba(5,150,105,0.15) 0%, var(--card) 60%); }
+  body.dark-mode .kpi-card.kpi-red { background: linear-gradient(160deg, rgba(220,38,38,0.12) 0%, var(--card) 60%); }
+  body.dark-mode .kpi-card.kpi-blue { background: linear-gradient(160deg, rgba(37,99,235,0.15) 0%, var(--card) 60%); }
+  body.dark-mode .kpi-card.kpi-yellow { background: linear-gradient(160deg, rgba(217,119,6,0.15) 0%, var(--card) 60%); }
+  body.dark-mode .kpi-card.kpi-orange { background: linear-gradient(160deg, rgba(234,88,12,0.15) 0%, var(--card) 60%); }
+  body.dark-mode .kpi-card.kpi-purple { background: linear-gradient(160deg, rgba(124,58,237,0.15) 0%, var(--card) 60%); }
+  body.dark-mode .kpi-card.kpi-teal { background: linear-gradient(160deg, rgba(13,148,136,0.15) 0%, var(--card) 60%); }
+  body.dark-mode .bpa-panel { background: var(--card); border-color: var(--border); }
+  body.dark-mode .bpa-insight { background: var(--card); border-color: var(--border); }
+  body.dark-mode .bpa-insight.critical { background: linear-gradient(135deg, rgba(220,38,38,0.12) 0%, var(--card) 100%); }
+  body.dark-mode .bpa-insight.warning { background: linear-gradient(135deg, rgba(234,88,12,0.12) 0%, var(--card) 100%); }
+  body.dark-mode .bpa-insight.suggestion { background: linear-gradient(135deg, rgba(37,99,235,0.12) 0%, var(--card) 100%); }
+  body.dark-mode .bpa-insight.positive { background: linear-gradient(135deg, rgba(5,150,105,0.12) 0%, var(--card) 100%); }
+  body.dark-mode .report-modal { background: var(--card); }
+  body.dark-mode .report-modal-overlay { background: rgba(0,0,0,0.7); }
+  body.dark-mode .settings-modal { background: var(--card); }
+  body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0a0f1a; border-color: var(--border); color: var(--text); }
+  body.dark-mode .login-box { background: var(--card); }
+  body.dark-mode .login-screen { background: #050a14; }
+  body.dark-mode .upload-screen { background: #050a14; }
+  body.dark-mode .upload-card { background: var(--card); border-color: var(--border); }
+  body.dark-mode .cmd-select option { background: #111827; }
+  body.dark-mode .clickable-row:hover { background: linear-gradient(90deg, rgba(30,64,175,0.18) 0%, rgba(30,64,175,0.06) 100%); }
+  body.dark-mode .cell-green { background: rgba(5,150,105,0.18) !important; }
+  body.dark-mode .cell-yellow { background: rgba(217,119,6,0.18) !important; }
+  body.dark-mode .cell-red { background: rgba(220,38,38,0.18) !important; }
+  body.dark-mode .cell-blue { background: rgba(37,99,235,0.15) !important; }
+  body.dark-mode ::selection { background: rgba(96,165,250,0.3); }
+  body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    width: 32px; height: 32px; border-radius: 8px; border: none;
+    background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+    font-size: 16px; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .theme-toggle:hover { background: rgba(255,255,255,0.15); color: #fff; }
 
   /* ═══════════════════════════════════════════
      GROW REPORTS — KPI Cards & Grids
@@ -3572,6 +3633,7 @@
       <button class="view-btn" data-view="dataroom" role="tab" aria-selected="false" aria-controls="view-dataroom">Data Room</button>
     </div>
     <div class="nav-user" style="position:relative;">
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark/light mode" type="button">&#9790;</button>
       <button class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" aria-label="User menu" aria-haspopup="true" aria-expanded="false" type="button"></button>
       <div class="user-menu-dropdown" id="userMenuDropdown" role="menu">
         <div class="user-menu-header">
@@ -4482,6 +4544,30 @@ function bpaConfirm(message, onConfirm, onCancel) {
 // ============================================================
 // USER MENU
 // ============================================================
+// ============================================================
+// THEME TOGGLE — dark / light mode
+// ============================================================
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('bp_theme', isDark ? 'dark' : 'light');
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.innerHTML = isDark ? '&#9788;' : '&#9790;';
+  // Update Chart.js colors for dark mode
+  if (typeof Chart !== 'undefined') {
+    Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+    Chart.defaults.borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  }
+}
+// Restore saved theme on load — default to dark
+(function() {
+  const saved = localStorage.getItem('bp_theme');
+  if (saved !== 'light') {
+    document.body.classList.add('dark-mode');
+    var btn = document.getElementById('themeToggle');
+    if (btn) btn.innerHTML = '&#9788;';
+  }
+})();
+
 function toggleUserMenu() {
   const menu = document.getElementById('userMenuDropdown');
   const avatar = document.getElementById('userAvatar');
@@ -14231,30 +14317,30 @@ async function doLogin() {
     document.getElementById('loginScreen').classList.add('hidden');
   }
 
-  if (user.company) {
-    localStorage.setItem('bp_company', user.company);
-    localStorage.setItem('bp_user', user.name);
-    updateBadge(user.company, user.name);
-  }
-
-  updateUserAvatar(getCurrentUser());
-
-  // Auto-restore saved data for this account
-  if (loadUserData()) {
-    const info = getUserDataInfo();
-    const fileListEl = document.getElementById('fileList');
-    if (fileListEl && info) {
-      fileListEl.innerHTML = `<div class="file-item"><span class="check">✓</span><span class="name">Saved Data</span><span class="rows">${info.totalRows.toLocaleString()} rows restored from ${new Date(info.savedAt).toLocaleDateString()}</span></div>`;
+  // Post-login setup
+  const loggedIn = getCurrentUser();
+  if (loggedIn) {
+    if (loggedIn.company) {
+      localStorage.setItem('bp_company', loggedIn.company);
+      localStorage.setItem('bp_user', loggedIn.name);
+      updateBadge(loggedIn.company, loggedIn.name);
     }
-    launchDashboard();
-    updateDataSavedIndicator(true);
-  } else {
-    // No saved data for this user — show upload zone
-    document.getElementById('uploadZone').style.display = '';
-    document.getElementById('dashboard').classList.remove('active');
-    document.getElementById('fileList').innerHTML = '';
-    const launchBtn = document.getElementById('launchBtnWrap');
-    if (launchBtn) launchBtn.style.display = 'none';
+    updateUserAvatar(loggedIn);
+
+    // Try to restore saved data
+    if (loadUserData()) {
+      const info = getUserDataInfo();
+      const fileListEl = document.getElementById('fileList');
+      if (fileListEl && info) {
+        fileListEl.innerHTML = '<div class="file-item"><span class="check">\u2713</span><span class="name">Saved Data</span><span class="rows">' + info.totalRows.toLocaleString() + ' rows restored</span></div>';
+      }
+      launchDashboard();
+      updateDataSavedIndicator(true);
+    } else {
+      // No local data — show upload zone but also offer API sync
+      document.getElementById('uploadZone').style.display = '';
+      document.getElementById('dashboard').classList.remove('active');
+    }
   }
 }
 
