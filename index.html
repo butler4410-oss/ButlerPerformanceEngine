@@ -15494,9 +15494,13 @@ async function doLogin() {
               document.getElementById('filterFrom').value = fmtDateISO(minD);
               document.getElementById('filterTo').value = fmtDateISO(maxD);
             }
-            hideProcessing();
-            applyFilters();
-            bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
+            document.getElementById('processingText').textContent = 'Building dashboard...';
+            document.getElementById('processingSub').textContent = totalRows.toLocaleString() + ' records across ' + stores.size + ' stores';
+            setTimeout(function() {
+              try { applyFilters(); } catch(e) { console.error('Filter error:', e); }
+              hideProcessing();
+              bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
+            }, 200);
             return;
           }
           var type = csvTypes[loaded];
@@ -15511,7 +15515,12 @@ async function doLogin() {
               console.log('[AutoSync] ' + type + ': ' + rows.length.toLocaleString() + ' rows');
             }
             loaded++;
-            setTimeout(loadNextCSV, 50);
+            document.getElementById('processingSub').textContent = totalRows.toLocaleString() + ' total rows loaded';
+            setTimeout(loadNextCSV, 100);
+          }).catch(function(e) {
+            console.warn('[AutoSync] stream error for ' + type + ':', e.message);
+            loaded++;
+            setTimeout(loadNextCSV, 100);
           });
         }
         loadNextCSV();
