@@ -2396,6 +2396,182 @@
   }
   .kpi-card.clickable:hover::after { opacity: 0.6; }
 
+  /* ═══ Trend Arrow Badges ═══ */
+  .kpi-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-top: 4px;
+    line-height: 1;
+  }
+  .kpi-trend.trend-up { color: #059669; background: rgba(5,150,105,0.12); }
+  .kpi-trend.trend-down { color: #dc2626; background: rgba(220,38,38,0.10); }
+  .kpi-trend.trend-flat { color: var(--text-muted); background: rgba(100,116,139,0.08); }
+
+  /* ═══ Revenue Heatmap ═══ */
+  .heatmap-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    overflow-x: auto;
+  }
+  .heatmap-grid {
+    display: grid;
+    gap: 3px;
+    width: 100%;
+  }
+  .heatmap-cell {
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    cursor: pointer;
+    position: relative;
+    min-height: 32px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .heatmap-cell:hover { transform: scale(1.15); z-index: 5; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+  .heatmap-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+  }
+  .heatmap-tooltip {
+    position: fixed;
+    background: rgba(15,23,42,0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 999;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    white-space: nowrap;
+  }
+
+  /* ═══ Customer Intelligence ═══ */
+  .ci-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .ci-section h4 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ci-section h4 .ci-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .ci-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ci-full { grid-column: 1 / -1; }
+
+  /* ═══ Smart Alerts Notification Badge ═══ */
+  .smart-alerts-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background: #dc2626;
+    color: white;
+    font-size: 9px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    animation: alertPulse 2s ease-in-out infinite;
+  }
+  @keyframes alertPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.5); }
+    50% { box-shadow: 0 0 0 4px rgba(220,38,38,0); }
+  }
+  .smart-alerts-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 380px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    z-index: 300;
+    display: none;
+    padding: 0;
+  }
+  .smart-alerts-dropdown.open { display: block; }
+  .smart-alert-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .smart-alert-item:hover { background: rgba(30,64,175,0.04); }
+  .smart-alert-item:last-child { border-bottom: none; }
+  .smart-alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .smart-alert-dot.critical { background: #dc2626; }
+  .smart-alert-dot.warning { background: #d97706; }
+  .smart-alert-dot.info { background: #2563eb; }
+  .smart-alert-text { font-size: 12px; color: var(--text); line-height: 1.4; }
+  .smart-alert-text strong { font-weight: 700; }
+  .smart-alert-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ═══ Service Mix Optimization ═══ */
+  .cross-sell-matrix {
+    display: grid;
+    gap: 2px;
+    font-size: 10px;
+    overflow-x: auto;
+  }
+  .cross-sell-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    min-height: 32px;
+    border-radius: 3px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .cross-sell-cell:hover { transform: scale(1.1); z-index: 2; }
+
   /* Today Snapshot */
   .today-snapshot {
     background: linear-gradient(135deg, rgba(30,64,175,0.04) 0%, var(--card) 100%);
@@ -4113,6 +4289,10 @@
     <!-- Split: KPIs left + Insights right -->
     <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
       <div>
+        <div class="kpi-grid-header" style="margin-bottom:8px;">
+          <h3 style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Key Metrics</h3>
+          <button class="nav-util-btn" onclick="openTilePicker()" style="font-size:10px;padding:4px 10px;">Customize</button>
+        </div>
         <div class="kpi-grid reveal-stagger" id="dashKPIs" style="margin-bottom:0;"></div>
       </div>
       <div>
@@ -7736,7 +7916,7 @@ const TILE_CATALOG = [
   { id: 'valid_mailing',    cat: 'Customers',    label: 'Mailable Addresses',   desc: 'Customers with full mailing address', calc: () => { const c=FILTERED.customers; const v=c.filter(hasValidAddress).length; return { value: pct(c.length?v/c.length*100:0), sub: num(v)+' of '+num(c.length) }; }},
 ];
 
-const DEFAULT_TILES = ['total_revenue','avg_ticket','active_stores','promo_discounts','insp_total'];
+const DEFAULT_TILES = ['total_revenue','avg_ticket','total_invoices','active_stores','avg_bay_time','avg_wait_time','email_capture','phone_capture','promo_discounts','insp_total','insp_conversion','unique_services'];
 
 function getSelectedTiles() {
   const stored = localStorage.getItem('bp_tiles');
