@@ -4269,6 +4269,7 @@
     <select id="filterStore" name="store" class="cmd-select" onchange="applyFilters()" style="min-width:150px;" aria-label="Filter by store"><option value="">All Stores</option></select>
     <label for="filterPeriod" class="sr-only">Filter by time period</label>
     <select id="filterPeriod" class="cmd-select" onchange="applyPeriodFilter()" style="min-width:130px;" aria-label="Filter by time period">
+      <option value="all" selected>All Data</option>
       <option value="mtd">This Month</option>
       <option value="qtd">This Quarter</option>
       <option value="ytd">Year to Date</option>
@@ -6197,6 +6198,21 @@ function applyPeriodFilter() {
     return;
   }
   customDiv.style.display = 'none';
+
+  if (period === 'all') {
+    // Use full data date range
+    let minD = null, maxD = null;
+    [DATA.customers, DATA.details, DATA.promos, DATA.daily_sales || []].forEach(function(arr) {
+      arr.forEach(function(r) {
+        var d = r._d;
+        if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; }
+      });
+    });
+    if (minD) document.getElementById('filterFrom').value = fmtDateISO(minD);
+    if (maxD) document.getElementById('filterTo').value = fmtDateISO(maxD);
+    applyFilters();
+    return;
+  }
 
   const today = new Date();
   let from = new Date(today);
