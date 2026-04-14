@@ -16469,6 +16469,25 @@ function removeCustomReport(idx) {
       if (loadUserData()) {
         launchDashboard();
         updateDataSavedIndicator(true);
+      } else {
+        // No saved data — auto-sync from DDS if configured
+        const apiUrl = localStorage.getItem('bp_api_url');
+        const apiKey = localStorage.getItem('bp_api_key');
+        if (!apiUrl) {
+          // Auto-configure on first visit
+          localStorage.setItem('bp_data_source', 'api');
+          localStorage.setItem('bp_api_url', 'https://dds.butleranalytics.io/api/data');
+          localStorage.setItem('bp_api_key', '***REDACTED-API-KEY-ROTATED-2026-04-28***');
+        }
+        const url = localStorage.getItem('bp_api_url');
+        const key = localStorage.getItem('bp_api_key');
+        if (url && key) {
+          document.getElementById('uploadZone').style.display = 'none';
+          document.getElementById('dashboard').classList.add('active');
+          document.getElementById('settingApiUrl') && (document.getElementById('settingApiUrl').value = url);
+          document.getElementById('settingApiKey') && (document.getElementById('settingApiKey').value = key);
+          syncNow();
+        }
       }
     } else {
       // No session — seed local defaults as fallback
