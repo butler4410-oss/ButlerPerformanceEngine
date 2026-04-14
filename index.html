@@ -6129,9 +6129,16 @@ function validStore(s) {
 
 function parseDate(str) {
   if (!str) return null;
+  // MM/DD/YYYY or M/D/YYYY
   const match = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (!match) return null;
-  return new Date(+match[3], +match[1] - 1, +match[2]);
+  if (match) return new Date(+match[3], +match[1] - 1, +match[2]);
+  // YYYY-MM-DD
+  const iso = str.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]);
+  // JS Date string: "Mon Apr 13 2026 20:00:00 GMT..." or "4/13/2026 12:00:00 AM"
+  const d = new Date(str);
+  if (!isNaN(d.getTime()) && d.getFullYear() > 2000 && d.getFullYear() < 2100) return d;
+  return null;
 }
 
 function fmtDate(d) {
@@ -15403,15 +15410,31 @@ async function doLogin() {
         let totalRows = 0;
         let loaded = 0;
 
+        function parseCSVLine(line) {
+          var result = [], current = '', inQuotes = false;
+          for (var i = 0; i < line.length; i++) {
+            var c = line[i];
+            if (inQuotes) {
+              if (c === '"') { if (i + 1 < line.length && line[i + 1] === '"') { current += '"'; i++; } else inQuotes = false; }
+              else current += c;
+            } else {
+              if (c === '"') inQuotes = true;
+              else if (c === ',') { result.push(current.trim()); current = ''; }
+              else current += c;
+            }
+          }
+          result.push(current.trim());
+          return result;
+        }
         function parseCSVText(text) {
           var lines = text.split('\n');
           if (lines.length < 2) return [];
-          var headers = lines[0].split(',').map(function(h) { return h.replace(/^"|"$/g, '').trim(); });
+          var headers = parseCSVLine(lines[0]);
           var rows = [];
           for (var i = 1; i < lines.length; i++) {
             var line = lines[i].trim();
             if (!line) continue;
-            var vals = line.split(',').map(function(v) { return v.replace(/^"|"$/g, '').trim(); });
+            var vals = parseCSVLine(line);
             var obj = {};
             for (var h = 0; h < headers.length; h++) obj[headers[h]] = vals[h] || '';
             rows.push(obj);
