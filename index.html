@@ -7585,13 +7585,30 @@ function saveSelectedTiles(ids) {
   localStorage.setItem('bp_tiles', JSON.stringify(ids));
 }
 
+// Color mapping for KPI tile categories
+const TILE_COLORS = {
+  'Revenue': 'kpi-revenue', 'Volume': 'kpi-purple', 'Promotions': 'kpi-orange',
+  'Inspections': 'kpi-teal', 'Operations': 'kpi-blue', 'Customers': 'kpi-green'
+};
+// Specific overrides for certain tiles
+const TILE_COLOR_OVERRIDE = {
+  'total_revenue': 'kpi-revenue', 'avg_ticket': 'kpi-green', 'service_revenue': 'kpi-blue',
+  'product_revenue': 'kpi-purple', 'max_ticket': 'kpi-yellow', 'promo_discounts': 'kpi-red',
+  'promo_uses': 'kpi-orange', 'insp_total': 'kpi-teal', 'insp_green_pct': 'kpi-green',
+  'insp_needs_attn': 'kpi-yellow', 'insp_conversion': 'kpi-orange', 'avg_bay_time': 'kpi-blue',
+  'avg_wait_time': 'kpi-purple', 'vehicles_serviced': 'kpi-purple', 'email_capture': 'kpi-green',
+  'phone_capture': 'kpi-teal', 'active_stores': 'kpi-orange', 'biz_accounts': 'kpi-pink',
+  'valid_mailing': 'kpi-blue', 'total_invoices': 'kpi-purple'
+};
+
 function renderCustomTiles() {
   const selected = getSelectedTiles();
   const html = selected.map((id, idx) => {
     const tile = TILE_CATALOG.find(t => t.id === id);
     if (!tile) return '';
     const result = tile.calc();
-    return `<div class="kpi-card" draggable="true" data-tile-idx="${idx}" data-tile-id="${id}"><div class="kpi-label">${tile.label}</div><div class="kpi-value">${result.value}</div>${result.sub ? '<div class="kpi-sub">'+result.sub+'</div>' : ''}</div>`;
+    const accent = TILE_COLOR_OVERRIDE[id] || TILE_COLORS[tile.cat] || 'kpi-blue';
+    return `<div class="kpi-card ${accent} clickable" draggable="true" data-tile-idx="${idx}" data-tile-id="${id}" onclick="drillKPI('${tile.label}')"><div class="kpi-label">${tile.label}</div><div class="kpi-value">${result.value}</div>${result.sub ? '<div class="kpi-sub">'+result.sub+'</div>' : ''}</div>`;
   }).join('');
   document.getElementById('dashKPIs').innerHTML = html;
   initTileDrag();
