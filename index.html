@@ -7749,7 +7749,7 @@ function renderDashboard() {
   const view = active ? active.dataset.view : 'business';
   const safe = (fn) => { try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); } };
 
-  // Only render the ACTIVE view — massive performance win
+  // PHASE 1: Render the ACTIVE view FAST (user sees content immediately)
   if (view === 'business') {
     safe(renderOverview);
     safe(renderOpsGrid);
@@ -7763,25 +7763,42 @@ function renderDashboard() {
     safe(renderRevenue);
     safe(renderInspections);
     safe(renderPromos);
-    safe(renderOperations);
     safe(renderCustomers);
-    safe(renderPeople);
-    safe(renderMarketing);
-    safe(renderReporting);
-    if (typeof renderCustomerIntelligence === 'function') safe(renderCustomerIntelligence);
-    if (typeof renderServiceMixOptimization === 'function') safe(renderServiceMixOptimization);
   }
 
-  // Defer non-critical tasks
-  requestIdleCallback(function() {
-    safe(runAlertCheck);
-    if (typeof runSmartAlertCheck === 'function') safe(runSmartAlertCheck);
-    safe(updateFilterSummary);
-  });
-
-  // Render GROW data if available (lightweight)
-  if (typeof renderGrow === 'function' && GROW && GROW.system_impact && GROW.system_impact.length) safe(renderGrow);
+  // Always run lightweight renders
+  safe(updateFilterSummary);
   if (typeof renderReports === 'function') safe(renderReports);
+  if (typeof renderGrow === 'function' && GROW && GROW.system_impact && GROW.system_impact.length) safe(renderGrow);
+
+  // PHASE 2: Progressively render EVERYTHING ELSE in background
+  // Nothing left on the table — all views get built, just not blocking the UI
+  var bgQueue = [];
+  if (view !== 'business') bgQueue.push(renderOverview, renderOpsGrid, runBPAInsights);
+  if (view !== 'stores') bgQueue.push(renderStores);
+  if (view !== 'growth') bgQueue.push(renderForecastView);
+  if (view !== 'dataroom') {
+    bgQueue.push(renderRevenue, renderInspections, renderPromos, renderCustomers);
+  }
+  bgQueue.push(renderOperations, renderPeople, renderMarketing, renderReporting);
+  bgQueue.push(runAlertCheck);
+  if (typeof runSmartAlertCheck === 'function') bgQueue.push(runSmartAlertCheck);
+  if (typeof renderCustomerIntelligence === 'function') bgQueue.push(renderCustomerIntelligence);
+  if (typeof renderServiceMixOptimization === 'function') bgQueue.push(renderServiceMixOptimization);
+  if (typeof renderRevenueHeatmap === 'function') bgQueue.push(renderRevenueHeatmap);
+  if (typeof renderTrendAnalysis === 'function') bgQueue.push(renderTrendAnalysis);
+  if (typeof renderPredictiveIndicators === 'function') bgQueue.push(renderPredictiveIndicators);
+
+  // Process background queue in chunks — 2 functions per frame, yielding between
+  var bgIdx = 0;
+  function processBgChunk() {
+    if (bgIdx >= bgQueue.length) return;
+    var end = Math.min(bgIdx + 2, bgQueue.length);
+    for (var i = bgIdx; i < end; i++) safe(bgQueue[i]);
+    bgIdx = end;
+    if (bgIdx < bgQueue.length) setTimeout(processBgChunk, 100);
+  }
+  setTimeout(processBgChunk, 500); // Start background after 500ms (active view painted)
 }
 
 // Re-render when switching views
