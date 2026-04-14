@@ -6209,6 +6209,16 @@ function applyPeriodFilter() {
   applyFilters();
 }
 
+// Pre-parse and cache dates on all data rows (called once after data load)
+function preParseDates() {
+  console.time('[perf] preParseDates');
+  [DATA.customers, DATA.details, DATA.promos, DATA.odi, DATA.invoices].forEach(function(arr) {
+    arr.forEach(function(r) { if (!r._d && r.Invoice_Date) r._d = parseDate(r.Invoice_Date); });
+  });
+  DATA.inspections.forEach(function(r) { if (!r._d) r._d = parseDate(r.Update_Date || r.Invoice_Date); });
+  console.timeEnd('[perf] preParseDates');
+}
+
 function applyFilters() {
   const store = document.getElementById('filterStore').value;
   const from = document.getElementById('filterFrom').value ? new Date(document.getElementById('filterFrom').value + 'T00:00:00') : null;
@@ -6216,7 +6226,7 @@ function applyFilters() {
 
   const filterRow = (row) => {
     if (store && row.Store_Number !== store) return false;
-    const d = parseDate(row.Invoice_Date);
+    const d = row._d;
     if (from && d && d < from) return false;
     if (to && d && d > to) return false;
     return true;
@@ -6228,7 +6238,7 @@ function applyFilters() {
   FILTERED.odi = DATA.odi.filter(filterRow);
   FILTERED.inspections = DATA.inspections.filter(r => {
     if (store && r.Store_Number !== store) return false;
-    const d = parseDate(r.Update_Date);
+    const d = r._d;
     if (from && d && d < from) return false;
     if (to && d && d > to) return false;
     return true;
@@ -6280,7 +6290,7 @@ function launchDashboard() {
   uploadZone.style.display = 'none';
   document.getElementById('dashboard').classList.add('active');
   // Defer rendering to allow the processing overlay to paint
-  setTimeout(() => { try { _launchDashboardInner(); } catch(e) { console.error('Dashboard render error:', e); } hideProcessing(); }, 50);
+  setTimeout(() => { try { preParseDates(); } catch(e) {} try { _launchDashboardInner(); } catch(e) { console.error('Dashboard render error:', e); } hideProcessing(); }, 50);
 }
 function _launchDashboardInner() {
 
@@ -15025,7 +15035,13 @@ function syncNow() {
       [DATA.customers, DATA.details, DATA.promos].forEach(function(a) { a.forEach(function(r) { var d = parseDate(r.Invoice_Date || r.Update_Date || ''); if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; } }); });
       if (minD && maxD) { document.getElementById('filterFrom').value = fmtDateISO(minD); document.getElementById('filterTo').value = fmtDateISO(maxD); }
       document.getElementById('processingText').textContent = 'Building dashboard...';
-      setTimeout(function() { try { applyFilters(); } catch(e) { console.error(e); } hideProcessing(); bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success'); }, 200);
+      document.getElementById('processingSub').textContent = 'Pre-processing ' + totalRows.toLocaleString() + ' records...';
+      setTimeout(function() {
+        try { preParseDates(); } catch(e) { console.warn('preParse:', e); }
+        try { applyFilters(); } catch(e) { console.error(e); }
+        hideProcessing();
+        bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
+      }, 200);
       return;
     }
     var type = csvTypes[loaded];
@@ -15555,8 +15571,9 @@ async function doLogin() {
               document.getElementById('filterTo').value = fmtDateISO(maxD);
             }
             document.getElementById('processingText').textContent = 'Building dashboard...';
-            document.getElementById('processingSub').textContent = totalRows.toLocaleString() + ' records across ' + stores.size + ' stores';
+            document.getElementById('processingSub').textContent = 'Pre-processing ' + totalRows.toLocaleString() + ' records...';
             setTimeout(function() {
+              try { preParseDates(); } catch(e) { console.warn('preParse:', e); }
               try { applyFilters(); } catch(e) { console.error('Filter error:', e); }
               hideProcessing();
               bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
