@@ -5544,6 +5544,16 @@ function getDataStorageKey() {
 function saveUserData() {
   const key = getDataStorageKey();
   if (!key) return;
+  // Skip localStorage persistence for DDS-scale tenants. Above ~500k total rows
+  // the trim-to-15k fallback below saves nothing useful (transaction tables
+  // become empty) and JSON.stringify on the raw payload costs hundreds of ms.
+  // Re-syncing on login is faster and more accurate than restoring a stub.
+  const totalDataRows = Object.values(DATA).reduce(function(s, arr) { return s + (arr && arr.length ? arr.length : 0); }, 0);
+  if (totalDataRows > 500000) {
+    console.info('[persist] Skipping localStorage save (' + totalDataRows.toLocaleString() + ' rows — above 500k threshold). Data will re-sync from DDS on next login.');
+    updateDataSavedIndicator(false);
+    return false;
+  }
   try {
     // Trim large datasets — only persist summary/aggregated data, skip massive transaction logs
     const MAX_ROWS_PER_TYPE = 15000;
@@ -6254,6 +6264,51 @@ function preParseDates() {
   console.timeEnd('[perf] preParseDates');
 }
 
+// Remove duplicate rows from DATA in place. Each sync of a DDS tenant can
+// introduce duplicates if the proxy accumulates without deduping; those
+// inflate every KPI that counts or sums. Keys are per-table natural keys:
+// - customers / invoices: Store + Invoice_Number (one row per invoice)
+// - details:     Store + Invoice + Detail_Code + Detail_Description (line items)
+// - inspections: Store + Invoice + Checkpoint_Code + Print_Sequence
+// - promos:      Store + Invoice + Promo_Code
+// - odi:         Store + Invoice + ODI field name
+function dedupDataInPlace() {
+  console.time('[perf] dedup');
+  var keyFns = {
+    customers:   function(r) { return r.Store_Number + '|' + r.Invoice_Number; },
+    invoices:    function(r) { return r.Store_Number + '|' + r.Invoice_Number; },
+    details:     function(r) { return r.Store_Number + '|' + r.Invoice_Number + '|' + (r.Invoice_Detail_Code || '') + '|' + (r.Invoice_Detail_Description || ''); },
+    inspections: function(r) { return r.Store_Number + '|' + r.Invoice_Number + '|' + (r.Checkpoint_Code || '') + '|' + (r.Print_Sequence || ''); },
+    promos:      function(r) { return r.Store_Number + '|' + r.Invoice_Number + '|' + (r.Promo_Code || ''); },
+    odi:         function(r) { return r.Store_Number + '|' + r.Invoice_Number + '|' + (r.ODI_Cust_Pref_Short_Desc || ''); }
+  };
+  Object.keys(keyFns).forEach(function(type) {
+    var arr = DATA[type];
+    if (!arr || arr.length < 2) return;
+    var seen = new Set();
+    var keep = [];
+    var fn = keyFns[type];
+    for (var i = 0; i < arr.length; i++) {
+      var k = fn(arr[i]);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      keep.push(arr[i]);
+    }
+    if (keep.length !== arr.length) {
+      console.info('[dedup] ' + type + ': ' + arr.length.toLocaleString() + ' -> ' + keep.length.toLocaleString() + ' (' + (arr.length - keep.length).toLocaleString() + ' duplicates removed)');
+      DATA[type] = keep;
+    }
+  });
+  console.timeEnd('[perf] dedup');
+}
+
+// Called at the end of every data-load path (CSV upload, DDS sync, AutoSync).
+// Idempotent: safe to call multiple times.
+function finalizeDataLoad() {
+  try { preParseDates(); } catch (e) { console.warn('preParseDates failed:', e.message); }
+  try { dedupDataInPlace(); } catch (e) { console.warn('dedupDataInPlace failed:', e.message); }
+}
+
 // Debounce wrapper around applyFiltersNow so rapid filter changes (e.g. typing
 // in Custom Range date inputs, or quick dropdown toggles) coalesce into a
 // single expensive pass. Critical for the South Bay DDS tenant where removing
@@ -6400,6 +6455,7 @@ function _launchDashboardInner() {
     navigateTo(location.hash ? location.hash.replace('#','').split('/')[0] || 'business' : 'business', true);
   }
 
+  finalizeDataLoad();
   applyFiltersNow();
   updateFilterSummary();
 
@@ -15239,7 +15295,7 @@ function syncNow() {
       document.getElementById('processingText').textContent = 'Building dashboard...';
       document.getElementById('processingSub').textContent = 'Rendering ' + totalRows.toLocaleString() + ' records...';
       setTimeout(function() {
-        try { preParseDates(); } catch(e) { console.warn('preParse:', e); }
+        finalizeDataLoad();
         try { applyFiltersNow(); } catch(e) { console.error(e); }
         hideProcessing();
         bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
@@ -15765,6 +15821,7 @@ async function doLogin() {
             document.getElementById('processingText').textContent = 'Building dashboard...';
             document.getElementById('processingSub').textContent = 'Rendering ' + totalRows.toLocaleString() + ' records...';
             setTimeout(function() {
+              finalizeDataLoad();
               try { applyFiltersNow(); } catch(e) { console.error('Filter error:', e); }
               hideProcessing();
               bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
