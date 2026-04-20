@@ -16,13 +16,24 @@ function buildTrendBadge(trend) {
 }
 
 function computePriorPeriodDates() {
-  var dates = FILTERED.customers.map(function(r) { return parseDate(r.Invoice_Date); }).filter(Boolean);
-  if (dates.length < 2) return null;
-  var minD = new Date(Math.min.apply(null, dates));
-  var maxD = new Date(Math.max.apply(null, dates));
-  var spanMs = maxD - minD;
+  // Single-pass min/max over pre-cached _d. Never use Math.min.apply(null, dates)
+  // or Math.min(...dates) on FILTERED — arrays here exceed the JS call-arg limit
+  // (V8 ≈300k) and throw RangeError: Maximum call stack size exceeded.
+  var minMs = Infinity, maxMs = -Infinity, count = 0;
+  var cust = FILTERED.customers;
+  for (var i = 0; i < cust.length; i++) {
+    var d = cust[i]._d;
+    if (!d) continue;
+    var t = d.getTime();
+    if (t < minMs) minMs = t;
+    if (t > maxMs) maxMs = t;
+    count++;
+  }
+  if (count < 2 || minMs === Infinity) return null;
+  var spanMs = maxMs - minMs;
   if (spanMs < 86400000) return null;
-  var priorEnd = new Date(minD.getTime() - 86400000);
+  var minD = new Date(minMs), maxD = new Date(maxMs);
+  var priorEnd = new Date(minMs - 86400000);
   var priorStart = new Date(priorEnd.getTime() - spanMs);
   return { currentStart: minD, currentEnd: maxD, priorStart: priorStart, priorEnd: priorEnd };
 }
@@ -30,15 +41,16 @@ function computePriorPeriodDates() {
 function computeOverviewTrends(cust) {
   var periods = computePriorPeriodDates();
   if (!periods) return {};
-  var priorCust = DATA.customers.filter(function(r) { var d = parseDate(r.Invoice_Date); return d && d >= periods.priorStart && d <= periods.priorEnd; });
+  var pStart = periods.priorStart.getTime(), pEnd = periods.priorEnd.getTime();
+  var priorCust = DATA.customers.filter(function(r) { var d = r._d; if (!d) return false; var t = d.getTime(); return t >= pStart && t <= pEnd; });
   if (!priorCust.length) return {};
   var curRev = cust.reduce(function(s, r) { return s + (+r.Net_Sales || 0); }, 0);
   var priRev = priorCust.reduce(function(s, r) { return s + (+r.Net_Sales || 0); }, 0);
   var curAvg = cust.length ? curRev / cust.length : 0;
   var priAvg = priorCust.length ? priRev / priorCust.length : 0;
   var curCount = cust.length, priCount = priorCust.length;
-  var curDatesSet = new Set(cust.map(function(r) { var d = parseDate(r.Invoice_Date); return d ? fmtDateISO(d) : null; }).filter(Boolean));
-  var priDatesSet = new Set(priorCust.map(function(r) { var d = parseDate(r.Invoice_Date); return d ? fmtDateISO(d) : null; }).filter(Boolean));
+  var curDatesSet = new Set(cust.map(function(r) { return r._d ? fmtDateISO(r._d) : null; }).filter(Boolean));
+  var priDatesSet = new Set(priorCust.map(function(r) { return r._d ? fmtDateISO(r._d) : null; }).filter(Boolean));
   var curStores = new Set(cust.map(function(r) { return r.Store_Number; }).filter(Boolean));
   var priStores = new Set(priorCust.map(function(r) { return r.Store_Number; }).filter(Boolean));
   var curCPD = curDatesSet.size && curStores.size ? curCount / curDatesSet.size / curStores.size : 0;
@@ -56,7 +68,10 @@ function computeOverviewTrends(cust) {
 function computeTrendData() {
   var periods = computePriorPeriodDates();
   if (!periods) return {};
-  var fp = function(arr) { return arr.filter(function(r) { var d = parseDate(r.Invoice_Date || r.From_Date); return d && d >= periods.priorStart && d <= periods.priorEnd; }); };
+  var pStart = periods.priorStart.getTime(), pEnd = periods.priorEnd.getTime();
+  // Hot path — use pre-cached _d; fall back to parseDate only for rows without it
+  // (e.g. GROW summary rows that use From_Date rather than Invoice_Date).
+  var fp = function(arr) { return arr.filter(function(r) { var d = r._d || parseDate(r.Invoice_Date || r.From_Date); if (!d) return false; var t = d.getTime(); return t >= pStart && t <= pEnd; }); };
   var priorCust = fp(DATA.customers), priorDet = fp(DATA.details), priorPromo = fp(DATA.promos), priorInsp = fp(DATA.inspections);
   if (!priorCust.length) return {};
   var result = {}, label = 'vs prior period';
