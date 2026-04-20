@@ -9014,12 +9014,18 @@ function renderOverview() {
       totalInv = cust.length;
       avgTicket = totalInv ? totalRev / totalInv : 0;
       storeSet = new Set(cust.map(r => r.Store_Number).filter(Boolean));
-      // Calculate days span for cars/day
-      const dates = cust.map(r => parseDate(r.Invoice_Date)).filter(Boolean);
-      if (dates.length > 0) {
-        const minD = new Date(Math.min(...dates));
-        const maxD = new Date(Math.max(...dates));
-        const daySpan = Math.max(1, Math.round((maxD - minD) / 86400000) + 1);
+      // Calculate days span for cars/day — single-pass min/max over pre-cached _d.
+      // Never use Math.min(...dates) here: spread blows the call-arg limit on large datasets.
+      let minMs = Infinity, maxMs = -Infinity;
+      for (let i = 0; i < cust.length; i++) {
+        const d = cust[i]._d;
+        if (!d) continue;
+        const t = d.getTime();
+        if (t < minMs) minMs = t;
+        if (t > maxMs) maxMs = t;
+      }
+      if (minMs !== Infinity) {
+        const daySpan = Math.max(1, Math.round((maxMs - minMs) / 86400000) + 1);
         carsPerDay = totalInv / daySpan;
         if (storeSet.size > 1) carsPerDay = carsPerDay / storeSet.size;
       }
