@@ -7733,10 +7733,17 @@ function removeStoreFromRegistry(idx) {
   renderStoreRegistry();
 }
 
+// Background-render generation token. Each renderDashboard() call bumps this,
+// and pending background work from prior calls self-aborts on the next tick.
+// Prevents queue stacking when users switch tabs faster than Phase 2 completes
+// (previous behavior re-started a new bgQueue without cancelling the old one).
+let bgRenderGen = 0;
+
 function renderDashboard() {
   const active = document.querySelector('.view-btn.active');
   const view = active ? active.dataset.view : 'business';
   const safe = (fn) => { try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); } };
+  const myGen = ++bgRenderGen;
 
   // PHASE 1: Render the ACTIVE view FAST (user sees content immediately)
   if (view === 'business') {
@@ -7778,12 +7785,18 @@ function renderDashboard() {
   if (typeof renderTrendAnalysis === 'function') bgQueue.push(renderTrendAnalysis);
   if (typeof renderPredictiveIndicators === 'function') bgQueue.push(renderPredictiveIndicators);
 
-  // Process background queue in chunks — 2 functions per frame, yielding between
+  // Process background queue in chunks — 2 functions per frame, yielding between.
+  // Cancellable: if a newer renderDashboard() has started, myGen falls behind
+  // bgRenderGen and this queue exits immediately without running stale renders.
   var bgIdx = 0;
   function processBgChunk() {
+    if (myGen !== bgRenderGen) return; // superseded by a later tab switch — abort
     if (bgIdx >= bgQueue.length) return;
     var end = Math.min(bgIdx + 2, bgQueue.length);
-    for (var i = bgIdx; i < end; i++) safe(bgQueue[i]);
+    for (var i = bgIdx; i < end; i++) {
+      if (myGen !== bgRenderGen) return; // check mid-chunk too (heavy renders)
+      safe(bgQueue[i]);
+    }
     bgIdx = end;
     if (bgIdx < bgQueue.length) setTimeout(processBgChunk, 100);
   }
