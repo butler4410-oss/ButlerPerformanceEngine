@@ -15680,10 +15680,11 @@ async function doLogin() {
         let totalRows = 0;
         let loaded = 0;
 
-        // Stream-parse CSV: reads response as stream, parses incrementally, never holds full file in memory
+        // Stream-parse CSV: reads response as stream, parses incrementally, never holds full file in memory.
+        // Returns the fetch promise so callers can .catch() network/parse errors.
         function streamParseCSV(url, headers, onDone, maxRows) {
           var limit = maxRows || 0;
-          fetch(url, { headers: headers, mode: 'cors' }).then(function(response) {
+          return fetch(url, { headers: headers, mode: 'cors' }).then(function(response) {
             if (!response.ok) throw new Error(response.status);
             var reader = response.body.getReader();
             var decoder = new TextDecoder();
