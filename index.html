@@ -4269,12 +4269,13 @@
     <select id="filterStore" name="store" class="cmd-select" onchange="applyFilters()" style="min-width:150px;" aria-label="Filter by store"><option value="">All Stores</option></select>
     <label for="filterPeriod" class="sr-only">Filter by time period</label>
     <select id="filterPeriod" class="cmd-select" onchange="applyPeriodFilter()" style="min-width:130px;" aria-label="Filter by time period">
-      <option value="all" selected>All Data</option>
-      <option value="mtd">This Month</option>
+      <option value="today" selected>Today</option>
+      <option value="mtd">MTD (Month to Date)</option>
       <option value="qtd">This Quarter</option>
       <option value="ytd">Year to Date</option>
       <option value="last30">Last 30 Days</option>
       <option value="last90">Last 90 Days</option>
+      <option value="all">All Data</option>
       <option value="custom">Custom Range...</option>
     </select>
     <div id="customDateRange" style="display:none;align-items:center;gap:4px;">
@@ -6218,6 +6219,7 @@ function applyPeriodFilter() {
   let from = new Date(today);
 
   switch (period) {
+    case 'today': from = new Date(today); break;
     case 'mtd': from = new Date(today.getFullYear(), today.getMonth(), 1); break;
     case 'qtd': from = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1); break;
     case 'ytd': from = new Date(today.getFullYear(), 0, 1); break;
@@ -6358,35 +6360,10 @@ function _launchDashboardInner() {
     sel.innerHTML += `<option value="${s}">${display}</option>`;
   });
 
-  // Date range — scan ALL data sources for dates
-  let minD = null, maxD = null;
-  [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(arr => {
-    arr.forEach(r => {
-      const dateStr = r.Invoice_Date || r.Update_Date || '';
-      const d = parseDate(dateStr);
-      if (d) {
-        if (!minD || d < minD) minD = d;
-        if (!maxD || d > maxD) maxD = d;
-      }
-    });
-  });
-  if (minD && maxD) {
-    document.getElementById('filterFrom').value = fmtDateISO(minD);
-    document.getElementById('filterTo').value = fmtDateISO(maxD);
-  } else {
-    // Try GROW data for date range
-    const growSources = [GROW.sales_summary, GROW.kpi_retail_comp, GROW.time_analysis].find(arr => arr.length > 0 && arr[0].From_Date);
-    if (growSources) {
-      const fromStr = (growSources[0].From_Date || '').replace(/["']/g, '').trim();
-      const toStr = (growSources[0].To_Date || '').replace(/["']/g, '').trim();
-      // Parse MM/DD/YYYY to Date
-      const parseGrowDate = (s) => { const m = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? new Date(+m[3], +m[1]-1, +m[2]) : null; };
-      const gFrom = parseGrowDate(fromStr);
-      const gTo = parseGrowDate(toStr);
-      if (gFrom) document.getElementById('filterFrom').value = fmtDateISO(gFrom);
-      if (gTo) document.getElementById('filterTo').value = fmtDateISO(gTo);
-    }
-  }
+  // Default date filter to today when loading stats
+  const todayISO = fmtDateISO(new Date());
+  document.getElementById('filterFrom').value = todayISO;
+  document.getElementById('filterTo').value = todayISO;
 
   // If only GROW data loaded, go to Stores view; otherwise Dashboard
   const hasStandardData = DATA.customers.length > 0 || DATA.details.length > 0 || DATA.promos.length > 0 || DATA.inspections.length > 0 || DATA.invoices.length > 0 || DATA.odi.length > 0;
@@ -15140,9 +15117,9 @@ function syncNow() {
       [DATA.customers, DATA.details, DATA.promos, DATA.inspections].forEach(function(a) { a.forEach(function(r) { var s = cleanStoreNum(r.Store_Number); if (validStore(s)) stores.add(s); }); });
       var sel = document.getElementById('filterStore');
       if (sel) { sel.innerHTML = '<option value="">All Stores (' + stores.size + ')</option>'; Array.from(stores).sort(function(a,b) { return a.localeCompare(b, undefined, {numeric:true}); }).forEach(function(s) { sel.innerHTML += '<option value="' + s + '">#' + s + '</option>'; }); }
-      var minD = null, maxD = null;
-      [DATA.customers, DATA.details, DATA.promos].forEach(function(a) { a.forEach(function(r) { var d = parseDate(r.Invoice_Date || r.Update_Date || ''); if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; } }); });
-      if (minD && maxD) { document.getElementById('filterFrom').value = fmtDateISO(minD); document.getElementById('filterTo').value = fmtDateISO(maxD); }
+      var todayISO = fmtDateISO(new Date());
+      document.getElementById('filterFrom').value = todayISO;
+      document.getElementById('filterTo').value = todayISO;
       document.getElementById('processingText').textContent = 'Building dashboard...';
       document.getElementById('processingSub').textContent = 'Rendering ' + totalRows.toLocaleString() + ' records...';
       setTimeout(function() {
@@ -15157,7 +15134,7 @@ function syncNow() {
     document.getElementById('processingText').textContent = 'Loading ' + type + '... (' + (loaded+1) + '/' + csvTypes.length + ')';
     document.getElementById('processingSub').textContent = 'Connecting...';
     // Cap large tables to keep browser responsive
-    var caps = { customers: 75000, details: 75000, inspections: 75000, promos: 75000, odi: 75000 };
+    var caps = { customers: 0, details: 0, inspections: 0, promos: 0, odi: 0 };
     var maxR = caps[type] || 0;
     streamCSV(baseUrl + '/api/csv/' + type, function(rows) {
       if (rows.length > 0) { DATA[type] = rows; loadedFiles[type] = true; totalRows += rows.length; console.log('[Sync] ' + type + ': ' + rows.length.toLocaleString() + ' rows'); }
@@ -15203,21 +15180,12 @@ function syncNow() {
             sel.innerHTML += '<option value="' + s + '">' + (typeof getStoreDisplayName === 'function' ? getStoreDisplayName(s) : '#' + s) + '</option>';
           });
         }
-        // Auto-detect date range from synced data
-        let minD = null, maxD = null;
-        [DATA.customers, DATA.details, DATA.promos].forEach(arr => {
-          arr.forEach(r => {
-            const d = parseDate(r.Invoice_Date || r.Update_Date || '');
-            if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; }
-          });
-        });
-        if (minD && maxD) {
-          document.getElementById('filterFrom').value = fmtDateISO(minD);
-          document.getElementById('filterTo').value = fmtDateISO(maxD);
-        }
+        const todayISO = fmtDateISO(new Date());
+        document.getElementById('filterFrom').value = todayISO;
+        document.getElementById('filterTo').value = todayISO;
         applyFilters();
         closeSettings();
-        console.info('API Sync complete:', totalRows, 'rows,', stores.size, 'stores, date range:', minD ? fmtDateISO(minD) : 'none', '→', maxD ? fmtDateISO(maxD) : 'none');
+        console.info('API Sync complete:', totalRows, 'rows,', stores.size, 'stores, filter defaulted to:', todayISO);
       }, 300);
       return;
     }
@@ -15674,17 +15642,9 @@ async function doLogin() {
                 sel.innerHTML += '<option value="' + s + '">' + (typeof getStoreDisplayName === 'function' ? getStoreDisplayName(s) : '#' + s) + '</option>';
               });
             }
-            var minD = null, maxD = null;
-            [DATA.customers, DATA.details, DATA.promos].forEach(function(arr) {
-              arr.forEach(function(r) {
-                var d = parseDate(r.Invoice_Date || r.Update_Date || '');
-                if (d) { if (!minD || d < minD) minD = d; if (!maxD || d > maxD) maxD = d; }
-              });
-            });
-            if (minD && maxD) {
-              document.getElementById('filterFrom').value = fmtDateISO(minD);
-              document.getElementById('filterTo').value = fmtDateISO(maxD);
-            }
+            var todayISO = fmtDateISO(new Date());
+            document.getElementById('filterFrom').value = todayISO;
+            document.getElementById('filterTo').value = todayISO;
             document.getElementById('processingText').textContent = 'Building dashboard...';
             document.getElementById('processingSub').textContent = 'Rendering ' + totalRows.toLocaleString() + ' records...';
             setTimeout(function() {
@@ -15698,7 +15658,7 @@ async function doLogin() {
           document.getElementById('processingText').textContent = 'Loading ' + type + '... (' + (loaded + 1) + '/' + csvTypes.length + ')';
           document.getElementById('processingSub').textContent = 'Connecting...';
 
-          var caps = { customers: 75000, details: 75000, inspections: 75000, promos: 75000, odi: 75000 };
+          var caps = { customers: 0, details: 0, inspections: 0, promos: 0, odi: 0 };
           var maxR = caps[type] || 0;
           streamParseCSV(baseUrl + '/api/csv/' + type, hdrs, function(rows) {
             if (rows.length > 0) {
