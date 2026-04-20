@@ -6404,7 +6404,7 @@ function _launchDashboardInner() {
   updateFilterSummary();
 
   // Log data load summary to console for debugging
-  console.info('BPA Data Loaded:', Object.keys(loadedFiles).length, 'files.', 'Customers:', DATA.customers.length, 'Details:', DATA.details.length, 'Promos:', DATA.promos.length, 'Inspections:', DATA.inspections.length, 'Stores:', stores.size, 'Date range:', minD ? fmtDateISO(minD) : 'none', '→', maxD ? fmtDateISO(maxD) : 'none');
+  console.info('BPA Data Loaded:', Object.keys(loadedFiles).length, 'files.', 'Customers:', DATA.customers.length, 'Details:', DATA.details.length, 'Promos:', DATA.promos.length, 'Inspections:', DATA.inspections.length, 'Stores:', stores.size, 'Filter defaulted to:', todayISO);
 }
 
 // ============================================================
