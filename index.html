@@ -6057,7 +6057,7 @@ addFilesEl.addEventListener('change', async () => {
     if (loaded.length) {
       const msg = loaded.map(r => r.name + ' (' + r.rows.toLocaleString() + ' rows)').join(', ');
       showTokenCopyToast('Loaded: ' + msg);
-      applyFilters();
+      applyFiltersNow();
       saveUserData();
     }
   }
@@ -6254,7 +6254,22 @@ function preParseDates() {
   console.timeEnd('[perf] preParseDates');
 }
 
+// Debounce wrapper around applyFiltersNow so rapid filter changes (e.g. typing
+// in Custom Range date inputs, or quick dropdown toggles) coalesce into a
+// single expensive pass. Critical for the South Bay DDS tenant where removing
+// the 75k-row cap now puts hundreds of thousands of rows through filterRow.
+// Data-load completion paths should bypass this and call applyFiltersNow()
+// directly so the first render is immediate.
+var _applyFiltersTimer = null;
 function applyFilters() {
+  if (_applyFiltersTimer) clearTimeout(_applyFiltersTimer);
+  _applyFiltersTimer = setTimeout(function() {
+    _applyFiltersTimer = null;
+    applyFiltersNow();
+  }, 200);
+}
+
+function applyFiltersNow() {
   const store = document.getElementById('filterStore').value;
   const from = document.getElementById('filterFrom').value ? new Date(document.getElementById('filterFrom').value + 'T00:00:00') : null;
   const to = document.getElementById('filterTo').value ? new Date(document.getElementById('filterTo').value + 'T23:59:59') : null;
@@ -6385,7 +6400,7 @@ function _launchDashboardInner() {
     navigateTo(location.hash ? location.hash.replace('#','').split('/')[0] || 'business' : 'business', true);
   }
 
-  applyFilters();
+  applyFiltersNow();
   updateFilterSummary();
 
   // Log data load summary to console for debugging
@@ -7577,7 +7592,7 @@ function applyMapping() {
 
   // If dashboard is active, re-render
   if (document.getElementById('dashboard')?.classList.contains('active')) {
-    applyFilters();
+    applyFiltersNow();
     saveUserData();
   }
 }
@@ -15194,7 +15209,7 @@ function syncNow() {
       document.getElementById('processingSub').textContent = 'Rendering ' + totalRows.toLocaleString() + ' records...';
       setTimeout(function() {
         try { preParseDates(); } catch(e) { console.warn('preParse:', e); }
-        try { applyFilters(); } catch(e) { console.error(e); }
+        try { applyFiltersNow(); } catch(e) { console.error(e); }
         hideProcessing();
         bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
       }, 200);
@@ -15253,7 +15268,7 @@ function syncNow() {
         const todayISO = fmtDateISO(new Date());
         document.getElementById('filterFrom').value = todayISO;
         document.getElementById('filterTo').value = todayISO;
-        applyFilters();
+        applyFiltersNow();
         closeSettings();
         console.info('API Sync complete:', totalRows, 'rows,', stores.size, 'stores, filter defaulted to:', todayISO);
       }, 300);
@@ -15278,7 +15293,7 @@ function syncNow() {
         loadedFiles[type] = true;
       }
       resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + json.length + ' records (' + type + '). Refreshing...</span>';
-      setTimeout(() => { applyFilters(); saveUserData(); }, 500);
+      setTimeout(() => { applyFiltersNow(); saveUserData(); }, 500);
       return;
     }
 
@@ -15287,7 +15302,7 @@ function syncNow() {
       CUSTOM_REPORTS.push({ name: 'API Sync ' + new Date().toLocaleDateString(), headers: Object.keys(json.data[0] || {}), rows: json.data });
       loadedFiles['custom_api_sync'] = true;
       resultEl.innerHTML = '<span style="color:var(--green);">Synced ' + json.data.length + ' records. Refreshing...</span>';
-      setTimeout(() => { applyFilters(); saveUserData(); }, 500);
+      setTimeout(() => { applyFiltersNow(); saveUserData(); }, 500);
       return;
     }
 
@@ -15718,7 +15733,7 @@ async function doLogin() {
             document.getElementById('processingText').textContent = 'Building dashboard...';
             document.getElementById('processingSub').textContent = 'Rendering ' + totalRows.toLocaleString() + ' records...';
             setTimeout(function() {
-              try { applyFilters(); } catch(e) { console.error('Filter error:', e); }
+              try { applyFiltersNow(); } catch(e) { console.error('Filter error:', e); }
               hideProcessing();
               bpaToast(totalRows.toLocaleString() + ' records loaded from ' + stores.size + ' stores', 'success');
             }, 200);
