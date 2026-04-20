@@ -7767,8 +7767,20 @@ function renderDashboard() {
   if (typeof renderReports === 'function') safe(renderReports);
   if (typeof renderGrow === 'function' && GROW && GROW.system_impact && GROW.system_impact.length) safe(renderGrow);
 
-  // PHASE 2: Progressively render EVERYTHING ELSE in background
-  // Nothing left on the table — all views get built, just not blocking the UI
+  // PHASE 2: Progressively render EVERYTHING ELSE in background.
+  // On large datasets (South Bay DDS scale: 100k+ rows), skip Phase 2 entirely.
+  // Each tab switch triggers renderDashboard() again, which renders Phase 1 for
+  // the newly-active view — so inactive views are rendered lazily on focus
+  // instead of being pre-built in the background. Alerts can be run manually
+  // from the bell icon; they're not critical-path for first paint.
+  var LARGE_DATASET_THRESHOLD = 100000;
+  var totalFilteredRows = (FILTERED.customers ? FILTERED.customers.length : 0)
+    + (FILTERED.details ? FILTERED.details.length : 0)
+    + (FILTERED.inspections ? FILTERED.inspections.length : 0);
+  if (totalFilteredRows > LARGE_DATASET_THRESHOLD) {
+    console.info('[perf] Large dataset (' + totalFilteredRows.toLocaleString() + ' rows) — skipping Phase 2 background renders; views render lazily on focus.');
+    return;
+  }
   var bgQueue = [];
   if (view !== 'business') bgQueue.push(renderOverview, renderOpsGrid, runBPAInsights);
   if (view !== 'stores') bgQueue.push(renderStores);
