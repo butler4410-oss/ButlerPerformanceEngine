@@ -15701,13 +15701,15 @@ async function doLogin() {
     }
     updateUserAvatar(loggedIn);
 
-    // Auto-configure data source for known companies on first login
+    // Auto-configure data-source URL only. The API key MUST be entered by the
+    // user via Settings -> Data Source. Hardcoding it in client JS made the key
+    // public via GitHub Pages (security audit 2026-04-28). Server-side issuance
+    // post-login is the proper fix; until then, the key is per-tenant and manual.
     if (!localStorage.getItem('bp_api_url')) {
       localStorage.setItem('bp_data_source', 'api');
       localStorage.setItem('bp_api_url', 'https://dds.butleranalytics.io/api/data');
-      localStorage.setItem('bp_api_key', '***REDACTED-API-KEY-ROTATED-2026-04-28***');
       localStorage.setItem('bp_api_schedule', 'manual');
-      console.log('[Auth] Auto-configured DDS data source for', loggedIn.company);
+      console.log('[Auth] Auto-configured DDS endpoint for', loggedIn.company, '— set API key in Settings.');
     }
 
     // Try to restore saved data
@@ -16698,17 +16700,18 @@ function removeCustomReport(idx) {
         launchDashboard();
         updateDataSavedIndicator(true);
       } else {
-        // No saved data — auto-sync from DDS if configured
-        const apiUrl = localStorage.getItem('bp_api_url');
-        const apiKey = localStorage.getItem('bp_api_key');
-        if (!apiUrl) {
-          // Auto-configure on first visit
+        // No saved data — auto-sync from DDS if configured.
+        // NOTE: API key must be set per-tenant via Settings (no longer hardcoded —
+        // see security audit 2026-04-28). Endpoint URL is fine to default.
+        if (!localStorage.getItem('bp_api_url')) {
           localStorage.setItem('bp_data_source', 'api');
           localStorage.setItem('bp_api_url', 'https://dds.butleranalytics.io/api/data');
-          localStorage.setItem('bp_api_key', '***REDACTED-API-KEY-ROTATED-2026-04-28***');
         }
         const url = localStorage.getItem('bp_api_url');
         const key = localStorage.getItem('bp_api_key');
+        if (url && !key) {
+          console.warn('[BPA] API key not configured. Open Settings -> Data Source to set it.');
+        }
         if (url && key) {
           document.getElementById('uploadZone').style.display = 'none';
           document.getElementById('dashboard').classList.add('active');
