@@ -5446,18 +5446,52 @@ let allCharts = {};
 // CSV PARSER
 // ============================================================
 function parseCSV(text) {
-  const lines = text.split('\n');
-  if (lines.length < 2) return [];
-  const headers = parseCSVLine(lines[0]);
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-    const vals = parseCSVLine(line);
-    const obj = {};
-    for (let h = 0; h < headers.length; h++) {
-      obj[headers[h]] = vals[h] || '';
+  // Quote-aware tokenizer. A single character pass tracks quote state so that
+  // commas AND newlines inside quoted fields (e.g. multi-line customer
+  // complaint/recommendation notes in the transactions export) do not split a
+  // record. Splitting on '\n' first — the old approach — shattered such invoices
+  // into phantom rows whose first column landed on note text, producing bogus
+  // "stores" and inflating row counts (tanking avg ticket).
+  const records = [];
+  let field = '';
+  let record = [];
+  let inQuotes = false;
+  const pushRecord = () => {
+    record.push(field.trim());
+    field = '';
+    if (record.length > 1 || record[0] !== '') records.push(record);
+    record = [];
+  };
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } // escaped quote
+        else inQuotes = false;
+      } else {
+        field += c; // preserve commas/newlines inside quotes
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ',') {
+      record.push(field.trim());
+      field = '';
+    } else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++; // treat \r\n as one break
+      pushRecord();
+    } else {
+      field += c;
     }
+  }
+  if (field.length || record.length) pushRecord(); // flush last row (no trailing newline)
+
+  if (records.length < 2) return [];
+  const headers = records[0];
+  const rows = [];
+  for (let r = 1; r < records.length; r++) {
+    const vals = records[r];
+    const obj = {};
+    for (let h = 0; h < headers.length; h++) obj[headers[h]] = vals[h] || '';
     rows.push(obj);
   }
   return rows;
@@ -5513,7 +5547,11 @@ function detectFileType(headers) {
   if (h.includes('cy_comp_net_sales') && h.includes('cy_comp_labor_pct_sales')) return 'grow_kpi_retail_comp';
   // Standard file detection
   if (h.includes('inspection_status')) return 'inspections';
-  if (h.includes('customer_first_name') || h.includes('greet_time')) return 'customers';
+  // Invoice-level file (carries an invoice # or revenue) → customers. A pure
+  // customer/vehicle registry or work-order export has neither → 'vehicles', so
+  // it is NOT counted as an invoice (avg-ticket & cars/day divide by cust.length).
+  if (h.includes('customer_first_name') || h.includes('greet_time'))
+    return (h.includes('invoice_number') || h.includes('net_sales')) ? 'customers' : 'vehicles';
   if (h.includes('invoice_detail_type') || h.includes('extended_price')) return 'details';
   if (h.includes('promo_code')) return 'promos';
   if (h.includes('odi_value')) return 'odi';
@@ -5527,6 +5565,7 @@ const fileLabels = {
   odi: 'ODI Values',
   details: 'Invoice Details',
   customers: 'Customers & Vehicles',
+  vehicles: 'Vehicle Registry',
   inspections: 'Inspections',
   grow_sales_summary: 'Sales Summary',
   grow_kpi_actuals: 'KPI Actuals',
@@ -15701,6 +15740,7 @@ async function doLogin() {
   // Post-login setup
   const loggedIn = getCurrentUser();
   if (loggedIn) {
+    try {
     if (loggedIn.company) {
       localStorage.setItem('bp_company', loggedIn.company);
       localStorage.setItem('bp_user', loggedIn.name);
@@ -15864,6 +15904,16 @@ async function doLogin() {
         document.getElementById('uploadZone').style.display = '';
         document.getElementById('dashboard').classList.remove('active');
       }
+    }
+    } catch (err) {
+      // A setup/render error must not strand the user on a blank screen (which
+      // previously forced a manual refresh — initAuth is wrapped in try/catch,
+      // this path was not). Fall back to a visible upload screen.
+      console.error('Post-login setup error:', err);
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('uploadZone').style.display = '';
+      document.getElementById('dashboard').classList.remove('active');
+      if (typeof hideProcessing === 'function') hideProcessing();
     }
   }
 }
