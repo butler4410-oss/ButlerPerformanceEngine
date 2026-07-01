@@ -74,33 +74,31 @@
     det.forEach(function (r) {
       var ext = num(r.Extended_Price), q = num(r.Quantity_Sold) || 1, c = r.JLI_Category_Code || '';
       if (ext <= 0) return;
-      catRev[c] = (catRev[c] || 0) + ext; catQty[c] = (catQty[c] || 0) + q;
-      allRev += ext; allQty += q;
+      catRev[c] = (catRev[c] || 0) + ext; catQty[c] = (catQty[c] || 0) + q; allRev += ext; allQty += q;
     });
     var blended = allQty ? allRev / allQty : 0;
     var priceFor = function (c) { return (catQty[c] && catRev[c]) ? catRev[c] / catQty[c] : blended; };
 
-    var flagged = 0, sold = 0;
-    var byCat = {}; // cat -> {flag, sold, title}
+    // Single pass — accumulate declined opportunity by service, store, and severity.
+    var SEV = { Red: 1, Orange: 1, Yellow: 1 };
+    var flagged = 0, sold = 0, estLost = 0;
+    var byCat = {}, byStore = {}, bySev = {};
+    function bump(map, key, purch, lost, title) {
+      var b = map[key] || (map[key] = { flag: 0, sold: 0, lost: 0, title: title || key });
+      b.flag++; if (purch) b.sold++; b.lost += lost;
+    }
     insp.forEach(function (r) {
-      var st = r.Inspection_Status;
-      if (!(st === 'Yellow' || st === 'Orange' || st === 'Red')) return;
-      flagged++;
+      var st = r.Inspection_Status; if (!SEV[st]) return;
       var purch = String(r.Purchased_This_Visit) === 'True';
-      if (purch) sold++;
-      var key = r.JLI_Category_Code || (r.Service_Title || 'Other');
-      var b = byCat[key] || (byCat[key] = { flag: 0, sold: 0, title: r.Service_Title || key });
-      b.flag++; if (purch) b.sold++;
+      var cat = r.JLI_Category_Code || (r.Service_Title || 'Other');
+      var lost = purch ? 0 : priceFor(r.JLI_Category_Code || '');
+      flagged++; if (purch) sold++; estLost += lost;
+      bump(byCat, cat, purch, lost, r.Service_Title || cat);
+      bump(byStore, (typeof cleanStoreNum === 'function') ? cleanStoreNum(r.Store_Number) : r.Store_Number, purch, lost);
+      bump(bySev, st, purch, lost);
     });
-    var declined = flagged - sold;
-    var estLost = 0;
-    var list = Object.keys(byCat).map(function (k) {
-      var b = byCat[k], dec = b.flag - b.sold, price = priceFor(k), lost = dec * price;
-      estLost += lost;
-      return { cat: k, title: b.title, flag: b.flag, sold: b.sold, dec: dec, close: b.flag ? b.sold / b.flag * 100 : 0, price: price, lost: lost };
-    }).sort(function (a, b) { return b.lost - a.lost; });
+    var declined = flagged - sold, closeRate = flagged ? sold / flagged * 100 : 0;
 
-    var closeRate = flagged ? sold / flagged * 100 : 0;
     var chips = chipRow([
       { label: 'Flagged (Y/O/R)', value: int(flagged) },
       { label: 'Sold on Visit', value: int(sold), color: 'var(--green)' },
@@ -110,24 +108,38 @@
       { label: 'Recoverable @ 25% Close', value: money0(estLost * 0.25), color: 'var(--green)' }
     ]);
 
-    var top = list.slice(0, 25);
-    var maxLost = Math.max.apply(null, top.map(function (r) { return r.lost; }).concat([1]));
-    var body = top.map(function (r) {
-      return '<tr>'
-        + '<td style="text-align:left;font-weight:600;position:sticky;left:0;background:var(--card);">' + esc(r.title) + '</td>'
-        + '<td>' + int(r.flag) + '</td><td style="color:var(--green);">' + int(r.sold) + '</td>'
-        + '<td style="' + heatBg(1 - r.dec / (top[0].dec || 1)) + '">' + int(r.dec) + '</td>'
-        + '<td style="' + heatBg(norm(r.close, 0, 100, 'high')) + '">' + pct(r.close) + '</td>'
-        + '<td>' + money2(r.price) + '</td>'
-        + '<td style="font-weight:700;' + heatBg(1 - r.lost / maxLost) + '">' + money0(r.lost) + '</td></tr>';
-    }).join('');
-    var table = '<div class="ops-grid-scroll" style="max-height:380px;"><table class="ops-grid" id="tblDeclined"><thead><tr>'
-      + '<th style="text-align:left;position:sticky;left:0;background:var(--card);">Recommended Service</th>'
-      + '<th>Flagged</th><th>Sold</th><th>Declined</th><th>Close %</th><th>Avg Price</th><th>Est. Lost $</th>'
-      + '</tr></thead><tbody>' + body + '</tbody></table></div>'
-      + '<div style="font-size:10px;color:var(--text-muted);margin-top:8px;">Value declined = declined count × average sold price per category — an upper bound assuming everything closes. "Recoverable @ 25% Close" models lifting the close rate from today\'s ' + closeRate.toFixed(1) + '% toward a realistic target. Prioritize the reddest rows.</div>';
+    function sectionLabel(t) { return '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin:16px 0 6px;text-transform:uppercase;letter-spacing:0.5px;">' + t + '</div>'; }
+    function declRow(label, b, lostMax) {
+      var dec = b.flag - b.sold, close = b.flag ? b.sold / b.flag * 100 : 0;
+      return '<tr><td style="text-align:left;font-weight:600;position:sticky;left:0;background:var(--card);">' + esc(label) + '</td>'
+        + '<td>' + int(b.flag) + '</td><td style="color:var(--green);">' + int(b.sold) + '</td>'
+        + '<td>' + int(dec) + '</td>'
+        + '<td style="' + heatBg(norm(close, 0, 100, 'high')) + '">' + pct(close) + '</td>'
+        + '<td style="font-weight:700;' + heatBg(1 - b.lost / (lostMax || 1)) + '">' + money0(b.lost) + '</td></tr>';
+    }
+    function grid(id, firstCol, entries) {
+      var lostMax = Math.max.apply(null, entries.map(function (e) { return e.b.lost; }).concat([1]));
+      var body = entries.map(function (e) { return declRow(e.label, e.b, lostMax); }).join('');
+      return '<div class="ops-grid-scroll" style="max-height:320px;"><table class="ops-grid" id="' + id + '"><thead><tr>'
+        + '<th style="text-align:left;position:sticky;left:0;background:var(--card);">' + firstCol + '</th>'
+        + '<th>Flagged</th><th>Sold</th><th>Declined</th><th>Close %</th><th>Est. Lost $</th></tr></thead><tbody>'
+        + body + '</tbody></table></div>';
+    }
 
-    set('rptDeclined', card('Declined Services — Lost Revenue', 'Yellow/Orange/Red inspections not purchased', chips + table, 'tblDeclined'));
+    var storeEntries = Object.keys(byStore).map(function (s) { return { label: storeName(s), b: byStore[s] }; }).sort(function (a, b) { return b.b.lost - a.b.lost; });
+    var sevEntries = ['Red', 'Orange', 'Yellow'].filter(function (s) { return bySev[s]; }).map(function (s) { return { label: s, b: bySev[s] }; });
+    var svcEntries = Object.keys(byCat).map(function (k) { return { label: byCat[k].title, b: byCat[k] }; }).sort(function (a, b) { return b.b.lost - a.b.lost; }).slice(0, 30);
+
+    var inner = chips
+      + sectionLabel('By store — where the money is walking out')
+      + grid('tblDeclined', 'Store', storeEntries)
+      + sectionLabel('By severity — close Red (safety/urgent) first')
+      + grid('tblDeclinedSev', 'Severity', sevEntries)
+      + sectionLabel('By service — top 30 declined recommendations')
+      + grid('tblDeclinedSvc', 'Recommended Service', svcEntries)
+      + '<div style="font-size:10px;color:var(--text-muted);margin-top:8px;">Value declined = declined count × average sold price for that category (an upper bound assuming everything closes). "Recoverable @ 25% Close" models lifting the close rate from today\'s ' + closeRate.toFixed(1) + '% toward a realistic target. Est. Lost $ heat: reddest = biggest opportunity.</div>';
+
+    set('rptDeclined', card('Declined Services — Lost Revenue', 'Yellow/Orange/Red inspection recommendations not purchased', inner, 'tblDeclined'));
   }
 
   // ── 2) GROSS MARGIN BY CATEGORY ──────────────────────────────
