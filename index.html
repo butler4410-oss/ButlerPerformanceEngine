@@ -5035,6 +5035,11 @@
     </div>
     <!-- ACE weekly ancillary scorecard (bundled, gated to Dakota's stores) -->
     <div id="aceReportPanel" style="display:none;"></div>
+    <!-- Advanced operator reports (computed from loaded data) -->
+    <div id="rptDeclined" style="display:none;"></div>
+    <div id="rptMargin" style="display:none;"></div>
+    <div id="rptSpeed" style="display:none;"></div>
+    <div id="rptFleet" style="display:none;"></div>
     <div class="kpi-grid reveal-stagger" id="reportingKPIs"></div>
 
     <!-- Product & Service Analysis -->
@@ -7907,6 +7912,7 @@ function renderDashboard() {
     safe(renderInspections);
     safe(renderPromos);
     safe(renderCustomers);
+    if (typeof renderAdvancedReports === 'function') safe(renderAdvancedReports);
   }
 
   // Always run lightweight renders
@@ -17388,6 +17394,7 @@ checkDueReports();
 <script src="bpa-dds-views.js"></script>
 <script src="bpa-vibrant.js"></script>
 <script src="bpa-ace-report.js"></script>
+<script src="bpa-reports.js"></script>
 </body>
 </html>
 <!-- v1774496416 -->
