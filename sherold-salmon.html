@@ -45,11 +45,12 @@
 
 <style>
   :root{
-    --navy:#0d1b2a; --navy-2:#132a43; --ink:#0b1420;
-    --red:#d62828; --red-dark:#b21f1f; --gold:#f4a300;
-    --bg:#f4f6f9; --card:#ffffff; --line:#e4e9f0;
-    --text:#12202f; --muted:#5f6f80; --muted-2:#8a97a6;
-    --green:#1a9d5a; --blue:#2563eb;
+    /* Sherold Salmon brand: orange + green (from the salmon mascot logo) */
+    --navy:#18241d; --navy-2:#22352a; --ink:#0f1811;
+    --red:#f26522; --red-dark:#d5511a; --gold:#4fa63f;
+    --bg:#f5f6f4; --card:#ffffff; --line:#e5e9e2;
+    --text:#182219; --muted:#5f6f63; --muted-2:#8a978c;
+    --green:#2f8a4a; --blue:#2563eb;
     --r:16px; --r-sm:10px;
     --sh-1:0 1px 2px rgba(13,27,42,.06);
     --sh-2:0 6px 20px rgba(13,27,42,.08);
@@ -70,9 +71,9 @@
        white-space:nowrap;line-height:1}
   .btn:hover{transform:translateY(-1px)}
   .btn:active{transform:translateY(0)}
-  .btn-red{background:linear-gradient(180deg,var(--red),var(--red-dark));color:#fff;box-shadow:0 6px 16px rgba(214,40,40,.32)}
-  .btn-red:hover{box-shadow:0 10px 24px rgba(214,40,40,.42)}
-  .btn-gold{background:linear-gradient(180deg,#ffc043,var(--gold));color:var(--ink);box-shadow:0 6px 16px rgba(244,163,0,.32)}
+  .btn-red{background:linear-gradient(180deg,var(--red),var(--red-dark));color:#fff;box-shadow:0 6px 16px rgba(242,101,34,.34)}
+  .btn-red:hover{box-shadow:0 10px 24px rgba(242,101,34,.46)}
+  .btn-gold{background:linear-gradient(180deg,#63c150,var(--gold));color:#fff;box-shadow:0 6px 16px rgba(79,166,63,.34)}
   .btn-dark{background:var(--navy);color:#fff}
   .btn-ghost{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--line)}
   .btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--navy)}
@@ -88,7 +89,7 @@
   .topbar{background:var(--ink);color:#cfe0f0;font-size:12.5px}
   .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:38px}
   .topbar .anniv{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:#fff}
-  .topbar .anniv .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(244,163,0,.18)}
+  .topbar .anniv .dot{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px rgba(242,101,34,.22)}
   .topbar .t-right{display:flex;gap:18px;align-items:center}
   .topbar .t-right a:hover{color:#fff}
   @media(max-width:720px){.topbar .t-right{display:none}}
@@ -100,7 +101,7 @@
   .brand{display:flex;align-items:center;gap:12px;flex-shrink:0}
   .brand .mark{width:44px;height:44px;border-radius:12px;background:linear-gradient(150deg,var(--navy),var(--navy-2));
                display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px;box-shadow:var(--sh-2);position:relative;overflow:hidden}
-  .brand .mark::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(214,40,40,.55))}
+  .brand .mark::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(242,101,34,.7))}
   .brand .mark span{position:relative;z-index:1}
   .brand b{font-size:16px;font-weight:900;letter-spacing:-.01em;line-height:1}
   .brand small{display:block;font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-top:3px}
@@ -115,10 +116,10 @@
   @media(max-width:980px){nav.main,.h-phone{display:none}.menu-btn{display:flex}}
 
   /* ---------- Hero ---------- */
-  .hero{position:relative;background:radial-gradient(120% 140% at 82% -20%,#20456b 0%,var(--navy) 46%,var(--ink) 100%);color:#fff;overflow:hidden}
+  .hero{position:relative;background:radial-gradient(120% 140% at 82% -20%,#2c5238 0%,var(--navy) 46%,var(--ink) 100%);color:#fff;overflow:hidden}
   .hero::before{content:"";position:absolute;inset:0;background-image:
-      radial-gradient(circle at 12% 30%,rgba(244,163,0,.10),transparent 40%),
-      radial-gradient(circle at 90% 80%,rgba(214,40,40,.14),transparent 45%);pointer-events:none}
+      radial-gradient(circle at 12% 30%,rgba(79,166,63,.16),transparent 42%),
+      radial-gradient(circle at 90% 80%,rgba(242,101,34,.20),transparent 46%);pointer-events:none}
   .hero .wrap{position:relative;padding:56px 20px 42px;display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center}
   .hero h1{font-size:clamp(32px,4.6vw,56px);font-weight:900;letter-spacing:-.03em}
   .hero h1 .hl{color:var(--gold)}
@@ -131,7 +132,7 @@
   .hero-art{position:relative}
   .hero-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;
              padding:16px;backdrop-filter:blur(6px);box-shadow:var(--sh-3)}
-  .hero-card .photo{border-radius:14px;overflow:hidden;background:#0f2137}
+  .hero-card .photo{border-radius:14px;overflow:hidden;background:#0f2137;position:relative;aspect-ratio:16/10}
   .hero-card .meta{display:flex;align-items:center;justify-content:space-between;padding:14px 6px 4px}
   .hero-card .meta b{font-size:16px}
   .hero-card .meta .price{color:var(--gold);font-weight:900;font-size:20px}
@@ -190,6 +191,12 @@
   .vcard:hover{box-shadow:var(--sh-3);transform:translateY(-3px);border-color:#d5deea}
   .vphoto{position:relative;aspect-ratio:16/10;background:linear-gradient(180deg,#eef3f9,#e4ebf3);cursor:pointer;overflow:hidden}
   .vphoto svg{width:100%;height:100%}
+  .vph-svg{position:absolute;inset:0;z-index:0}
+  .vph-svg svg{width:100%;height:100%}
+  .vph-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;
+           transition:transform .4s var(--ease)}
+  .vcard:hover .vph-img{transform:scale(1.05)}
+  .vphoto .badges,.vphoto .fav,.vphoto .media-ic{z-index:3}
   .vphoto .badges{position:absolute;top:10px;left:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:80%}
   .pill{font-size:10.5px;font-weight:800;letter-spacing:.3px;padding:5px 9px;border-radius:7px;background:rgba(13,27,42,.86);color:#fff;backdrop-filter:blur(4px);display:inline-flex;align-items:center;gap:4px}
   .pill.carfax{background:#0a7abf}
@@ -215,7 +222,7 @@
   .pay b{font-size:16px;font-weight:900;color:var(--green)}
   .pay small{display:block;font-size:10.5px;color:var(--muted);font-weight:700}
   .offers{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
-  .offer{font-size:11px;font-weight:800;color:var(--navy);background:rgba(244,163,0,.14);border:1px dashed rgba(244,163,0,.55);border-radius:7px;padding:5px 8px}
+  .offer{font-size:11px;font-weight:800;color:var(--green);background:rgba(79,166,63,.12);border:1px dashed rgba(79,166,63,.5);border-radius:7px;padding:5px 8px}
   .vcta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
   .vcta .btn{padding:11px 8px;font-size:12.5px}
   .vcta .wide{grid-column:1/-1}
@@ -235,11 +242,11 @@
   @media(max-width:860px){.rev-grid,.trust .grid{grid-template-columns:1fr}.trust .grid{grid-template-columns:1fr 1fr}}
 
   /* ---------- Finance CTA band ---------- */
-  .band{background:linear-gradient(120deg,var(--red),#8f1717);color:#fff;border-radius:22px;padding:38px;
+  .band{background:linear-gradient(120deg,var(--red) 0%,#c24810 55%,#2f6a3a 130%);color:#fff;border-radius:22px;padding:38px;
         display:grid;grid-template-columns:1.3fr 1fr;gap:26px;align-items:center;box-shadow:var(--sh-3);overflow:hidden;position:relative}
   .band::after{content:"";position:absolute;right:-40px;top:-40px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.08)}
   .band h2{font-size:30px;font-weight:900}
-  .band p{color:#ffdada;margin:10px 0 20px;font-size:15.5px}
+  .band p{color:#ffe2d1;margin:10px 0 20px;font-size:15.5px}
   .band .calc{background:#fff;color:var(--text);border-radius:16px;padding:20px;position:relative;z-index:1}
   .band .calc label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:5px}
   .band .calc input[type=range]{width:100%;accent-color:var(--red)}
@@ -325,7 +332,7 @@
   .day b{font-size:18px}
 
   .summary-line{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:16px}
-  .summary-line .thumb{width:74px;height:52px;border-radius:8px;overflow:hidden;background:#e4ebf3;flex-shrink:0}
+  .summary-line .thumb{width:74px;height:52px;border-radius:8px;overflow:hidden;background:#e4ebf3;flex-shrink:0;position:relative}
   .summary-line b{font-size:14.5px}
   .summary-line span{font-size:12.5px;color:var(--muted)}
 
@@ -640,6 +647,24 @@ function carSVG(v){
   </svg>`;
 }
 
+/* Real vehicle photos by body style (Unsplash), with SVG fallback on error */
+const PHOTOS={
+  Sedan:['1571127236794-81c0bbfe1ce3','1503376780353-7e6692767b70'],
+  SUV:['1519641471654-76ce0107ad1b','1533473359331-0135ef1b58bf'],
+  Crossover:['1609521263047-f8f205293f24','1519641471654-76ce0107ad1b'],
+  Truck:['1605893477799-b99e3b8b93fe'],
+  Coupe:['1552519507-da3b142c6e3d']
+};
+function photoURL(v,w=760,h=475){
+  const a=PHOTOS[v.body]||PHOTOS.Sedan; const id=a[v.id%a.length];
+  return `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&h=${h}&q=68`;
+}
+/* Photo layer: real image on top, SVG illustration behind as instant fallback */
+function photoHTML(v,w,h){
+  return `<div class="vph-svg">${carSVG(v)}</div>`+
+    `<img class="vph-img" src="${photoURL(v,w,h)}" alt="${v.year} ${v.make} ${v.model} for sale at Sherold Salmon Auto Superstore" loading="lazy" onerror="this.remove()">`;
+}
+
 /* ================= Inventory data ================= */
 const INV=[
   {id:1,year:2022,make:'Toyota',model:'RAV4',trim:'XLE Premium',body:'SUV',price:28995,miles:32410,mpg:'27/34',dt:'AWD',fuel:'Gas',trans:'Automatic',color:'Blue',rating:4.9,reviews:64,carfax:'1-Owner',feat:true,deal:'Anniversary Deal',v360:true,video:true,accidents:0,owners:1},
@@ -679,7 +704,7 @@ function vcardHTML(v){
   const cmpChecked=compare.includes(v.id)?'checked':'';
   return `<article class="vcard" data-id="${v.id}">
     <div class="vphoto" onclick="openDetail(${v.id})">
-      ${carSVG(v)}
+      ${photoHTML(v)}
       <div class="badges">
         <span class="pill carfax">✓ CARFAX</span>
         ${v.owners===1?'<span class="pill owner">1-Owner</span>':''}
@@ -834,7 +859,7 @@ function openCompare(){
   ];
   let html=`<div style="overflow-x:auto"><table class="spec-tbl" style="min-width:${vs.length*180+120}px">
     <tr><td></td>${vs.map(v=>`<td style="text-align:center;padding-bottom:10px">
-      <div style="height:90px;border-radius:10px;overflow:hidden;background:#e4ebf3">${carSVG(v)}</div>
+      <div style="height:90px;border-radius:10px;overflow:hidden;background:#e4ebf3;position:relative">${photoHTML(v,300,190)}</div>
       <b style="display:block;margin-top:8px;font-size:13px">${v.year} ${v.make} ${v.model}</b></td>`).join('')}</tr>`;
   rows.forEach(([label,fn])=>{
     html+=`<tr><td style="font-weight:800;color:var(--muted)">${label}</td>${vs.map(v=>`<td style="text-align:center;font-weight:800">${fn(v)}</td>`).join('')}</tr>`;
@@ -842,7 +867,7 @@ function openCompare(){
   html+='</table></div><div style="display:grid;grid-template-columns:repeat('+vs.length+',1fr);gap:10px;margin-top:16px;padding-left:120px" class="cmp-cta">';
   html=html.replace('padding-left:120px','');
   html='<div style="overflow-x:auto"><table class="spec-tbl" style="min-width:'+(vs.length*180+120)+'px"><tr><td></td>'+
-    vs.map(v=>`<td style="text-align:center;padding-bottom:10px"><div style="height:90px;border-radius:10px;overflow:hidden;background:#e4ebf3">${carSVG(v)}</div><b style="display:block;margin-top:8px;font-size:13px">${v.year} ${v.make} ${v.model}</b></td>`).join('')+'</tr>'+
+    vs.map(v=>`<td style="text-align:center;padding-bottom:10px"><div style="height:90px;border-radius:10px;overflow:hidden;background:#e4ebf3;position:relative">${photoHTML(v,300,190)}</div><b style="display:block;margin-top:8px;font-size:13px">${v.year} ${v.make} ${v.model}</b></td>`).join('')+'</tr>'+
     rows.map(([label,fn])=>`<tr><td style="font-weight:800;color:var(--muted)">${label}</td>${vs.map(v=>`<td style="text-align:center;font-weight:800">${fn(v)}</td>`).join('')}</tr>`).join('')+
     `<tr><td></td>${vs.map(v=>`<td style="text-align:center;padding-top:12px"><button class="btn btn-red btn-sm" onclick="openTestDrive(${v.id})">Test Drive</button></td>`).join('')}</tr>`+
     '</table></div>';
@@ -864,12 +889,12 @@ function openDetail(id,view='photo'){
       <div style="text-align:center"><div style="font-size:52px">▶</div><b>Full Walkaround Video</b>
       <div style="font-size:12px;color:#9fb2c7;margin-top:4px">3:24 · Exterior, interior & engine bay</div></div></div>`;
   }else if(view==='360'){
-    mediaPane=`<div class="det-photo" style="aspect-ratio:16/10;position:relative">${carSVG(v)}
-      <div style="position:absolute;inset:0;display:grid;place-items:center;color:#fff;background:rgba(13,27,42,.35)">
+    mediaPane=`<div class="det-photo" style="aspect-ratio:16/10;position:relative">${photoHTML(v,900,560)}
+      <div style="position:absolute;inset:0;z-index:2;display:grid;place-items:center;color:#fff;background:rgba(13,27,42,.4)">
       <div style="text-align:center"><div style="font-size:40px">🔄</div><b>360° Spin View</b>
       <div style="font-size:12px;margin-top:4px">Drag to rotate · Interior + exterior</div></div></div></div>`;
   }else{
-    mediaPane=`<div class="det-photo" style="aspect-ratio:16/10">${carSVG(v)}</div>`;
+    mediaPane=`<div class="det-photo" style="aspect-ratio:16/10">${photoHTML(v,900,560)}</div>`;
   }
   const html=`<div class="det-grid">
     <div>
@@ -958,7 +983,7 @@ function prettyDate(key){const[y,m,d]=key.split('-').map(Number);const dt=new Da
 function openTestDrive(vid){
   const v=vid?INV.find(x=>x.id===vid):null;
   booking={type:'Test Drive',vehicleId:vid,date:null,time:null};
-  const summary=v?`<div class="summary-line"><div class="thumb">${carSVG(v)}</div>
+  const summary=v?`<div class="summary-line"><div class="thumb">${photoHTML(v,220,150)}</div>
      <div><b>${v.year} ${v.make} ${v.model}</b><br><span>${v.trim} · ${money(v.price)} · ${v.miles.toLocaleString()} mi</span></div></div>`:'';
   const html=`${summary}
     <p style="color:var(--muted);font-size:14px;margin-bottom:14px">Pick a day and time — we'll have it pulled up front, cleaned and ready. No pressure, no obligation.</p>
@@ -1007,7 +1032,7 @@ function openService(){
 /* ================= Finance / Pre-approval ================= */
 function openFinance(vid){
   const v=vid?INV.find(x=>x.id===vid):null;
-  const summary=v?`<div class="summary-line"><div class="thumb">${carSVG(v)}</div>
+  const summary=v?`<div class="summary-line"><div class="thumb">${photoHTML(v,220,150)}</div>
      <div><b>${v.year} ${v.make} ${v.model}</b><br><span>${money(v.price)} · est. ${money(estPay(v.price))}/mo</span></div></div>`:'';
   const html=`${summary}
     <p style="color:var(--muted);font-size:14px;margin-bottom:14px">Soft credit check — <b>won't affect your score.</b> All credit types welcome. Most decisions in under a minute.</p>
@@ -1232,7 +1257,7 @@ function toggleMobileNav(v){$('mobileNav').classList.toggle('show',v);}
 /* ================= Hero ================= */
 function initHero(){
   const v=INV.find(x=>x.id===1);
-  $('heroPhoto').innerHTML=carSVG(v);
+  $('heroPhoto').innerHTML=photoHTML(v,760,475);
   $('heroTitle').textContent=`${v.year} ${v.make} ${v.model} ${v.trim}`;
   $('heroPrice').textContent=money(v.price);
   $('heroPhoto').style.cursor='pointer';
