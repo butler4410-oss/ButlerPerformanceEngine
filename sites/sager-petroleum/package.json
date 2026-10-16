@@ -1,0 +1,13 @@
+{
+  "name": "sager-petroleum-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sager Petroleum Solutions storefront prototype served on Railway",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}
