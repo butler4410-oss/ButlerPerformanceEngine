@@ -1,0 +1,3378 @@
+{
+ "_note": "Product names, numbers, categories and pack sizes from primrose.com (pulled 2026-10-16). Summaries written for Sager Petroleum Solutions. price is null until Sager sets pricing; never fill with estimates.",
+ "products": [
+  {
+   "id": "2001",
+   "no": "2001",
+   "name": "Power Blend",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Premium diesel additive that adds detergency, stability and lubricity to standard diesel.",
+   "tags": [
+    "Diesel"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "agriculture",
+    "construction",
+    "oil-gas"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 21,
+   "price": null
+  },
+  {
+   "id": "2002",
+   "no": "2002",
+   "name": "Power Blend",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Premium diesel additive with detergency, stability and lubricity plus Xtreme Torque cetane improver.",
+   "tags": [
+    "Diesel",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "agriculture",
+    "construction",
+    "oil-gas"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 37,
+   "price": null
+  },
+  {
+   "id": "2003",
+   "no": "2003",
+   "name": "Power Blend with Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Premium diesel additive with detergency, stability, lubricity and a strong cetane boost for power.",
+   "tags": [
+    "Diesel",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "agriculture",
+    "construction",
+    "oil-gas"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 2 x 2.5 gal",
+    "Case of 21 x 16 oz",
+    "Case of 24 x 12 oz",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 91,
+   "price": null
+  },
+  {
+   "id": "2010",
+   "no": "2010",
+   "name": "Winter Blend Diesel Fuel Conditioner",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized premium diesel additive with detergency, stability, lubricity and anti-gel.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 2 x 2.5 gal",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 92,
+   "price": null
+  },
+  {
+   "id": "2020",
+   "no": "2020",
+   "name": "Winter Blend",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized premium diesel additive for cold weather operation.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 43,
+   "price": null
+  },
+  {
+   "id": "2030",
+   "no": "2030",
+   "name": "Winter Blend with Ice Check Diesel Fuel Conditioner",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized premium diesel additive plus Ice Check for added protection against fuel line freeze-ups.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 94,
+   "price": null
+  },
+  {
+   "id": "2035",
+   "no": "2035",
+   "name": "Thermal Advantage",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Heating oil additive for residential and commercial furnaces. Improves winter flow and cuts furnace maintenance.",
+   "tags": [
+    "Fuel oil",
+    "Winter"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 95,
+   "price": null
+  },
+  {
+   "id": "3000",
+   "no": "3000",
+   "name": "Phaser 3000",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Fuel stabilizer for gasoline or diesel. Cleans carbon and varnish and is built for ethanol blended gasoline.",
+   "tags": [
+    "Gasoline",
+    "Ethanol",
+    "Stabilizer"
+   ],
+   "ops": [
+    "marine",
+    "agriculture",
+    "fleet"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "Case of 21 x 16 oz",
+    "Case of 24 x 12 oz",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 96,
+   "price": null
+  },
+  {
+   "id": "3030",
+   "no": "3030",
+   "name": "Laser",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Octane booster with detergents and a water dispersant for gasoline and ethanol blends.",
+   "tags": [
+    "Gasoline",
+    "Ethanol"
+   ],
+   "ops": [
+    "marine",
+    "fleet"
+   ],
+   "sizes": [
+    "Case of 24 x 12 oz",
+    "5 gal pail",
+    "55 gal drum"
+   ],
+   "primroseId": 97,
+   "price": null
+  },
+  {
+   "id": "3895",
+   "no": "3895",
+   "name": "Concentrated Tank Cleaner",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Treats stored fuel in steel tanks. Quarterly dose to stabilize, shock dose to polish fuel that has started to turn.",
+   "tags": [
+    "Diesel",
+    "Storage"
+   ],
+   "ops": [
+    "marine",
+    "oil-gas",
+    "industrial",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 126,
+   "price": null
+  },
+  {
+   "id": "400",
+   "no": "400",
+   "name": "Protect-O-Lube",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "The multifunction product Primrose developed for the War Department in the early 1940s. Cleans and lubricates in diesel, gasoline and many oils.",
+   "tags": [
+    "Diesel",
+    "Gasoline"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 39,
+   "price": null
+  },
+  {
+   "id": "4000",
+   "no": "4000",
+   "name": "Winter Power with WASA",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Anti-gel and flow improver for all diesel fuels, plus a cetane booster for quicker cold starts.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 98,
+   "price": null
+  },
+  {
+   "id": "4012",
+   "no": "4012",
+   "name": "Winter Power with Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized premium diesel additive with anti-gel and an ignition improver for quicker cold starts.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 2 x 2.5 gal",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 99,
+   "price": null
+  },
+  {
+   "id": "4013",
+   "no": "4013",
+   "name": "Winter Power with Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized premium diesel additive with anti-gel and a strong cetane improver for power.",
+   "tags": [
+    "Diesel",
+    "Winter",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 100,
+   "price": null
+  },
+  {
+   "id": "402",
+   "no": "402",
+   "name": "Lubri-Power",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Lubricity additive for ultra low and low sulfur diesel. Adds detergency and corrosion protection.",
+   "tags": [
+    "Diesel",
+    "ULSD"
+   ],
+   "ops": [
+    "fleet",
+    "agriculture",
+    "construction"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 40,
+   "price": null
+  },
+  {
+   "id": "4022",
+   "no": "4022",
+   "name": "Winter Power with Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Lets No. 2 diesel qualify as Premium Diesel on detergency, stability and winter operability. Adds an ignition improver.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 101,
+   "price": null
+  },
+  {
+   "id": "4023",
+   "no": "4023",
+   "name": "Winter Power with Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized premium diesel additive covering detergency, stability, lubricity, winter flow and cetane.",
+   "tags": [
+    "Diesel",
+    "Winter",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 102,
+   "price": null
+  },
+  {
+   "id": "403",
+   "no": "403",
+   "name": "Protect-O-Lube Plus",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Fuel stabilizer concentrate for diesel or gasoline. Cleans carbon, gum and varnish and neutralizes engine acids.",
+   "tags": [
+    "Diesel",
+    "Gasoline",
+    "Stabilizer"
+   ],
+   "ops": [
+    "marine",
+    "fleet",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "Case of 21 x 16 oz",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 41,
+   "price": null
+  },
+  {
+   "id": "4032",
+   "no": "4032",
+   "name": "Winter Power with Ice Check",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized premium diesel additive with anti-gel, Ice Check freeze-up protection and an ignition improver.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 103,
+   "price": null
+  },
+  {
+   "id": "4033",
+   "no": "4033",
+   "name": "Winter Power with Ice Check and Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Full winter package for diesel: anti-gel, Ice Check freeze-up protection and a cetane improver.",
+   "tags": [
+    "Diesel",
+    "Winter",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 2 x 2.5 gal",
+    "Case of 21 x 16 oz",
+    "Case of 24 x 12 oz",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 104,
+   "price": null
+  },
+  {
+   "id": "404",
+   "no": "404",
+   "name": "Fire-Power",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Concentrated cetane improver with a fuel stability package for diesel equipment.",
+   "tags": [
+    "Diesel",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 42,
+   "price": null
+  },
+  {
+   "id": "405c",
+   "no": "405C",
+   "name": "Power-Master Plus",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Concentrated cetane improver that keeps diesel engines cleaner and stored fuel more stable.",
+   "tags": [
+    "Diesel",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "Case of 2 x 2.5 gal",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 44,
+   "price": null
+  },
+  {
+   "id": "406",
+   "no": "406",
+   "name": "Injector Perfector",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Fuel system detergent that controls intake valve, port injector and carburetor deposits and adds rust protection.",
+   "tags": [
+    "Gasoline"
+   ],
+   "ops": [
+    "fleet",
+    "marine"
+   ],
+   "sizes": [
+    "Case of 24 x 12 oz",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 45,
+   "price": null
+  },
+  {
+   "id": "409",
+   "no": "409",
+   "name": "Flow-Master",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Keeps No. 2 diesel flowing in sub-zero weather. Costs less per gallon treated than blending kerosene.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 46,
+   "price": null
+  },
+  {
+   "id": "409s",
+   "no": "409S",
+   "name": "Flow-Master",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Alternate Flow-Master cold flow formulation for No. 2 diesel in sub-zero weather.",
+   "tags": [
+    "Diesel",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 47,
+   "price": null
+  },
+  {
+   "id": "410",
+   "no": "410",
+   "name": "HiFlame",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Multifunction fuel oil additive that covers storage, combustion and emissions.",
+   "tags": [
+    "Fuel oil"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 48,
+   "price": null
+  },
+  {
+   "id": "442",
+   "no": "442",
+   "name": "GoMaster Platinum",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Year round diesel treatment for lubricity, moisture, wax and stability problems in stored fuel.",
+   "tags": [
+    "Diesel",
+    "Storage"
+   ],
+   "ops": [
+    "marine",
+    "fleet",
+    "agriculture",
+    "oil-gas"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 49,
+   "price": null
+  },
+  {
+   "id": "5001",
+   "no": "5001",
+   "name": "Klenz ID",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Premium diesel additive for ULSD that cleans up and prevents internal injector deposits in common rail engines.",
+   "tags": [
+    "Diesel",
+    "ULSD"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "agriculture",
+    "construction",
+    "oil-gas"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 105,
+   "price": null
+  },
+  {
+   "id": "5002",
+   "no": "5002",
+   "name": "Power Klenz ID with Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Klenz ID injector deposit control plus Xtreme Torque cetane improver for ULSD.",
+   "tags": [
+    "Diesel",
+    "ULSD",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "agriculture",
+    "construction",
+    "oil-gas"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 106,
+   "price": null
+  },
+  {
+   "id": "5007",
+   "no": "5007",
+   "name": "Power Klenz ID with Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Premium diesel additive for high pressure common rail engines. Cleans injector deposits and adds detergency, stability, lubricity and cetane to ULSD.",
+   "tags": [
+    "Diesel",
+    "ULSD",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "agriculture",
+    "construction",
+    "oil-gas"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 107,
+   "price": null
+  },
+  {
+   "id": "5055",
+   "no": "5055",
+   "name": "Rescue Rx",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Klenz ID family diesel treatment for ULSD and common rail engines. Ask for the TDS to match it to your problem.",
+   "tags": [
+    "Diesel",
+    "ULSD"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "construction"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 119,
+   "price": null
+  },
+  {
+   "id": "5437",
+   "no": "5437",
+   "name": "All Season Klenz with Ice Check and Xtreme Torque",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Year round Klenz diesel treatment with Ice Check and Xtreme Torque cetane improver.",
+   "tags": [
+    "Diesel",
+    "ULSD",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "16 gal keg",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 137,
+   "price": null
+  },
+  {
+   "id": "5750",
+   "no": "5750",
+   "name": "Winter Klenz ID",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized premium diesel additive for ULSD. Injector deposit control, lubricity, filter protection and anti-gel in one dose.",
+   "tags": [
+    "Diesel",
+    "ULSD",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 20,
+   "price": null
+  },
+  {
+   "id": "5757",
+   "no": "5757",
+   "name": "Winter Klenz ID with Ice Check",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized Klenz ID for ULSD with injector deposit control, anti-gel and Ice Check.",
+   "tags": [
+    "Diesel",
+    "ULSD",
+    "Winter"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 109,
+   "price": null
+  },
+  {
+   "id": "6646",
+   "no": "6646",
+   "name": "Winter Klenz ID with Ice Check, Xtreme Torque & WASA",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Winterized Klenz ID for ULSD with injector deposit control, Ice Check, cetane improver and WASA.",
+   "tags": [
+    "Diesel",
+    "ULSD",
+    "Winter",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 123,
+   "price": null
+  },
+  {
+   "id": "6745",
+   "no": "6745",
+   "name": "Winter Klenz ID with Ice Check, Xtreme Torque & WASA",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Alternate 6646 formulation: winterized Klenz ID for ULSD with Ice Check, cetane improver and WASA.",
+   "tags": [
+    "Diesel",
+    "ULSD",
+    "Winter",
+    "Cetane"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 132,
+   "price": null
+  },
+  {
+   "id": "mp8",
+   "no": "MP8",
+   "name": "MP8 Microbicide",
+   "type": "fuel-additives",
+   "types": [
+    "fuel-additives"
+   ],
+   "summary": "Broad spectrum microbicide that kills bacteria and fungi in fuel and industrial systems. Use only as the label directs.",
+   "tags": [
+    "Microbicide",
+    "Storage"
+   ],
+   "ops": [
+    "marine",
+    "oil-gas",
+    "fleet",
+    "industrial"
+   ],
+   "sizes": [
+    "Case of 15 x 16 oz",
+    "5 gal pail",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 110,
+   "price": null
+  },
+  {
+   "id": "217g",
+   "no": "217G",
+   "name": "Armor Plate with Moly-D NGEO",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "15W-40 engine oil for engines running on CNG or LNG. Built for long drain mobile service.",
+   "tags": [
+    "Natural gas",
+    "Moly-D"
+   ],
+   "ops": [
+    "fleet",
+    "oil-gas"
+   ],
+   "sizes": [
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 12,
+   "price": null
+  },
+  {
+   "id": "217m",
+   "no": "217M",
+   "name": "Armor Plate with Moly-D LPG Oil",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Engine oil for natural gas and LPG engines in SAE straight grades and 15W-40.",
+   "tags": [
+    "Natural gas",
+    "Moly-D"
+   ],
+   "ops": [
+    "oil-gas",
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 13,
+   "price": null
+  },
+  {
+   "id": "219",
+   "no": "219",
+   "name": "Odyssey 2000",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Heavy duty synthetic blend moly motor oil. 15W-40, API CI-4 Plus/SM, high TBN for extended drains.",
+   "tags": [
+    "Synthetic blend",
+    "API CI-4 Plus"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 14,
+   "price": null
+  },
+  {
+   "id": "220",
+   "no": "220",
+   "name": "Odyssey 220 2-Cycle Land/Marine Engine Oil",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "2-cycle oil for land and marine engines with fuel stabilization built in.",
+   "tags": [
+    "2-cycle",
+    "Marine"
+   ],
+   "ops": [
+    "marine",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "Case of 24 x 12 oz",
+    "5 gal pail",
+    "55 gal drum"
+   ],
+   "primroseId": 124,
+   "price": null
+  },
+  {
+   "id": "229",
+   "no": "229",
+   "name": "Odyssey 3000",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Heavy duty synthetic blend moly motor oil. 15W-40, API CJ-4/SN, for diesel and gasoline engines.",
+   "tags": [
+    "Synthetic blend",
+    "API CJ-4"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 18,
+   "price": null
+  },
+  {
+   "id": "234",
+   "no": "234",
+   "name": "Odyssey 3400",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Heavy duty synthetic blend moly motor oil. 10W-30 (API CK-4) or 15W-40 (API CK-4/SP) for current diesel engines.",
+   "tags": [
+    "Synthetic blend",
+    "API CK-4"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "construction",
+    "agriculture",
+    "oil-gas"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 115,
+   "price": null
+  },
+  {
+   "id": "238",
+   "no": "238",
+   "name": "Odyssey 1800",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Passenger car motor oil, 0W-20, API SP.",
+   "tags": [
+    "API SP"
+   ],
+   "ops": [
+    "fleet"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 116,
+   "price": null
+  },
+  {
+   "id": "239",
+   "no": "239",
+   "name": "Odyssey 1900",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Passenger car motor oil, 0W-30, API SP.",
+   "tags": [
+    "API SP"
+   ],
+   "ops": [
+    "fleet"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 117,
+   "price": null
+  },
+  {
+   "id": "480m",
+   "no": "480M",
+   "name": "Armor Plate with Moly-D Ultragard",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils",
+    "specialty"
+   ],
+   "summary": "Oil supplement that builds film strength and adds Moly-D to motor, gear, hydraulic and compressor oils.",
+   "tags": [
+    "Moly-D",
+    "Supplement"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "industrial"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 50,
+   "price": null
+  },
+  {
+   "id": "711",
+   "no": "711",
+   "name": "Syn-O-Gen Diesel Engine Oil",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Full synthetic heavy duty diesel engine oil, API CI-4 Plus, built for extended service intervals.",
+   "tags": [
+    "Synthetic",
+    "API CI-4 Plus"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "oil-gas",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 70,
+   "price": null
+  },
+  {
+   "id": "711g",
+   "no": "711G",
+   "name": "Syn-O-Gen Natural Gas Engine Oil",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Full synthetic low ash oil for natural gas engines.",
+   "tags": [
+    "Synthetic",
+    "Natural gas"
+   ],
+   "ops": [
+    "oil-gas",
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 71,
+   "price": null
+  },
+  {
+   "id": "790",
+   "no": "790",
+   "name": "Syn-O-Gen 8 TBN Multigrade Synthetic",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Full synthetic 5W-30 universal motor oil for gasoline and diesel engines.",
+   "tags": [
+    "Synthetic"
+   ],
+   "ops": [
+    "fleet"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 83,
+   "price": null
+  },
+  {
+   "id": "791",
+   "no": "791",
+   "name": "Syn-O-Gen Motor Oil",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Full synthetic universal motor oil, API CI-4 Plus/SL, for diesel and gasoline engines.",
+   "tags": [
+    "Synthetic",
+    "API CI-4 Plus"
+   ],
+   "ops": [
+    "fleet"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 135,
+   "price": null
+  },
+  {
+   "id": "792",
+   "no": "792",
+   "name": "Syn-O-Gen 10 TBN Multigrade Synthetic",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Full synthetic 5W-40 heavy duty motor oil for API CJ-4, CI-4 Plus, CI-4 and CH-4/SN engines.",
+   "tags": [
+    "Synthetic",
+    "API CJ-4"
+   ],
+   "ops": [
+    "fleet",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 118,
+   "price": null
+  },
+  {
+   "id": "793",
+   "no": "793",
+   "name": "Syn-O-Gen Motor Oil",
+   "type": "engine-oils",
+   "types": [
+    "engine-oils"
+   ],
+   "summary": "Full synthetic 5W-40 heavy duty motor oil, API CK-4/SN.",
+   "tags": [
+    "Synthetic",
+    "API CK-4"
+   ],
+   "ops": [
+    "fleet",
+    "construction",
+    "marine"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 128,
+   "price": null
+  },
+  {
+   "id": "303",
+   "no": "303",
+   "name": "Good Stuff",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "White, very tacky grease that stays put under heavy loads and standing water.",
+   "tags": [
+    "Water resistant"
+   ],
+   "ops": [
+    "marine",
+    "construction",
+    "industrial"
+   ],
+   "sizes": [
+    "Carton of 30",
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 31,
+   "price": null
+  },
+  {
+   "id": "311",
+   "no": "311",
+   "name": "Blue Max",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Lithium complex grease rated from minus 25°F with a 500°F dropping point.",
+   "tags": [
+    "Lithium complex"
+   ],
+   "ops": [
+    "fleet",
+    "agriculture",
+    "industrial"
+   ],
+   "sizes": [
+    "Carton of 30",
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 32,
+   "price": null
+  },
+  {
+   "id": "323",
+   "no": "323",
+   "name": "Gin Kleen",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Spindle grease for grease lubricated mechanical cotton pickers.",
+   "tags": [],
+   "ops": [
+    "agriculture"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 33,
+   "price": null
+  },
+  {
+   "id": "324",
+   "no": "324",
+   "name": "Plunger Grease",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Multipurpose pass-through grease for grease lubricated plungers.",
+   "tags": [],
+   "ops": [
+    "oil-gas",
+    "industrial"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 34,
+   "price": null
+  },
+  {
+   "id": "325",
+   "no": "325",
+   "name": "Mining Grease",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Grease built for most mining applications.",
+   "tags": [],
+   "ops": [
+    "construction",
+    "industrial"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum"
+   ],
+   "primroseId": 134,
+   "price": null
+  },
+  {
+   "id": "327",
+   "no": "327",
+   "name": "Armor Plate with Moly-D Multipurpose Grease",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Green moly grease made with dissolved moly instead of black moly disulfide. Stable across a wide range of heat and load.",
+   "tags": [
+    "Moly-D",
+    "Multipurpose"
+   ],
+   "ops": [
+    "fleet",
+    "marine",
+    "agriculture",
+    "construction",
+    "oil-gas",
+    "industrial"
+   ],
+   "sizes": [
+    "Carton of 30",
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 35,
+   "price": null
+  },
+  {
+   "id": "327c",
+   "no": "327C",
+   "name": "Armor Plate with Moly-D NLGI No. 3",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Heavier, tackier NLGI 3 Armor Plate for high pressure and hot running equipment.",
+   "tags": [
+    "Moly-D",
+    "NLGI 3"
+   ],
+   "ops": [
+    "construction",
+    "oil-gas",
+    "industrial"
+   ],
+   "sizes": [
+    "Carton of 30",
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 36,
+   "price": null
+  },
+  {
+   "id": "357",
+   "no": "357",
+   "name": "Armor Plate with Moly-D MAGNUM Multipurpose Grease",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Green moly multipurpose grease for a wide range of temperatures and working conditions.",
+   "tags": [
+    "Moly-D",
+    "Multipurpose"
+   ],
+   "ops": [
+    "construction",
+    "agriculture",
+    "fleet"
+   ],
+   "sizes": [
+    "Carton of 30",
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 38,
+   "price": null
+  },
+  {
+   "id": "358",
+   "no": "358",
+   "name": "Corn Head Grease",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Semi-fluid grease for corn head gearboxes and enclosed systems under changing loads and temperatures.",
+   "tags": [],
+   "ops": [
+    "agriculture"
+   ],
+   "sizes": [
+    "Carton of 30",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum"
+   ],
+   "primroseId": 138,
+   "price": null
+  },
+  {
+   "id": "558",
+   "no": "558",
+   "name": "Enviro Blend 558",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Non-toxic valve and bearing grease for parts in contact with water. Suited to environmentally sensitive areas.",
+   "tags": [
+    "Non-toxic"
+   ],
+   "ops": [
+    "marine",
+    "industrial",
+    "oil-gas"
+   ],
+   "sizes": [
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum"
+   ],
+   "primroseId": 139,
+   "price": null
+  },
+  {
+   "id": "777",
+   "no": "777",
+   "name": "Syn-O-Gen Synthetic Grease",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "Full synthetic multipurpose industrial grease for wide temperature ranges.",
+   "tags": [
+    "Synthetic",
+    "Multipurpose"
+   ],
+   "ops": [
+    "industrial",
+    "marine",
+    "construction"
+   ],
+   "sizes": [
+    "Carton of 30",
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 81,
+   "price": null
+  },
+  {
+   "id": "fg-80",
+   "no": "FG-80",
+   "name": "Enviro Blend Calcium Sulphonate Food Grade Grease",
+   "type": "greases",
+   "types": [
+    "greases"
+   ],
+   "summary": "NSF H1 calcium sulphonate grease for food grade or calcium sulphonate applications.",
+   "tags": [
+    "Food grade H-1"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "Carton of 30",
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 133,
+   "price": null
+  },
+  {
+   "id": "216g",
+   "no": "216G",
+   "name": "Enviro Blend Food Grade Gear Oil",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "NSF H-1 extreme pressure gear oil for food machinery gearboxes.",
+   "tags": [
+    "Food grade H-1"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 11,
+   "price": null
+  },
+  {
+   "id": "510m",
+   "no": "510M",
+   "name": "Armor Plate with Moly-D Multipurpose XHP Gear Lubricant",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Multipurpose gear oil for transmissions, differentials and worm gears in fleet, farm and construction equipment.",
+   "tags": [
+    "Moly-D",
+    "Extreme pressure"
+   ],
+   "ops": [
+    "fleet",
+    "agriculture",
+    "construction"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 52,
+   "price": null
+  },
+  {
+   "id": "512m",
+   "no": "512M",
+   "name": "Armor Plate with Moly-D XHP Gear Lubricant",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Multigrade gear oil for axles and transmissions that holds viscosity under extreme pressure.",
+   "tags": [
+    "Moly-D",
+    "Multigrade"
+   ],
+   "ops": [
+    "fleet",
+    "construction"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 53,
+   "price": null
+  },
+  {
+   "id": "513m",
+   "no": "513M",
+   "name": "Armor Plate with Moly-D XHP Gear Lubricant",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Multigrade gear oil for axles and transmissions in summer and winter. Shear stable under extreme pressure.",
+   "tags": [
+    "Moly-D",
+    "Multigrade"
+   ],
+   "ops": [
+    "fleet",
+    "construction"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 54,
+   "price": null
+  },
+  {
+   "id": "514m",
+   "no": "514M",
+   "name": "Armor Plate with Moly-D Industrial XHP Gear Lubricant",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Industrial gear oil for the higher temperatures and pressures in modern gearboxes.",
+   "tags": [
+    "Moly-D",
+    "Extreme pressure"
+   ],
+   "ops": [
+    "industrial",
+    "oil-gas"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 55,
+   "price": null
+  },
+  {
+   "id": "555",
+   "no": "555",
+   "name": "Armor Plate with Moly-D EP Open Gear Lubricant",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Adhesive green grease for open gears, cables, guide rails and fifth wheels in exposed conditions.",
+   "tags": [
+    "Moly-D",
+    "Extreme pressure"
+   ],
+   "ops": [
+    "oil-gas",
+    "construction",
+    "fleet",
+    "marine"
+   ],
+   "sizes": [
+    "Carton of 50",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "400 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 59,
+   "price": null
+  },
+  {
+   "id": "556",
+   "no": "556",
+   "name": "Emerald Shield",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Very heavy fluid for large shrouded open gears where flow is needed.",
+   "tags": [],
+   "ops": [
+    "industrial",
+    "oil-gas"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "420 lb drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 60,
+   "price": null
+  },
+  {
+   "id": "714m",
+   "no": "714M",
+   "name": "Armor Plate with Moly-D Gear & Mud Pump Oil",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Gear oil for large high pressure reciprocating mud pumps on drilling rigs.",
+   "tags": [
+    "Moly-D"
+   ],
+   "ops": [
+    "oil-gas"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 72,
+   "price": null
+  },
+  {
+   "id": "743",
+   "no": "743",
+   "name": "Syn-O-Gen Synthetic EP Gear Lubricant 75W-140",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Full synthetic GL-5 gear oil, 75W-140, for heavy duty automotive gears.",
+   "tags": [
+    "Synthetic",
+    "GL-5"
+   ],
+   "ops": [
+    "fleet",
+    "construction"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 73,
+   "price": null
+  },
+  {
+   "id": "744",
+   "no": "744",
+   "name": "Syn-O-Gen Synthetic CD-50 Transmission",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants",
+    "transmissions"
+   ],
+   "summary": "Full synthetic lubricant for heavy duty manual transmissions.",
+   "tags": [
+    "Synthetic"
+   ],
+   "ops": [
+    "fleet",
+    "construction"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 74,
+   "price": null
+  },
+  {
+   "id": "745",
+   "no": "745",
+   "name": "Syn-O-Gen Synthetic EP Gear Lubricant 75W-90",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Full synthetic GL-5 gear oil, 75W-90, for rear axles and heavy duty gear drives.",
+   "tags": [
+    "Synthetic",
+    "GL-5"
+   ],
+   "ops": [
+    "fleet"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 75,
+   "price": null
+  },
+  {
+   "id": "746",
+   "no": "746",
+   "name": "Syn-O-Gen Synthetic EP Gear Lubricant 80W-140",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Full synthetic GL-5 gear oil, 80W-140, for rear axles and heavy duty gear drives.",
+   "tags": [
+    "Synthetic",
+    "GL-5"
+   ],
+   "ops": [
+    "fleet",
+    "construction"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 76,
+   "price": null
+  },
+  {
+   "id": "747s",
+   "no": "747S",
+   "name": "Syn-O-Gen Synthetic Industrial Gear Lubricant",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Synthetic extreme pressure industrial gear oil for long life in enclosed gear drives.",
+   "tags": [
+    "Synthetic",
+    "Extreme pressure"
+   ],
+   "ops": [
+    "industrial",
+    "oil-gas"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 77,
+   "price": null
+  },
+  {
+   "id": "b680",
+   "no": "B680",
+   "name": "Enviro Blend Gear Oil",
+   "type": "gear-lubricants",
+   "types": [
+    "gear-lubricants"
+   ],
+   "summary": "Biodegradable, non-toxic industrial gear oil.",
+   "tags": [
+    "Biodegradable",
+    "Non-toxic"
+   ],
+   "ops": [
+    "marine",
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 68,
+   "price": null
+  },
+  {
+   "id": "210",
+   "no": "210",
+   "name": "Uni-Vis Industrial Hydraulic Oil",
+   "type": "hydraulic",
+   "types": [
+    "hydraulic"
+   ],
+   "summary": "Hydraulic oil in light, medium and heavy weights with good cold flow and a high viscosity index.",
+   "tags": [],
+   "ops": [
+    "industrial",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 3,
+   "price": null
+  },
+  {
+   "id": "210m",
+   "no": "210M",
+   "name": "Armor Plate with Moly-D Industrial Hydraulic Oil",
+   "type": "hydraulic",
+   "types": [
+    "hydraulic"
+   ],
+   "summary": "Moly-D hydraulic oil in light, medium and heavy weights for a wide range of hydraulic systems.",
+   "tags": [
+    "Moly-D"
+   ],
+   "ops": [
+    "industrial",
+    "construction",
+    "oil-gas"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 4,
+   "price": null
+  },
+  {
+   "id": "216",
+   "no": "216",
+   "name": "Enviro Blend Food Grade Hydraulic Oil",
+   "type": "hydraulic",
+   "types": [
+    "hydraulic"
+   ],
+   "summary": "NSF H-1 hydraulic oil for food processing, packaging and transport equipment. Two viscosity grades.",
+   "tags": [
+    "Food grade H-1"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 10,
+   "price": null
+  },
+  {
+   "id": "253",
+   "no": "253",
+   "name": "Odyssey THF",
+   "type": "hydraulic",
+   "types": [
+    "hydraulic",
+    "tractor"
+   ],
+   "summary": "Synthetic blend tractor hydraulic and transmission fluid for farm, construction and industrial equipment.",
+   "tags": [
+    "Synthetic blend"
+   ],
+   "ops": [
+    "agriculture",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 28,
+   "price": null
+  },
+  {
+   "id": "788",
+   "no": "788",
+   "name": "Syn-O-Gen Synthetic THC Fluid",
+   "type": "hydraulic",
+   "types": [
+    "hydraulic"
+   ],
+   "summary": "Full synthetic multigrade fluid for most turbine, hydraulic and compressor applications.",
+   "tags": [
+    "Synthetic"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 82,
+   "price": null
+  },
+  {
+   "id": "789",
+   "no": "789",
+   "name": "Syn-O-Gen Synthetic AW Hydraulic Oil",
+   "type": "hydraulic",
+   "types": [
+    "hydraulic"
+   ],
+   "summary": "100% PAO synthetic anti-wear hydraulic oil for very hot or very cold service.",
+   "tags": [
+    "Synthetic"
+   ],
+   "ops": [
+    "industrial",
+    "construction",
+    "marine"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "16 gal keg",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 136,
+   "price": null
+  },
+  {
+   "id": "b660",
+   "no": "B660",
+   "name": "Enviro Blend Hydraulic Oil",
+   "type": "hydraulic",
+   "types": [
+    "hydraulic"
+   ],
+   "summary": "Non-toxic hydraulic oil that biodegrades rapidly if spilled and still delivers anti-wear protection in service.",
+   "tags": [
+    "Biodegradable",
+    "Non-toxic"
+   ],
+   "ops": [
+    "marine",
+    "construction",
+    "industrial",
+    "oil-gas"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 67,
+   "price": null
+  },
+  {
+   "id": "251",
+   "no": "251",
+   "name": "Odyssey No. 251 ATF/CVT/E-Mobility Fluid",
+   "type": "transmissions",
+   "types": [
+    "transmissions"
+   ],
+   "summary": "Fluid for automatic transmissions, CVTs and electric vehicle components.",
+   "tags": [],
+   "ops": [
+    "fleet"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 25,
+   "price": null
+  },
+  {
+   "id": "501",
+   "no": "501",
+   "name": "AlliCat Heavy Duty Transmission Lubricant",
+   "type": "transmissions",
+   "types": [
+    "transmissions"
+   ],
+   "summary": "Transmission and drive train fluid that meets the Caterpillar TO-4 specification.",
+   "tags": [
+    "Cat TO-4"
+   ],
+   "ops": [
+    "construction",
+    "oil-gas",
+    "agriculture"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 51,
+   "price": null
+  },
+  {
+   "id": "752",
+   "no": "752",
+   "name": "Syn-O-Gen Premium Manual Transmission Lubricant",
+   "type": "transmissions",
+   "types": [
+    "transmissions"
+   ],
+   "summary": "100% PAO synthetic lubricant for heavy duty manual transmissions.",
+   "tags": [
+    "Synthetic"
+   ],
+   "ops": [
+    "fleet",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 121,
+   "price": null
+  },
+  {
+   "id": "252",
+   "no": "252",
+   "name": "Primrose Plus Universal Torque Converter",
+   "type": "torque",
+   "types": [
+    "torque",
+    "hydraulic",
+    "tractor"
+   ],
+   "summary": "Universal tractor transmission oil (UTTO) for gears, pumps, final drives, wet brakes and PTO clutches.",
+   "tags": [
+    "UTTO"
+   ],
+   "ops": [
+    "agriculture",
+    "construction"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 26,
+   "price": null
+  },
+  {
+   "id": "252r",
+   "no": "252R",
+   "name": "Primrose Plus Universal Torque Converter Fluid",
+   "type": "torque",
+   "types": [
+    "torque",
+    "hydraulic",
+    "tractor"
+   ],
+   "summary": "UTTO fluid for tractor transmissions, hydraulics, wet brakes and PTO clutches across most makes.",
+   "tags": [
+    "UTTO"
+   ],
+   "ops": [
+    "agriculture",
+    "construction"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 27,
+   "price": null
+  },
+  {
+   "id": "255",
+   "no": "255",
+   "name": "Twin Disc 3-Stage Torque Fluid",
+   "type": "torque",
+   "types": [
+    "torque"
+   ],
+   "summary": "Torque fluid built to Twin Disc requirements for three stage torque converter units.",
+   "tags": [],
+   "ops": [
+    "oil-gas",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 29,
+   "price": null
+  },
+  {
+   "id": "201",
+   "no": "201",
+   "name": "Primrose Plus Non-Detergent Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Pure mineral oil in SAE 10, 20, 30, 40 and 50 for equipment that calls for a non-detergent oil.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 1,
+   "price": null
+  },
+  {
+   "id": "203m",
+   "no": "203M",
+   "name": "Armor Plate with Moly-D Machine & Way Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Way oil for machine tool slides. Holds its film under heavy loads to cut stick-slip and keep parts on size.",
+   "tags": [
+    "Moly-D"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 2,
+   "price": null
+  },
+  {
+   "id": "204",
+   "no": "204",
+   "name": "Primrose Plus Saw Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Saw oil built to extend blade life and time between maintenance.",
+   "tags": [],
+   "ops": [
+    "industrial",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 127,
+   "price": null
+  },
+  {
+   "id": "210v",
+   "no": "210V",
+   "name": "Armor Plate with Moly-D Vacuum Pump Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Vacuum pump oil in light, medium and heavy weights with good cold flow and a high viscosity index.",
+   "tags": [
+    "Moly-D"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 5,
+   "price": null
+  },
+  {
+   "id": "211m",
+   "no": "211M",
+   "name": "Armor Plate with Moly-D Industrial Multigrade Hydraulic",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Multigrade hydraulic oil for equipment that works through wide temperature swings.",
+   "tags": [
+    "Moly-D"
+   ],
+   "ops": [
+    "industrial",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 6,
+   "price": null
+  },
+  {
+   "id": "212a",
+   "no": "212A",
+   "name": "Uni-Vis",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils",
+    "hydraulic"
+   ],
+   "summary": "Industrial oil with an ashless anti-wear package. Offered in all viscosities.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum"
+   ],
+   "primroseId": 114,
+   "price": null
+  },
+  {
+   "id": "212m",
+   "no": "212M",
+   "name": "Armor Plate with Moly-D Multifunction Industrial Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils",
+    "hydraulic"
+   ],
+   "summary": "One industrial oil for many jobs. Offered in all viscosities with good cold flow.",
+   "tags": [
+    "Moly-D"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 7,
+   "price": null
+  },
+  {
+   "id": "213m",
+   "no": "213M",
+   "name": "Armor Plate with Moly-D Multifunction Industrial Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils",
+    "hydraulic"
+   ],
+   "summary": "Emerald green multigrade industrial oil built for wide ambient temperature swings.",
+   "tags": [
+    "Moly-D"
+   ],
+   "ops": [
+    "industrial",
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 8,
+   "price": null
+  },
+  {
+   "id": "213r",
+   "no": "213R",
+   "name": "Primrose Plus HD Rock Drill Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Extreme pressure rock drill oil with adhesive properties. Three viscosity grades for any season and any make of drill.",
+   "tags": [],
+   "ops": [
+    "construction",
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 9,
+   "price": null
+  },
+  {
+   "id": "225",
+   "no": "225",
+   "name": "Primrose Plus Water Soluble Cutting Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Emulsifiable cutting fluid that pulls heat away fast and resists going rancid.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 16,
+   "price": null
+  },
+  {
+   "id": "226",
+   "no": "226",
+   "name": "Kool-Kut Sulfurized Cutting Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Heavy duty cutting oil for threading, tapping, broaching and hard to machine alloys.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 17,
+   "price": null
+  },
+  {
+   "id": "230",
+   "no": "230",
+   "name": "Primrose Plus Spindle & Loom Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Non-staining, non-corrosive oil for high speed spindles and looms.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 19,
+   "price": null
+  },
+  {
+   "id": "236",
+   "no": "236",
+   "name": "Primrose Plus Air Compressor Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Rust and oxidation inhibited compressor oil that keeps carbon deposits in check.",
+   "tags": [],
+   "ops": [
+    "industrial",
+    "oil-gas"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 22,
+   "price": null
+  },
+  {
+   "id": "242",
+   "no": "242",
+   "name": "Primrose Plus Turbine Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Turbine oil for steam, water and gas turbines in power generation.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 23,
+   "price": null
+  },
+  {
+   "id": "258",
+   "no": "258",
+   "name": "Odyssey AW",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils",
+    "hydraulic"
+   ],
+   "summary": "Synthetic blend anti-wear hydraulic oil in ISO grades with strong oxidation stability.",
+   "tags": [
+    "Synthetic blend"
+   ],
+   "ops": [
+    "industrial",
+    "construction",
+    "marine"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 30,
+   "price": null
+  },
+  {
+   "id": "400p",
+   "no": "400P",
+   "name": "Protectolube 4000",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Multifunction penetrating lubricant in 12 oz cans. Cleans as it lubricates.",
+   "tags": [
+    "Aerosol"
+   ],
+   "ops": [
+    "marine",
+    "fleet",
+    "industrial"
+   ],
+   "sizes": [
+    "Case of 12 x 12 oz"
+   ],
+   "primroseId": 113,
+   "price": null
+  },
+  {
+   "id": "750",
+   "no": "750",
+   "name": "Syn-O-Gen Synthetic Tenter Frame Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Anti-wear synthetic ISO 220 oil for tenter frames.",
+   "tags": [
+    "Synthetic"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 79,
+   "price": null
+  },
+  {
+   "id": "815",
+   "no": "815",
+   "name": "Heat Transfer Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Heat transfer oil for closed, forced circulation systems up to 600°F.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 86,
+   "price": null
+  },
+  {
+   "id": "817",
+   "no": "817",
+   "name": "Primrose Plus Flushing Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Flushing oil that removes sludge and deposits and leaves surfaces rust protected.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 87,
+   "price": null
+  },
+  {
+   "id": "884",
+   "no": "884",
+   "name": "Air Line Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Lubricant for reciprocating and rotary pneumatic tools.",
+   "tags": [],
+   "ops": [
+    "industrial",
+    "construction",
+    "fleet"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 88,
+   "price": null
+  },
+  {
+   "id": "b66r",
+   "no": "B66R",
+   "name": "Enviro Blend Biodegradable Rock Drill Oil",
+   "type": "industrial-oils",
+   "types": [
+    "industrial-oils"
+   ],
+   "summary": "Biodegradable synthetic blend rock drill oil with adhesive properties.",
+   "tags": [
+    "Biodegradable",
+    "Synthetic blend"
+   ],
+   "ops": [
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 66,
+   "price": null
+  },
+  {
+   "id": "222",
+   "no": "222",
+   "name": "Neatsfoot Oil Compound",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Leather dressing for saddles, boots, belts and other leather goods.",
+   "tags": [],
+   "ops": [
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "35 gal drum",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 15,
+   "price": null
+  },
+  {
+   "id": "243",
+   "no": "243",
+   "name": "Cylinder Oil",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Steam cylinder and worm gear oil. Resists foam and rust and separates readily from condensate.",
+   "tags": [],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "6 gal pail",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 24,
+   "price": null
+  },
+  {
+   "id": "532t",
+   "no": "532T",
+   "name": "Seal Saver",
+   "type": "specialty",
+   "types": [
+    "specialty",
+    "hydraulic",
+    "tractor"
+   ],
+   "summary": "Additive concentrate that conditions seals in tractor and industrial hydraulic fluid to slow and stop leaks.",
+   "tags": [
+    "Supplement"
+   ],
+   "ops": [
+    "agriculture",
+    "construction",
+    "industrial"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "Case of 24 x 1 qt",
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 57,
+   "price": null
+  },
+  {
+   "id": "548",
+   "no": "548",
+   "name": "Armor Plate with Moly-D Chain & Cable Lubricant",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Green moly lubricant that clings to chains, sprockets, cables and wire rope.",
+   "tags": [
+    "Moly-D"
+   ],
+   "ops": [
+    "marine",
+    "oil-gas",
+    "construction"
+   ],
+   "sizes": [
+    "Case of 15 x 1 qt",
+    "Case of 24 x 1 qt",
+    "35 lb pail",
+    "50 lb pail",
+    "120 lb keg",
+    "260 lb drum",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 58,
+   "price": null
+  },
+  {
+   "id": "548a",
+   "no": "548A",
+   "name": "Armor Plate with Moly-D Chain & Cable Lubricant (Aerosol)",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Aerosol version of 548 for chains, sprockets, cables and wire rope.",
+   "tags": [
+    "Moly-D",
+    "Aerosol"
+   ],
+   "ops": [
+    "marine",
+    "construction",
+    "industrial"
+   ],
+   "sizes": [
+    "Case of 12 x 12 oz"
+   ],
+   "primroseId": 140,
+   "price": null
+  },
+  {
+   "id": "621",
+   "no": "621",
+   "name": "Superior Spreader Surfactant",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Spray adjuvant that improves coverage of agricultural chemicals.",
+   "tags": [],
+   "ops": [
+    "agriculture"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 62,
+   "price": null
+  },
+  {
+   "id": "623",
+   "no": "623",
+   "name": "Spindle Bright",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Water dispersible cleaner and lubricant for cotton picker spindles.",
+   "tags": [],
+   "ops": [
+    "agriculture"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 63,
+   "price": null
+  },
+  {
+   "id": "625",
+   "no": "625",
+   "name": "Kut Down",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Water dispersible coolant and lubricant for cutting, drilling and coring concrete. Also controls dust.",
+   "tags": [],
+   "ops": [
+    "construction"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "Bulk delivery"
+   ],
+   "primroseId": 64,
+   "price": null
+  },
+  {
+   "id": "713",
+   "no": "713",
+   "name": "Syn-O-Gen Cylinder Oil",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Pure synthetic cylinder oil.",
+   "tags": [
+    "Synthetic"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "5 gal pail",
+    "55 gal drum",
+    "275 gal tote"
+   ],
+   "primroseId": 125,
+   "price": null
+  },
+  {
+   "id": "748",
+   "no": "748",
+   "name": "Syn-O-Gen Synthetic Industrial Chain Lubricant",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Synthetic extreme pressure lubricant for industrial chain drives.",
+   "tags": [
+    "Synthetic"
+   ],
+   "ops": [
+    "industrial"
+   ],
+   "sizes": [
+    "35 lb pail",
+    "50 lb pail",
+    "420 lb drum",
+    "2100 lb tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 78,
+   "price": null
+  },
+  {
+   "id": "b620",
+   "no": "B620",
+   "name": "Quik-Solv Cleaner Concentrate",
+   "type": "specialty",
+   "types": [
+    "specialty"
+   ],
+   "summary": "Biodegradable cleaner and degreaser. Mix with water or solvent.",
+   "tags": [
+    "Biodegradable"
+   ],
+   "ops": [
+    "marine",
+    "industrial",
+    "fleet"
+   ],
+   "sizes": [
+    "Case of 6 x 1 gal",
+    "5 gal pail",
+    "6 gal pail",
+    "55 gal drum",
+    "275 gal tote",
+    "Bulk delivery"
+   ],
+   "primroseId": 61,
+   "price": null
+  }
+ ]
+}
